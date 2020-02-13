@@ -3,8 +3,15 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
+      <template v-if="$store.getters.hasRole('ROLE_USER')">
+        | <router-link to="/user">User</router-link>
+      </template>
+
+      <template v-if="$store.getters.hasRole('ROLE_ADMIN')">
+        | <router-link to="/admin">Admin</router-link>
+      </template>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
