@@ -8,7 +8,10 @@
 
     <p
       v-if="$store.getters.isAuthenticated"
-    >{{$store.state.account.username}} - {{$store.state.account.roles}}</p>
+    >{{ $store.state.account.username }} - {{ $store.state.account.roles }}</p>
+
+    <p>{{ $store.state.auth }}</p>
+    <p>{{ $store.state.csrf }}</p>
   </div>
 </template>
 

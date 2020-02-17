@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import JwtDecode from 'jwt-decode';
 
 Vue.use(Vuex);
@@ -16,33 +16,72 @@ interface JwtTokenData {
 
 interface State {
   account: {
-    token: string | null;
-    username: string | null;
-    roles: string[];
     profile: string | null;
+    roles: string[];
+    username: string | null;
+  };
+  auth: {
+    token: string | null;
+  };
+  csrf: {
+    header: string | null;
+    interceptor: number | null;
+    token: string | null;
   };
 }
 
 const initialState: State = {
   account: {
-    token: null,
-    username: null,
-    roles: [],
     profile: null,
+    roles: [],
+    username: null,
+  },
+  auth: {
+    token: null,
+  },
+  csrf: {
+    header: null,
+    interceptor: null,
+    token: null,
   },
 };
 
 export default new Vuex.Store({
   state: initialState,
   getters: {
-    isAuthenticated: (state): boolean => !!state.account.token,
+    isAuthenticated: (state: State): boolean => !!state.auth.token,
     hasRole: (state) => (role: string): boolean => state.account.roles.includes(role),
   },
   mutations: {
-    setToken(state, token) {
+    setCsrfToken(state: State, csrf: { token: string | null; header: string | null }) {
+      // Reset existing interceptor
+      const { interceptor } = state.csrf;
+
+      if (interceptor !== null) {
+        axios.interceptors.request.eject(interceptor);
+        state.csrf.interceptor = null;
+      }
+
+      // Update token and configure interceptor
+      state.csrf.header = csrf.header;
+      state.csrf.token = csrf.token;
+
+      state.csrf.interceptor = axios.interceptors.request.use((config: AxiosRequestConfig) => {
+        const result = { ...config };
+
+        const required = ['POST', 'PUT', 'DELETE'].includes((config.method as string).toUpperCase());
+
+        if (csrf.token && csrf.header && required) {
+          result.headers[csrf.header] = csrf.token;
+        }
+        return result;
+      });
+    },
+    setAccessToken(state, token) {
       const data: JwtTokenData = JwtDecode(token);
 
-      state.account.token = token;
+      state.auth.token = token;
+
       state.account.username = data.sub;
       state.account.roles = data.roles;
 
@@ -52,7 +91,10 @@ export default new Vuex.Store({
       state.account.profile = profile;
     },
     logout(state) {
-      state.account.token = null;
+      state.auth.token = null;
+
+      state.account.username = null;
+      state.account.roles = [];
       state.account.profile = null;
 
       axios.defaults.headers = null;

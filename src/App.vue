@@ -24,9 +24,25 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
+import store from './store';
+
 @Component
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/api-docs.html`;
+
+  mounted() {
+    // Initialize CSRF token
+    const token = document
+      .querySelector('meta[name=_csrf]')
+      ?.getAttribute('content');
+    const header = document
+      .querySelector('meta[name=_csrf_header]')
+      ?.getAttribute('content');
+
+    if (token && header) {
+      store.commit('setCsrfToken', { token, header });
+    }
+  }
 }
 </script>
 

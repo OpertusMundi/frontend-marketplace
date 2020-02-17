@@ -15,7 +15,7 @@ export default class Callback extends Vue {
     const token = this.$route?.hash?.substring(1);
 
     if (token) {
-      store.commit('setToken', token);
+      store.commit('setAccessToken', token);
 
       axios.get('/action/profile').then((response) => {
         store.commit('setProfile', response.data);
