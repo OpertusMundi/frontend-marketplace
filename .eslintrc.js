@@ -12,7 +12,17 @@ module.exports = {
     ecmaVersion: 2020,
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    /** 
+     * Configure airbnb eslint rules for vue.js component lifecycle methods
+     * 
+     * See; https://github.com/vuejs/vue-cli/issues/1203#issuecomment-452471826
+     */
+    'class-methods-use-this': ['error', {
+      exceptMethods: [
+        'mounted',
+      ],
+    }],
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
   overrides: [
