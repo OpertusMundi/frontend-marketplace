@@ -16,6 +16,10 @@
       <a v-bind:href="apiUrl" target="_blank">
         <img class="logo-image" src="./assets/oas.svg" alt="OPERTUS MUNDI API documentation" />
       </a>
+      <template v-if="$store.getters.isAuthenticated">
+        {{ "|" }}
+        <a v-on:click.prevent="logout()">Logout</a>
+      </template>
     </div>
     <router-view />
   </div>
@@ -42,6 +46,14 @@ export default class App extends Vue {
     if (token && header) {
       store.commit('setCsrfToken', { token, header });
     }
+  }
+
+  logout() {
+    const router = this.$router;
+
+    store.dispatch('logout').then(() => {
+      router.push({ name: 'Home' });
+    });
   }
 }
 </script>

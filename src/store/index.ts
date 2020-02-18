@@ -101,6 +101,12 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    logout(context) {
+      return new Promise((resolve, reject) => {
+        context.commit('logout');
+        resolve(true);
+      });
+    },
   },
   modules: {
   },
