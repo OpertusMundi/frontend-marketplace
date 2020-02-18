@@ -22,7 +22,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
 
-  loginUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/login/helix`;
+  loginUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/login/opertus-mundi`;
 }
 </script>
 
