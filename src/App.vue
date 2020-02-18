@@ -28,6 +28,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
+import axios from 'axios';
+
 import store from './store';
 
 @Component
@@ -46,6 +48,11 @@ export default class App extends Vue {
     if (token && header) {
       store.commit('setCsrfToken', { token, header });
     }
+
+    // Get initial confgiuration
+    axios.get('/action/configuration/el').then((response: any) => {
+      console.log(response.data);
+    });
   }
 
   logout() {
