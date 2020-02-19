@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import JwtDecode from 'jwt-decode';
 
-import { Configuration } from '@/model';
+import { Configuration, LogoutSuccessResult, ServerResponse } from '@/model';
 
 Vue.use(Vuex);
 
@@ -53,8 +53,9 @@ const initialState: State = {
 export default new Vuex.Store({
   state: initialState,
   getters: {
-    isAuthenticated: (state: State): boolean => !!state.auth.token,
+    csrfHeader: (state: State): string | null => state.csrf.header,
     hasRole: (state) => (role: string): boolean => state.account.roles.includes(role),
+    isAuthenticated: (state: State): boolean => !!state.auth.token,
   },
   mutations: {
     setCsrfToken(state: State, csrf: { token: string | null; header: string | null }) {
@@ -109,9 +110,16 @@ export default new Vuex.Store({
   },
   actions: {
     logout(context) {
-      return new Promise((resolve) => {
-        context.commit('logout');
-        resolve(true);
+      return axios.post('/logout', new FormData()).then((response: AxiosResponse<ServerResponse<LogoutSuccessResult>>) => {
+        const { data } = response;
+
+        if (data?.success && data?.result) {
+          // Update CSRF token
+          context.commit('setCsrfToken', { token: data.result.csrfToken, header: data.result.csrfHeader });
+
+          // Reset session
+          context.commit('logout');
+        }
       });
     },
   },

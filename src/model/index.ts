@@ -1,4 +1,8 @@
 export {
+  LogoutSuccessResult,
+} from '@/model/auth';
+
+export {
   Configuration,
   EnumAuthProvider,
 } from '@/model/configuration';
