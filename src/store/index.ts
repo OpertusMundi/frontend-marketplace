@@ -4,6 +4,8 @@ import Vuex from 'vuex';
 import axios, { AxiosRequestConfig } from 'axios';
 import JwtDecode from 'jwt-decode';
 
+import { Configuration } from '@/model';
+
 Vue.use(Vuex);
 
 interface JwtTokenData {
@@ -23,6 +25,7 @@ interface State {
   auth: {
     token: string | null;
   };
+  configuration: Configuration | null;
   csrf: {
     header: string | null;
     interceptor: number | null;
@@ -39,6 +42,7 @@ const initialState: State = {
   auth: {
     token: null,
   },
+  configuration: null,
   csrf: {
     header: null,
     interceptor: null,
@@ -87,6 +91,9 @@ export default new Vuex.Store({
 
       axios.defaults.headers = { Authorization: `Bearer ${token}` };
     },
+    setConfiguration(state: State, configuration: Configuration) {
+      state.configuration = configuration;
+    },
     setProfile(state, profile) {
       state.account.profile = profile;
     },
@@ -102,7 +109,7 @@ export default new Vuex.Store({
   },
   actions: {
     logout(context) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         context.commit('logout');
         resolve(true);
       });

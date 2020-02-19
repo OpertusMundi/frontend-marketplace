@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
 
     <p v-if="!$store.getters.isAuthenticated">
-      <a v-bind:href="loginUrl" rel="noopener">Login HELIX</a>
+      <a v-bind:href="loginUrl" rel="noopener">Login Opertus Mundi</a>
     </p>
 
     <p
@@ -12,6 +12,7 @@
 
     <p>{{ $store.state.auth }}</p>
     <p>{{ $store.state.csrf }}</p>
+    <p>{{ $store.state.configuration }}</p>
   </div>
 </template>
 
