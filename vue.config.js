@@ -7,12 +7,21 @@ module.exports = {
   indexPath: process.env.NODE_ENV === 'development' ? 'index.html' : '../templates/index.html',
   // For development, proxy all action requests
   devServer: {
-    port: 4200,
+    // If the remote development server is used, do not change port value
+    // All redirects are sent to localhost:8080
+    port: 8080,
     proxy: process.env.NODE_ENV === 'development' ? {
       '^/action': {
         target: process.env.VUE_APP_API_GATEWAY_URL,
         ws: true,
         changeOrigin: true,
+        cookieDomainRewrite: '',
+      },
+      '^/(login|logged-in)': {
+        target: process.env.VUE_APP_API_GATEWAY_URL,
+        ws: true,
+        changeOrigin: true,
+        cookieDomainRewrite: '',
       },
     } : null,
   },
