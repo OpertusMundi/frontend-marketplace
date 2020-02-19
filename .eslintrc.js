@@ -12,9 +12,9 @@ module.exports = {
     ecmaVersion: 2020,
   },
   rules: {
-    /** 
+    /**
      * Configure airbnb eslint rules for vue.js component lifecycle methods
-     * 
+     *
      * See; https://github.com/vuejs/vue-cli/issues/1203#issuecomment-452471826
      */
     'class-methods-use-this': ['error', {
@@ -24,6 +24,9 @@ module.exports = {
     }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    // Uncomment if using windows. Git client should be configured to handle
+    // line breaks i.e. git config --global core.autocrlf true
+    // 'linebreak-style': 'warn',
   },
   overrides: [
     {
