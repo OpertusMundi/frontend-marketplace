@@ -57,20 +57,6 @@ const routes: RouteConfig[] = [
   },
 ];
 
-// Inject route only for development
-if (process.env.NODE_ENV === 'development') {
-  routes.push({
-    path: '/login/helix',
-    redirect: (to: Route) => {
-      // the function receives the target route as the argument
-      // return redirect path/location here.
-      const url = `${process.env.VUE_APP_API_GATEWAY_URL}${to.fullPath}`;
-      window.location.href = url;
-      return '/';
-    },
-  });
-}
-
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
