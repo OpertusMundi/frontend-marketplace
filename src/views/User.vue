@@ -18,6 +18,7 @@ export default class User extends Vue {
       .post('/action/profile', { name: 'Yannis', location: 'Athens' })
       .catch((err) => {
         // TODO : Handle error ...
+        console.error(err);
       });
   };
 }

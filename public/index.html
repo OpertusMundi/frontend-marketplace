@@ -12,7 +12,8 @@
     <meta name="description" content="OpertusMundi" />
     <meta name="keyword" content="OpertusMudni" />
 
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+    <link rel="icon" href="<%= BASE_URL %>assets/img/cropped-OpertusMundi1024-32x32.png" sizes="32x32" />
+    <link rel="icon" href="<%= BASE_URL %>assets/img/cropped-OpertusMundi1024-192x192.png" sizes="192x192" />
     <link rel="profile" href="http://gmpg.org/xfn/11" />
 
     <title><%= htmlWebpackPlugin.options.title %></title>
@@ -20,6 +21,8 @@
     <!-- Inject Thymeleaf template variables -->
     <meta name="_csrf" th:content="<%= '${_csrf.token}' %>" />
     <meta name="_csrf_header" th:content="<%= '${_csrf.headerName}' %>" />
+
+    <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
     <noscript>

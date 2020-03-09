@@ -4,6 +4,8 @@
       <router-link to="/">Home</router-link>
       {{ "|" }}
       <router-link to="/about">About</router-link>
+      {{ "|" }}
+      <router-link to="/order">Order</router-link>
       <template v-if="$store.getters.hasRole('ROLE_USER')">
         {{ "|" }}
         <router-link to="/user">User</router-link>
