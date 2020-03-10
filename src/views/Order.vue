@@ -19,8 +19,8 @@
           <el-table-column prop="item.title" label="Title" width="180"></el-table-column>
           <el-table-column prop="item.creator" label="Creator" width="180"></el-table-column>
           <el-table-column prop="item.description" label="Description"></el-table-column>
-          <el-table-column label="Amount" width="120" align="right">
-            <template slot-scope="scope">{{ `${(scope.row.item.amount / 100).toFixed(2)} €` }}</template>
+          <el-table-column label="Price" width="120" align="right">
+            <template slot-scope="scope">{{ `${(scope.row.item.price / 100).toFixed(2)} €` }}</template>
           </el-table-column>
         </el-table>
       </el-row>
@@ -79,15 +79,17 @@ import {
   Selectable,
 } from '../model';
 
-declare const Stripe: any;
-
 @Component
 export default class User extends Vue {
   isLoading = true;
 
   payment: CreatePaymentResult | null = null;
 
-  config: { stripe: any; card: any; clientSecret: string };
+  config: {
+    client: stripe.Stripe;
+    card: any;
+    clientSecret: string;
+  } | null = null;
 
   step = 1;
 
@@ -95,7 +97,7 @@ export default class User extends Vue {
 
   selectedItems = 0;
 
-  order: Order = null;
+  order: Order | null = null;
 
   price = 0;
 
@@ -135,7 +137,7 @@ export default class User extends Vue {
     this.selectedItems = this.items.filter((s) => s.selected).length;
     this.price = this.items
       .filter((s) => s.selected)
-      .reduce((total, s) => total + s.item.amount, 0);
+      .reduce((total, s) => total + s.item.price, 0);
   }
 
   createOrder() {
@@ -144,9 +146,9 @@ export default class User extends Vue {
       items: this.items
         .filter((s) => s.selected)
         .map((s, index) => ({
-          amount: s.item.amount,
-          assetId: s.item.id,
-          position: index,
+          id: s.item.id,
+          index,
+          price: s.item.price,
         })),
     };
 
@@ -187,104 +189,154 @@ export default class User extends Vue {
         }
         throw new Error('Failed to create payment intent');
       })
-      .then((config: { stripe: any; card: any; clientSecret: string }) => {
-        this.isLoading = false;
-        this.config = config;
-      });
+      .then(
+        (
+          config: {
+            client: stripe.Stripe;
+            card: any;
+            clientSecret: string;
+          } | null,
+        ) => {
+          this.isLoading = false;
+          this.config = config;
+        },
+      );
   }
 
-  setupElements(): { stripe: any; card: any; clientSecret: string } {
-    const stripe = Stripe(this.payment.publishableKey);
-    const elements = stripe.elements();
-    const style = {
-      base: {
-        color: '#32325d',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-          color: '#aab7c4',
+  setupElements(): {
+    client: stripe.Stripe;
+    card: any;
+    clientSecret: string;
+  } | null {
+    if (this.payment) {
+      // eslint-disable-next-line no-undef
+      const client: stripe.Stripe = Stripe(this.payment.publishableKey);
+      const elements = client.elements();
+      const style = {
+        base: {
+          color: '#32325d',
+          fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+          fontSmoothing: 'antialiased',
+          fontSize: '16px',
+          '::placeholder': {
+            color: '#aab7c4',
+          },
         },
-      },
-      invalid: {
-        color: '#fa755a',
-        iconColor: '#fa755a',
-      },
-    };
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a',
+        },
+      };
 
-    const card = elements.create('card', { style });
-    card.mount('#card-element');
+      const card = elements.create('card', { style });
+      card.mount('#card-element');
 
-    return {
-      stripe,
-      card,
-      clientSecret: this.payment.clientSecret,
-    };
+      return {
+        client,
+        card,
+        clientSecret: this.payment.clientSecret,
+      };
+    }
+    return null;
   }
 
   changeLoadingState = (isLoading: boolean): void => {
+    const button = document.querySelector('button');
+    const spinner = document.querySelector('#spinner');
+    const text = document.querySelector('#button-text');
+
     if (isLoading) {
-      document.querySelector('button').disabled = true;
-      document.querySelector('#spinner').classList.remove('hidden');
-      document.querySelector('#button-text').classList.add('hidden');
+      if (button) {
+        button.disabled = true;
+      }
+      if (spinner) {
+        spinner.classList.remove('hidden');
+      }
+      if (text) {
+        text.classList.add('hidden');
+      }
     } else {
-      document.querySelector('button').disabled = false;
-      document.querySelector('#spinner').classList.add('hidden');
-      document.querySelector('#button-text').classList.remove('hidden');
+      if (button) {
+        button.disabled = false;
+      }
+      if (spinner) {
+        spinner.classList.add('hidden');
+      }
+      if (text) {
+        text.classList.remove('hidden');
+      }
     }
   };
 
   pay() {
-    const { stripe, card, clientSecret } = this.config;
+    if (this.config) {
+      const { client, card, clientSecret } = this.config;
 
-    this.changeLoadingState(true);
+      this.changeLoadingState(true);
 
-    // Initiate the payment.
-    // If authentication is required, confirmCardPayment will automatically display a modal
-    stripe
-      .confirmCardPayment(clientSecret, {
-        payment_method: {
-          card,
-        },
-      })
-      .then((result) => {
-        if (result.error) {
-          // Show error to your customer
-          this.showError(result.error.message);
-        } else {
-          // The payment has been processed!
-          this.orderComplete();
-        }
-      });
+      // Initiate the payment.
+      // If authentication is required, confirmCardPayment will automatically display a modal
+      client
+        .confirmCardPayment(clientSecret, {
+          payment_method: {
+            card,
+          },
+        })
+        .then((result) => {
+          if (result.error) {
+            // Show error to your customer
+            this.showError(result.error?.message || 'Unknown error');
+          } else {
+            // The payment has been processed!
+            this.orderComplete();
+          }
+        });
+    }
   }
 
   orderComplete(): void {
-    const { stripe, clientSecret } = this.config;
+    if (this.config) {
+      const { client, clientSecret } = this.config;
 
-    // Just for the purpose of the sample, show the PaymentIntent response object
-    stripe.retrievePaymentIntent(clientSecret).then((result) => {
-      const { paymentIntent } = result;
-      const paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
+      // Just for the purpose of the sample, show the PaymentIntent response object
+      client.retrievePaymentIntent(clientSecret).then((result) => {
+        const { paymentIntent } = result;
+        const paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
 
-      document.querySelector('.sr-payment-form').classList.add('hidden');
-      document.querySelector('pre').textContent = paymentIntentJson;
+        const form = document.querySelector('.sr-payment-form');
+        if (form) {
+          form.classList.add('hidden');
+        }
 
-      document.querySelector('.sr-result').classList.remove('hidden');
-      setTimeout(() => {
-        document.querySelector('.sr-result').classList.add('expand');
-      }, 200);
+        const preElement = document.querySelector('pre');
+        if (preElement) {
+          preElement.textContent = paymentIntentJson;
+        }
+        const resultElement = document.querySelector('.sr-result');
+        if (resultElement) {
+          resultElement.classList.remove('hidden');
+        }
 
-      this.changeLoadingState(false);
-    });
+        setTimeout(() => {
+          if (resultElement) {
+            resultElement.classList.add('expand');
+          }
+        }, 200);
+
+        this.changeLoadingState(false);
+      });
+    }
   }
 
   showError(errorMsgText: string): void {
     this.changeLoadingState(false);
     const errorMsg = document.querySelector('.sr-field-error');
-    errorMsg.textContent = errorMsgText;
-    setTimeout(() => {
-      errorMsg.textContent = '';
-    }, 4000);
+    if (errorMsg) {
+      errorMsg.textContent = errorMsgText;
+      setTimeout(() => {
+        errorMsg.textContent = '';
+      }, 4000);
+    }
   }
 }
 </script>

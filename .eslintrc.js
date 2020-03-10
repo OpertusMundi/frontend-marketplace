@@ -24,7 +24,7 @@ module.exports = {
     }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'max-len': ["error", { "code": 120 }],
+    'max-len': ["error", { "code": 140 }],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/camelcase': 'off',
     // Uncomment if using windows. Git client should be configured to handle

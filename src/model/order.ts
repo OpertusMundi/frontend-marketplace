@@ -1,10 +1,10 @@
 export interface OrderItem {
-    amount: number;
-    assetId: string;
-    position: number;
+  id: string;
+  index: number;
+  price: number;
 }
 
 export interface Order {
-    id: string;
-    items: OrderItem[];
+  id: string | null;
+  items: OrderItem[];
 }
