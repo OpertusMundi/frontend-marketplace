@@ -38,7 +38,7 @@ import { Configuration, ServerResponse } from '@/model';
 
 @Component
 export default class App extends Vue {
-  apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/api-docs.html`;
+  apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html`;
 
   mounted() {
     // Initialize CSRF token
