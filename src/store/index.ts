@@ -4,7 +4,11 @@ import Vuex from 'vuex';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import JwtDecode from 'jwt-decode';
 
-import { Configuration, LogoutSuccessResult, ServerResponse } from '@/model';
+import {
+  Configuration, LoginSuccessResult, LogoutSuccessResult, ServerResponse,
+} from '@/model';
+import { Account, Profile } from '@/model/account';
+import { EnumRole } from '@/model/role';
 
 Vue.use(Vuex);
 
@@ -13,13 +17,13 @@ interface JwtTokenData {
   aud: string;
   sub: string;
   exp: number;
-  roles: string[];
+  roles: EnumRole[];
 }
 
 interface State {
   account: {
-    profile: string | null;
-    roles: string[];
+    profile: Profile | null;
+    roles: EnumRole[];
     username: string | null;
   };
   auth: {
@@ -54,8 +58,8 @@ export default new Vuex.Store({
   state: initialState,
   getters: {
     csrfHeader: (state: State): string | null => state.csrf.header,
-    hasRole: (state) => (role: string): boolean => state.account.roles.includes(role),
-    isAuthenticated: (state: State): boolean => !!state.auth.token,
+    hasRole: (state) => (role: EnumRole): boolean => state.account.roles.includes(role),
+    isAuthenticated: (state: State): boolean => !!state.auth.token || !!state.account.profile,
   },
   mutations: {
     setCsrfToken(state: State, csrf: { token: string | null; header: string | null }) {
@@ -77,6 +81,9 @@ export default new Vuex.Store({
         const required = ['POST', 'PUT', 'DELETE'].includes((config.method as string).toUpperCase());
 
         if (csrf.token && csrf.header && required) {
+          if (!result.headers) {
+            result.headers = {};
+          }
           result.headers[csrf.header] = csrf.token;
         }
         return result;
@@ -95,8 +102,10 @@ export default new Vuex.Store({
     setConfiguration(state: State, configuration: Configuration) {
       state.configuration = configuration;
     },
-    setProfile(state, profile) {
-      state.account.profile = profile;
+    setProfile(state, profile: Account) {
+      state.account.username = profile.username;
+      state.account.roles = profile.roles;
+      state.account.profile = profile.profile;
     },
     logout(state) {
       state.auth.token = null;
@@ -109,6 +118,22 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    login(context, credentials: { username: string; password: string }) {
+      const form = new FormData();
+      form.append('username', credentials.username);
+      form.append('password', credentials.password);
+
+      return axios.post('/login', form).then((response: AxiosResponse<ServerResponse<LoginSuccessResult>>) => {
+        const { data } = response;
+
+        if (data?.success && data?.result) {
+          // Update CSRF token
+          context.commit('setCsrfToken', { token: data.result.csrfToken, header: data.result.csrfHeader });
+        }
+
+        return response.data;
+      });
+    },
     logout(context) {
       return axios.post('/logout', new FormData()).then((response: AxiosResponse<ServerResponse<LogoutSuccessResult>>) => {
         const { data } = response;

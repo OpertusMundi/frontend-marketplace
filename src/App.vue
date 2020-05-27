@@ -34,7 +34,7 @@ import axios, { AxiosResponse } from 'axios';
 
 import store from '@/store';
 
-import { Configuration, ServerResponse } from '@/model';
+import { Configuration, ServerResponse, Profile } from '@/model';
 
 @Component
 export default class App extends Vue {
@@ -56,10 +56,18 @@ export default class App extends Vue {
     // Get initial configuration
     axios
       .get('/action/configuration/el')
-      .then((response: AxiosResponse<ServerResponse<Configuration>>) => {
+      .then((configResponse: AxiosResponse<ServerResponse<Configuration>>) => {
         store.commit('setConfiguration', {
-          configuration: response.data.result,
+          configuration: configResponse.data.result,
         });
+        // Check if user is authenticated
+        axios
+          .get('/action/profile')
+          .then((profileResponse: AxiosResponse<ServerResponse<Profile>>) => {
+            if (profileResponse.data.success) {
+              store.commit('setProfile', profileResponse.data.result);
+            }
+          });
       });
   }
 

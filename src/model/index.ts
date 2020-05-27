@@ -1,4 +1,5 @@
 export {
+  LoginSuccessResult,
   LogoutSuccessResult,
 } from '@/model/auth';
 
@@ -27,8 +28,9 @@ export {
 } from '@/model/payment';
 
 export {
+  Account,
   Profile,
-} from '@/model/profile';
+} from '@/model/account';
 
 export {
   ServerResponse,

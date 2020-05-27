@@ -118,7 +118,6 @@ export default class User extends Vue {
               selected: false,
               item,
             }));
-            console.log(this.items);
           } else {
             throw new Error('Failed to load catalogue items');
           }
@@ -157,14 +156,13 @@ export default class User extends Vue {
       .then((response: AxiosResponse<ServerResponse<Order>>) => {
         if (response.data.success) {
           this.order = response.data.result;
-          console.log(this.order);
+
           return this.order;
         }
 
         throw new Error('Failed to create order');
       })
       .then((order: Order) => {
-        console.log(order);
         this.preparePaymentIntent(order);
       });
   }
@@ -183,7 +181,6 @@ export default class User extends Vue {
       .then((response: AxiosResponse<ServerResponse<CreatePaymentResult>>) => {
         if (response.data.success) {
           this.payment = response.data.result;
-          console.log(this.payment);
 
           return this.setupElements();
         }

@@ -11,15 +11,19 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import axios from 'axios';
 
+import { ProfileCommand } from '@/model/account';
+
 @Component
 export default class User extends Vue {
   updateProfile = () => {
-    axios
-      .post('/action/profile', { name: 'Yannis', location: 'Athens' })
-      .catch((err) => {
-        // TODO : Handle error ...
-        console.error(err);
-      });
+    const data: ProfileCommand = {
+      email: 'user@example.com',
+    };
+
+    axios.post('/action/profile', data).catch((err) => {
+      // TODO : Handle error ...
+      console.error(err);
+    });
   };
 }
 </script>

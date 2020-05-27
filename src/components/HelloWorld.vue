@@ -6,6 +6,18 @@
       <a v-bind:href="loginUrl" rel="noopener">Login Opertus Mundi</a>
     </p>
 
+    <form>
+      <p>
+        <input v-model="username" placeholder="User" />
+      </p>
+      <p>
+        <input v-model="password" type="password" placeholder="Password" />
+      </p>
+      <p>
+        <button type="submit" v-on:click="login($event)">Login</button>
+      </p>
+    </form>
+
     <p
       v-if="$store.getters.isAuthenticated"
     >{{ $store.state.account.username }} - {{ $store.state.account.roles }}</p>
@@ -19,11 +31,53 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import store from '@/store';
+
+import axios, { AxiosResponse } from 'axios';
+
+import { ServerResponse, LoginSuccessResult } from '@/model';
+import { Profile } from '@/model/account';
+
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
 
+  credentials: { username: string; password: string } = {
+    username: '',
+    password: '',
+  };
+
+  set username(value: string) {
+    this.credentials.username = value;
+  }
+
+  set password(value: string) {
+    this.credentials.password = value;
+  }
+
   loginUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/login/opertus-mundi`;
+
+  login = (e: MouseEvent) => {
+    e.preventDefault();
+
+    store
+      .dispatch('login', {
+        username: this.credentials.username,
+        password: this.credentials.password,
+      })
+      .then((loginResponse: ServerResponse<LoginSuccessResult>) => {
+        // Load profile
+        if (loginResponse.success) {
+          axios
+            .get('/action/profile')
+            .then((profileResponse: AxiosResponse<ServerResponse<Profile>>) => {
+              if (profileResponse.data.success) {
+                store.commit('setProfile', profileResponse.data.result);
+              }
+            });
+        }
+      });
+  };
 }
 </script>
 
