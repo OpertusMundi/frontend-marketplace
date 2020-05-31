@@ -1,12 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import JwtDecode from 'jwt-decode';
 
-import {
-  Configuration, LoginSuccessResult, LogoutSuccessResult, ServerResponse,
-} from '@/model';
+import { Configuration } from '@/model';
 import { Account, Profile } from '@/model/account';
 import { EnumRole } from '@/model/role';
 
@@ -58,11 +55,18 @@ export default new Vuex.Store({
   state: initialState,
   getters: {
     csrfHeader: (state: State): string | null => state.csrf.header,
-    hasRole: (state) => (role: EnumRole): boolean => state.account.roles.includes(role),
+    hasRole: (state: State) => (role: EnumRole): boolean => state.account.roles.includes(role),
     isAuthenticated: (state: State): boolean => !!state.auth.token || !!state.account.profile,
   },
   mutations: {
-    setCsrfToken(state: State, csrf: { token: string | null; header: string | null }) {
+    setCsrfToken(state: State, csrf: { token: string | null; header: string | null }): void {
+      // Update token and configure interceptor
+      state.csrf.header = csrf.header;
+      state.csrf.token = csrf.token;
+
+      // Uncomment for using global axios default instance
+
+      /*
       // Reset existing interceptor
       const { interceptor } = state.csrf;
 
@@ -70,10 +74,6 @@ export default new Vuex.Store({
         axios.interceptors.request.eject(interceptor);
         state.csrf.interceptor = null;
       }
-
-      // Update token and configure interceptor
-      state.csrf.header = csrf.header;
-      state.csrf.token = csrf.token;
 
       state.csrf.interceptor = axios.interceptors.request.use((config: AxiosRequestConfig) => {
         const result = { ...config };
@@ -88,8 +88,9 @@ export default new Vuex.Store({
         }
         return result;
       });
+      */
     },
-    setAccessToken(state, token) {
+    setAccessToken(state: State, token: string): void {
       const data: JwtTokenData = JwtDecode(token);
 
       state.auth.token = token;
@@ -97,55 +98,32 @@ export default new Vuex.Store({
       state.account.username = data.sub;
       state.account.roles = data.roles;
 
+      // Uncomment for using global axios default instance
+
+      /*
       axios.defaults.headers = { Authorization: `Bearer ${token}` };
+      */
     },
-    setConfiguration(state: State, configuration: Configuration) {
+    setConfiguration(state: State, configuration: Configuration): void {
       state.configuration = configuration;
     },
-    setProfile(state, profile: Account) {
-      state.account.username = profile.username;
-      state.account.roles = profile.roles;
-      state.account.profile = profile.profile;
+    setUserData(state: State, data: Account): void {
+      state.account.username = data.username;
+      state.account.roles = data.roles;
+      state.account.profile = data.profile;
     },
-    logout(state) {
+    logout(state: State): void {
       state.auth.token = null;
 
       state.account.username = null;
       state.account.roles = [];
       state.account.profile = null;
 
+      // Uncomment for using global axios default instance
+
+      /*
       axios.defaults.headers = null;
-    },
-  },
-  actions: {
-    login(context, credentials: { username: string; password: string }) {
-      const form = new FormData();
-      form.append('username', credentials.username);
-      form.append('password', credentials.password);
-
-      return axios.post('/login', form).then((response: AxiosResponse<ServerResponse<LoginSuccessResult>>) => {
-        const { data } = response;
-
-        if (data?.success && data?.result) {
-          // Update CSRF token
-          context.commit('setCsrfToken', { token: data.result.csrfToken, header: data.result.csrfHeader });
-        }
-
-        return response.data;
-      });
-    },
-    logout(context) {
-      return axios.post('/logout', new FormData()).then((response: AxiosResponse<ServerResponse<LogoutSuccessResult>>) => {
-        const { data } = response;
-
-        if (data?.success && data?.result) {
-          // Update CSRF token
-          context.commit('setCsrfToken', { token: data.result.csrfToken, header: data.result.csrfHeader });
-
-          // Reset session
-          context.commit('logout');
-        }
-      });
+      */
     },
   },
   modules: {

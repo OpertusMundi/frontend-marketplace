@@ -68,14 +68,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 import {
-  Order,
-  CreatePaymentResult,
-  ServerResponse,
+  AxiosServerResponse,
   CatalogueSearchResult,
   CatalogueItem,
+  CreatePaymentResult,
+  Order,
   Selectable,
 } from '../model';
 
@@ -101,31 +101,29 @@ export default class User extends Vue {
 
   price = 0;
 
-  mounted() {
+  mounted(): void {
     this.isLoading = false;
   }
 
-  search() {
+  search(): void {
     axios
       .post('/action/catalogue', {
         page: 1,
         size: 2,
       })
-      .then(
-        (response: AxiosResponse<ServerResponse<CatalogueSearchResult>>) => {
-          if (response.data.success) {
-            this.items = response.data.result.items.map((item) => ({
-              selected: false,
-              item,
-            }));
-          } else {
-            throw new Error('Failed to load catalogue items');
-          }
-        },
-      );
+      .then((response: AxiosServerResponse<CatalogueSearchResult>) => {
+        if (response.data.success) {
+          this.items = response.data.result.items.map((item) => ({
+            selected: false,
+            item,
+          }));
+        } else {
+          throw new Error('Failed to load catalogue items');
+        }
+      });
   }
 
-  toggleItem(id: string, selected: boolean) {
+  toggleItem(id: string, selected: boolean): void {
     this.items = this.items.map((s) => {
       if (s.item.id === id) {
         return { ...s, selected };
@@ -139,7 +137,7 @@ export default class User extends Vue {
       .reduce((total, s) => total + s.item.price, 0);
   }
 
-  createOrder() {
+  createOrder(): void {
     const data: Order = {
       id: null,
       items: this.items
@@ -153,7 +151,7 @@ export default class User extends Vue {
 
     axios
       .post('/action/orders', data)
-      .then((response: AxiosResponse<ServerResponse<Order>>) => {
+      .then((response: AxiosServerResponse<Order>) => {
         if (response.data.success) {
           this.order = response.data.result;
 
@@ -167,7 +165,7 @@ export default class User extends Vue {
       });
   }
 
-  preparePaymentIntent(order: Order) {
+  preparePaymentIntent(order: Order): void {
     // Disable the button until we have Stripe set up on the page
     this.isLoading = true;
 
@@ -178,9 +176,9 @@ export default class User extends Vue {
 
     axios
       .post(endpoint, order)
-      .then((response: AxiosResponse<ServerResponse<CreatePaymentResult>>) => {
+      .then((response: AxiosServerResponse<CreatePaymentResult>) => {
         if (response.data.success) {
-          this.payment = response.data.result;
+          this.payment = response.data.result || null;
 
           return this.setupElements();
         }
@@ -265,7 +263,7 @@ export default class User extends Vue {
     }
   };
 
-  pay() {
+  pay(): void {
     if (this.config) {
       const { client, card, clientSecret } = this.config;
 

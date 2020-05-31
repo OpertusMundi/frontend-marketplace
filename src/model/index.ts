@@ -1,6 +1,6 @@
 export {
-  LoginSuccessResult,
-  LogoutSuccessResult,
+  LoginResult,
+  LogoutResult,
 } from '@/model/auth';
 
 export {
@@ -15,7 +15,7 @@ export {
 
 export {
   EnumLevel,
-  ServerError,
+  ServerMessage,
 } from '@/model/error';
 
 export {
@@ -33,6 +33,7 @@ export {
 } from '@/model/account';
 
 export {
+  AxiosServerResponse,
   ServerResponse,
 } from '@/model/response';
 

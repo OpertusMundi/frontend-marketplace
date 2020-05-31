@@ -30,17 +30,32 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import axios, { AxiosResponse } from 'axios';
-
 import store from '@/store';
 
-import { Configuration, ServerResponse, Profile } from '@/model';
+import AccountApi from '@/service/account';
+import ConfigurationApi from '@/service/config';
+
+import {
+  Configuration, Account, ServerResponse, LogoutResult,
+} from '@/model';
 
 @Component
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html`;
 
-  mounted() {
+  accountApi: AccountApi;
+
+  configApi: ConfigurationApi;
+
+  constructor() {
+    super();
+
+    this.accountApi = new AccountApi();
+
+    this.configApi = new ConfigurationApi();
+  }
+
+  mounted(): void {
     // Initialize CSRF token
     const token = document
       .querySelector('meta[name=_csrf]')
@@ -54,29 +69,49 @@ export default class App extends Vue {
     }
 
     // Get initial configuration
-    axios
-      .get('/action/configuration/el')
-      .then((configResponse: AxiosResponse<ServerResponse<Configuration>>) => {
+    this.configApi
+      .getConfiguration()
+      .then((configResponse: ServerResponse<Configuration>) => {
         store.commit('setConfiguration', {
-          configuration: configResponse.data.result,
+          configuration: configResponse.result,
         });
         // Check if user is authenticated
-        axios
-          .get('/action/profile')
-          .then((profileResponse: AxiosResponse<ServerResponse<Profile>>) => {
-            if (profileResponse.data.success) {
-              store.commit('setProfile', profileResponse.data.result);
+        this.accountApi
+          .getUserData()
+          .then((profileResponse: ServerResponse<Account>) => {
+            if (profileResponse.success) {
+              store.commit('setUserData', profileResponse.result);
             }
           });
       });
   }
 
-  logout() {
+  logout(): void {
     const router = this.$router;
 
-    store.dispatch('logout').then(() => {
-      router.push({ name: 'Home' });
-    });
+    const name = 'Home';
+
+    // Logout
+    this.accountApi
+      .logout()
+      .then((logoutResponse: ServerResponse<LogoutResult>) => {
+        if (logoutResponse.success) {
+          // Set CSRF Token
+          const {
+            csrfToken: token,
+            csrfHeader: header,
+          } = logoutResponse.result;
+
+          store.commit('setCsrfToken', { token, header });
+
+          // Update user data
+          store.commit('logout');
+
+          if (router.currentRoute.name !== name) {
+            router.push({ name });
+          }
+        }
+      });
   }
 }
 </script>

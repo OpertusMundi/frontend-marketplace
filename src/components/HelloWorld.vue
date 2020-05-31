@@ -3,15 +3,23 @@
     <h1>{{ msg }}</h1>
 
     <p v-if="!$store.getters.isAuthenticated">
-      <a v-bind:href="loginUrl" rel="noopener">Login Opertus Mundi</a>
+      <a v-bind:href="loginOpertusMundi" rel="noopener">Login Opertus Mundi</a>
     </p>
 
-    <form>
+    <p v-if="!$store.getters.isAuthenticated">
+      <a v-bind:href="loginGoogle" rel="noopener">Login Google</a>
+    </p>
+
+    <p v-if="!$store.getters.isAuthenticated">
+      <a v-bind:href="loginGithub" rel="noopener">Login GitHub</a>
+    </p>
+
+    <form v-if="!$store.getters.isAuthenticated">
       <p>
-        <input v-model="username" placeholder="User" />
+        <input v-model="model.username" placeholder="User" />
       </p>
       <p>
-        <input v-model="password" type="password" placeholder="Password" />
+        <input v-model="model.password" type="password" placeholder="Password" />
       </p>
       <p>
         <button type="submit" v-on:click="login($event)">Login</button>
@@ -33,48 +41,64 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import store from '@/store';
 
-import axios, { AxiosResponse } from 'axios';
+import AccountApi from '@/service/account';
 
-import { ServerResponse, LoginSuccessResult } from '@/model';
-import { Profile } from '@/model/account';
+import { ServerResponse, LoginResult } from '@/model';
+
+import { Account } from '@/model/account';
 
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
 
-  credentials: { username: string; password: string } = {
-    username: '',
-    password: '',
-  };
+  accountApi: AccountApi;
 
-  set username(value: string) {
-    this.credentials.username = value;
+  loginOpertusMundi: string;
+
+  loginGoogle: string;
+
+  loginGithub: string;
+
+  model: { username: string; password: string };
+
+  constructor() {
+    super();
+
+    this.accountApi = new AccountApi();
+
+    this.loginOpertusMundi = `${process.env.VUE_APP_API_GATEWAY_URL}/login/opertus-mundi`;
+    this.loginGoogle = `${process.env.VUE_APP_API_GATEWAY_URL}/login/google`;
+    this.loginGithub = `${process.env.VUE_APP_API_GATEWAY_URL}/login/github`;
+    this.model = { username: '', password: '' };
   }
 
-  set password(value: string) {
-    this.credentials.password = value;
-  }
-
-  loginUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/login/opertus-mundi`;
-
-  login = (e: MouseEvent) => {
+  login = (e: MouseEvent): void => {
     e.preventDefault();
 
-    store
-      .dispatch('login', {
-        username: this.credentials.username,
-        password: this.credentials.password,
-      })
-      .then((loginResponse: ServerResponse<LoginSuccessResult>) => {
-        // Load profile
+    const { username, password } = this.model;
+
+    // Login
+    this.accountApi
+      .login(username, password)
+      .then((loginResponse: ServerResponse<LoginResult>) => {
         if (loginResponse.success) {
-          axios
-            .get('/action/profile')
-            .then((profileResponse: AxiosResponse<ServerResponse<Profile>>) => {
-              if (profileResponse.data.success) {
-                store.commit('setProfile', profileResponse.data.result);
+          // Set CSRF Token
+          const { csrfToken: token, csrfHeader: header } = loginResponse.result;
+
+          store.commit('setCsrfToken', { token, header });
+
+          // Load user data
+          this.accountApi
+            .getUserData()
+            .then((accountResponse: ServerResponse<Account>) => {
+              if (accountResponse.success) {
+                store.commit('setUserData', accountResponse.result);
+              } else {
+                // TODO: Handle error
               }
             });
+        } else {
+          // TODO: Hanlde error
         }
       });
   };
