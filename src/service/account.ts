@@ -38,7 +38,7 @@ export default class AccountApi extends Api {
   }
 
   public async getUserData(): Promise<ServerResponse<Account>> {
-    const url = '/action/profile';
+    const url = '/action/account/user-data';
 
     return this.get<ServerResponse<Account>>(url)
       .then((response: AxiosServerResponse<Account>) => {
@@ -48,7 +48,7 @@ export default class AccountApi extends Api {
       });
   }
 
-  public async setUserData(command: ProfileCommand): Promise<ServerResponse<Account>> {
+  public async setProfile(command: ProfileCommand): Promise<ServerResponse<Account>> {
     const url = '/action/profile';
 
     return this.post<ProfileCommand, ServerResponse<Account>>(url, command)

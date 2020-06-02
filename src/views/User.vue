@@ -28,7 +28,7 @@ export default class User extends Vue {
       email: 'user@example.com',
     };
 
-    this.accountApi.setUserData(command);
+    this.accountApi.setProfile(command);
   };
 }
 </script>
