@@ -19,15 +19,6 @@ export {
 } from '@/model/error';
 
 export {
-  Order,
-  OrderItem,
-} from '@/model/order';
-
-export {
-  CreatePaymentResult
-} from '@/model/payment';
-
-export {
   Account,
   Profile,
 } from '@/model/account';

@@ -55,14 +55,6 @@ const routes: RouteConfig[] = [
       requiresRole: 'ROLE_ADMIN',
     },
   },
-  {
-    path: '/order',
-    name: 'Order',
-    // route level code-splitting
-    // this generates a separate chunk (admin.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "order" */ '../views/Order.vue'),
-  },
 ];
 
 const router = new VueRouter({
