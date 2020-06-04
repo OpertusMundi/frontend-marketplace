@@ -39,7 +39,7 @@ import {
 
 @Component
 export default class App extends Vue {
-  apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html`;
+  apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
 
   accountApi: AccountApi;
 
