@@ -1,43 +1,135 @@
-export enum EnumType {
-  Raster = 'Raster',
-  Vector = 'Vector',
-}
+import { PageRequest, QueryResultPage } from '@/model/request';
+import { ServerResponse } from './response';
 
-export enum EnumFormat {
-  CSV = 'CSV',
-  ShapeFile = 'ShapeFile',
-}
-
-export enum EnumService {
-  WFS = 'WFS',
-  WMS = 'WMS',
-}
-
-export interface Seller {
-  id: string;
-  title: string;
+export interface CatalogueQuery extends PageRequest {
+  /*
+   * Query string used for full text search operation
+   */
+  query: string;
 }
 
 export interface CatalogueItem {
-  boundingBox: GeoJSON.BBox;
-  creator: string;
-  description: string;
-  format: EnumFormat;
+  /*
+   * Catalogue item identifier (UUID)
+   */
   id: string;
-  price: number;
-  rating: number;
-  services: EnumService[];
+  /*
+   * The nature or genre of the resource
+   */
+  type: string;
+  /*
+   * A name given to the resource
+   */
   title: string;
-  type: EnumType;
+  /*
+   * The file format, physical medium, or dimensions of the resource
+   */
+  format: string;
+  /*
+   * Information about resource licensing
+   */
+  license: string;
+  /*
+   * General explanation of the data producer’s knowledge about the lineage of a dataset
+   */
+  lineage: string;
+  /*
+   * Version of the resource
+   */
   version: string;
+  /*
+   * An abstract of the resource
+   */
+  abstractText: string;
+  /*
+   * The temporal extent of the resource (end date)
+   */
+  dateEnd: string;
+  /*
+   * The topic of the resource
+   */
+  keywords: string;
+  /*
+   * A language of the resource
+   */
+  language: string;
+  /*
+   * Provides the ID of a parent dataset
+   */
+  parentId: string;
+  /*
+   * An entity responsible for making the resource available
+   */
+  publisher: string;
+  /*
+   * Degree of conformity with the implementing rules/standard of the metadata followed
+   */
+  conformity: string;
+  /*
+   * The temporal extent of the resource (start date)
+   */
+  dateStart: string;
+  /*
+   * The date which specifies when the metadata record was created or updated
+   */
+  metadataDate: string;
+  /*
+   * A point or period of time associated with the revision event in the lifecycle of the resource",
+   */
+  revisionDate: string;
+  /*
+   * A high-level classification scheme to assist in the grouping and topic-based
+   * search of available spatial data resources
+   */
+  topicCategory: string;
+  /*
+   * Provides information about the datasets that the service operates on
+   */
+  coupledResource: string;
+  /*
+   * A point or period of time associated with the publication even in the
+   * lifecycle of the resource
+   */
+  publicationDate: string;
+  /*
+   * Information about the reference system
+   */
+  referenceSystem: string;
+  /*
+   * The ‘navigation section’ of a metadata record which point users to the location (URL)
+   * where the data can be downloaded, or to where additional information about the resource
+   * may be provided
+   */
+  resourceLocator: string;
+  /*
+   * The language in which the metadata elements are expressed
+   */
+  metadataLanguage: string;
+  /*
+   * Spatial resolution refers to the level of detail of the data set
+   */
+  spatialResolution: string;
+  /*
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: string;
+  /*
+   * The description of the organization responsible for the creation and maintenance of the metadata
+   */
+  metadataPointOfContact: string;
+  /*
+   * Information on the limitations and the reasons for them
+   */
+  publicAccessLimitations: string;
 
+  /*
+   * The nature or genre of the service
+   */
+  spatialDataServiceType: string;
+  /*
+   * Geometry as GeoJSON
+   */
+  geometry: GeoJSON.Geometry;
 }
 
-export interface CatalogueSearchResult {
-  pageRequest: {
-    page: number;
-    size: number;
-  };
-  count: number;
-  items: CatalogueItem[];
-}
+export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
