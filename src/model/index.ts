@@ -1,11 +1,17 @@
 export {
+  Account,
+  Profile,
+} from '@/model/account';
+
+export {
   LoginResult,
   LogoutResult,
 } from '@/model/auth';
 
 export {
   CatalogueItem,
-  CatalogueSearchResult,
+  CatalogueQuery,
+  CatalogueQueryResponse,
 } from '@/model/catalogue';
 
 export {
@@ -19,15 +25,11 @@ export {
 } from '@/model/error';
 
 export {
-  Account,
-  Profile,
-} from '@/model/account';
+  PageRequest,
+  QueryResultPage,
+} from '@/model/request';
 
 export {
   AxiosServerResponse,
   ServerResponse,
 } from '@/model/response';
-
-export {
-  Selectable,
-} from '@/model/collection';
