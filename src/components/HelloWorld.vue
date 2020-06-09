@@ -28,11 +28,11 @@
 
     <p
       v-if="$store.getters.isAuthenticated"
-    >{{ $store.state.account.username }} - {{ $store.state.account.roles }}</p>
+    >{{ $store.state.user.account.username }} - {{ $store.state.user.account.roles }}</p>
 
-    <p>{{ $store.state.auth }}</p>
-    <p>{{ $store.state.csrf }}</p>
-    <p>{{ $store.state.configuration }}</p>
+    <p>{{ $store.state.user.auth }}</p>
+    <p>{{ $store.state.user.csrf }}</p>
+    <p>{{ $store.state.user.configuration }}</p>
   </div>
 </template>
 
@@ -60,6 +60,10 @@ export default class HelloWorld extends Vue {
   loginGithub: string;
 
   model: { username: string; password: string };
+
+  mounted() {
+    console.log(store.getters.getConfig);
+  }
 
   constructor() {
     super();

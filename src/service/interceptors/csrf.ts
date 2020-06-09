@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 
-import store from '@/store';
+import store from '@/store/modules/user.module';
 
 export default function csrfRequestInterceptor(value: AxiosRequestConfig): AxiosRequestConfig | Promise<AxiosRequestConfig> {
   const { token, header } = store.state.csrf;
