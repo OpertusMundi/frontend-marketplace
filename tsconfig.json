@@ -12,6 +12,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "strictNullChecks": true,
+    "noImplicitAny": false,
     "types": [
       "webpack-env",
       "jest",

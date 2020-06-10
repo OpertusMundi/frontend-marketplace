@@ -1,8 +1,7 @@
 <template>
   <div id="app">
-    <app-header></app-header>
+    
     <router-view />
-    <app-footer></app-footer>
   </div>
 </template>
 
@@ -18,12 +17,7 @@ import {
   Configuration, Account, ServerResponse, LogoutResult,
 } from '@/model';
 
-import AppHeader from '@/components/Header.vue';
-import AppFooter from '@/components/Footer.vue';
-
-@Component({
-  components: { AppHeader, AppFooter },
-})
+@Component
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
 
@@ -99,3 +93,31 @@ export default class App extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+#nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}
+img.logo-image {
+  height: 19px;
+  position: relative;
+  top: 4px;
+}
+</style>
