@@ -1,5 +1,6 @@
 import { PageRequest, QueryResultPage } from '@/model/request';
-import { ServerResponse } from './response';
+import { ServerResponse } from '@/model/response';
+import { BasePricingModel, BasePricingModelCommand } from '@/model/pricing-model';
 
 export interface CatalogueQuery extends PageRequest {
   /*
@@ -8,11 +9,7 @@ export interface CatalogueQuery extends PageRequest {
   query: string;
 }
 
-export interface CatalogueItem {
-  /*
-   * Catalogue item identifier (UUID)
-   */
-  id: string;
+interface BaseCatalogueItem {
   /*
    * The nature or genre of the resource
    */
@@ -33,10 +30,6 @@ export interface CatalogueItem {
    * General explanation of the data producer’s knowledge about the lineage of a dataset
    */
   lineage: string;
-  /*
-   * Version of the resource
-   */
-  version: string;
   /*
    * An abstract of the resource
    */
@@ -121,7 +114,6 @@ export interface CatalogueItem {
    * Information on the limitations and the reasons for them
    */
   publicAccessLimitations: string;
-
   /*
    * The nature or genre of the service
    */
@@ -130,6 +122,28 @@ export interface CatalogueItem {
    * Geometry as GeoJSON
    */
   geometry: GeoJSON.Geometry;
+}
+
+export interface CatalogueItem extends BaseCatalogueItem {
+  /*
+   * Catalogue item identifier (UUID)
+   */
+  id: string;
+  /*
+   * Version of the resource
+   */
+  version: string;
+  /*
+   * Pricing model available for the asset
+   */
+  pricingModels: BasePricingModel[];
+}
+
+export interface CatalogueAddItemCommand extends BaseCatalogueItem {
+  /*
+   * Pricing model available for the asset
+   */
+  pricingModels: BasePricingModelCommand[];
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
