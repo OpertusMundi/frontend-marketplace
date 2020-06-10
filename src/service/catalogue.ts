@@ -3,6 +3,7 @@ import Api from '@/service/api';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { CatalogueQuery, CatalogueQueryResponse, CatalogueItem } from '@/model';
 import { AxiosResponse } from 'axios';
+import { CatalogueAddItemCommand } from '@/model/catalogue';
 
 export default class CatalogueApi extends Api {
   constructor() {
@@ -32,4 +33,16 @@ export default class CatalogueApi extends Api {
         return data;
       });
   }
+
+  public async create(command: CatalogueAddItemCommand): Promise<ServerResponse<void>> {
+    const url = '/action/catalogue/items';
+
+    return this.post<CatalogueAddItemCommand, ServerResponse<void>>(url, command)
+      .then((response: AxiosServerResponse<void>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
 }
