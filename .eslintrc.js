@@ -17,14 +17,15 @@ module.exports = {
      *
      * See; https://github.com/vuejs/vue-cli/issues/1203#issuecomment-452471826
      */
-    'class-methods-use-this': ['error', {
-      exceptMethods: [
-        'mounted',
-      ],
-    }],
+    'class-methods-use-this': 0,
+    // 'class-methods-use-this': ['error', {
+    //   exceptMethods: [
+    //     'mounted',
+    //   ],
+    // }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'max-len': ["error", { "code": 140 }],
+    'max-len': ["error", { "code": 400 }],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/camelcase': 'off',
     // Uncomment if using windows. Git client should be configured to handle
