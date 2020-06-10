@@ -23,7 +23,7 @@ export default class CatalogueApi extends Api {
   }
 
   public async findOne(id: string): Promise<ServerResponse<CatalogueItem>> {
-    const url = `/action/catalogue/${id}`;
+    const url = `/action/catalogue/items/${id}`;
 
     return this.get<ServerResponse<CatalogueItem>>(url)
       .then((response: AxiosServerResponse<CatalogueItem>) => {
