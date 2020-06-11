@@ -5,7 +5,6 @@ import store from '@/store';
 
 import Home from '@/views/Home.vue';
 import Callback from '@/views/Callback.vue';
-import Error401 from '@/views/Error401.vue';
 
 Vue.use(VueRouter);
 
@@ -23,15 +22,15 @@ const routes: RouteConfig[] = [
   {
     path: '/signin',
     name: 'Login',
-    component: () => import(/* webpackChunkName: "Login" */ '../views/Login.vue'),
+    component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
     meta: {
       hideForAuth: true,
     },
   },
   {
-    path: '/error/401',
-    name: 'Error401',
-    component: Error401,
+    path: '/error/:error',
+    name: 'Error',
+    component: () => import(/* webpackChunkName: "error" */ '../views/ErrorPage.vue'),
   },
   {
     path: '/about',
@@ -62,6 +61,10 @@ const routes: RouteConfig[] = [
     meta: {
       requiresRole: 'ROLE_ADMIN',
     },
+  },
+  {
+    path: '*',
+    redirect: '/error/404',
   },
 ];
 

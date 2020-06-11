@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
-      <app-header v-if="showHeader"></app-header>
+      <app-header v-if="showHeader" :headerClass="(routeName === 'Error') ? 'bg' : 'header--nobg'" ></app-header>
     </transition>
     <transition name="fade" mode="out-in">
       <router-view />
@@ -64,7 +64,7 @@ export default class App extends Vue {
     return this.$route.name;
   }
 
-  beforeMount(): void {
+  mounted(): void {
     // Initialize CSRF token
     const token = document
       .querySelector('meta[name=_csrf]')
