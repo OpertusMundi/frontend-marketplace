@@ -21,6 +21,14 @@ const routes: RouteConfig[] = [
     component: Home,
   },
   {
+    path: '/signin',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "Login" */ '../views/Login.vue'),
+    meta: {
+      hideForAuth: true,
+    },
+  },
+  {
     path: '/error/401',
     name: 'Error401',
     component: Error401,
@@ -65,6 +73,10 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const role = to.meta?.requiresRole;
+  const auth = to.meta?.hideForAuth;
+  if (auth && store.getters.isAuthenticated) {
+    next({ name: 'User' });
+  }
 
   if (role && !store.getters.hasRole(role)) {
     next('/error/401');

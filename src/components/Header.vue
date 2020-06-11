@@ -40,8 +40,11 @@
         <div class="header__cart">
           <a href="#"><img src="@/assets/images/icons/cart_icon.svg" alt=""><span>0</span></a>
         </div>
-        <div class="header__login">
-          <a href="#">Login</a><span>/</span><a href="#">Register</a>
+        <div class="header__login" v-if="$store.getters.isAuthenticated">
+          <router-link to="/user"><img src="@/assets/images/icons/dashboard/profile_white.svg" alt=""></router-link>
+        </div>
+        <div class="header__login" v-else>
+          <router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link>
         </div>
       </div>
     </div>

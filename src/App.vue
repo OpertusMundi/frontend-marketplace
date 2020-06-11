@@ -1,13 +1,19 @@
 <template>
   <div id="app">
-    <app-header></app-header>
-    <router-view />
-    <app-footer></app-footer>
+    <transition name="fade" mode="out-in">
+      <app-header v-if="showHeader"></app-header>
+    </transition>
+    <transition name="fade" mode="out-in">
+      <router-view />
+    </transition>
+    <transition name="fade" mode="out-in">
+    <app-footer v-if="showFooter"></app-footer>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 
 import store from '@/store';
 
@@ -31,6 +37,10 @@ export default class App extends Vue {
 
   configApi: ConfigurationApi;
 
+  showHeader= true;
+
+  showFooter= true;
+
   constructor() {
     super();
 
@@ -39,7 +49,22 @@ export default class App extends Vue {
     this.configApi = new ConfigurationApi();
   }
 
-  mounted(): void {
+  @Watch('$route', { immediate: true, deep: true })
+  showHideHeader():void {
+    if (this.routeName === 'Login') {
+      this.showHeader = false;
+      this.showFooter = false;
+    } else {
+      this.showHeader = true;
+      this.showFooter = true;
+    }
+  }
+
+  get routeName(): string | null | undefined {
+    return this.$route.name;
+  }
+
+  beforeMount(): void {
     // Initialize CSRF token
     const token = document
       .querySelector('meta[name=_csrf]')

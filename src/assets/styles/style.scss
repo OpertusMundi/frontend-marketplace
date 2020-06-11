@@ -100,3 +100,15 @@ h1, h2, h3, h4, h4, h6 {
         }   
     }
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
+}
