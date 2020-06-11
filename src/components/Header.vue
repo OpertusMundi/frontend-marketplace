@@ -44,7 +44,7 @@
           <router-link to="/user"><img src="@/assets/images/icons/dashboard/profile_white.svg" alt=""></router-link>
         </div>
         <div class="header__login" v-else>
-          <router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link>
+          <router-link to="/signin">Login</router-link><span>/</span><router-link to="/login">Register</router-link>
         </div>
       </div>
     </div>
