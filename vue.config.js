@@ -27,7 +27,7 @@ module.exports = {
         cookieDomainRewrite: '',
         autoRewrite: true,
       },
-      '^/(login|logged-in|logout|logged-out|login/opertus-mundi)': {
+      '^/(login|logged-in|logout|logged-out|login/opertus-mundi|error/*)': {
         target: process.env.VUE_APP_API_GATEWAY_URL,
         ws: true,
         changeOrigin: true,
