@@ -7,7 +7,10 @@
       <router-view />
     </transition>
     <transition name="fade" mode="out-in">
-    <app-footer v-if="showFooter"></app-footer>
+      <app-footer v-if="showFooter"></app-footer>
+    </transition>
+    <transition name="fade" mode="out-in">
+      <div class="loader" v-if="$store.getters.isLoading"></div>
     </transition>
   </div>
 </template>
@@ -23,6 +26,7 @@ import ConfigurationApi from '@/service/config';
 import {
   Configuration, Account, ServerResponse, LogoutResult,
 } from '@/model';
+import { AxiosError } from 'axios';
 
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
@@ -91,6 +95,10 @@ export default class App extends Vue {
             if (profileResponse.success) {
               store.commit('setUserData', profileResponse.result);
             }
+            store.commit('setLoading', false);
+          })
+          .catch((error: AxiosError) => {
+            store.commit('setLoading', false);
           });
       });
   }
