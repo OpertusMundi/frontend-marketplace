@@ -18,7 +18,7 @@
         <li><a href="#" @click.prevent="showRecent = false; showPopular = true;" :class="{active: showPopular}">Popular Searches</a></li>
       </ul>
       <ul class="asset_search__resultscont__results" v-if="queryHasResults">
-        <li v-for="item in queryResults" :key="item.id"><router-link :to="`/assets/${item.id}`"><h5>{{ item.title }}</h5><span>Country: Greece, Language: {{item.language}}, Price: {{showItemPrice(item)}}</span></router-link></li>
+        <li v-for="item in queryResults" :key="item.id"><router-link :to="`/catalogue/${item.id}`"><h5>{{ item.title }}</h5><span>Country: Greece, Language: {{item.language}}, Price: {{showItemPrice(item)}}</span></router-link></li>
       </ul>
       <ul class="asset_search__resultscont__results" v-if="!queryHasResults && !showRecent && !showPopular">
         <li class="no_results"><i>No results found for your query</i></li>

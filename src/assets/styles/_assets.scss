@@ -29,8 +29,29 @@
         padding: 130px 0 100px;
         @media(max-width: 576px) {  
             padding: 80px 0 50px;
-
         }
+
+        .custom-select {
+            select {
+                cursor: pointer;
+                appearance: none;
+                outline: none;
+                border: none;
+                background: none;
+                color: #fff;
+                font-weight: 500;
+                font-family: $mainFont;
+                padding-right: 20px;
+                letter-spacing: 0.02em;
+                background-image: url('~@/assets/images/icons/arrow_down_white.svg');
+                background-repeat: no-repeat;
+                background-position: 100% center;
+                background-size: 13px;
+            }
+
+            
+        }
+        
 
         &__breadcrumps {
             display: flex;

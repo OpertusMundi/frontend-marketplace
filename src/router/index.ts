@@ -10,6 +10,11 @@ Vue.use(VueRouter);
 
 const routes: RouteConfig[] = [
   {
+    path: '/catalogue/:id',
+    name: 'CatalogueSingle',
+    component: () => import(/* webpackChunkName: "asset" */ '../views/CatalogueSingle.vue'),
+  },
+  {
     path: '/callback',
     name: 'callback',
     component: Callback,
