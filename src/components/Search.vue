@@ -118,26 +118,26 @@ export default class Search extends Vue {
     // this.slideToggle('asset_search__resultscont');
   }
 
-  slideToggle(selectorClass:string):void {
-    const selector = document.getElementsByClassName(selectorClass)[0] as HTMLElement;
-    if (!selector) return;
-    if (!selector.classList.contains('active')) {
-      selector.classList.add('active');
-      selector.style.height = 'auto';
-      const height = `${selector.clientHeight}px`;
-      selector.style.height = '0px';
-      setTimeout(() => {
-        selector.style.height = height;
-      }, 0);
-    } else {
-      selector.style.height = '0px';
-      selector.addEventListener('transitionend', () => {
-        selector.classList.remove('active');
-      }, {
-        once: true,
-      });
-    }
-  }
+  // slideToggle(selectorClass:string):void {
+  //   const selector = document.getElementsByClassName(selectorClass)[0] as HTMLElement;
+  //   if (!selector) return;
+  //   if (!selector.classList.contains('active')) {
+  //     selector.classList.add('active');
+  //     selector.style.height = 'auto';
+  //     const height = `${selector.clientHeight}px`;
+  //     selector.style.height = '0px';
+  //     setTimeout(() => {
+  //       selector.style.height = height;
+  //     }, 0);
+  //   } else {
+  //     selector.style.height = '0px';
+  //     selector.addEventListener('transitionend', () => {
+  //       selector.classList.remove('active');
+  //     }, {
+  //       once: true,
+  //     });
+  //   }
+  // }
 
   searchAssets(): void {
     if (this.query.length <= 2) return;
