@@ -98,6 +98,8 @@ export default class App extends Vue {
             store.commit('setLoading', false);
           })
           .catch((error: AxiosError) => {
+            // TODO: Handle error
+            console.log(error);
             store.commit('setLoading', false);
           });
       });

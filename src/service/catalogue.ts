@@ -44,5 +44,4 @@ export default class CatalogueApi extends Api {
         return data;
       });
   }
-
 }

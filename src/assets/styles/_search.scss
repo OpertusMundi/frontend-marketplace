@@ -8,10 +8,20 @@
         border-radius: 26px;
         font-size: 15px;
     }
+    &__backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+    }
     &__upper {
 
         position: relative;
         width: 100%;
+        z-index: 999;
 
         &__input {
             width: 100%;
@@ -59,10 +69,14 @@
 
     
     &__resultscont {
+        position: relative;
+        z-index: 1000;
+        display: block;
         text-align: center;
+        background: #fff;
         transition: height .25s ease;
         &:not(.active) {
-            display: none;
+            // display: none;
         }
         
 
@@ -92,6 +106,11 @@
                         color: $secondColor;
                     }
                 }
+                &:first-child {
+                    a {
+                        border-right:2px solid $secondColor;
+                    }
+                }
             }
         }
 
@@ -106,6 +125,9 @@
                     a {
                         padding-top: 15px;
                     }                
+                }
+                &.no_results {
+                    padding: 15px;
                 }
                 a {
                     display: block;
