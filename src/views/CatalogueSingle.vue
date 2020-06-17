@@ -112,17 +112,9 @@
         <div class="asset__sidebar">
           <div class="asset__shopcard">
             <div class="asset__shopcard__variations">
-              <div class="asset__shopcard__variations__row">
-                <input type="radio" name="variations" id="variation_1">
-                <label for="variation_1">300€ <span>(no updates)</span></label>
-              </div>
-              <div class="asset__shopcard__variations__row">
-                <input type="radio" name="variations" id="variation_2">
-                <label for="variation_2">350€  <span>+ 12 month updates</span></label>
-              </div>
-              <div class="asset__shopcard__variations__row">
-                <input type="radio" name="variations" id="variation_3">
-                <label for="variation_3">420€ <span>+ 24 month updates</span></label>
+              <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
+                <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
+                <label :for="`p_variation_${pr_model.id}`">{{ pr_model.totalPrice === 0 ? 'FREE' : pr_model.totalPrice + prModelCurrencyFormat(pr_model.currency) }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
               </div>
             </div>
             <ul class="asset__shopcard__priceoptions">
@@ -405,11 +397,14 @@ export default class CatalogueSingle extends Vue {
 
   itemLoaded = false;
 
+  selectedPricingModel: string;
+
   constructor() {
     super();
 
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueApi = new CatalogueApi();
+    this.selectedPricingModel = '';
   }
 
   mounted():void {
@@ -428,6 +423,18 @@ export default class CatalogueSingle extends Vue {
     return moment(date).format('DD MMM. YYYY');
   }
 
+  prModelCurrencyFormat(currency:string): string {
+    switch (currency) {
+      case 'EUR':
+        return '€';
+      case 'USD':
+        return '$';
+
+      default:
+        return '';
+    }
+  }
+
   loadAsset(): void {
     const catalogueItemID = this.$route.params.id;
     this.catalogueApi.findOne(catalogueItemID)
@@ -437,6 +444,7 @@ export default class CatalogueSingle extends Vue {
         }
         this.itemLoaded = true;
         this.catalogueItem = queryResponse.result;
+        console.log(this.catalogueItem);
         setTimeout(() => {
           this.calcAssetHeaderTitle();
         }, 200);
