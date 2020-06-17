@@ -439,7 +439,9 @@ export default class CatalogueSingle extends Vue {
       mapOptions: {
         zoomSnap: 0.5,
         zoomControl: false,
-        draggable: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
       },
       coordinates_type: '',
 
