@@ -180,6 +180,16 @@
             padding: 15px;
         }
 
+        &__errors {
+            color: red;
+            margin-top: -20px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: em(13);
+            font-weight: 500;
+        }
+
         &__variations {
             &__row {
                 display:flex;

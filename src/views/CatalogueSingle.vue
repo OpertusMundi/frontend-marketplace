@@ -136,7 +136,8 @@
               <li>+ 24% VAT</li>
               <li>+ 5,99€ delivery to Poland</li>
             </ul>
-            <div class="asset__shopcard__addtocart"><a href="#" class="btn btn--std btn--blue">ADD TO CART</a></div>
+            <div class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
+            <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
             <ul class="asset__shopcard__buyinfo">
               <li><strong>Expected delivery:</strong>Available immediately</li>
               <li><strong>Payment:</strong> Secure, escrow account</li>
@@ -394,7 +395,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   CatalogueItem, ServerResponse,
 } from '@/model';
@@ -425,6 +426,8 @@ export default class CatalogueSingle extends Vue {
 
   map:any;
 
+  cartErrors: string;
+
 
   constructor() {
     super();
@@ -432,6 +435,7 @@ export default class CatalogueSingle extends Vue {
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueApi = new CatalogueApi();
     this.selectedPricingModel = '';
+    this.cartErrors = '';
     this.map = {
       show: false,
       zoom: 10,
@@ -444,8 +448,6 @@ export default class CatalogueSingle extends Vue {
         doubleClickZoom: false,
       },
       coordinates_type: '',
-
-
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
@@ -457,6 +459,13 @@ export default class CatalogueSingle extends Vue {
       this.calcAssetHeaderTitle();
     });
     this.loadAsset();
+  }
+
+  @Watch('selectedPricingModel')
+  selectedPricingModelChanged(newVal: string) {
+    if (newVal !== '') {
+      this.cartErrors = '';
+    }
   }
 
   beforeDestroy():void {
@@ -502,6 +511,15 @@ export default class CatalogueSingle extends Vue {
     if (this.catalogueItem.geometry) {
       this.map.center = latLng(this.catalogueItem.geometry.coordinates[0][0][0], this.catalogueItem.geometry.coordinates[0][0][1]);
     }
+  }
+
+  addToCart():void {
+    if (this.selectedPricingModel === '') {
+      this.cartErrors = 'Please select a pricing model!';
+      return;
+    }
+    this.cartErrors = '';
+    // TODO: add to cart functions
   }
 
   calcAssetHeaderTitle():void {
