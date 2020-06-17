@@ -121,7 +121,7 @@ interface BaseCatalogueItem {
   /*
    * Geometry as GeoJSON
    */
-  geometry: GeoJSON.Geometry;
+  geometry: GeoJSON.Polygon;
 }
 
 export interface CatalogueItem extends BaseCatalogueItem {

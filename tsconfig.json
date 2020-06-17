@@ -16,7 +16,8 @@
     "types": [
       "webpack-env",
       "jest",
-      "geojson"
+      "geojson",
+      "leaflet"
     ],
     "paths": {
       "@/*": [

@@ -1,7 +1,22 @@
 <template>
   <div class="asset" v-show='itemLoaded'>
     <div class="asset__map">
-      <div class="asset__map__inner"></div>
+      <div class="asset__map__inner">
+        <l-map
+          v-if="map.show"
+          :zoom="map.zoom"
+          :center="map.center"
+          :options="map.mapOptions"
+        >
+        <l-tile-layer
+          :url="map.url"
+          :attribution="map.attribution"/>
+        <l-polygon v-if="map.coordinates_type === 'Polygon'"
+          :latLngs="this.catalogueItem.geometry.coordinates[0]"
+          color="#190AFF"
+        />
+        </l-map>
+      </div>
     </div>
     <div class="s_container">
       <div class="asset__inner">
@@ -387,8 +402,17 @@ import moment from 'moment';
 import CatalogueApi from '@/service/catalogue';
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 
+import { latLng } from 'leaflet';
+import { LMap, LTileLayer, LPolygon } from 'vue2-leaflet';
+import 'leaflet/dist/leaflet.css';
+
 @Component({
-  components: { TopicCategoryIcon },
+  components: {
+    TopicCategoryIcon,
+    LMap,
+    LTileLayer,
+    LPolygon,
+  },
 })
 export default class CatalogueSingle extends Vue {
   catalogueApi: CatalogueApi;
@@ -399,12 +423,30 @@ export default class CatalogueSingle extends Vue {
 
   selectedPricingModel: string;
 
+  map:any;
+
+
   constructor() {
     super();
 
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueApi = new CatalogueApi();
     this.selectedPricingModel = '';
+    this.map = {
+      show: false,
+      zoom: 10,
+      center: latLng(37.9782553, 23.7263485),
+      mapOptions: {
+        zoomSnap: 0.5,
+        zoomControl: false,
+        draggable: false,
+      },
+      coordinates_type: '',
+
+
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    };
   }
 
   mounted():void {
@@ -447,8 +489,17 @@ export default class CatalogueSingle extends Vue {
         console.log(this.catalogueItem);
         setTimeout(() => {
           this.calcAssetHeaderTitle();
+          this.initMap();
         }, 200);
       });
+  }
+
+  initMap():void {
+    this.map.show = true;
+    this.map.coordinates_type = this.catalogueItem.geometry.type;
+    if (this.catalogueItem.geometry) {
+      this.map.center = latLng(this.catalogueItem.geometry.coordinates[0][0][0], this.catalogueItem.geometry.coordinates[0][0][1]);
+    }
   }
 
   calcAssetHeaderTitle():void {
