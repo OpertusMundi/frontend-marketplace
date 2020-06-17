@@ -397,10 +397,13 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
-  CatalogueItem, ServerResponse,
+  CatalogueItem, ServerResponse, CartAddItemCommand, Cart,
 } from '@/model';
+import store from '@/store';
 import moment from 'moment';
 import CatalogueApi from '@/service/catalogue';
+import CartApi from '@/service/cart';
+
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 
 import { latLng } from 'leaflet';
@@ -428,6 +431,8 @@ export default class CatalogueSingle extends Vue {
 
   cartErrors: string;
 
+  cartApi: CartApi;
+
 
   constructor() {
     super();
@@ -436,6 +441,7 @@ export default class CatalogueSingle extends Vue {
     this.catalogueApi = new CatalogueApi();
     this.selectedPricingModel = '';
     this.cartErrors = '';
+    this.cartApi = new CartApi();
     this.map = {
       show: false,
       zoom: 10,
@@ -462,7 +468,7 @@ export default class CatalogueSingle extends Vue {
   }
 
   @Watch('selectedPricingModel')
-  selectedPricingModelChanged(newVal: string) {
+  selectedPricingModelChanged(newVal: string):void {
     if (newVal !== '') {
       this.cartErrors = '';
     }
@@ -497,7 +503,6 @@ export default class CatalogueSingle extends Vue {
         }
         this.itemLoaded = true;
         this.catalogueItem = queryResponse.result;
-        console.log(this.catalogueItem);
         setTimeout(() => {
           this.calcAssetHeaderTitle();
           this.initMap();
@@ -520,6 +525,19 @@ export default class CatalogueSingle extends Vue {
     }
     this.cartErrors = '';
     // TODO: add to cart functions
+    const cartItem:CartAddItemCommand = {
+      productId: this.catalogueItem.id,
+      pricingModelId: this.selectedPricingModel,
+    };
+    this.cartApi.addItem(cartItem)
+      .then((cartResponse: ServerResponse<Cart>) => {
+        if (cartResponse.success) {
+          store.commit('setCartItems', cartResponse.result);
+        } else {
+          // TODO: Handle error
+          console.error('cannot add item to cart!');
+        }
+      });
   }
 
   calcAssetHeaderTitle():void {

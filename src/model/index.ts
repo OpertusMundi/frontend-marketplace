@@ -15,6 +15,12 @@ export {
 } from '@/model/catalogue';
 
 export {
+  CartAddItemCommand,
+  CartItem,
+  Cart,
+} from '@/model/cart';
+
+export {
   Configuration,
   EnumAuthProvider,
 } from '@/model/configuration';

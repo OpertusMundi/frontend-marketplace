@@ -22,9 +22,10 @@ import store from '@/store';
 
 import AccountApi from '@/service/account';
 import ConfigurationApi from '@/service/config';
+import CartApi from '@/service/cart';
 
 import {
-  Configuration, Account, ServerResponse, LogoutResult,
+  Configuration, Account, ServerResponse, LogoutResult, Cart,
 } from '@/model';
 import { AxiosError } from 'axios';
 
@@ -41,6 +42,8 @@ export default class App extends Vue {
 
   configApi: ConfigurationApi;
 
+  cartApi: CartApi;
+
   showHeader= true;
 
   showFooter= true;
@@ -54,8 +57,8 @@ export default class App extends Vue {
     this.showFooter = true;
 
     this.accountApi = new AccountApi();
-
     this.configApi = new ConfigurationApi();
+    this.cartApi = new CartApi();
   }
 
   @Watch('$route', { immediate: true, deep: true })
@@ -113,6 +116,20 @@ export default class App extends Vue {
             console.log(error);
             store.commit('setLoading', false);
           });
+      });
+
+    this.getCartItems();
+  }
+
+  getCartItems():void {
+    this.cartApi.getCart()
+      .then((cartResponse: ServerResponse<Cart>) => {
+        if (cartResponse.success) {
+          store.commit('setCartItems', cartResponse.result);
+        } else {
+          // TODO: Handle error
+          console.error('cannot add item to cart!');
+        }
       });
   }
 

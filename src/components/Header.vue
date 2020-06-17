@@ -34,7 +34,7 @@
           <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="29.014" height="22.358"><g data-name="Group 1700" fill="none" stroke="#fff" stroke-width="2"><g data-name="Ellipse 7"><circle cx="10.5" cy="10.5" r="10.5" stroke="none"/><circle cx="10.5" cy="10.5" r="9.5"/></g><path data-name="Path 29" d="M19.375 16.031l9.125 5.47"/></g></svg></a>
         </div>
         <div class="header__cart">
-          <a href="#"><img src="@/assets/images/icons/cart_icon.svg" alt=""><span>0</span></a>
+          <a href="#"><img src="@/assets/images/icons/cart_icon.svg" alt=""><span>{{ cartCount() }}</span></a>
         </div>
         <div class="header__login" v-if="$store.getters.isAuthenticated" @mouseover="showUserMenu=true" @mouseleave="showUserMenu=false">
           <div class="user_menu">
@@ -79,7 +79,6 @@ export default class Header extends Vue {
 
   accountApi: AccountApi;
 
-
   constructor() {
     super();
 
@@ -88,6 +87,13 @@ export default class Header extends Vue {
 
   mounted(): void {
     window.addEventListener('scroll', this.handleScroll);
+  }
+
+  cartCount(): number {
+    if (store.getters.getCart) {
+      return store.getters.getCart.totalItems;
+    }
+    return 0;
   }
 
   destroyed(): void {
