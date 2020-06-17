@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
-      <app-header v-if="showHeader" :headerClass="(routeName === 'Error') ? 'bg' : 'header--nobg'" ></app-header>
+      <app-header v-if="showHeader" :headerClass="headerClass" ></app-header>
     </transition>
     <transition name="fade" mode="out-in">
       <router-view />
@@ -45,8 +45,13 @@ export default class App extends Vue {
 
   showFooter= true;
 
+  headerClass = 'bg';
+
   constructor() {
     super();
+
+    this.showHeader = true;
+    this.showFooter = true;
 
     this.accountApi = new AccountApi();
 
@@ -58,9 +63,15 @@ export default class App extends Vue {
     if (this.routeName === 'Login') {
       this.showHeader = false;
       this.showFooter = false;
-    } else {
+    } else if (this.routeName === 'DashboardHome') {
+      this.showFooter = false;
+      this.headerClass = 'header--dark';
+    } else if (this.routeName === 'Error' || this.routeName === 'Home') {
+      this.headerClass = 'header--nobg';
       this.showHeader = true;
       this.showFooter = true;
+    } else {
+      this.headerClass = 'bg';
     }
   }
 

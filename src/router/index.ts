@@ -10,19 +10,27 @@ Vue.use(VueRouter);
 
 const routes: RouteConfig[] = [
   {
+    path: '/',
+    name: 'Home',
+    component: Home,
+  },
+  {
     path: '/catalogue/:id',
     name: 'CatalogueSingle',
     component: () => import(/* webpackChunkName: "asset" */ '../views/CatalogueSingle.vue'),
   },
   {
+    path: '/dashboard',
+    name: 'DashboardHome',
+    component: () => import(/* webpackChunkName: "asset" */ '../views/dashboard/Home.vue'),
+    meta: {
+      requiresRole: 'ROLE_USER',
+    },
+  },
+  {
     path: '/callback',
     name: 'callback',
     component: Callback,
-  },
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
   },
   {
     path: '/signin',

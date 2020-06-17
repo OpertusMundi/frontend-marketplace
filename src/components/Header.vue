@@ -1,7 +1,7 @@
 <template>
   <header class="header" v-bind:class="[headerClass, scrollClass, {'open':showMobileMenu}]">
     <div class="header__inner">
-      <div class="header__logo"><a href="/"><img src="@/assets/images/logo.svg" alt=""></a></div>
+      <div class="header__logo"><router-link to="/"><img src="@/assets/images/logo.svg" alt=""></router-link></div>
       <div class="header__mobile">
         <a href="#" class="header__mobile__burger" v-bind:class="{'open':showMobileMenu}" @click.prevent="toggleMobileMenu">
           <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
