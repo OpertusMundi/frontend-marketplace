@@ -25,7 +25,21 @@ export default class User extends Vue {
 
   updateUserData = (): void => {
     const command: ProfileCommand = {
+      addresses: [],
+      additionalInfo: '',
+      bankAccountCurrency: 'EUR',
+      bankAccountHolderName: '',
+      bankAccountIban: '',
+      bankAccountSwift: '',
+      company: '',
+      companyType: '',
+      country: 'Greece',
+      countryPhoneCode: '+30',
       email: 'user@example.com',
+      mobile: '',
+      phone: '',
+      siteUrl: '',
+      vat: '',
     };
 
     this.accountApi.setProfile(command);

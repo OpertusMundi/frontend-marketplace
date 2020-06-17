@@ -11,33 +11,37 @@ export interface CatalogueQuery extends PageRequest {
 
 interface BaseCatalogueItem {
   /*
-   * The nature or genre of the resource
-   */
-  type: string;
-  /*
-   * A name given to the resource
-   */
-  title: string;
-  /*
-   * The file format, physical medium, or dimensions of the resource
-   */
-  format: string;
-  /*
-   * Information about resource licensing
-   */
-  license: string;
-  /*
-   * General explanation of the data producer’s knowledge about the lineage of a dataset
-   */
-  lineage: string;
-  /*
    * An abstract of the resource
    */
   abstractText: string;
   /*
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: string;
+  /*
+   * Degree of conformity with the implementing rules/standard of the metadata followed
+   */
+  conformity: string;
+  /*
+   * Provides information about the datasets that the service operates on
+   */
+  coupledResource: string;
+  /**
+   * A point or period of time associated with the creation event in the lifecycle of the resource
+   */
+  creationDate: string;
+  /*
    * The temporal extent of the resource (end date)
    */
   dateEnd: string;
+  /*
+   * The temporal extent of the resource (start date)
+   */
+  dateStart: string;
+  /*
+   * The file format, physical medium, or dimensions of the resource
+   */
+  format: string;
   /*
    * The topic of the resource
    */
@@ -47,43 +51,50 @@ interface BaseCatalogueItem {
    */
   language: string;
   /*
-   * Provides the ID of a parent dataset
+   * Information about resource licensing
    */
-  parentId: string;
+  license: string;
   /*
-   * An entity responsible for making the resource available
+   * General explanation of the data producer’s knowledge about the lineage of a dataset
    */
-  publisher: string;
-  /*
-   * Degree of conformity with the implementing rules/standard of the metadata followed
-   */
-  conformity: string;
-  /*
-   * The temporal extent of the resource (start date)
-   */
-  dateStart: string;
+  lineage: string;
   /*
    * The date which specifies when the metadata record was created or updated
    */
   metadataDate: string;
   /*
-   * A point or period of time associated with the revision event in the lifecycle of the resource",
+   * The language in which the metadata elements are expressed
    */
-  revisionDate: string;
+  metadataLanguage: string;
   /*
-   * A high-level classification scheme to assist in the grouping and topic-based
-   * search of available spatial data resources
+   * The email of the organization responsible for the creation and maintenance of the metadata
    */
-  topicCategory: string;
+  metadataPointOfContactEmail: string;
   /*
-   * Provides information about the datasets that the service operates on
+   * The name of the organization responsible for the creation and maintenance of the metadata
    */
-  coupledResource: string;
+  metadataPointOfContactName: string;
+  /*
+   * Provides the ID of a parent dataset
+   */
+  parentId: string;
+  /*
+   * Information on the limitations and the reasons for them
+   */
+  publicAccessLimitations: string;
   /*
    * A point or period of time associated with the publication even in the
    * lifecycle of the resource
    */
   publicationDate: string;
+  /*
+   * Email of an entity responsible for making the resource available
+   */
+  publisherEmail: string;
+  /*
+   * Name of an entity responsible for making the resource available
+   */
+  publisherName: string;
   /*
    * Information about the reference system
    */
@@ -95,29 +106,38 @@ interface BaseCatalogueItem {
    */
   resourceLocator: string;
   /*
-   * The language in which the metadata elements are expressed
+   * A point or period of time associated with the revision event in the lifecycle of the resource",
    */
-  metadataLanguage: string;
+  revisionDate: string;
+  /*
+   * Denominator of the scale of the data set
+   */
+  scale: string;
+  /*
+   * The nature or genre of the service
+   */
+  spatialDataServiceType: string;
   /*
    * Spatial resolution refers to the level of detail of the data set
    */
   spatialResolution: string;
   /*
-   * Auxiliary files or additional resources to the dataset
+   * A name given to the resource
    */
-  additionalResources: string;
+  title: string;
   /*
-   * The description of the organization responsible for the creation and maintenance of the metadata
+   * A high-level classification scheme to assist in the grouping and topic-based
+   * search of available spatial data resources
    */
-  metadataPointOfContact: string;
+  topicCategory: string;
   /*
-   * Information on the limitations and the reasons for them
+   * The nature or genre of the resource
    */
-  publicAccessLimitations: string;
+  type: string;
   /*
-   * The nature or genre of the service
+   * Version of the resource
    */
-  spatialDataServiceType: string;
+  version: string;
   /*
    * Geometry as GeoJSON
    */
@@ -129,10 +149,6 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Catalogue item identifier (UUID)
    */
   id: string;
-  /*
-   * Version of the resource
-   */
-  version: string;
   /*
    * Pricing model available for the asset
    */

@@ -19,29 +19,29 @@ export enum EnumPricingModel {
 
 export interface BasePricingModel {
   /*
+   * Currency of monetary values (always EUR)
+   */
+  currency: string;
+  /*
    * Model unique identifier
    */
   id: string;
-  /*
-   * Tax percent in range [0, 100]
-   */
-  taxPercent: number;
-  /*
-   * Price excluding tax
-   */
-  totalPriceExcludingTax: number;
   /*
    * Price tax
    */
   tax: number;
   /*
+   * Tax percent in range [0, 100]
+   */
+  taxPercent: number;
+  /*
    * Price total including tax
    */
   totalPrice: number;
   /*
-   * Currency of monetary values (always EUR)
+   * Price excluding tax
    */
-  currency: string;
+  totalPriceExcludingTax: number;
 }
 
 export interface FreePricingModel extends BasePricingModel {
