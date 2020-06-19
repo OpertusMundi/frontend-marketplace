@@ -460,6 +460,7 @@ export default class CatalogueSingle extends Vue {
   }
 
   mounted():void {
+    alert('sdf');
     this.calcAssetHeaderTitle();
     window.addEventListener('resize', () => {
       this.calcAssetHeaderTitle();
