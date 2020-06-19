@@ -406,7 +406,7 @@ import CartApi from '@/service/cart';
 
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 
-import { latLng } from 'leaflet';
+import L, { latLng } from 'leaflet';
 import { LMap, LTileLayer, LPolygon } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -444,7 +444,7 @@ export default class CatalogueSingle extends Vue {
     this.cartApi = new CartApi();
     this.map = {
       show: false,
-      zoom: 10,
+      zoom: 7,
       center: latLng(37.9782553, 23.7263485),
       mapOptions: {
         zoomSnap: 0.5,
@@ -515,8 +515,15 @@ export default class CatalogueSingle extends Vue {
     this.map.show = true;
     this.map.coordinates_type = this.catalogueItem.geometry.type;
     if (this.catalogueItem.geometry) {
-      this.map.center = latLng(this.catalogueItem.geometry.coordinates[0][0][0], this.catalogueItem.geometry.coordinates[0][0][1]);
+      this.polygonCenter();
     }
+  }
+
+  polygonCenter():void {
+    if (!this.catalogueItem.geometry.coordinates) return;
+    const coordinates:any = this.catalogueItem.geometry.coordinates[0];
+    const polygon = L.polygon(coordinates);
+    this.map.center = polygon.getBounds().getCenter();
   }
 
   addToCart():void {
