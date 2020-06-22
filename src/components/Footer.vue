@@ -42,10 +42,10 @@
               <a href="#" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</a>
             </div>
           </div>
-          <div class="vendorpromo__center">
-            <img src="@/assets/images/icons/market_icon.svg" alt="">
-            <img src="@/assets/images/icons/arrow_icon.svg" alt="">
+          <div class="vendorpromo__center" v-bind:class="promoClasses[1]">
             <img src="@/assets/images/icons/db_icon.svg" alt="">
+            <img src="@/assets/images/icons/arrow_icon.svg" alt="">
+            <img src="@/assets/images/icons/market_icon.svg" alt="">
           </div>
           <div class="vendorpromo__item" v-bind:class="promoClasses[1]" @mouseover="promoAnimation(1)">
             <h6 class="vendorpromo__title">Do you work with geodata?</h6>
