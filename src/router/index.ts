@@ -17,12 +17,12 @@ const routes: RouteConfig[] = [
   {
     path: '/catalogue/:id',
     name: 'CatalogueSingle',
-    component: () => import(/* webpackChunkName: "asset" */ '../views/CatalogueSingle.vue'),
+    component: () => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
     path: '/dashboard',
     name: 'DashboardHome',
-    component: () => import(/* webpackChunkName: "asset" */ '../views/dashboard/Home.vue'),
+    component: () => import(/* webpackChunkName: "home" */ '../views/dashboard/Home.vue'),
     meta: {
       requiresRole: 'ROLE_USER',
     },
@@ -30,7 +30,7 @@ const routes: RouteConfig[] = [
   {
     path: '/order-thankyou',
     name: 'OrderThankYou',
-    component: () => import(/* webpackChunkName: "asset" */ '../views/orders/Thankyou.vue'),
+    component: () => import(/* webpackChunkName: "thankyou" */ '../views/orders/Thankyou.vue'),
   },
   {
     path: '/callback',
@@ -53,10 +53,17 @@ const routes: RouteConfig[] = [
   {
     path: '/about',
     name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+  },
+  {
+    path: '/vendor-benefits',
+    name: 'VendorBenefits',
+    component: () => import(/* webpackChunkName: "vendorbenefits" */ '../views/VendorBenefits.vue'),
+  },
+  {
+    path: '/user-benefits',
+    name: 'UserBenefits',
+    component: () => import(/* webpackChunkName: "userbenefits" */ '../views/UserBenefits.vue'),
   },
   {
     path: '/user',

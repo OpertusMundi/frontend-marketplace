@@ -460,7 +460,6 @@ export default class CatalogueSingle extends Vue {
   }
 
   mounted():void {
-    console.log('test webhook');
     this.calcAssetHeaderTitle();
     window.addEventListener('resize', () => {
       this.calcAssetHeaderTitle();

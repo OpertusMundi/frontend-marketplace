@@ -67,12 +67,12 @@
             </div>
             <div class="footer__upper__item">
               <h6>Sell Geodata</h6>
-              <a href="#">Benefits for vendors</a>
+              <router-link to="/vendor-benefits">Benefits for vendors</router-link>
               <a href="#">Get started</a>
             </div>
             <div class="footer__upper__item">
               <h6>Buy Geodata</h6>
-              <a href="#">Benefits for users</a>
+              <router-link to="/user-benefits">Benefits for users</router-link>
               <a href="#">Data catalogue</a>
             </div>
             <div class="footer__upper__item">

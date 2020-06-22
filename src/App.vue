@@ -50,6 +50,10 @@ export default class App extends Vue {
 
   headerClass = 'bg';
 
+  noHeaderBgArray:Array<string | null | undefined>;
+
+  noHeader:Array<string | null | undefined>;
+
   constructor() {
     super();
 
@@ -59,17 +63,28 @@ export default class App extends Vue {
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
+
+    this.noHeader = [
+      'Login',
+    ];
+    this.noHeaderBgArray = [
+      'Home',
+      'CatalogueSingle',
+      'OrderThankYou',
+      'UserBenefits',
+      'VendorBenefits',
+    ];
   }
 
   @Watch('$route', { immediate: true, deep: true })
   showHideHeader():void {
-    if (this.routeName === 'Login') {
+    if (this.noHeader.includes(this.routeName)) {
       this.showHeader = false;
       this.showFooter = false;
     } else if (this.routeName === 'DashboardHome') {
       this.showFooter = false;
       this.headerClass = 'header--dark';
-    } else if (this.routeName === 'Home' || this.routeName === 'CatalogueSingle' || this.routeName === 'OrderThankYou') {
+    } else if (this.noHeaderBgArray.includes(this.routeName)) {
       this.headerClass = 'header--nobg';
       this.showHeader = true;
       this.showFooter = true;
