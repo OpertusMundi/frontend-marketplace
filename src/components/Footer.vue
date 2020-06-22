@@ -14,7 +14,7 @@
               <p>Upload, promote, and trade your data assets with ease </p>
               <p>Gain new clients & increase your profits </p>
               <p>Turn your assets into services</p>
-              <a href="#" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</a>
+              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</router-link>
             </div>
           </div>
           <div class="vendorpromo__item over">
@@ -28,7 +28,7 @@
               <p>View, discover, compare, and purchase geospatial data assets </p>
               <p>Top-class methods of secure payment, delivery, and storage </p>
               <p>Zero fees</p>
-              <a href="#" class="btn btn--std btn--blue">BENEFITS FOR USERS</a>
+              <router-link to="/user-benefits" class="btn btn--std btn--blue">BENEFITS FOR USERS</router-link>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@
               <p>Upload, promote, and trade your data assets with ease </p>
               <p>Gain new clients & increase your profits </p>
               <p>Turn your assets into services</p>
-              <a href="#" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</a>
+              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</router-link>
             </div>
           </div>
           <div class="vendorpromo__center" v-bind:class="promoClasses[1]">
@@ -53,7 +53,7 @@
               <p>View, discover, compare, and purchase geospatial data assets </p>
               <p>Top-class methods of secure payment, delivery, and storage </p>
               <p>Zero fees</p>
-              <a href="#" class="btn btn--std btn--blue">BENEFITS FOR USERS</a>
+              <router-link to="/user-benefits" class="btn btn--std btn--blue">BENEFITS FOR USERS</router-link>
             </div>
           </div>
         </div>
