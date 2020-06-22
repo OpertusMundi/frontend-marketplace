@@ -28,6 +28,11 @@ const routes: RouteConfig[] = [
     },
   },
   {
+    path: '/order-thankyou',
+    name: 'OrderThankYou',
+    component: () => import(/* webpackChunkName: "asset" */ '../views/orders/Thankyou.vue'),
+  },
+  {
     path: '/callback',
     name: 'callback',
     component: Callback,

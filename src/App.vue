@@ -69,7 +69,7 @@ export default class App extends Vue {
     } else if (this.routeName === 'DashboardHome') {
       this.showFooter = false;
       this.headerClass = 'header--dark';
-    } else if (this.routeName === 'Error' || this.routeName === 'Home' || this.routeName === 'CatalogueSingle') {
+    } else if (this.routeName === 'Home' || this.routeName === 'CatalogueSingle' || this.routeName === 'OrderThankYou') {
       this.headerClass = 'header--nobg';
       this.showHeader = true;
       this.showFooter = true;
