@@ -21,11 +21,27 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/dashboard',
-    name: 'DashboardHome',
-    component: () => import(/* webpackChunkName: "home" */ '../views/dashboard/Home.vue'),
+    component: () => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
     meta: {
       requiresRole: 'ROLE_USER',
     },
+    children: [
+      {
+        path: '',
+        name: 'DashboardHome',
+        component: () => import(/* webpackChunkName: "dashboardhome" */ '../views/dashboard/Home.vue'),
+      },
+      {
+        path: 'assets',
+        name: 'Assets',
+        component: () => import(/* webpackChunkName: "dashboardassets" */ '../views/dashboard/Assets.vue'),
+      },
+      {
+        path: 'assets/create',
+        name: 'CreateAsset',
+        component: () => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
+      },
+    ],
   },
   {
     path: '/order-thankyou',

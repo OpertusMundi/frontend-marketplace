@@ -70,7 +70,7 @@
                                 }
                             }
                         }
-                        &.active { 
+                        &.active, &.router-link-active { 
                             color: $secondColor;
                             svg {
                                 path {
@@ -138,8 +138,14 @@
         justify-content: space-between;
         margin-bottom: 35px;
 
+        &__left {
+            display: flex;
+            align-items: center;
+        }
+
         h1 {
             @include fluid-type(30px, 45px);
+            padding-right: 25px;
         }
         .btn {
             margin-left: 10px;
