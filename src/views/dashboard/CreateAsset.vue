@@ -539,7 +539,11 @@
             </div>
           </div>
           </validation-observer>
-
+          <div class="dashboard__form__errors" v-if="uploading.errors.length">
+            <ul>
+              <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">{{ error.description }}</li>
+            </ul>
+          </div>
 
         </div>
         <div class="dashboard__form__navbuttons">
@@ -636,6 +640,7 @@ export default class CreateAsset extends Vue {
       title: 'Your asset is being uploaded',
       subtitle: 'Don’t close this page until upload is complete',
       completed: false,
+      errors: [],
     };
 
 
@@ -690,16 +695,22 @@ export default class CreateAsset extends Vue {
   submitForm():void {
     // TODO: submit form!
     this.uploading.status = true;
+    this.uploading.errors = [];
     this.catalogueApi.create(this.asset)
       .then((response: ServerResponse<void>) => {
-        console.log(response);
         if (response.success) {
           this.uploading.status = false;
           this.uploading.completed = true;
           this.uploading.title = 'Your asset has been submitted for review';
           this.uploading.subtitle = 'You’ll be notified by email for this process';
+        } else {
+          this.uploading.status = false;
+          this.uploading.completed = true;
+          this.uploading.errors = response.messages;
+          setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+          }, 100);
         }
-        this.uploading.status = false;
       })
       .catch((error: AxiosError) => {
         console.log(error);
