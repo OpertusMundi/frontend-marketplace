@@ -1,6 +1,6 @@
 <template>
 <div class="dashboard__inner">
-    <div class="dashboard__inner__steps" v-if="!uploading">
+    <div class="dashboard__inner__steps" v-if="!uploading.status">
       <div class="dashboard__head">
         <h1>Add an asset</h1>
         <div class="dashboard__head__helpers">
@@ -549,9 +549,13 @@
       </div>
     </div>
 
-    <div class="dashboard__form__uploading" v-if="uploading">
+    <div class="dashboard__form__uploading" v-if="uploading.status">
       <div class="dashboard__form__uploading__inner">
-        <div class="dashboard__form__uploading__pbar"><span :style="{width: uploadingPercent + '%'}"></span><p>{{ uploadingPercent }}%</p></div>
+        <div class="dashboard__form__uploading__pbar">
+          <span :style="{width: uploading.percent + '%'}"></span>
+          <p v-if="!uploading.completed">{{ uploading.percent }}%</p>
+          <p v-if="uploading.completed">Well done!</p>
+        </div>
         <div class="dashboard__form__uploading__body">
           <h4>Your asset is being uploaded</h4>
           <p>Don’t close this page until upload is complete</p>
@@ -564,7 +568,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { CatalogueAddItemCommand } from '@/model';
+import { CatalogueAddItemCommand, ServerResponse } from '@/model';
 import { BasePricingModelCommand } from '@/model/pricing-model';
 import CatalogueApi from '@/service/catalogue';
 import { required, email, regex } from 'vee-validate/dist/rules';
@@ -572,6 +576,7 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import VueCardFormat from 'vue-credit-card-validation';
+import { AxiosError } from 'axios';
 
 Vue.use(VueCardFormat);
 
@@ -613,9 +618,7 @@ export default class CreateAsset extends Vue {
 
   creatidCardValid = false;
 
-  uploading = false;
-
-  uploadingPercent = 0;
+  uploading:any;
 
   constructor() {
     super();
@@ -627,15 +630,22 @@ export default class CreateAsset extends Vue {
     this.asset.pricingModels = [];
     this.asset.pricingModels.push(priceModel);
 
+    this.uploading = {
+      status: false,
+      percentage: 0,
+      title: 'Your asset is being uploaded',
+      subtitle: 'Don’t close this page until upload is complete',
+      completed: false,
+    };
+
 
     this.catalogueApi = new CatalogueApi();
   }
 
-  mounted():void {
-    console.log(this.$route.params.error);
-    console.log(this.asset.pricingModels);
-  }
-
+  // mounted():void {
+  //   console.log(this.$route.params.error);
+  //   console.log(this.asset.pricingModels);
+  // }
   goToStep(step:number):void {
     this.currentStep = step;
   }
@@ -679,7 +689,22 @@ export default class CreateAsset extends Vue {
 
   submitForm():void {
     // TODO: submit form!
-    console.log(this.asset);
+    this.uploading.status = true;
+    this.catalogueApi.create(this.asset)
+      .then((response: ServerResponse<void>) => {
+        console.log(response);
+        if (response.success) {
+          this.uploading.status = false;
+          this.uploading.completed = true;
+          this.uploading.title = 'Your asset has been submitted for review';
+          this.uploading.subtitle = 'You’ll be notified by email for this process';
+        }
+        this.uploading.status = false;
+      })
+      .catch((error: AxiosError) => {
+        console.log(error);
+        this.uploading.status = false;
+      });
   }
 }
 </script>
