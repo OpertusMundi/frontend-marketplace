@@ -22,24 +22,25 @@ const routes: RouteConfig[] = [
   {
     path: '/dashboard',
     component: () => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
-    meta: {
-      requiresRole: 'ROLE_USER',
-    },
+    meta: { requiresRole: 'ROLE_USER' },
     children: [
       {
         path: '',
         name: 'DashboardHome',
         component: () => import(/* webpackChunkName: "dashboardhome" */ '../views/dashboard/Home.vue'),
+        meta: { requiresRole: 'ROLE_USER' },
       },
       {
         path: 'assets',
         name: 'Assets',
         component: () => import(/* webpackChunkName: "dashboardassets" */ '../views/dashboard/Assets.vue'),
+        meta: { requiresRole: 'ROLE_USER' },
       },
       {
         path: 'assets/create',
         name: 'CreateAsset',
         component: () => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
+        meta: { requiresRole: 'ROLE_USER' },
       },
     ],
   },
