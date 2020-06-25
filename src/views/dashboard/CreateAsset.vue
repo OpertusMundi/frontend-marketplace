@@ -66,70 +66,70 @@
             <validation-provider v-slot="{ errors }" name="Editor's name" rules="required">
               <div class="form-group">
                 <label for="editor">Editor</label>
-                <input type="text" name="editor" class="form-group__text" id="" v-model="asset.publisherName">
+                <input type="text" name="publisherName" class="form-group__text" id="" v-model="asset.publisherName">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Editor's email" rules="required|email">
               <div class="form-group">
                 <label for="">Editor’s email</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.publisherEmail">
+                <input type="text" class="form-group__text" id="" name="publisherEmail" v-model="asset.publisherEmail">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Maintenance manager name" rules="required">
               <div class="form-group">
                 <label for="">Maintenance manager</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.metadataPointOfContactName">
+                <input type="text" class="form-group__text" id="" name="metadataPointOfContactName" v-model="asset.metadataPointOfContactName">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Maintenance manager’s email" rules="required|email">
               <div class="form-group">
                 <label for="">Maintenance manager’s email</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.metadataPointOfContactEmail">
+                <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="asset.metadataPointOfContactEmail">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Version" rules="required">
               <div class="form-group">
                 <label for="">Version</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.version">
+                <input type="text" class="form-group__text" id="" name="version" v-model="asset.version">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Asset title" rules="required">
               <div class="form-group">
                 <label for="">Asset title</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.title">
+                <input type="text" class="form-group__text" id="" name="title" v-model="asset.title">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Asset short description" rules="required">
               <div class="form-group">
                 <label for="">Asset short description</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.abstractText">
+                <input type="text" class="form-group__text" id="" name="abstractText" v-model="asset.abstractText">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Metadata language" rules="required">
               <div class="form-group">
                 <label for="">Metadata language</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.metadataLanguage">
+                <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="asset.metadataLanguage">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Metadata date" rules="required">
               <div class="form-group">
                 <label for="">Metadata date</label>
-                <datepicker v-model="asset.metadataDate" format="dd/MM/yyyy" input-class="form-group__text"></datepicker>
+                <datepicker v-model="asset.metadataDate" name="metadataDate" format="dd/MM/yyyy" input-class="form-group__text"></datepicker>
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
             <validation-provider v-slot="{ errors }" name="Scale" rules="required">
               <div class="form-group">
                 <label for="">Scale</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.scale">
+                <input type="text" class="form-group__text" id="" name="scale" v-model="asset.scale">
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
@@ -561,8 +561,11 @@
           <p v-if="uploading.completed">Well done!</p>
         </div>
         <div class="dashboard__form__uploading__body">
-          <h4>Your asset is being uploaded</h4>
-          <p>Don’t close this page until upload is complete</p>
+          <h4>{{ uploading.title }}</h4>
+          <p>{{ uploading.subtitle }}</p>
+          <div class="dashboard__form__uploading__body__btns">
+            <router-link to="/dashboard" class="btn btn--std btn--blue">GO TO Dashboard</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -580,7 +583,7 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import VueCardFormat from 'vue-credit-card-validation';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 
@@ -747,10 +750,17 @@ export default class CreateAsset extends Vue {
 
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
-    this.catalogueApi.create(this.asset)
+    const config: AxiosRequestConfig = {
+      onUploadProgress: (progressEvent: any): void => {
+        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+        if (totalLength !== null) {
+          this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+        }
+      },
+    };
+    this.catalogueApi.create(this.asset, config)
       .then((response: ServerResponse<void>) => {
         if (response.success) {
-          this.uploading.status = false;
           this.uploading.completed = true;
           this.uploading.title = 'Your asset has been submitted for review';
           this.uploading.subtitle = 'You’ll be notified by email for this process';
