@@ -556,8 +556,8 @@
     <div class="dashboard__form__uploading" v-if="uploading.status">
       <div class="dashboard__form__uploading__inner">
         <div class="dashboard__form__uploading__pbar">
-          <span :style="{width: uploading.percent + '%'}"></span>
-          <p v-if="!uploading.completed">{{ uploading.percent }}%</p>
+          <span :style="{width: uploading.percentage + '%'}"></span>
+          <p v-if="!uploading.completed">{{ uploading.percentage }}%</p>
           <p v-if="uploading.completed">Well done!</p>
         </div>
         <div class="dashboard__form__uploading__body">
@@ -738,7 +738,7 @@ export default class CreateAsset extends Vue {
     this.uploading.errors = [];
 
     // fix dates format
-    this.asset.metadataDate = moment(this.asset.metadataDate).format('yyyy-MM-dd');
+    this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
     this.catalogueApi.create(this.asset)
       .then((response: ServerResponse<void>) => {
         if (response.success) {
