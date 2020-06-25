@@ -122,7 +122,7 @@
             <validation-provider v-slot="{ errors }" name="Metadata date" rules="required">
               <div class="form-group">
                 <label for="">Metadata date</label>
-                <input type="text" class="form-group__text" id="" v-model="asset.metadataDate">
+                <datepicker v-model="asset.metadataDate" format="dd/MM/yyyy" input-class="form-group__text"></datepicker>
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
@@ -195,7 +195,7 @@
                 <div class="asset-pricing-model__fixed" v-if="priceModelType == 'FIXED'">
                   <validation-provider v-slot="{ errors }" name="Price" rules="required"  tag="div" class="form-group form-group--inline">
                       <label for="">Price in EUR</label>
-                      <input type="number" class="form-group__text" value="" v-model="pricingModel.totalPrice">
+                      <input type="number" class="form-group__text" value="" v-model="pricingModel.totalPriceExcludingTax">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </validation-provider>
                   <validation-provider v-slot="{ errors }" name="Updates" rules="required" tag="div" class="form-group form-group--inline">
@@ -581,6 +581,8 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import VueCardFormat from 'vue-credit-card-validation';
 import { AxiosError } from 'axios';
+import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
 
 Vue.use(VueCardFormat);
 
@@ -597,6 +599,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     ValidationProvider,
     ValidationObserver,
     Multiselect,
+    Datepicker,
   },
 })
 export default class CreateAsset extends Vue {
@@ -627,7 +630,44 @@ export default class CreateAsset extends Vue {
   constructor() {
     super();
 
-    this.asset = {} as CatalogueAddItemCommand;
+    this.asset = {
+      abstractText: '',
+      additionalResources: '',
+      conformity: '',
+      coupledResource: '',
+      creationDate: '',
+      dateEnd: '',
+      dateStart: '',
+      format: 'CSV',
+      keywords: '',
+      language: '',
+      license: '',
+      lineage: '',
+      metadataDate: '',
+      metadataLanguage: '',
+      metadataPointOfContactEmail: '',
+      metadataPointOfContactName: '',
+      parentId: '',
+      publicAccessLimitations: '',
+      publicationDate: '',
+      publisherEmail: '',
+      publisherName: '',
+      referenceSystem: '',
+      resourceLocator: '',
+      revisionDate: '',
+      scale: '',
+      spatialDataServiceType: '',
+      spatialResolution: '',
+      title: '',
+      topicCategory: '',
+      type: '',
+      version: '',
+      pricingModels: [],
+      geometry: {
+        type: 'Polygon',
+        coordinates: [],
+      } as GeoJSON.Polygon,
+    };
 
     this.priceModelType = '';
     const priceModel = { type: '' } as BasePricingModelCommand;
@@ -696,6 +736,9 @@ export default class CreateAsset extends Vue {
     // TODO: submit form!
     this.uploading.status = true;
     this.uploading.errors = [];
+
+    // fix dates format
+    this.asset.metadataDate = moment(this.asset.metadataDate).format('yyyy-MM-dd');
     this.catalogueApi.create(this.asset)
       .then((response: ServerResponse<void>) => {
         if (response.success) {
@@ -708,12 +751,20 @@ export default class CreateAsset extends Vue {
           this.uploading.completed = true;
           this.uploading.errors = response.messages;
           setTimeout(() => {
+            this.uploading.errors = [];
+          }, 10000);
+          setTimeout(() => {
             window.scrollTo(0, document.body.scrollHeight);
-          }, 100);
+          }, 300);
         }
       })
       .catch((error: AxiosError) => {
-        console.log(error);
+        if (error.response) {
+          this.uploading.errors = error.response.data.messages;
+          setTimeout(() => {
+            this.uploading.errors = [];
+          }, 10000);
+        }
         this.uploading.status = false;
       });
   }

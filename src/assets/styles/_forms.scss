@@ -569,3 +569,11 @@
         border-radius: 20px;
     }
 }
+
+.vdp-datepicker__calendar .cell.selected {
+    background: $secondColor!important;
+    color: #fff;
+}
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover, .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover, .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
+    border-color: $secondColor!important;
+}
