@@ -15,6 +15,11 @@ const routes: RouteConfig[] = [
     component: Home,
   },
   {
+    path: '/catalogue/',
+    name: 'Catalogue',
+    component: () => import(/* webpackChunkName: "cataloguesingle" */ '../views/Catalogue.vue'),
+  },
+  {
     path: '/catalogue/:id',
     name: 'CatalogueSingle',
     component: () => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),

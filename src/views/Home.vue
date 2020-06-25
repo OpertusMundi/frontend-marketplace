@@ -134,7 +134,7 @@
         </a>
       </div>
       <div class="homepage__assets__btn">
-        <a href="#" class="btn btn--std btn--blue">EXPLORE ASSETS</a>
+        <router-link to="/catalogue" class="btn btn--std btn--blue">EXPLORE ASSETS</router-link>
       </div>
     </section>
     <section class="homepage__small_blocks">
