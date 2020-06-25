@@ -20,7 +20,9 @@
 // @import "shape";
 // @import "thankyou";
 
-
+html {
+    scroll-behavior: smooth;
+}
 body {
     font-size: #{$baseFontSize}px;
     -webkit-font-smoothing: antialiased;
