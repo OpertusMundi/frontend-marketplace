@@ -36,6 +36,8 @@ export default class User extends Vue {
       country: 'Greece',
       countryPhoneCode: '+30',
       email: 'user@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
       mobile: '',
       phone: '',
       siteUrl: '',

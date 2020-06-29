@@ -69,6 +69,10 @@ interface ProfileBase {
    */
   email: string;
   /**
+   * First name
+   */
+  firstName: string;
+  /**
    * Base64 encoded user image
    */
   image?: string;
@@ -76,6 +80,10 @@ interface ProfileBase {
    * User image mime type (used with image property to create a data URL)
    */
   imageMimeType?: string;
+  /**
+   * Last name
+   */
+  lastName: string;
   /**
    * Base64 encoded company logo image
    */
@@ -163,11 +171,11 @@ export interface AccountBase {
    */
   email: string;
   /**
-   * First name
+   * @deprecated Will be removed in future update
    */
   firstName: string;
   /**
-   * Last name
+   * @deprecated Will be removed in future update
    */
   lastName: string;
   /**

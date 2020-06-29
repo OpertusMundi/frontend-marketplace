@@ -642,7 +642,7 @@ export default class CreateAsset extends Vue {
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
       format: 'CSV',
-      keywords: '',
+      keywords: [],
       language: '',
       license: '',
       lineage: '',
