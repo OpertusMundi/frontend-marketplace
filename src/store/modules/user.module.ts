@@ -1,6 +1,5 @@
 import { Account, Profile } from '@/model/account';
 import { EnumRole } from '@/model/role';
-import JwtDecode from 'jwt-decode';
 
 interface JwtTokenData {
     iss: string;
@@ -79,18 +78,6 @@ const mutations = {
       }
        return result;
     });
-    */
-  },
-  setAccessToken(state: State, token: string): void {
-    const data: JwtTokenData = JwtDecode(token);
-    state.auth.token = token;
-    state.account.username = data.sub;
-    state.account.roles = data.roles;
-
-    // Uncomment for using global axios default instance
-
-    /*
-    axios.defaults.headers = { Authorization: `Bearer ${token}` };
     */
   },
   setUserData(state: State, data: Account): void {
