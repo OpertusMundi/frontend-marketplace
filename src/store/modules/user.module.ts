@@ -1,14 +1,6 @@
 import { Account, Profile } from '@/model/account';
 import { EnumRole } from '@/model/role';
 
-interface JwtTokenData {
-    iss: string;
-    aud: string;
-    sub: string;
-    exp: number;
-    roles: EnumRole[];
-  }
-
 interface State {
     account: {
       profile: Profile | null;
