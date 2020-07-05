@@ -1,9 +1,19 @@
 import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
-import { CatalogueQuery, CatalogueQueryResponse, CatalogueItem } from '@/model';
+import {
+  CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
+} from '@/model';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { CatalogueAddItemCommand } from '@/model/catalogue';
+import { CatalogueAddItemCommand, Publisher } from '@/model/catalogue';
+
+// Custom response types
+interface CatalogueQueryResponseInternal extends ServerResponse<QueryResultPage<CatalogueItem>> {
+  /*
+   * Map with all publishers for all items in the response
+   */
+  publishers: { [key: string]: Publisher };
+}
 
 export default class CatalogueApi extends Api {
   constructor() {
@@ -15,9 +25,18 @@ export default class CatalogueApi extends Api {
 
     const data: CatalogueQuery = typeof query === 'string' ? { query, page, size } : query;
 
-    return this.post<CatalogueQuery, CatalogueQueryResponse>(url, data)
-      .then((response: AxiosResponse<CatalogueQueryResponse>) => {
+    return this.post<CatalogueQuery, CatalogueQueryResponseInternal>(url, data)
+      .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
         const { data: serverResponse } = response;
+
+        // Inject publishers
+        if (serverResponse.success) {
+          serverResponse.result.items = serverResponse.result.items.map((item) => ({
+            ...item,
+            publisher: serverResponse.publishers[item.publisherId],
+          }));
+        }
+        console.log(serverResponse);
 
         return serverResponse;
       });
@@ -34,7 +53,7 @@ export default class CatalogueApi extends Api {
       });
   }
 
-  public async create(command: CatalogueAddItemCommand, config?:AxiosRequestConfig): Promise<ServerResponse<void>> {
+  public async create(command: CatalogueAddItemCommand, config?: AxiosRequestConfig): Promise<ServerResponse<void>> {
     const url = '/action/catalogue/items';
     return this.post<CatalogueAddItemCommand, ServerResponse<void>>(url, command, config)
       .then((response: AxiosServerResponse<void>) => {

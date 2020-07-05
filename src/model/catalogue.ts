@@ -204,14 +204,14 @@ export interface CatalogueItem extends BaseCatalogueItem {
      */
     pricingModels: BasePricingModel[];
     /*
-     * Publisher details. This property is set only when the user requests a single item
+     * Publisher details
      */
-    publisher: Publisher | null;
+    publisher?: Publisher;
     /*
      * Id of an entity responsible for making the resource available
      */
     publisherId: string;
-    /* 
+    /*
      * Asset statistics
      */
     statistics: CatalogueItemStatistics;
