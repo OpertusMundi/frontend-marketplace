@@ -53,6 +53,12 @@ const routes: RouteConfig[] = [
         component: () => import(/* webpackChunkName: "dashboardprofile" */ '../views/dashboard/Profile.vue'),
         meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
       },
+      {
+        path: 'favorites',
+        name: 'Favorites',
+        component: () => import(/* webpackChunkName: "dashboardfavorites" */ '../views/dashboard/Favorites.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
     ],
   },
   {
