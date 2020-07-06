@@ -65,6 +65,23 @@
             }
         }
 
+        &--sm{
+            width: 360px;
+            border: 0px;
+            .asset_search__upper{
+                &__input{
+                    padding: 10px 25px;
+                    font-size: em(14);
+                }
+                &__icon{
+                    right: 20px;
+                    img{
+                        height: 15px;
+                    }
+                }
+            }
+        }
+
     }
 
     

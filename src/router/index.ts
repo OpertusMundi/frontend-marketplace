@@ -59,6 +59,24 @@ const routes: RouteConfig[] = [
         component: () => import(/* webpackChunkName: "dashboardfavorites" */ '../views/dashboard/Favorites.vue'),
         meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
       },
+      {
+        path: 'messages',
+        name: 'Messages',
+        component: () => import(/* webpackChunkName: "dashboardmesssages" */ '../views/dashboard/Messages.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
+      {
+        path: 'messages/create',
+        name: 'MessageNew',
+        component: () => import(/* webpackChunkName: "dashboardmesssagenew" */ '../views/dashboard/MessageNew.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
+      {
+        path: 'messages/:id',
+        name: 'MessagesThread',
+        component: () => import(/* webpackChunkName: "dashboardmesssagesthread" */ '../views/dashboard/MessagesThread.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
     ],
   },
   {

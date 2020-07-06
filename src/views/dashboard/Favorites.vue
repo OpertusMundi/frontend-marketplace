@@ -36,7 +36,7 @@ import CatalogueCard from '@/components/Catalogue/Card.vue';
 @Component({
   components: { CatalogueCard },
 })
-export default class DashboardHome extends Vue {
+export default class DashboardFavorites extends Vue {
 }
 </script>
 <style lang="scss">

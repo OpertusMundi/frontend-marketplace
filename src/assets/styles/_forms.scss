@@ -330,8 +330,20 @@
 
 .form-group {
     margin-bottom: 25px;
+    position: relative;
     &--full {
         flex: 1;
+    }
+    &__stickyright{
+        position: absolute;
+        top:0;
+        right:-100px;
+        &__text{
+            font-size: em(14);
+            text-decoration: underline;
+            text-align: center;
+            margin-top: 10px;
+        }
     }
     &--inline {
         display: flex;
