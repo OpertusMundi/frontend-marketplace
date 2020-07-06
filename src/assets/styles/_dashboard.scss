@@ -1,30 +1,48 @@
 .dashboard {
     margin-top: $header_height;
-    
+    @media(max-width:992px){
+        margin-top: 65px;
+    }
 
     &__sidebar {
         position: fixed;
-        z-index: 1;
+        z-index: 1000;
         left: 0;
-        top: $header_height;
+        top: 0;
         width: $sidebar_size;
-        height: calc(100% - #{$header_height});
+        height: 100%;
         padding: 20px;
+        background: #f2f2f2;
+        @media(max-width:992px){
+            transform: translateX(-100%);
+            transition: all 0.4s;
+        }
 
-        .sidebar_closed & {
+        &.open{
+            transform: translateX(0%);
+            width:100vw;
+        }
+
+        &.sidebar_closed  {
             width: $sidebar_size_closed;
         }
         &__inner {
             width: 100%;
             height: 100%;
             border-right: 1px solid $darkColor;
-            padding: 15px 15px 15px 0;
+            padding: 0px 15px 15px 0;
+            @media(max-width:992px){
+                border-right: 0;
+            }
         }
 
         &__toggle {
             position: absolute;
             bottom: 35px;
             right: 45px;
+            @media(max-width:992px){
+                display: none;
+            }
             svg {
                 display: block;
                 path {
@@ -70,7 +88,7 @@
                                 }
                             }
                         }
-                        &.active, &.router-link-active { 
+                        &.active { 
                             color: $secondColor;
                             svg {
                                 path {
@@ -113,6 +131,29 @@
                         }                    
                     }
                 }
+                .logo{
+                    margin-bottom: 60px;
+                    @media(max-width:992px){
+                        margin-bottom: 30px;
+                    }
+                    a{
+                        height: 35px;
+                    }
+                    &__big{
+                        opacity:1;
+                        .sidebar_closed &{
+                            opacity: 0;
+                        }
+                    }
+                    &__sm{
+                        position: absolute;
+                        left:0;
+                        opacity:0;
+                        .sidebar_closed &{
+                            opacity: 1;
+                        }
+                    }
+                }
             }
         }
     }
@@ -120,6 +161,9 @@
         padding-left: $sidebar_size;
         min-height: calc(100vh - #{$header_height});
         background: #f2f2f2;
+        @media(max-width:992px){
+            padding-left: 20px;
+        }
         .sidebar_closed & {
             padding-left: $sidebar_size_closed;
         }
@@ -138,14 +182,19 @@
         justify-content: space-between;
         margin-bottom: 35px;
 
-        &__left {
+        &__helpers{
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
         }
 
         h1 {
             @include fluid-type(30px, 45px);
-            padding-right: 25px;
+            margin-right: 20px;
+        }
+        h2 {
+            @include fluid-type(18px, 25px);
+            margin-right: 20px;
         }
         .btn {
             margin-left: 10px;
