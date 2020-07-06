@@ -145,7 +145,7 @@ export default class App extends Vue {
     this.getCartItems();
   }
 
-  showDashboardMobileMenu(status):void {
+  showDashboardMobileMenu(status:boolean):void {
     this.showMobileDashboard = status;
   }
 

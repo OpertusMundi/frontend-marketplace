@@ -47,6 +47,12 @@ const routes: RouteConfig[] = [
         component: () => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
         meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
       },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import(/* webpackChunkName: "dashboardprofile" */ '../views/dashboard/Profile.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
     ],
   },
   {
