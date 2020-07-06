@@ -20,10 +20,12 @@
       &--noback{
         background: unset;
         color:unset;
+        cursor: not-allowed;
         #{$row}__inner{
           background: none!important;
           border:0!important;
           width:100%!important;
+          cursor: not-allowed;
         }
         #{$row}__view{
           display: none!important;
