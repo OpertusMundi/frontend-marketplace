@@ -4,7 +4,6 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import store from '@/store';
 
 import Home from '@/views/Home.vue';
-import Callback from '@/views/Callback.vue';
 
 Vue.use(VueRouter);
 
@@ -85,11 +84,6 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "thankyou" */ '../views/orders/Thankyou.vue'),
   },
   {
-    path: '/callback',
-    name: 'callback',
-    component: Callback,
-  },
-  {
     path: '/signin',
     name: 'Login',
     component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
@@ -116,17 +110,6 @@ const routes: RouteConfig[] = [
     path: '/user-benefits',
     name: 'UserBenefits',
     component: () => import(/* webpackChunkName: "userbenefits" */ '../views/UserBenefits.vue'),
-  },
-  {
-    path: '/user',
-    name: 'User',
-    // route level code-splitting
-    // this generates a separate chunk (user.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
-    meta: {
-      requiresRole: 'ROLE_USER',
-    },
   },
   {
     path: '/admin',
