@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
-      <app-header v-if="showHeader" :headerClass="headerClass" ></app-header>
+      <app-header v-if="showHeader" :headerClass="headerClass" @showDashboardMobileMenu="showDashboardMobileMenu" ></app-header>
     </transition>
     <transition name="fade" mode="out-in">
-      <router-view />
+      <router-view :showMobileDashboard="showMobileDashboard" />
     </transition>
     <transition name="fade" mode="out-in">
       <app-footer v-if="showFooter"></app-footer>
@@ -48,6 +48,8 @@ export default class App extends Vue {
 
   showFooter= true;
 
+  showMobileDashboard = false;
+
   headerClass = 'bg';
 
   noHeaderBgArray:Array<string | null | undefined>;
@@ -59,6 +61,7 @@ export default class App extends Vue {
 
     this.showHeader = true;
     this.showFooter = true;
+    this.showMobileDashboard = false;
 
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
@@ -78,6 +81,12 @@ export default class App extends Vue {
 
   @Watch('$route', { immediate: true, deep: true })
   showHideHeader():void {
+    if (this.$route.meta.layout === 'dashboard') {
+      this.showHeader = true;
+      this.headerClass = 'header--dashboard';
+      this.showFooter = false;
+      return;
+    }
     if (this.noHeader.includes(this.routeName)) {
       this.showHeader = false;
       this.showFooter = false;
@@ -134,6 +143,10 @@ export default class App extends Vue {
       });
 
     this.getCartItems();
+  }
+
+  showDashboardMobileMenu(status:boolean):void {
+    this.showMobileDashboard = status;
   }
 
   getCartItems():void {

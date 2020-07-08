@@ -562,6 +562,47 @@
 
         }
     }
+    &--big{
+        margin-bottom: 50px;
+        @media(max-width: 1300px) { 
+            font-size: 15px;
+        }
+        .asset-owner__inner__logo{
+            width: 207px;
+            height: 207px;
+            border-radius: 50%;
+            @media(max-width: 1300px) {
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+            }
+            img{
+                padding:40px;
+            }
+        }
+        .asset-owner__inner__info {
+            &__name{
+                margin-bottom: 10px;
+                a{
+                    text-decoration: none;
+                    font-size: em(40);  
+                    line-height: 1;  
+                }
+            }
+            .rating,
+            &__country{
+                font-size: em(20);
+                margin-bottom: 5px;
+            }
+            &__date{
+                font-size: em(18);
+                margin-bottom: 15px;
+            }
+            .btn--std{
+                display: inline-block;
+            }
+        }
+    }
 }
 
 .asset_card {

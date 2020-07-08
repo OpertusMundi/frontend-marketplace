@@ -1,9 +1,14 @@
 <template>
 <div class="dashboard">
-    <div class="dashboard__sidebar">
+    <div class="dashboard__sidebar" v-bind:class="{open: showMobileDashboard}">
       <div class="dashboard__sidebar__inner">
         <nav class="dashboard__sidebar__nav">
           <ul>
+            <li class="logo">
+              <router-link to="/" exact data-name="Homepage">
+                <img class="logo__big" src="@/assets/images/logo-black.svg" alt=""><img class="logo__sm" src="@/assets/images/logo-black-sm.svg" alt="">
+              </router-link>
+            </li>
             <li>
               <router-link to="/dashboard" exact data-name="Dashboard">
                 <svg xmlns="http://www.w3.org/2000/svg" width="26.862" height="24" viewBox="0 0 26.862 24"><g id="Group_1971" data-name="Group 1971" transform="translate(-1761.883 -248.745)"><path id="Path_8965" data-name="Path 8965" d="M1779.2,270.282a2.131,2.131,0,0,0-.211-.353c-1.153-1.682-4.19-7-4.19-7a.5.5,0,0,0-.91.391s1.76,5.864,2.186,7.858a2.127,2.127,0,0,0,.11.4l0,.009h0a1.642,1.642,0,0,0,3.017-1.3h0Z" transform="translate(-2.396 -2.788)" fill="#333"/><path id="Path_8966" data-name="Path 8966" d="M1775.314,248.745a13.428,13.428,0,0,0-8.686,23.67,1.23,1.23,0,0,0,2.062-.775,1.192,1.192,0,0,0-.389-1.03,10.968,10.968,0,1,1,14.009.016,1.172,1.172,0,0,0-.372,1.014,1.229,1.229,0,0,0,2.021.811h0a13.429,13.429,0,0,0-8.646-23.706Z" fill="#333"/></g></svg>
@@ -31,7 +36,7 @@
             <li>
               <router-link to="/dashboard/favorites" data-name="Favorites">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22.854" height="24" viewBox="0 0 22.854 24"><g id="Group_1967" data-name="Group 1967" transform="translate(-1619.885 -604.282)"><path id="Path_8957" data-name="Path 8957" d="M1631.167,628.282l-.725-.762c-.307-.323-7.526-7.942-9.37-11.518a.982.982,0,1,1,1.746-.9c1.393,2.7,6.433,8.251,8.325,10.291,1.908-2.12,7.076-7.97,8.4-10.542l.109-.21a7.877,7.877,0,0,0,1.107-3.36,4.387,4.387,0,0,0-1.165-3.393,5.115,5.115,0,0,0-7.7.218l-.758.917-.758-.917a5.1,5.1,0,0,0-3.943-1.859,4.383,4.383,0,0,0-3.219,1.3,5.144,5.144,0,0,0-1.361,3.779.985.985,0,0,1-.959,1.007,1.006,1.006,0,0,1-1.006-.959,7.1,7.1,0,0,1,1.92-5.2,6.388,6.388,0,0,1,4.625-1.893,7.08,7.08,0,0,0,9.4,0,7.062,7.062,0,0,1,5.208,2.281,6.344,6.344,0,0,1,1.67,4.9,9.812,9.812,0,0,1-1.318,4.083l-.107.206c-1.741,3.39-9.1,11.418-9.411,11.759Z" fill="#333"/></g></svg>
-                <span>Collections</span>
+                <span>Favorites</span>
               </router-link>
             </li>
             <li>
@@ -54,10 +59,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component
 export default class DashboardMain extends Vue {
+  @Prop({ required: false, default: false }) readonly showMobileDashboard!: boolean;
 }
 </script>
 <style lang="scss">

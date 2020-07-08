@@ -16,12 +16,25 @@
     &--nobg {
         background: none;
     }
-    &--dark {
-        background: $darkColor;
+    &--dashboard {
+        background: #f2f2f2;
+        &.add_bg{
+            background: #f2f2f2!important;
+        }
+
+        .header__mobile{
+            svg{
+                path,
+                rect{
+                    fill: #333!important;
+                }
+            }
+        }
     }
 
     @media(max-width: 992px) {   
         height: 70px;
+        z-index:10000;
     }
 
     &.open{
@@ -56,6 +69,9 @@
     }
 
     &__logo {
+        .header--dashboard &{
+            visibility: hidden;
+        }   
         @media(max-width: 992px) { 
             display: none;
         }
@@ -122,6 +138,26 @@
                 }
             }
         }
+
+        &--dashboard{
+            background: #f2f2f2;
+            @media(min-width:993px){
+                display: none;
+            }
+            nav{
+                top: 30px;
+                transform: translateY(0);
+                ul{
+                    li{
+                        text-align: left;
+                        margin-left: 20px;
+                        &:last-child{
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     &__right {
@@ -158,7 +194,7 @@
     }
 
     &__cart {
-        margin-right: 50px;
+        margin-right: 40px;
         a {
             position: relative;
             display: block;
@@ -168,7 +204,30 @@
                 left: 50%;
                 transform: translate(-50%, -30%);
                 font-size: em(11);
-                color: $mainFontColor!important;
+                color: #fff;
+            }
+            .header--dashboard & {
+                span {
+                    color: #333;
+                }
+                svg {
+                    path {
+                        fill: #333;
+                    }
+                }
+            }
+        }
+        &--dark{
+            svg{
+                path{
+                    fill:#333;
+                }
+            }
+            a{
+                span{
+                    color: $mainFontColor!important;
+                    line-height: 10px;
+                }
             }
         }
     }
@@ -181,6 +240,13 @@
         }
         span {
             padding: 0 5px;
+        }
+        .header--dashboard & { 
+            svg {
+                path {
+                    fill: #333;
+                }
+            }
         }
     }
 
@@ -243,7 +309,6 @@
         }
     } 
 }
-
 .user_menu {
     position: relative;
     &__dropdown {

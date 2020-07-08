@@ -37,7 +37,7 @@ export default class Catalogue extends Vue {
   constructor() {
     super();
 
-    this.query = 'asset';
+    this.query = '';
     this.queryResults = [];
     this.catalogQuery = {
       page: 0,
