@@ -43,93 +43,111 @@
       <h4 class="homepage__assets__title">Popular Assets</h4>
       <div class="a_carousel">
         <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/vector_icon.svg" alt="">
-            <span>Vector</span>
-          </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-          </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
-          </div>
-        </a>
-        <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/raster_icon.svg" alt="">
-            <span>Raster</span>
-          </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">The Historical Centre of the Municipality of Athens</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-          </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/bag-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/vector_icon.svg" alt="">
+              <span>Vector</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
         </a>
         <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/api_icon.svg" alt="">
-            <span>API</span>
-          </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">Swimming Shore Water</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-          </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/check-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
-          </div>
-        </a>
-        <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/tiles_icon.svg" alt="">
-            <span>Tiles</span>
-          </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">Spatial and residential</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-          </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/raster_icon.svg" alt="">
+              <span>Raster</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">The Historical Centre of the Municipality of Athens</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/bag-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
         </a>
         <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/vector_icon.svg" alt="">
-            <span>Vector</span>
-          </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-          </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/api_icon.svg" alt="">
+              <span>API</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">Swimming Shore Water</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/check-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
         </a>
         <a href="" class="a_carousel__item">
-          <div class="a_carousel__item__top">
-            <img src="@/assets/images/icons/vector_icon.svg" alt="">
-            <span>Vector</span>
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/tiles_icon.svg" alt="">
+              <span>Tiles</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">Spatial and residential</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
-          <div class="a_carousel__item__main">
-            <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-            <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-            <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+        </a>
+        <a href="" class="a_carousel__item">
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/vector_icon.svg" alt="">
+              <span>Vector</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
-          <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
-            <div class="a_carousel__item__footer__price">300€</div>
+        </a>
+        <a href="" class="a_carousel__item">
+          <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
+          <div class="a_carousel__item__inner">
+            <div class="a_carousel__item__top">
+              <img src="@/assets/images/icons/vector_icon.svg" alt="">
+              <span>Vector</span>
+            </div>
+            <div class="a_carousel__item__main">
+              <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
+              <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
+              <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
+            </div>
+            <div class="a_carousel__item__footer">
+              <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt=""><span>1546</span></div>
+              <div class="a_carousel__item__footer__price">300€</div>
+            </div>
           </div>
         </a>
       </div>

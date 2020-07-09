@@ -46,8 +46,79 @@
       <div class="header__menu" v-if="$route.meta.layout != 'dashboard'">
         <nav>
           <ul>
-            <li><a href="#">Sell</a></li>
-            <li><a href="#">Buy</a></li>
+            <li>
+              <a href="#">Sell</a>
+              <div class="arrow-up arrow-up--white" style="display:none"></div>
+              <div class="header__submenu" style="display:none">
+                <div class="header__submenu__wrapper">
+                  <div class="header__submenu__block">
+                    <div class="header__submenu__block__img-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="112.573" height="48.014" viewBox="0 0 112.573 48.014">
+                        <g id="Group_1287" data-name="Group 1287" transform="translate(191.202 164.66)">
+                          <g id="Group_1287-2" data-name="Group 1287">
+                            <path id="Path_2334" data-name="Path 2334" d="M-188.762-140.19l12.82,22.53a2,2,0,0,0,2.726.753,2,2,0,0,0,.754-.753l12.51-22h0c1.39-2.43,2.75-5.09,2.75-8.52,0-9.09-7.63-16.48-17-16.48s-17,7.39-17,16.48A15.324,15.324,0,0,0-188.762-140.19Zm14.56-20.47a12.76,12.76,0,0,1,13,12.48c0,2.22-.81,4.09-2.23,6.56l-10.77,18.96-11.08-19.51a11.6,11.6,0,0,1-1.92-6A12.76,12.76,0,0,1-174.2-160.66Z"/>
+                            <path id="Path_2335" data-name="Path 2335" d="M-174.2-141.66a7,7,0,0,0,7-7,7,7,0,0,0-7-7,7,7,0,0,0-7,7A7,7,0,0,0-174.2-141.66Zm0-10a3,3,0,0,1,3,3,3,3,0,0,1-3,3,3,3,0,0,1-3-3A3,3,0,0,1-174.2-151.66Z"/>
+                          </g>
+                          <path id="Path_2336" data-name="Path 2336" d="M-95.784-118.924c11.86,0,17.155-1.67,17.155-5.455v-32.6c0-3.729-5.3-5.4-17.155-5.4s-17.154,1.669-17.154,5.4v32.662C-112.938-120.594-107.643-118.924-95.784-118.924Zm0-38.884a51.024,51.024,0,0,1,10.67.824,50.958,50.958,0,0,1-10.67.823,50.958,50.958,0,0,1-10.67-.823A51.024,51.024,0,0,1-95.784-157.808Zm-12.58,5.044a49.294,49.294,0,0,0,12.58,1.143,49.294,49.294,0,0,0,12.58-1.143v6.049c-.812.4-3.739,1.43-12.58,1.43s-11.768-1.029-12.58-1.43Zm0,10.887a49.34,49.34,0,0,0,12.58,1.144,49.34,49.34,0,0,0,12.58-1.144v6.05c-.812.4-3.739,1.429-12.58,1.429s-11.768-1.029-12.58-1.429Zm0,10.887a49.251,49.251,0,0,0,12.58,1.144A49.251,49.251,0,0,0-83.2-130.99v6.062c-.812.4-3.751,1.429-12.58,1.429s-11.768-1.029-12.58-1.429Z"/>
+                          <g id="Group_1289" data-name="Group 1289">
+                            <rect id="Rectangle_1175" data-name="Rectangle 1175" width="26.279" height="3.511" transform="translate(-150.893 -142.409)"/>
+                            <g id="Group_1288" data-name="Group 1288">
+                              <path id="Path_2337" data-name="Path 2337" d="M-133.919-129.168l-1.916-2.057,10.143-9.426-10.143-9.429,1.916-2.057,12.351,11.486Z"/>
+                            </g>
+                          </g>
+                        </g>
+                      </svg>
+                      <router-link to="/catalogue" class="btn btn--std btn--blue">BECOME A VENDOR</router-link>
+                    </div>
+                  </div>
+                  <div class="header__submenu__block">
+                    <h4 class="header__submenu__block__title">Benefits for vendors</h4>
+                    <div class="header__submenu__block__text">
+                      <ul>
+                        <li>Easily upload, promote and trade your data assets</li>
+                        <li>Increase your clients & profits</li>
+                        <li>Turn your assets into services</li>
+                      </ul>
+                    </div>
+                    <a href="#" class="header__submenu__block__link">
+                      <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li>
+              <a href="#">Buy</a>
+              <div class="arrow-up arrow-up--white" style="display:none"></div>
+              <div class="header__submenu" style="display:none">
+                <div class="header__submenu__wrapper">
+                  <div class="header__submenu__block">
+                    <div class="header__submenu__block__menu">
+                      <ul>
+                        <li><a href="#">Vector</a></li>
+                        <li><a href="#">Title</a></li>
+                        <li><a href="#">Raster</a></li>
+                        <li><a href="#">APIs</a></li>
+                        <li><a href="#">Bundles</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="header__submenu__block">
+                    <h4 class="header__submenu__block__title">Benefits for vendors</h4>
+                    <div class="header__submenu__block__text">
+                      <ul>
+                        <li>Easily upload, promote and trade your data assets</li>
+                        <li>Increase your clients & profits</li>
+                        <li>Turn your assets into services</li>
+                      </ul>
+                    </div>
+                    <a href="#" class="header__submenu__block__link">
+                      <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
             <li><a href="#">About</a></li>
             <li><a href="#">FAQ</a></li>
           </ul>
