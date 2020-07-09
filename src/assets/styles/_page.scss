@@ -25,6 +25,16 @@
                 font-weight: 500;
             }
         }
+
+        &--about{
+            background-attachment: fixed;
+            height: 100%;
+            .page__hero__inner{
+                padding-top: 177px;
+                top: unset;
+                transform: unset;
+            }
+        }
     }
 }
 
