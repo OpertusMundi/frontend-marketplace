@@ -47,9 +47,10 @@
         <nav>
           <ul>
             <li>
-              <a href="#">Sell</a>
-              <div class="arrow-up arrow-up--white" style="display:none"></div>
-              <div class="header__submenu" style="display:none">
+              <a href="#" @click.prevent="showSubmenu1">Sell</a>
+              <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
+              <transition name="fade" mode="out-in">
+              <div class="header__submenu" v-if="showSubmenuSell">
                 <div class="header__submenu__wrapper">
                   <div class="header__submenu__block">
                     <div class="header__submenu__block__img-btn">
@@ -86,11 +87,13 @@
                   </div>
                 </div>
               </div>
+              </transition>
             </li>
             <li>
-              <a href="#">Buy</a>
-              <div class="arrow-up arrow-up--white" style="display:none"></div>
-              <div class="header__submenu" style="display:none">
+              <a href="#" @click.prevent="showSubmenu2">Buy</a>
+              <div class="arrow-up arrow-up--white" v-if="showSubmenuBuy"></div>
+              <transition name="fade" mode="out-in">
+              <div class="header__submenu" v-if="showSubmenuBuy">
                 <div class="header__submenu__wrapper">
                   <div class="header__submenu__block">
                     <div class="header__submenu__block__menu">
@@ -118,8 +121,9 @@
                   </div>
                 </div>
               </div>
+              </transition>
             </li>
-            <li><a href="#">About</a></li>
+            <li><router-link to="/about">About</router-link></li>
             <li><a href="#">FAQ</a></li>
           </ul>
         </nav>
@@ -204,6 +208,10 @@ export default class Header extends Vue {
 
   accountApi: AccountApi;
 
+  showSubmenuSell = false;
+
+  showSubmenuBuy = false;
+
   constructor() {
     super();
 
@@ -232,6 +240,20 @@ export default class Header extends Vue {
   toggleMobileMenu():void {
     this.showMobileMenu = !this.showMobileMenu;
     this.$emit('showDashboardMobileMenu', this.showMobileMenu);
+  }
+
+  showSubmenu1():void {
+    this.showSubmenuSell = !this.showSubmenuSell;
+    if (this.showSubmenuBuy) {
+      this.showSubmenuBuy = !this.showSubmenuBuy;
+    }
+  }
+
+  showSubmenu2():void {
+    this.showSubmenuBuy = !this.showSubmenuBuy;
+    if (this.showSubmenuSell) {
+      this.showSubmenuSell = !this.showSubmenuSell;
+    }
   }
 
   bgColor():void {
