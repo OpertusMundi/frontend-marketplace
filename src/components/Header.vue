@@ -21,7 +21,7 @@
         <router-link to="/" class="header__mobile__logo header__mobile__logo--open">
           <svg xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
             <g id="logo" transform="translate(-66 -33)">
-              <path id="Path_1" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_1" data-name="Path 1"  d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
               <path id="Path_2" data-name="Path 2" d="M5517.451,5377.123a8.97,8.97,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.535,10.535,0,0,1,5.171,1.253,9,9,0,0,1,3.564,3.565,11.866,11.866,0,0,1,0,10.773,8.989,8.989,0,0,1-3.564,3.564,10.525,10.525,0,0,1-5.171,1.254,10.635,10.635,0,0,1-5.191-1.254,8.929,8.929,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.671,6.671,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.753,7.753,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
               <path id="Path_3" data-name="Path 3" d="M5515.167,5365.112a3.418,3.418,0,0,1,2.473-.995,3.472,3.472,0,0,1,2.5.955,3.291,3.291,0,0,1,.994,2.487,3.316,3.316,0,0,1-1.774,3.011,3.6,3.6,0,0,1-1.721.43,3.43,3.43,0,0,1-1.72-.457,3.529,3.529,0,0,1-1.291-1.25,3.4,3.4,0,0,1,.538-4.181Zm.927,4.006a2.315,2.315,0,0,0,3.092,0,2.313,2.313,0,0,0,0-3.119,2.318,2.318,0,0,0-3.092,0,2.315,2.315,0,0,0,0,3.119Z" transform="translate(-5415 -5331.117)" fill="#fff"/>
               <path id="Path_4" data-name="Path 4" d="M5537.659,5364.117l-1.223,5.99h-.8l.25-5.99Z" transform="translate(-5399 -5331.117)" fill="#fff"/>
@@ -48,6 +48,12 @@
           <ul>
             <li>
               <a href="#" @click.prevent="showSubmenu1">Sell</a>
+              <div class="header__mobile-submenu" v-if="showSubmenuSell">
+                <ul>
+                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">Benefits for vendors</span></router-link></li>
+                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">BECOME A VENDOR</span></router-link></li>
+                </ul>
+              </div>
               <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
               <transition name="fade" mode="out-in">
               <div class="header__submenu" v-if="showSubmenuSell">
@@ -69,7 +75,7 @@
                           </g>
                         </g>
                       </svg>
-                      <router-link to="/" class="btn btn--std btn--blue">BECOME A VENDOR</router-link>
+                      <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/vendor-benefits" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
                     </div>
                   </div>
                   <div class="header__submenu__block">
@@ -82,7 +88,7 @@
                       </ul>
                     </div>
                     <router-link class="header__submenu__block__link" to="/vendor-benefits">
-                      <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
+                      <span @click="showSubmenuSell = !showSubmenuSell">LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
                     </router-link>
                   </div>
                 </div>
@@ -91,6 +97,12 @@
             </li>
             <li>
               <a href="#" @click.prevent="showSubmenu2">Buy</a>
+              <div class="header__mobile-submenu" v-if="showSubmenuBuy">
+                <ul>
+                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">Benefits for data users</span></router-link></li>
+                  <li><router-link to="/catalogue"><span @click="showMobileMenu = false">Data catalogue</span></router-link></li>
+                </ul>
+              </div>
               <div class="arrow-up arrow-up--white" v-if="showSubmenuBuy"></div>
               <transition name="fade" mode="out-in">
               <div class="header__submenu" v-if="showSubmenuBuy">
@@ -98,11 +110,11 @@
                   <div class="header__submenu__block">
                     <div class="header__submenu__block__menu">
                       <ul>
-                        <li><router-link to="/catalogue">Vector</router-link></li>
-                        <li><router-link to="/catalogue">Title</router-link></li>
-                        <li><router-link to="/catalogue">Raster</router-link></li>
-                        <li><router-link to="/catalogue">APIs</router-link></li>
-                        <li><router-link to="/catalogue">Bundles</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Vector</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Title</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Raster</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">APIs</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Bundles</router-link></li>
                       </ul>
                     </div>
                   </div>
@@ -110,25 +122,25 @@
                     <h4 class="header__submenu__block__title">Benefits for vendors</h4>
                     <div class="header__submenu__block__text">
                       <ul>
-                        <li>Easily upload, promote and trade your data assets</li>
-                        <li>Increase your clients & profits</li>
-                        <li>Turn your assets into services</li>
+                        <li>View, discover, compare and purchase geospatial data assets</li>
+                        <li>Top-class secure payment, delivery and storage methods</li>
+                        <li>0% fees</li>
                       </ul>
                     </div>
                     <router-link class="header__submenu__block__link" to="/user-benefits">
-                      <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
+                      <span @click="showSubmenuBuy = !showSubmenuBuy">LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
                     </router-link>
                   </div>
                 </div>
               </div>
               </transition>
             </li>
-            <li><router-link to="/about">About</router-link></li>
-            <li><a href="#">FAQ</a></li>
+            <li @click="closeAllSubmenus"><router-link to="/about">About</router-link></li>
+            <li @click="closeAllSubmenus"><a href="#">FAQ</a></li>
           </ul>
         </nav>
         <div class="header__menu__btn">
-          <a href="#" class="btn btn--std btn--blue">become a vendor</a>
+          <router-link to="/vendor-benefits" class="btn btn--std btn--blue"><span @click="closeAllSubmenus">become a vendor</span></router-link>
         </div>
       </div>
       <div class="header__right">
@@ -254,6 +266,12 @@ export default class Header extends Vue {
     if (this.showSubmenuSell) {
       this.showSubmenuSell = !this.showSubmenuSell;
     }
+  }
+
+  closeAllSubmenus():void {
+    this.showSubmenuSell = false;
+    this.showSubmenuBuy = false;
+    this.showMobileMenu = false;
   }
 
   bgColor():void {

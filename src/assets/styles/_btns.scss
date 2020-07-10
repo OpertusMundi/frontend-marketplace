@@ -21,6 +21,9 @@
         text-align: center;
         transition: all 0.2s ease;
         color: $secondColor;
+        span{
+            font-weight: 500;
+        }
         &:hover {
             background: $secondColor;
             color: #fff;
@@ -37,6 +40,9 @@
         box-shadow: none;
         border: none;
         transition: all 0.4s ease;
+        span{
+            font-weight: 500;
+        }
     }
 
     &--blue {

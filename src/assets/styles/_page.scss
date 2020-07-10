@@ -23,6 +23,9 @@
                 @include fluid-type(16px, 18px);
                 font-family: $mainFont;
                 font-weight: 500;
+                max-width: 975px;
+                margin: auto;
+                margin-bottom: 65px;
             }
         }
 

@@ -114,7 +114,7 @@
                 @media(max-width: 992px) { 
                     padding: 50px 0
                 }
-                li {
+                > li {
                     margin-right: 50px;
                     display: inline-block;
                     position: relative;
@@ -128,12 +128,12 @@
                     &:last-child {
                         opacity: 0.5;
                     }
-                    a {
+                    > a {
                         color: #fff;
                         font-weight: 500;
                         font-size: em(20);
                         @media(max-width: 992px) {  
-                            font-size: em(30);
+                            font-size: em(18);
                             padding: 5px 0;
                             display: block;
                         }
@@ -168,6 +168,9 @@
         left: 50%;
         transform: translateX(-50%);
         top: 100%;
+        @media(max-width:992px){
+            display: none;
+        }
     }
 
     &__submenu{
@@ -176,6 +179,9 @@
         top: 100%;
         transform: translateY(10px);
         left: -5vw;
+        @media(max-width:992px){
+            display: none;
+        }
         &__wrapper{
             display: flex;
             flex-wrap: wrap;
@@ -227,13 +233,26 @@
                     font-size: em(13);
                     font-weight: 500;
                     color: $darkColor;
+                    transition: all 0.4s;
                 }
                 svg{
                     transform: rotate(-90deg);
                     width: em(13);
-                    margin-left: 20px;
+                    margin-left: 15px;
+                    transition: all 0.4s;
                     path{
                         stroke: #000;
+                    }
+                }
+                &:hover{
+                    span{
+                        color: $secondColor;
+                    }
+                    svg{
+                        transform: rotate(-90deg) translateY(10px);
+                        path{
+                            stroke: $secondColor;                            
+                        }
                     }
                 }
             }
@@ -254,6 +273,23 @@
                 font-size: em(15);
                 font-weight: 500;
                 display: inline-block;
+            }
+        }
+    }
+
+    &__mobile-submenu{
+        @media(min-width:993px){
+            display: none !important;
+        }
+        ul{
+            li{
+                a{
+                    span{
+                        font-size: em(14);
+                        font-weight: 500;
+                        color: #fff;
+                    }
+                }
             }
         }
     }
