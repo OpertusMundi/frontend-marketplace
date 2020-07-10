@@ -4,7 +4,7 @@
       <div class="page__hero__inner">
         <div class="page__hero__head s_container">
           <h1>Search. Share. Trade. Use.</h1>
-          <h3 class="about__subtitle">We are here to deliver a breakthrough in the trading and sharing of commercial geospatial data assets across borders and sectors. All in an easy way; all through a single point of entry. </h3>
+          <h2>We are here to deliver a breakthrough in the trading and sharing of commercial geospatial data assets across borders and sectors. All in an easy way; all through a single point of entry. </h2>
 
           <div class="about__sections">
             <div class="about__sections__row" data-aos="" data-aos-offset="350">
