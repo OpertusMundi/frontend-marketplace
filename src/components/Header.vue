@@ -69,7 +69,7 @@
                           </g>
                         </g>
                       </svg>
-                      <router-link to="/catalogue" class="btn btn--std btn--blue">BECOME A VENDOR</router-link>
+                      <router-link to="/" class="btn btn--std btn--blue">BECOME A VENDOR</router-link>
                     </div>
                   </div>
                   <div class="header__submenu__block">
@@ -81,9 +81,9 @@
                         <li>Turn your assets into services</li>
                       </ul>
                     </div>
-                    <a href="#" class="header__submenu__block__link">
+                    <router-link class="header__submenu__block__link" to="/vendor-benefits">
                       <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
-                    </a>
+                    </router-link>
                   </div>
                 </div>
               </div>
@@ -98,11 +98,11 @@
                   <div class="header__submenu__block">
                     <div class="header__submenu__block__menu">
                       <ul>
-                        <li><a href="#">Vector</a></li>
-                        <li><a href="#">Title</a></li>
-                        <li><a href="#">Raster</a></li>
-                        <li><a href="#">APIs</a></li>
-                        <li><a href="#">Bundles</a></li>
+                        <li><router-link to="/catalogue">Vector</router-link></li>
+                        <li><router-link to="/catalogue">Title</router-link></li>
+                        <li><router-link to="/catalogue">Raster</router-link></li>
+                        <li><router-link to="/catalogue">APIs</router-link></li>
+                        <li><router-link to="/catalogue">Bundles</router-link></li>
                       </ul>
                     </div>
                   </div>
@@ -115,9 +115,9 @@
                         <li>Turn your assets into services</li>
                       </ul>
                     </div>
-                    <a href="#" class="header__submenu__block__link">
+                    <router-link class="header__submenu__block__link" to="/user-benefits">
                       <span>LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2"/></svg></span>
-                    </a>
+                    </router-link>
                   </div>
                 </div>
               </div>
