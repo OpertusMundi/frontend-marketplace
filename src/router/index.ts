@@ -24,6 +24,11 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
+    path: '/terms',
+    name: 'Terms',
+    component: () => import(/* webpackChunkName: "terms" */ '../views/Terms.vue'),
+  },
+  {
     path: '/dashboard',
     component: () => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
     meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
