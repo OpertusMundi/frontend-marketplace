@@ -73,17 +73,17 @@
             <div class="footer__upper__item">
               <h6>Buy Geodata</h6>
               <router-link to="/user-benefits">Benefits for users</router-link>
-              <a href="#">Data catalogue</a>
+              <router-link to="/catalogue">Data catalogue</router-link>
             </div>
             <div class="footer__upper__item">
               <h6>Topio</h6>
-              <a href="#">About</a>
+              <router-link to="/about">About</router-link>
               <a href="#">Contact</a>
             </div>
             <div class="footer__upper__item">
               <h6>Disclaimers</h6>
-              <a href="#">Terms & Conditions</a>
-              <a href="#">Privacy Policy</a>
+              <router-link to="/terms">Terms & Conditions</router-link>
+              <router-link to="/privacy">Privacy Policy</router-link>
             </div>
             <div class="footer__upper__social">
               <a href="#" target="_blank"><img src="@/assets/images/icons/linkedin_icon.svg" alt=""></a>

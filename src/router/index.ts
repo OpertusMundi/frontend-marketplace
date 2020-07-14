@@ -29,6 +29,16 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "terms" */ '../views/Terms.vue'),
   },
   {
+    path: '/privacy',
+    name: 'Privacy',
+    component: () => import(/* webpackChunkName: "privacy" */ '../views/Privacy.vue'),
+  },
+  {
+    path: '/faq',
+    name: 'Faq',
+    component: () => import(/* webpackChunkName: "faq" */ '../views/Faq.vue'),
+  },
+  {
     path: '/dashboard',
     component: () => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
     meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
