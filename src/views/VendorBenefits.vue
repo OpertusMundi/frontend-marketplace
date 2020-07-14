@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page page--nooverflow">
     <section class="page__hero">
       <div class="page__hero__inner">
         <h1>Share. Trade. Grow.</h1>

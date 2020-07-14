@@ -11,7 +11,7 @@
             <rect x="1.2" y="25" style="fill:#FFFFFF;" width="33.5" height="2"/>
           </svg>
         </a>
-        <router-link to="/" class="header__mobile__logo header__mobile__logo--closed">
+        <router-link to="/" class="header__mobile__logo--closed">
           <svg id="Logo-header_footer" data-name="Logo-header&amp;footer" xmlns="http://www.w3.org/2000/svg" width="24.135" height="28.048" viewBox="0 0 24.135 28.048">
             <path id="Path_1" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5499 -5364.117)" fill="#fff"/>
             <path id="Path_1-2" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5499 -5364.117)" fill="#fff"/>
@@ -40,8 +40,20 @@
             </g>
           </svg>
         </router-link>
-        <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="29.014" height="22.358"><g data-name="Group 1700" fill="none" stroke="#fff" stroke-width="2"><g data-name="Ellipse 7"><circle cx="10.5" cy="10.5" r="10.5" stroke="none"/><circle cx="10.5" cy="10.5" r="9.5"/></g><path data-name="Path 29" d="M19.375 16.031l9.125 5.47"/></g></svg></a>
-        <a href="#" class="header__mobile__search" v-if="$route.meta.layout == 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977"><g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)"><g id="Group_1974" data-name="Group 1974"><path id="Path_8972" data-name="Path 8972" d="M690.591,494.182c-.247,0-1.488-.037-1.658-.757a5.909,5.909,0,0,1,.035-1.77,46.892,46.892,0,0,0,.242-4.918c0-4.294-3.156-7.068-8.041-7.072h-.011c-4.885,0-8.041,2.778-8.041,7.072a46.583,46.583,0,0,0,.242,4.918,5.943,5.943,0,0,1,.035,1.77c-.17.72-1.412.757-1.659.757-1.58,0-2.727,1.344-2.727,3.2a2.863,2.863,0,0,0,2.727,2.918H674.6a.982.982,0,0,0,0-1.965h-2.862a.9.9,0,0,1-.762-.953c0-.613.236-1.231.762-1.231,1.9,0,3.236-.85,3.571-2.272a7.175,7.175,0,0,0,.008-2.407,44.586,44.586,0,0,1-.232-4.731c0-3.765,3.14-5.106,6.081-5.107s6.082,1.342,6.082,5.107a44.489,44.489,0,0,1-.233,4.729,7.187,7.187,0,0,0,.009,2.41c.335,1.421,1.669,2.271,3.57,2.271.63,0,.762.669.762,1.231a.9.9,0,0,1-.762.953H687.73a.982.982,0,0,0,0,1.965h2.861a2.863,2.863,0,0,0,2.727-2.918C693.318,495.17,691.949,494.182,690.591,494.182Z" fill="#333"/><path id="Path_8973" data-name="Path 8973" d="M683.939,498.944a.982.982,0,0,0-.982.983,1.773,1.773,0,1,1-3.546,0,.983.983,0,1,0-1.965,0,3.738,3.738,0,1,0,7.476,0A.983.983,0,0,0,683.939,498.944Z" fill="#333"/></g><circle id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333"/></g></svg> </a>
+        <div class="header__cart">
+          <a href="#" class="header__mobile__cart" v-if="$route.meta.layout != 'dashboard'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24.08" height="24.001" viewBox="0 0 24.08 24.001">
+                <g id="Group_1973" data-name="Group 1973" transform="translate(-1684 -36)">
+                  <g id="Group_1972" data-name="Group 1972" transform="translate(1005.503 -324.638)">
+                    <path id="Path_8968" data-name="Path 8968" d="M693.77,368.612h-6.464a1,1,0,0,0,0,2h6.464a1,1,0,0,0,0-2Z" fill="#ffffff"/>
+                    <path id="Path_8969" data-name="Path 8969" d="M701.841,368.651a1,1,0,0,0-1.229.7l-3.628,13.28H684.092l-3.629-13.28a1,1,0,1,0-1.93.527l3.83,14.017a1,1,0,0,0,.965.736h14.42a1,1,0,0,0,.965-.736l3.829-14.017A1,1,0,0,0,701.841,368.651Z" fill="#ffffff"/>
+                    <path id="Path_8970" data-name="Path 8970" d="M683.553,370.615h0a1,1,0,0,0,1-1c0-.285.1-6.98,6-6.98,5.873,0,5.969,6.7,5.969,6.978a1,1,0,0,0,2,0c0-3.105-1.666-8.978-7.97-8.978-6.325,0-8,5.873-8,8.978A1,1,0,0,0,683.553,370.615Z" fill="#ffffff"/>
+                  </g>
+                </g>
+              </svg><span>{{ cartCount() }}</span>
+          </a>
+        </div>
+        <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/></svg></a>
       </div>
       <div class="header__menu" v-if="$route.meta.layout != 'dashboard'">
         <nav>
@@ -140,13 +152,17 @@
           </ul>
         </nav>
         <div class="header__menu__btn">
-          <router-link to="/vendor-benefits" class="btn btn--std btn--blue"><span @click="closeAllSubmenus">become a vendor</span></router-link>
+          <router-link to="/dashboard" class="btn btn--std"><span @click="closeAllSubmenus">Dashboard</span></router-link>
         </div>
       </div>
       <div class="header__right">
         <div class="header__search"  v-if="$route.meta.layout != 'dashboard'">
           <input type="text" name="search" id="" placeholder="Search" >
-          <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="29.014" height="22.358"><g data-name="Group 1700" fill="none" stroke="#fff" stroke-width="2"><g data-name="Ellipse 7"><circle cx="10.5" cy="10.5" r="10.5" stroke="none"/><circle cx="10.5" cy="10.5" r="9.5"/></g><path data-name="Path 29" d="M19.375 16.031l9.125 5.47"/></g></svg></a>
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/>
+            </svg>
+          </a>
         </div>
         <div class="header__search" v-if="$route.meta.layout == 'dashboard'">
           <svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
@@ -272,6 +288,7 @@ export default class Header extends Vue {
     this.showSubmenuSell = false;
     this.showSubmenuBuy = false;
     this.showMobileMenu = false;
+    this.$emit('showDashboardMobileMenu', false);
   }
 
   bgColor():void {
