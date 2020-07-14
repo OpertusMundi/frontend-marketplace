@@ -54,7 +54,9 @@
                   <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">BECOME A VENDOR</span></router-link></li>
                 </ul>
               </div>
-              <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
+              <transition name="fade" mode="out-in">
+                <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
+              </transition>
               <transition name="fade" mode="out-in">
               <div class="header__submenu" v-if="showSubmenuSell">
                 <div class="header__submenu__wrapper">
@@ -103,7 +105,9 @@
                   <li><router-link to="/catalogue"><span @click="showMobileMenu = false">Data catalogue</span></router-link></li>
                 </ul>
               </div>
+              <transition name="fade" mode="out-in">
               <div class="arrow-up arrow-up--white" v-if="showSubmenuBuy"></div>
+              </transition>
               <transition name="fade" mode="out-in">
               <div class="header__submenu" v-if="showSubmenuBuy">
                 <div class="header__submenu__wrapper">
