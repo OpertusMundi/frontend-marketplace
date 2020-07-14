@@ -56,10 +56,21 @@
       margin-bottom: 20px;
       font-size: em(16);
     }
-    h2,h3{
+    h2{
       font-size: em(30);
       padding-top: 10px;
       margin-bottom: 20px;
+    }
+    h3{
+      font-size: em(25);
+      margin-bottom: 10px;
+    }
+    ul{
+      list-style: disc;
+      margin-left: 20px;
+      li{
+        font-size: em(16);
+      }
     }
   }
 }
