@@ -188,8 +188,8 @@
             <div class="user_menu__dropdown" v-show="showUserMenu">
               <ul>
                 <li><router-link to="/dashboard"><img src="@/assets/images/icons/dashboard/dashboard.svg" alt="">Dashboard</router-link></li>
-                <li><router-link to="/dashboard"><img src="@/assets/images/icons/dashboard/profile.svg" alt="">My profile</router-link></li>
-                <li><router-link to="/dashboard"><img src="@/assets/images/icons/dashboard/settings.svg" alt="">Settings</router-link></li>
+                <li><router-link to="/dashboard/profile"><img src="@/assets/images/icons/dashboard/profile.svg" alt="">My profile</router-link></li>
+                <li><router-link to="/dashboard/settings"><img src="@/assets/images/icons/dashboard/settings.svg" alt="">Settings</router-link></li>
                 <li><a href="#" @click.prevent="logout"><img src="@/assets/images/icons/dashboard/logout.svg" alt="">Logout</a></li>
               </ul>
             </div>
