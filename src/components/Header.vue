@@ -136,7 +136,7 @@
               </transition>
             </li>
             <li @click="closeAllSubmenus"><router-link to="/about">About</router-link></li>
-            <li @click="closeAllSubmenus"><a href="#">FAQ</a></li>
+            <li @click="closeAllSubmenus"><router-link to="/faq">FAQ</router-link></li>
           </ul>
         </nav>
         <div class="header__menu__btn">
