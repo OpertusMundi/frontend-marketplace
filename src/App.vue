@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
-      <app-header v-if="showHeader" :headerClass="headerClass" @showDashboardMobileMenu="showDashboardMobileMenu" ></app-header>
+      <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu" ></app-header>
     </transition>
     <transition name="fade" mode="out-in">
-      <router-view :showMobileDashboard="showMobileDashboard" />
+      <router-view :showMenuMobile="showMenuMobile" @showHideMobileMenu="toggleMobileMenu" />
     </transition>
     <transition name="fade" mode="out-in">
       <app-footer v-if="showFooter"></app-footer>
@@ -48,7 +48,9 @@ export default class App extends Vue {
 
   showFooter= true;
 
-  showMobileDashboard = false;
+  showMenuMobile = false;
+
+  showMenuMobile = false;
 
   headerClass = 'bg';
 
@@ -61,7 +63,7 @@ export default class App extends Vue {
 
     this.showHeader = true;
     this.showFooter = true;
-    this.showMobileDashboard = false;
+    this.showMenuMobile = false;
 
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
@@ -145,8 +147,8 @@ export default class App extends Vue {
     this.getCartItems();
   }
 
-  showDashboardMobileMenu(status:boolean):void {
-    this.showMobileDashboard = status;
+  toggleMobileMenu(status:boolean):void {
+    this.showMenuMobile = status;
   }
 
   getCartItems():void {

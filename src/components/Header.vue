@@ -1,9 +1,9 @@
 <template>
-  <header class="header" v-bind:class="[headerClass, scrollClass, {'open':showMobileMenu}]">
+  <header class="header" v-bind:class="[headerClass, scrollClass, {'open':showMenuMobile}]">
     <div class="header__inner">
       <div class="header__logo"><router-link to="/"><img src="@/assets/images/logo.svg" alt=""></router-link></div>
       <div class="header__mobile">
-        <a href="#" class="header__mobile__burger" v-bind:class="{'open':showMobileMenu}" @click.prevent="toggleMobileMenu">
+        <a href="#" class="header__mobile__burger" v-bind:class="{'open':showMenuMobile}" @click.prevent="toggleMobileMenu">
           <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
             viewBox="0 0 36 36" style="enable-background:new 0 0 36 36;" xml:space="preserve">
             <rect x="1.2" y="9" style="fill:#FFFFFF;" width="33.5" height="2"/>
@@ -19,7 +19,7 @@
           </svg>
         </router-link>
         <router-link to="/" class="header__mobile__logo header__mobile__logo--open">
-          <svg xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
+          <svg @click="toggleMobileMenu" xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
             <g id="logo" transform="translate(-66 -33)">
               <path id="Path_1" data-name="Path 1"  d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
               <path id="Path_2" data-name="Path 2" d="M5517.451,5377.123a8.97,8.97,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.535,10.535,0,0,1,5.171,1.253,9,9,0,0,1,3.564,3.565,11.866,11.866,0,0,1,0,10.773,8.989,8.989,0,0,1-3.564,3.564,10.525,10.525,0,0,1-5.171,1.254,10.635,10.635,0,0,1-5.191-1.254,8.929,8.929,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.671,6.671,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.753,7.753,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
@@ -62,8 +62,8 @@
               <a href="#" @click.prevent="showSubmenu1">Sell</a>
               <div class="header__mobile-submenu" v-if="showSubmenuSell">
                 <ul>
-                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">Benefits for vendors</span></router-link></li>
-                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">BECOME A VENDOR</span></router-link></li>
+                  <li><router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for vendors</span></router-link></li>
+                  <li><router-link to="/vendor-benefits"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link></li>
                 </ul>
               </div>
               <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
@@ -111,8 +111,8 @@
               <a href="#" @click.prevent="showSubmenu2">Buy</a>
               <div class="header__mobile-submenu" v-if="showSubmenuBuy">
                 <ul>
-                  <li><router-link to="/vendor-benefits"><span @click="showMobileMenu = false">Benefits for data users</span></router-link></li>
-                  <li><router-link to="/catalogue"><span @click="showMobileMenu = false">Data catalogue</span></router-link></li>
+                  <li><router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for data users</span></router-link></li>
+                  <li><router-link to="/catalogue"><span @click="toggleMobileMenu">Data catalogue</span></router-link></li>
                 </ul>
               </div>
               <div class="arrow-up arrow-up--white" v-if="showSubmenuBuy"></div>
@@ -147,13 +147,13 @@
               </div>
               </transition>
             </li>
-            <li @click="closeAllSubmenus"><router-link to="/about">About</router-link></li>
-            <li @click="closeAllSubmenus"><router-link to="/faq">FAQ</router-link></li>
+            <li @click="toggleMobileMenu"><router-link to="/about">About</router-link></li>
+            <li @click="toggleMobileMenu"><router-link to="/faq">FAQ</router-link></li>
           </ul>
         </nav>
         <div class="header__menu__btn">
-          <router-link to="/dashboard" class="btn btn--std" v-if="$store.getters.isAuthenticated"><span @click="closeAllSubmenus">Dashboard</span></router-link>
-          <router-link to="/signin" class="btn btn--std" v-if="!$store.getters.isAuthenticated"><span @click="closeAllSubmenus">Login</span><span>/</span><span @click="closeAllSubmenus">Register</span></router-link>
+          <router-link to="/dashboard" class="btn btn--std" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
+          <router-link to="/signin" class="btn btn--std" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link>
         </div>
       </div>
       <div class="header__right">
@@ -229,9 +229,9 @@ import {
 export default class Header extends Vue {
   @Prop({ default: 'header--nobg' }) private headerClass!: string;
 
-  scrollClass = '';
+  @Prop({ default: false }) private showMenuMobile!: boolean;
 
-  showMobileMenu = false;
+  scrollClass = '';
 
   showUserMenu = false;
 
@@ -267,8 +267,7 @@ export default class Header extends Vue {
   }
 
   toggleMobileMenu():void {
-    this.showMobileMenu = !this.showMobileMenu;
-    this.$emit('showDashboardMobileMenu', this.showMobileMenu);
+    this.$emit('toggleMobileMenu', !this.showMenuMobile);
   }
 
   showSubmenu1():void {
@@ -283,13 +282,6 @@ export default class Header extends Vue {
     if (this.showSubmenuSell) {
       this.showSubmenuSell = !this.showSubmenuSell;
     }
-  }
-
-  closeAllSubmenus():void {
-    this.showSubmenuSell = false;
-    this.showSubmenuBuy = false;
-    this.showMobileMenu = false;
-    this.$emit('showDashboardMobileMenu', false);
   }
 
   bgColor():void {
