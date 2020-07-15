@@ -3,14 +3,23 @@
     <div class="dashboard__head">
       <div class="dashboard__head__helpers">
         <h1>Messages</h1>
-        <router-link to="/dashboard/messages/create" class="btn--std btn--blue">NEW MESSAGE</router-link>
+        <a href="#" class="btn--std btn--blue">NEW MESSAGE</a>
+        <div class="dashboard__head__helpers__mobile">
+          <div class="dashboard__head__helpers__mobile__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+              <g id="Group_2023" data-name="Group 2023" transform="translate(-201.983 -142.983)">
+                <path id="Union_13" data-name="Union 13" d="M6.375,14.874v-4.25H2.125a2.125,2.125,0,1,1,0-4.25h4.25V2.125a2.125,2.125,0,0,1,4.251,0v4.25h4.25a2.125,2.125,0,1,1,0,4.25h-4.25v4.25a2.125,2.125,0,1,1-4.251,0Z" transform="translate(201.983 142.983)" fill="#fff"/>
+              </g>
+            </svg>
+          </div>
+        </div>
       </div>
       <div class="dashboard__head__helpers">
         <div class="asset_search asset_search--grey-border">
           <div class="asset_search__upper asset_search__upper--sm">
             <input type="text" name="" id="" placeholder="Search in messages" class="asset_search__upper__input">
-            <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
-            <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="@/assets/images/icons/close_icon.svg" alt=""></div>
+            <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="/assets/images/icons/search_black.svg" alt=""></div>
+            <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="/assets/images/icons/close_icon.svg" alt=""></div>
           </div>
         </div>
       </div>
