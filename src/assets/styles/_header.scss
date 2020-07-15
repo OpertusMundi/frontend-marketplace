@@ -110,11 +110,11 @@
             .btn{
                 font-size: em(18);
                 color:#fff;
+                display: block;
             }
             @media(min-width: 993px) {
                 display: none;
             }
-
         }
         nav {
             > ul {

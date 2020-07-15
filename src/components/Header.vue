@@ -152,7 +152,8 @@
           </ul>
         </nav>
         <div class="header__menu__btn">
-          <router-link to="/dashboard" class="btn btn--std"><span @click="closeAllSubmenus">Dashboard</span></router-link>
+          <router-link to="/dashboard" class="btn btn--std" v-if="$store.getters.isAuthenticated"><span @click="closeAllSubmenus">Dashboard</span></router-link>
+          <router-link to="/signin" class="btn btn--std" v-if="!$store.getters.isAuthenticated"><span @click="closeAllSubmenus">Login</span><span>/</span><span @click="closeAllSubmenus">Register</span></router-link>
         </div>
       </div>
       <div class="header__right">

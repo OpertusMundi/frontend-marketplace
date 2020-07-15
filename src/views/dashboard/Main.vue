@@ -1,6 +1,6 @@
 <template>
-<div class="dashboard">
-    <div class="dashboard__sidebar" v-bind:class="{open: showMobileDashboard}">
+<div class="dashboard" v-bind:class="{sidebar_closed: sidebarClosed}">
+    <div class="dashboard__sidebar" v-bind:class="{open: showMobileDashboard, sidebar_closed: sidebarClosed}">
       <div class="dashboard__sidebar__inner">
         <nav class="dashboard__sidebar__nav">
           <ul>
@@ -47,7 +47,7 @@
             </li>
           </ul>
         </nav>
-        <a href="#" class="dashboard__sidebar__toggle"><svg xmlns="http://www.w3.org/2000/svg" width="17.404" height="25.65" viewBox="0 0 17.404 25.65"><path id="Path_2292" data-name="Path 2292" d="M-1105.012-7721.223l11.469 14.086 11.871-14.086" transform="translate(-7704.786 1106.175) rotate(90)" fill="none" stroke="#333" stroke-width="3"/></svg></a>
+        <a href="#" class="dashboard__sidebar__toggle" v-bind:class="{active: sidebarClosed}" @click.prevent="sidebarClosed = !sidebarClosed"><svg xmlns="http://www.w3.org/2000/svg" width="17.404" height="25.65" viewBox="0 0 17.404 25.65"><path id="Path_2292" data-name="Path 2292" d="M-1105.012-7721.223l11.469 14.086 11.871-14.086" transform="translate(-7704.786 1106.175) rotate(90)" fill="none" stroke="#333" stroke-width="3"/></svg></a>
       </div>
     </div>
     <div class="dashboard__wrapper">
@@ -64,6 +64,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 @Component
 export default class DashboardMain extends Vue {
   @Prop({ required: false, default: false }) readonly showMobileDashboard!: boolean;
+
+  sidebarClosed = false;
 }
 </script>
 <style lang="scss">
