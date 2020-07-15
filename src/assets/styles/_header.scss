@@ -318,7 +318,7 @@
             }
         }
         input {
-            margin-right: -30px;
+            margin-right: -35px;
             border-radius: 20px;
             padding: 12px 20px 11px;
             border: none;
@@ -328,6 +328,16 @@
             display: inline-block;
             font-size: em(16);
             display: none;
+        }            
+        &.open{
+            input{
+                display: block;
+            }
+            svg{
+                path{
+                    fill: $darkColor;
+                }
+            }
         }
     }
 

@@ -64,7 +64,7 @@
             </svg>
           </div>
         </div>
-        <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/></svg></a>
+        <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"><svg @click.prevent="showSearchModal = true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/></svg></a>
       </div>
       <div class="header__menu" v-if="$route.meta.layout != 'dashboard'">
         <nav>
@@ -168,9 +168,9 @@
         </div>
       </div>
       <div class="header__right">
-        <div class="header__search"  v-if="$route.meta.layout != 'dashboard'">
-          <input type="text" name="search" id="" placeholder="Search" >
-          <a href="#">
+        <div class="header__search" v-bind:class="{'open':showSearch}" v-if="$route.meta.layout != 'dashboard'">
+          <input type="text" name="search" id="" placeholder="Search">
+          <a href="#" @click.prevent="showSearch = !showSearch">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/>
             </svg>
@@ -225,6 +225,43 @@
         </div>
       </div>
     </div>
+    <div class="modal-search" v-bind:class="{'open':showSearchModal}">
+      <div class="modal-search__header">
+        <a href="#" @click.prevent="showSearchModal = false" class="header__mobile__burger open">
+          <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 36 36" style="enable-background:new 0 0 36 36;" xml:space="preserve">
+            <rect x="1.2" y="9" style="fill:#FFFFFF;" width="33.5" height="2"/>
+            <path style="fill:#FFFFFF;" d="M34.2,19h-6v-2h6V19z M24.2,19h-9v-2h9V19z M11.2,19h-9v-2h9V19z"/>
+            <rect x="1.2" y="25" style="fill:#FFFFFF;" width="33.5" height="2"/>
+          </svg>
+        </a>
+        <router-link to="/" class="header__mobile__logo header__mobile__logo--open">
+          <svg @click="showSearchModal = false" xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
+            <g id="logo" transform="translate(-66 -33)">
+              <path id="Path_1" data-name="Path 1"  d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_2" data-name="Path 2" d="M5517.451,5377.123a8.97,8.97,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.535,10.535,0,0,1,5.171,1.253,9,9,0,0,1,3.564,3.565,11.866,11.866,0,0,1,0,10.773,8.989,8.989,0,0,1-3.564,3.564,10.525,10.525,0,0,1-5.171,1.254,10.635,10.635,0,0,1-5.191-1.254,8.929,8.929,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.671,6.671,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.753,7.753,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_3" data-name="Path 3" d="M5515.167,5365.112a3.418,3.418,0,0,1,2.473-.995,3.472,3.472,0,0,1,2.5.955,3.291,3.291,0,0,1,.994,2.487,3.316,3.316,0,0,1-1.774,3.011,3.6,3.6,0,0,1-1.721.43,3.43,3.43,0,0,1-1.72-.457,3.529,3.529,0,0,1-1.291-1.25,3.4,3.4,0,0,1,.538-4.181Zm.927,4.006a2.315,2.315,0,0,0,3.092,0,2.313,2.313,0,0,0,0-3.119,2.318,2.318,0,0,0-3.092,0,2.315,2.315,0,0,0,0,3.119Z" transform="translate(-5415 -5331.117)" fill="#fff"/>
+              <path id="Path_4" data-name="Path 4" d="M5537.659,5364.117l-1.223,5.99h-.8l.25-5.99Z" transform="translate(-5399 -5331.117)" fill="#fff"/>
+              <path id="Path_5" data-name="Path 5" d="M5559.7,5364.117l-1.222,5.99h-.8l.249-5.99Zm3.219,0-1.222,5.99h-.824l.25-5.99Z" transform="translate(-5400 -5331.117)" fill="#fff"/>
+              <path id="Path_6" data-name="Path 6" d="M5543.559,5372.853v2.82h.391a7.5,7.5,0,0,1,6.7-3.368,8.2,8.2,0,0,1,4.407,1.253,9.03,9.03,0,0,1,3.231,3.565,12.5,12.5,0,0,1,0,10.753,8.991,8.991,0,0,1-3.231,3.584,8.2,8.2,0,0,1-4.407,1.254,7.361,7.361,0,0,1-6.621-3.291h-.391V5400h-4.27v-27.147Zm10.028,14.4a7.856,7.856,0,0,0,0-9.519,5.864,5.864,0,0,0-8.364.02,7.726,7.726,0,0,0,0,9.48,5.865,5.865,0,0,0,8.364.019Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_7" data-name="Path 7" d="M5567.415,5392.165h-4.27v-19.312h4.27Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_8" data-name="Path 8" d="M5572.35,5377.123a8.973,8.973,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.528,10.528,0,0,1,5.17,1.253,8.994,8.994,0,0,1,3.565,3.565,11.866,11.866,0,0,1,0,10.773,8.986,8.986,0,0,1-3.565,3.564,10.518,10.518,0,0,1-5.17,1.254,10.635,10.635,0,0,1-5.191-1.254,8.932,8.932,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.672,6.672,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.755,7.755,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_1-2" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_2-2" data-name="Path 2" d="M5517.451,5377.123a8.97,8.97,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.535,10.535,0,0,1,5.171,1.253,9,9,0,0,1,3.564,3.565,11.866,11.866,0,0,1,0,10.773,8.989,8.989,0,0,1-3.564,3.564,10.525,10.525,0,0,1-5.171,1.254,10.635,10.635,0,0,1-5.191-1.254,8.929,8.929,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.671,6.671,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.753,7.753,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_3-2" data-name="Path 3" d="M5515.167,5365.112a3.418,3.418,0,0,1,2.473-.995,3.472,3.472,0,0,1,2.5.955,3.291,3.291,0,0,1,.994,2.487,3.316,3.316,0,0,1-1.774,3.011,3.6,3.6,0,0,1-1.721.43,3.43,3.43,0,0,1-1.72-.457,3.529,3.529,0,0,1-1.291-1.25,3.4,3.4,0,0,1,.538-4.181Zm.927,4.006a2.315,2.315,0,0,0,3.092,0,2.313,2.313,0,0,0,0-3.119,2.318,2.318,0,0,0-3.092,0,2.315,2.315,0,0,0,0,3.119Z" transform="translate(-5415 -5331.117)" fill="#fff"/>
+              <path id="Path_4-2" data-name="Path 4" d="M5537.659,5364.117l-1.223,5.99h-.8l.25-5.99Z" transform="translate(-5399 -5331.117)" fill="#fff"/>
+              <path id="Path_5-2" data-name="Path 5" d="M5559.7,5364.117l-1.222,5.99h-.8l.249-5.99Zm3.219,0-1.222,5.99h-.824l.25-5.99Z" transform="translate(-5400 -5331.117)" fill="#fff"/>
+              <path id="Path_6-2" data-name="Path 6" d="M5543.559,5372.853v2.82h.391a7.5,7.5,0,0,1,6.7-3.368,8.2,8.2,0,0,1,4.407,1.253,9.03,9.03,0,0,1,3.231,3.565,12.5,12.5,0,0,1,0,10.753,8.991,8.991,0,0,1-3.231,3.584,8.2,8.2,0,0,1-4.407,1.254,7.361,7.361,0,0,1-6.621-3.291h-.391V5400h-4.27v-27.147Zm10.028,14.4a7.856,7.856,0,0,0,0-9.519,5.864,5.864,0,0,0-8.364.02,7.726,7.726,0,0,0,0,9.48,5.865,5.865,0,0,0,8.364.019Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_7-2" data-name="Path 7" d="M5567.415,5392.165h-4.27v-19.312h4.27Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+              <path id="Path_8-2" data-name="Path 8" d="M5572.35,5377.123a8.973,8.973,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.528,10.528,0,0,1,5.17,1.253,8.994,8.994,0,0,1,3.565,3.565,11.866,11.866,0,0,1,0,10.773,8.986,8.986,0,0,1-3.565,3.564,10.518,10.518,0,0,1-5.17,1.254,10.635,10.635,0,0,1-5.191-1.254,8.932,8.932,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.672,6.672,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.755,7.755,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
+            </g>
+          </svg>
+        </router-link>
+      </div>
+      <div class="modal-search__main">
+        <search></search>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -232,11 +269,14 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import store from '@/store';
 import AccountApi from '@/service/account';
+import Search from '@/components/Search.vue';
 import {
   ServerResponse, LogoutResult,
 } from '@/model';
 
-@Component
+@Component({
+  components: { Search },
+})
 export default class Header extends Vue {
   @Prop({ default: 'header--nobg' }) private headerClass!: string;
 
@@ -251,6 +291,10 @@ export default class Header extends Vue {
   showSubmenuSell = false;
 
   showSubmenuBuy = false;
+
+  showSearch = false;
+
+  showSearchModal = false;
 
   constructor() {
     super();

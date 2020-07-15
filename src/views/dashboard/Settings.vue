@@ -151,3 +151,6 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class DashboardHome extends Vue {
 }
 </script>
+<style lang="scss">
+  @import "@/assets/styles/_settings.scss";
+</style>
