@@ -1,5 +1,5 @@
 <template>
-  <div class="page about">
+  <div class="page page--nooverflow about">
     <section class="page__hero page__hero--about">
       <div class="page__hero__inner">
         <div class="page__hero__head s_container">

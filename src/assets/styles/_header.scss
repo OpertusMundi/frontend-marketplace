@@ -39,7 +39,7 @@
 
     &.open{
         .header__menu {
-            transform: translateY(0);
+            transform: translateX(0);
         }
         .header__mobile__logo {
             &--closed {
@@ -48,6 +48,9 @@
             &--open {
                 opacity: 1;
             }
+        }
+        .header__mobile__cart{
+            opacity: 0;
         }
     }
 
@@ -90,7 +93,7 @@
             top: 0;
             left: 0;
             background: $gradient_main;
-            transform: translateY(-100%);
+            transform: translateX(-100%);
             transition: transform 0.4s ease;
             nav {
                 top: 50%;
@@ -104,10 +107,14 @@
             bottom:40px;
             width: 100%;
             text-align: center;
+            .btn{
+                font-size: em(18);
+                color:#fff;
+                display: block;
+            }
             @media(min-width: 993px) {
                 display: none;
             }
-
         }
         nav {
             > ul {
@@ -298,29 +305,56 @@
         @media(max-width: 992px) { 
             display: none;
         }
+        svg{
+            display: block;
+        }
     }
 
     &__search {
-        display: flex;
-        align-items: center;
-        margin-right: 50px;
+        margin-right: 40px;
+        position: relative;
         a {
-            display: inline-block;
+            display: block;
+            z-index: 2;
+            position: relative;
             img {
                 display: inline-block;
             }
         }
         input {
-            margin-right: -30px;
+            position: absolute;
+            top:-7px;
+            right: -20px;
             border-radius: 20px;
-            padding: 12px 20px 11px;
             border: none;
             outline: none;
             box-shadow: none;
-            width: 300px;
             display: inline-block;
             font-size: em(16);
-            display: none;
+            //display: none;
+            width:0;
+            transition: width 0.4s ease, padding 0.4s ease;
+            padding: 11px 0px; 
+        }            
+        &.open{
+            input{
+                //display: block;
+                padding: 11px 40px 11px 20px;                
+                width: 330px;
+            }
+            svg{
+                path{
+                    fill: $darkColor;
+                }
+            }
+        }
+    }
+
+    &__notif{
+        margin-right: 40px;
+        cursor: pointer;
+        @media(max-width:992px){
+            margin-right: 0;
         }
     }
 
@@ -336,6 +370,7 @@
                 transform: translate(-50%, -30%);
                 font-size: em(11);
                 color: #fff;
+                line-height: 5px;
             }
             .header--dashboard & {
                 span {
@@ -364,6 +399,7 @@
     }
 
     &__login {
+        cursor: pointer;
         a {
             color: inherit;
             font-weight: 500;
@@ -393,6 +429,9 @@
             display: none;
         }
 
+        .header__cart{
+            margin-right: 0;
+        }
 
         &__logo {
             position: absolute;
