@@ -305,29 +305,48 @@
         @media(max-width: 992px) { 
             display: none;
         }
+        svg{
+            display: block;
+        }
     }
 
     &__search {
-        display: flex;
-        align-items: center;
         margin-right: 40px;
+        position: relative;
         a {
-            display: inline-block;
+            display: block;
+            z-index: 2;
+            position: relative;
             img {
                 display: inline-block;
             }
         }
         input {
-            margin-right: -30px;
+            position: absolute;
+            top:-7px;
+            right: -20px;
             border-radius: 20px;
-            padding: 12px 20px 11px;
             border: none;
             outline: none;
             box-shadow: none;
-            width: 300px;
             display: inline-block;
             font-size: em(16);
-            display: none;
+            //display: none;
+            width:0;
+            transition: width 0.4s ease, padding 0.4s ease;
+            padding: 11px 0px; 
+        }            
+        &.open{
+            input{
+                //display: block;
+                padding: 11px 40px 11px 20px;                
+                width: 330px;
+            }
+            svg{
+                path{
+                    fill: $darkColor;
+                }
+            }
         }
     }
 
