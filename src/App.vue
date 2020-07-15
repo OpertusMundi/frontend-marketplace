@@ -50,8 +50,6 @@ export default class App extends Vue {
 
   showMenuMobile = false;
 
-  showMenuMobile = false;
-
   headerClass = 'bg';
 
   noHeaderBgArray:Array<string | null | undefined>;

@@ -12,14 +12,14 @@
           </svg>
         </a>
         <router-link to="/" class="header__mobile__logo--closed">
-          <svg id="Logo-header_footer" data-name="Logo-header&amp;footer" xmlns="http://www.w3.org/2000/svg" width="24.135" height="28.048" viewBox="0 0 24.135 28.048">
+          <svg @click="hideMobileMenu" id="Logo-header_footer" data-name="Logo-header&amp;footer" xmlns="http://www.w3.org/2000/svg" width="24.135" height="28.048" viewBox="0 0 24.135 28.048">
             <path id="Path_1" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5499 -5364.117)" fill="#fff"/>
             <path id="Path_1-2" data-name="Path 1" d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5499 -5364.117)" fill="#fff"/>
             <path id="Path_3" data-name="Path 3" d="M5515.167,5365.112a3.418,3.418,0,0,1,2.473-.995,3.472,3.472,0,0,1,2.5.955,3.291,3.291,0,0,1,.994,2.487,3.316,3.316,0,0,1-1.774,3.011,3.6,3.6,0,0,1-1.721.43,3.43,3.43,0,0,1-1.72-.457,3.529,3.529,0,0,1-1.291-1.25,3.4,3.4,0,0,1,.538-4.181Zm.927,4.006a2.315,2.315,0,0,0,3.092,0,2.313,2.313,0,0,0,0-3.119,2.318,2.318,0,0,0-3.092,0,2.315,2.315,0,0,0,0,3.119Z" transform="translate(-5497 -5364.117)" fill="#fff"/>
           </svg>
         </router-link>
         <router-link to="/" class="header__mobile__logo header__mobile__logo--open">
-          <svg @click="toggleMobileMenu" xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
+          <svg @click="hideMobileMenu" xmlns="http://www.w3.org/2000/svg" width="96.917" height="35.883" viewBox="0 0 96.917 35.883">
             <g id="logo" transform="translate(-66 -33)">
               <path id="Path_1" data-name="Path 1"  d="M5504.21,5372.853v-6.307h4.309v6.307h5.641v3.487h-5.641v11.125q0,1.175,1.1,1.175h3.956v3.525h-5.444a3.8,3.8,0,0,1-2.84-1.1,3.955,3.955,0,0,1-1.078-2.9v-11.83H5499v-3.487Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
               <path id="Path_2" data-name="Path 2" d="M5517.451,5377.123a8.97,8.97,0,0,1,3.584-3.565,10.645,10.645,0,0,1,5.191-1.253,10.535,10.535,0,0,1,5.171,1.253,9,9,0,0,1,3.564,3.565,11.866,11.866,0,0,1,0,10.773,8.989,8.989,0,0,1-3.564,3.564,10.525,10.525,0,0,1-5.171,1.254,10.635,10.635,0,0,1-5.191-1.254,8.929,8.929,0,0,1-3.584-3.584,11.825,11.825,0,0,1,0-10.753Zm4.6,10.087a5.816,5.816,0,0,0,8.3,0,6.743,6.743,0,0,0,1.587-4.72,6.671,6.671,0,0,0-1.587-4.7,5.837,5.837,0,0,0-8.3.02,7.753,7.753,0,0,0,0,9.4Z" transform="translate(-5433 -5331.117)" fill="#fff"/>
@@ -40,7 +40,7 @@
             </g>
           </svg>
         </router-link>
-        <div class="header__cart">
+        <div class="header__mobile__right header__cart">
           <a href="#" class="header__mobile__cart" v-if="$route.meta.layout != 'dashboard'">
               <svg xmlns="http://www.w3.org/2000/svg" width="24.08" height="24.001" viewBox="0 0 24.08 24.001">
                 <g id="Group_1973" data-name="Group 1973" transform="translate(-1684 -36)">
@@ -52,6 +52,17 @@
                 </g>
               </svg><span>{{ cartCount() }}</span>
           </a>
+          <div class="header__notif" v-if="$route.meta.layout == 'dashboard'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
+              <g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)">
+                <g id="Group_1974" data-name="Group 1974">
+                  <path id="Path_8972" data-name="Path 8972" d="M690.591,494.182c-.247,0-1.488-.037-1.658-.757a5.909,5.909,0,0,1,.035-1.77,46.892,46.892,0,0,0,.242-4.918c0-4.294-3.156-7.068-8.041-7.072h-.011c-4.885,0-8.041,2.778-8.041,7.072a46.583,46.583,0,0,0,.242,4.918,5.943,5.943,0,0,1,.035,1.77c-.17.72-1.412.757-1.659.757-1.58,0-2.727,1.344-2.727,3.2a2.863,2.863,0,0,0,2.727,2.918H674.6a.982.982,0,0,0,0-1.965h-2.862a.9.9,0,0,1-.762-.953c0-.613.236-1.231.762-1.231,1.9,0,3.236-.85,3.571-2.272a7.175,7.175,0,0,0,.008-2.407,44.586,44.586,0,0,1-.232-4.731c0-3.765,3.14-5.106,6.081-5.107s6.082,1.342,6.082,5.107a44.489,44.489,0,0,1-.233,4.729,7.187,7.187,0,0,0,.009,2.41c.335,1.421,1.669,2.271,3.57,2.271.63,0,.762.669.762,1.231a.9.9,0,0,1-.762.953H687.73a.982.982,0,0,0,0,1.965h2.861a2.863,2.863,0,0,0,2.727-2.918C693.318,495.17,691.949,494.182,690.591,494.182Z" fill="#333"/>
+                  <path id="Path_8973" data-name="Path 8973" d="M683.939,498.944a.982.982,0,0,0-.982.983,1.773,1.773,0,1,1-3.546,0,.983.983,0,1,0-1.965,0,3.738,3.738,0,1,0,7.476,0A.983.983,0,0,0,683.939,498.944Z" fill="#333"/>
+                </g>
+                <circle id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333"/>
+              </g>
+            </svg>
+          </div>
         </div>
         <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff"/></svg></a>
       </div>
@@ -152,8 +163,8 @@
           </ul>
         </nav>
         <div class="header__menu__btn">
-          <router-link to="/dashboard" class="btn btn--std" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
-          <router-link to="/signin" class="btn btn--std" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link>
+          <router-link to="/dashboard" class="btn" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
+          <router-link to="/signin" class="btn" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link>
         </div>
       </div>
       <div class="header__right">
@@ -165,7 +176,7 @@
             </svg>
           </a>
         </div>
-        <div class="header__search" v-if="$route.meta.layout == 'dashboard'">
+        <div class="header__notif" v-if="$route.meta.layout == 'dashboard'">
           <svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
             <g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)">
               <g id="Group_1974" data-name="Group 1974">
@@ -268,6 +279,10 @@ export default class Header extends Vue {
 
   toggleMobileMenu():void {
     this.$emit('toggleMobileMenu', !this.showMenuMobile);
+  }
+
+  hideMobileMenu():void {
+    this.$emit('toggleMobileMenu', false);
   }
 
   showSubmenu1():void {

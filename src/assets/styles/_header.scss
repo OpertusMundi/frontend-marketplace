@@ -310,7 +310,7 @@
     &__search {
         display: flex;
         align-items: center;
-        margin-right: 50px;
+        margin-right: 40px;
         a {
             display: inline-block;
             img {
@@ -328,6 +328,14 @@
             display: inline-block;
             font-size: em(16);
             display: none;
+        }
+    }
+
+    &__notif{
+        margin-right: 40px;
+        cursor: pointer;
+        @media(max-width:992px){
+            margin-right: 0;
         }
     }
 
@@ -372,6 +380,7 @@
     }
 
     &__login {
+        cursor: pointer;
         a {
             color: inherit;
             font-weight: 500;
@@ -401,6 +410,9 @@
             display: none;
         }
 
+        .header__cart{
+            margin-right: 0;
+        }
 
         &__logo {
             position: absolute;
