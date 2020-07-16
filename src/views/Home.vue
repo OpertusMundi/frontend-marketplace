@@ -226,6 +226,7 @@ export default class Header extends Vue {
         pageDots: false,
         wrapAround: false,
         freeScroll: true,
+        cellAlign: 'left',
       });
     }
   }
