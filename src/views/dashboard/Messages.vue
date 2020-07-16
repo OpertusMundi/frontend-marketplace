@@ -3,7 +3,7 @@
     <div class="dashboard__head">
       <div class="dashboard__head__helpers">
         <h1>Messages</h1>
-        <a href="#" class="btn--std btn--blue">NEW MESSAGE</a>
+        <router-link class="btn--std btn--blue" to="messages/create">NEW MESSAGE</router-link>
         <div class="dashboard__head__helpers__mobile">
           <div class="dashboard__head__helpers__mobile__icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
