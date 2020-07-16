@@ -331,19 +331,19 @@
             box-shadow: none;
             display: inline-block;
             font-size: em(16);
-            //display: none;
             width:0;
-            transition: width 0.4s ease, padding 0.4s ease;
-            padding: 11px 0px; 
+            transition: width 0.6s ease, opacity 0.4s ease;
+            padding: 11px 40px 11px 20px;   
+            opacity: 0;
         }            
         &.open{
-            input{
-                //display: block;
-                padding: 11px 40px 11px 20px;                
+            input{           
                 width: 330px;
+                opacity: 1;
             }
             svg{
                 path{
+                    transition: fill 0.4s ease;
                     fill: $darkColor;
                 }
             }
@@ -370,7 +370,7 @@
                 transform: translate(-50%, -30%);
                 font-size: em(11);
                 color: #fff;
-                line-height: 5px;
+                line-height: 15px;
             }
             .header--dashboard & {
                 span {
