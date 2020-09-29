@@ -177,6 +177,12 @@ export interface Publisher {
      * Average rating. If no user ratings exist, null is returned
      */
     rating: number | null;
+    /**
+     * Company contact email. This is the email address from the
+     * provider's profile. The email is returned only if it has been
+     * verified.
+     */
+    email: string | null;
 }
 
 export interface CatalogueItemStatistics {

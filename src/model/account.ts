@@ -171,14 +171,6 @@ export interface AccountBase {
    */
   email: string;
   /**
-   * @deprecated Will be removed in future update
-   */
-  firstName: string;
-  /**
-   * @deprecated Will be removed in future update
-   */
-  lastName: string;
-  /**
    * Locale. Default value is set to 'en'
    */
   locale: string;
