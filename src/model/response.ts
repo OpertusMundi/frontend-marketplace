@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
-import { ServerMessage } from './error';
+import { ServerMessage } from '@/model/error';
+import { PageRequest } from '@/model/request';
 
 export interface SimpleResponse {
   /**
@@ -22,3 +23,11 @@ export interface ServerResponse<R> extends SimpleResponse {
 }
 
 export type AxiosServerResponse<R> = AxiosResponse<ServerResponse<R>>;
+
+export interface PageResult<R> {
+  pageRequest: PageRequest;
+  count: number;
+  items: R[];
+}
+
+export type AxiosPageResponse<R> = AxiosResponse<ServerResponse<PageResult<R>>>;

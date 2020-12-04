@@ -223,11 +223,19 @@ export interface CatalogueItem extends BaseCatalogueItem {
   statistics: CatalogueItemStatistics;
 }
 
-export interface CatalogueAddItemCommand extends BaseCatalogueItem {
+export interface CatalogueItemCommand extends BaseCatalogueItem {
+  /**
+   * True if the file should be imported to PostGIS
+   */
+  ingested: boolean;
   /*
    * Pricing model available for the asset
    */
   pricingModels: BasePricingModelCommand[];
+  /**
+   * Optional relative path to user's remote file system
+   */
+  source?: string;
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;

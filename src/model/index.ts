@@ -10,7 +10,7 @@ export {
 
 export {
   CatalogueItem,
-  CatalogueAddItemCommand,
+  CatalogueItemCommand,
   CatalogueQuery,
   CatalogueQueryResponse,
 } from '@/model/catalogue';

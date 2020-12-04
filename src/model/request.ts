@@ -1,3 +1,10 @@
+export type Order = 'ASC' | 'DESC';
+
+export interface Sorting<T> {
+  id: T;
+  order: Order;
+}
+
 export interface PageRequest {
   /*
    * Page index. Page index is 0-based and cannot be a negative number

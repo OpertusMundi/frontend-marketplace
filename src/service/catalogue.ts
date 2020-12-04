@@ -4,8 +4,8 @@ import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
 } from '@/model';
-import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { CatalogueAddItemCommand, Publisher } from '@/model/catalogue';
+import { AxiosResponse } from 'axios';
+import { Publisher } from '@/model/catalogue';
 
 // Custom response types
 interface CatalogueQueryResponseInternal extends ServerResponse<QueryResultPage<CatalogueItem>> {
@@ -47,16 +47,6 @@ export default class CatalogueApi extends Api {
 
     return this.get<ServerResponse<CatalogueItem>>(url)
       .then((response: AxiosServerResponse<CatalogueItem>) => {
-        const { data } = response;
-
-        return data;
-      });
-  }
-
-  public async create(command: CatalogueAddItemCommand, config?: AxiosRequestConfig): Promise<ServerResponse<void>> {
-    const url = '/action/catalogue/items';
-    return this.post<CatalogueAddItemCommand, ServerResponse<void>>(url, command, config)
-      .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
 
         return data;

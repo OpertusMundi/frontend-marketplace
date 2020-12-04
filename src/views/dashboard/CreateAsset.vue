@@ -575,9 +575,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { CatalogueAddItemCommand, ServerResponse } from '@/model';
+import { CatalogueItemCommand, ServerResponse } from '@/model';
 import { BasePricingModelCommand } from '@/model/pricing-model';
 import CatalogueApi from '@/service/catalogue';
+import DraftAssetApi from '@/service/draft';
 import { required, email, regex } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
@@ -586,6 +587,7 @@ import VueCardFormat from 'vue-credit-card-validation';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
+import { AssetDraft } from '@/model/draft';
 
 Vue.use(VueCardFormat);
 
@@ -618,7 +620,9 @@ export default class CreateAsset extends Vue {
 
   catalogueApi: CatalogueApi;
 
-  asset: CatalogueAddItemCommand;
+  draftAssetApi: DraftAssetApi;
+
+  asset: CatalogueItemCommand;
 
   priceModelType: string;
 
@@ -642,6 +646,7 @@ export default class CreateAsset extends Vue {
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
       format: 'CSV',
+      ingested: false,
       keywords: [],
       language: '',
       license: '',
@@ -696,6 +701,7 @@ export default class CreateAsset extends Vue {
 
 
     this.catalogueApi = new CatalogueApi();
+    this.draftAssetApi = new DraftAssetApi();
   }
 
   // mounted():void {
@@ -758,8 +764,8 @@ export default class CreateAsset extends Vue {
         }
       },
     };
-    this.catalogueApi.create(this.asset, config)
-      .then((response: ServerResponse<void>) => {
+    this.draftAssetApi.submitNew(this.asset, config)
+      .then((response: ServerResponse<AssetDraft>) => {
         if (response.success) {
           this.uploading.completed = true;
           this.uploading.title = 'Your asset has been submitted for review';
