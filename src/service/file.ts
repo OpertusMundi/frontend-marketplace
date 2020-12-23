@@ -88,7 +88,7 @@ export default class FileSystemApi extends Api {
    * @param command Upload command with file metadata
    */
   public async uploadFile(file: File, command: FileUploadCommand): Promise<ServerResponse<DirectoryInfo>> {
-    const url = 'action/file-manager/files';
+    const url = 'action/file-system/files';
 
     const form = new FormData();
 
