@@ -1,4 +1,5 @@
 import { CatalogueItemCommand, Publisher } from '@/model/catalogue';
+import { FileInfo } from '@/model/file';
 
 export enum EnumDraftStatus {
   /**
@@ -54,7 +55,7 @@ export interface AssetDraft {
   assetPublished: string;
   command: CatalogueItemCommand;
   createdOn: string;
-  status: EnumDraftStatus;
+  files: FileInfo[];
   helpdeskRejectionReason: string;
   ingested: boolean;
   key: string;
@@ -62,11 +63,12 @@ export interface AssetDraft {
   providerRejectionReason: string;
   publisher: Publisher,
   source: string;
+  status: EnumDraftStatus;
   title: string;
   version: string;
 }
 
 export interface AssetDraftReviewCommand {
-  rejected: boolean;
   reason?: string;
+  rejected: boolean;
 }

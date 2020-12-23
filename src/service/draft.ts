@@ -168,4 +168,47 @@ export default class DraftAssetApi extends Api {
 
     return this.delete<ServerResponse<void>>(url);
   }
+
+  /**
+   * Upload files
+   * 
+   * @param key Draft unique key
+   * @param files Files to upload
+   * @param command Upload command with file metadata
+   */
+  public async uploadFile(key: string, files: File[]): Promise<ServerResponse<AssetDraft>> {
+    const url = `/provider/drafts/${key}/files`;
+
+    const form = new FormData();
+
+    for (let f of files) {
+      form.append('file', f);
+    }
+
+    return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
+
+  /**
+   * Delete file
+   * 
+   * @param key Draft unique key
+   * @param path Path of the file to delete e.g., /data.zip
+   */
+  public async deletePath(key: string, path: string): Promise<ServerResponse<AssetDraft>> {
+    const url = `/provider/drafts/${key}/files?path=${path}`;
+
+    return this.delete<ServerResponse<AssetDraft>>(url)
+      .then((response: AxiosServerResponse<AssetDraft>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
 }

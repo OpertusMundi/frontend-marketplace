@@ -70,7 +70,7 @@ export default class FileSystemApi extends Api {
    *
    * @param path Path to delete
    */
-  public async deletePath(path: string): Promise<SimpleResponse> {
+  public async deletePath(path: string): Promise<ServerResponse<DirectoryInfo>> {
     const url = `/action/file-system?path=${path}`;
 
     return this.delete<ServerResponse<DirectoryInfo>>(url)
