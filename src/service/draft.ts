@@ -171,7 +171,7 @@ export default class DraftAssetApi extends Api {
 
   /**
    * Upload files
-   * 
+   *
    * @param key Draft unique key
    * @param files Files to upload
    * @param command Upload command with file metadata
@@ -181,9 +181,7 @@ export default class DraftAssetApi extends Api {
 
     const form = new FormData();
 
-    for (let f of files) {
-      form.append('file', f);
-    }
+    files.forEach((f) => form.append('file', f));
 
     return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -196,7 +194,7 @@ export default class DraftAssetApi extends Api {
 
   /**
    * Delete file
-   * 
+   *
    * @param key Draft unique key
    * @param path Path of the file to delete e.g., /data.zip
    */
@@ -210,5 +208,4 @@ export default class DraftAssetApi extends Api {
         return data;
       });
   }
-
 }
