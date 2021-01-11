@@ -138,7 +138,7 @@
                     <div class="header__submenu__block__menu">
                       <ul>
                         <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Vector</router-link></li>
-                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Title</router-link></li>
+                        <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Tile</router-link></li>
                         <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Raster</router-link></li>
                         <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">APIs</router-link></li>
                         <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Bundles</router-link></li>
