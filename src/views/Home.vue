@@ -41,7 +41,7 @@
     </section>
     <section class="homepage__assets" data-aos="fade-in">
       <h4 class="homepage__assets__title">Popular Assets</h4>
-      <div class="a_carousel">
+      <div class="a_carousel draggable">
         <a href="" class="a_carousel__item">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
@@ -189,24 +189,24 @@ import Shape from '@/components/Shape.vue';
 import Search from '@/components/Search.vue';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Flickity from 'flickity';
-import 'flickity/css/flickity.css';
+import $ from '@/assets/scripts/jquery_cs';
+import slider from '@/assets/scripts/slider';
 
 @Component({
   components: { Shape, Search },
 })
 export default class Header extends Vue {
-  pSlider: any;
-
   searchResultsActive = false;
 
   mounted(): void {
     this.initAOS();
-    this.initPopularSlider();
+    this.carouselLeftOffset();
+    slider.init();
+    window.addEventListener('resize', this.carouselLeftOffset);
   }
 
   destroyed(): void {
-    if (this.pSlider) this.pSlider.destroy();
+    window.removeEventListener('resize', this.carouselLeftOffset);
   }
 
   initAOS = (): void => {
@@ -216,19 +216,11 @@ export default class Header extends Vue {
     });
   }
 
-  initPopularSlider = (): void => {
-    const pSliderS = document.querySelector('.a_carousel');
-    if (pSliderS) {
-      this.pSlider = new Flickity(pSliderS, {
-        selectedAttraction: 0.015,
-        friction: 0.3,
-        prevNextButtons: false,
-        pageDots: false,
-        wrapAround: false,
-        freeScroll: true,
-        cellAlign: 'left',
-      });
-    }
+  carouselLeftOffset = (): void => {
+    console.log('asdf');
+    const widthCont = $('.s_container')[0];
+    const offset = (window.innerWidth - widthCont.getBoundingClientRect().width) / 2;
+    document.documentElement.style.setProperty('--container-s-left-space', `${offset}px`);
   }
 }
 </script>

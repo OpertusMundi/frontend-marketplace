@@ -2,9 +2,17 @@
 
     width: 100%;
     position: relative;
+    padding: 0 var(--container-s-left-space);
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     &__item {
-        width: 400px;
+        flex: 0 0 400px;
         min-height: 400px;
         position: relative;
 
@@ -13,8 +21,8 @@
         border-radius: 20px;
         color: $mainFontColor;
         @media(max-width: 576px) {
-            width: 75%;
-            padding: 20px;
+            flex: 0 0 75%;
+            // padding: 20px;
             min-height: 320px;
             margin:0 5px;
         }
