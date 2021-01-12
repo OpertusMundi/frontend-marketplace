@@ -1,0 +1,6 @@
+.becomevendor {
+  h1 {
+    @include fluid-type(30px, 45px);
+    padding: 20px 0;
+  }
+}

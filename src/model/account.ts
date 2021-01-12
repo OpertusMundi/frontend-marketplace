@@ -52,7 +52,7 @@ interface AddressBase {
     city: string;
     /**
      * Country 2-letter code e.g. GR
-     * 
+     *
      * https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
     country: string;
@@ -65,6 +65,7 @@ interface AddressBase {
 /**
  * Address command
  */
+// eslint-disable-next-line
 export interface AddressCommand extends AddressBase {
 
 }
@@ -72,7 +73,8 @@ export interface AddressCommand extends AddressBase {
 /**
  * Address
  */
-export interface Address extends AddressBase {
+// eslint-disable-next-line
+ export interface Address extends AddressBase {
 
 }
 
@@ -109,7 +111,7 @@ export interface CustomerRepresentativeBase {
     birthdate: string;
     /**
      * The representative country of residence. ISO 3166-1 alpha-2 format is expected
-     * 
+     *
      * https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
     countryOfResidence: string;
@@ -118,7 +120,7 @@ export interface CustomerRepresentativeBase {
     lastName: string;
     /**
      * The representative nationality. ISO 3166-1 alpha-2 format is expected
-     * 
+     *
      * https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
     nationality: string;
@@ -151,7 +153,7 @@ interface CustomerCommand {
 
 /**
  * Individual consumer customer command
- * 
+ *
  * Property type value expected to be INDIVIDUAL
  */
 export interface ConsumerIndividualCommand extends CustomerCommand {
@@ -162,7 +164,7 @@ export interface ConsumerIndividualCommand extends CustomerCommand {
     birthdate: string;
     /**
      * The customer country of residence. ISO 3166-1 alpha-2 format is expected
-     * 
+     *
      * https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
     countryOfResidence: string;
@@ -170,7 +172,7 @@ export interface ConsumerIndividualCommand extends CustomerCommand {
     lastName: string;
     /**
      * The customer nationality. ISO 3166-1 alpha-2 format is expected
-     * 
+     *
      * https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
      */
     nationality: string;
@@ -179,7 +181,7 @@ export interface ConsumerIndividualCommand extends CustomerCommand {
 
 /**
  * Professional consumer customer command
- * 
+ *
  * Property type value expected to be PROFESSIONAL
  */
 export interface ConsumerProfessionalCommand extends CustomerCommand {
@@ -207,7 +209,7 @@ export interface ConsumerProfessionalCommand extends CustomerCommand {
 
 /**
  * Professional provider customer command
- * 
+ *
  * Property type value expected to be PROFESSIONAL
  */
 export interface ProviderProfessionalCommand extends ConsumerProfessionalCommand {

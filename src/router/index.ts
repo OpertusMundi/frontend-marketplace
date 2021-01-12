@@ -113,6 +113,11 @@ const routes: RouteConfig[] = [
     },
   },
   {
+    path: '/become-vendor',
+    name: 'BocomeVendor',
+    component: () => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
+  },
+  {
     path: '/error/:error',
     name: 'Error',
     component: () => import(/* webpackChunkName: "error" */ '../views/ErrorPage.vue'),

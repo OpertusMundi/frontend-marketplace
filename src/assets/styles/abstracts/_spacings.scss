@@ -1,0 +1,108 @@
+$space-values : (
+  5,
+  10,
+  15,
+  20,
+  30,
+  40,
+  50,
+  60,
+  70,
+  80,
+  90,
+  100,
+  120,
+  140,
+  150,
+  160,
+  170,
+) !default;
+
+// margin and padding shorthands
+$space-prefixes : (
+  p  : padding,
+  pt : padding-top,
+  pr : padding-right,
+  pb : padding-bottom,
+  pl : padding-left,
+  m  : margin,
+  mt : margin-top,
+  mr : margin-right,
+  mb : margin-bottom,
+  ml : margin-left,
+) !default;
+
+
+$breakpoints: (
+  // Extra small screen / phone
+  xs: 0,
+  // Small screen / phone
+  sm: 567px,
+  // Medium screen / tablet
+  md: 768px,
+  // Large screen / tablet
+  lg: 992px,
+  // Extra large screen / wide desktop
+  xl: 1400px,
+  // Extra extra large screen / wide desktop
+  xxl: 1600px
+) !default;
+
+
+// main function definition
+@mixin make-space($values, $prefixes, $breakpoints) {
+  @each $breakpoint-name, $breakpoint-value in $breakpoints {
+    // if xs value = 0, set it global without media queries
+    @if($breakpoint-value == 0) {
+      @each $attr-short, $attr-long in $prefixes {
+        @each $value in $values {
+          .#{$attr-short}-#{$breakpoint-name}-#{$value} {
+            #{$attr-long}: #{$value}#{'px'};
+          }
+        }
+      }
+    }
+    // breakpoint values that not equal to 0
+    @else {
+      @media screen and (min-width: $breakpoint-value) {
+        @each $attr-short, $attr-long in $prefixes {
+          @each $value in $values {
+            .#{$attr-short}-#{$breakpoint-name}-#{$value} {
+              #{$attr-long}: #{$value}#{'px'};
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@include make-space($space-values, $space-prefixes, $breakpoints);
+
+
+// main function definition
+@mixin make-visibility($breakpoints) {
+  @each $breakpoint-name, $breakpoint-value in $breakpoints {
+    // if xs value = 0, set it global without media queries
+    @if($breakpoint-value == 0) {
+      .hide-#{$breakpoint-name} {
+        display: none!important;
+      }
+      .show-#{$breakpoint-name} {
+        display: block!important;
+      }
+    }
+    // breakpoint values that not equal to 0
+    @else {
+      @media screen and (min-width: $breakpoint-value) {
+        .hide-#{$breakpoint-name} {
+          display: none!important;
+        }
+        .show-#{$breakpoint-name} {
+          display: block!important;
+        }
+      }
+    }
+  }
+}
+@include make-visibility($breakpoints);

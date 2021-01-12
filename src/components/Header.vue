@@ -74,7 +74,7 @@
               <div class="header__mobile-submenu" v-if="showSubmenuSell">
                 <ul>
                   <li><router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for vendors</span></router-link></li>
-                  <li><router-link to="/vendor-benefits"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link></li>
+                  <li><router-link to="/become-vendor"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link></li>
                 </ul>
               </div>
               <transition name="fade" mode="out-in">
@@ -100,7 +100,7 @@
                           </g>
                         </g>
                       </svg>
-                      <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/vendor-benefits" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
+                      <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/become-vendor" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
                     </div>
                   </div>
                   <div class="header__submenu__block">
