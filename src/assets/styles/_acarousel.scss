@@ -101,6 +101,7 @@
             &__title {
                 font-size: em(30);
                 font-family: $titleFont;
+                font-weight: 700;
                 @media(max-width: 576px) {
                     font-size: em(24);
                 }
@@ -142,6 +143,7 @@
 
             &__price {
                 font-family: $titleFont;
+                font-weight: 700;
                 font-size: em(30);
                 letter-spacing: 0.04em;
                 @media(max-width: 576px) { 

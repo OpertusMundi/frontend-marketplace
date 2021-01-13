@@ -459,6 +459,7 @@
         h5 {
             color: #fff;
             font-family: $titleFont;
+            font-weight: 700;
             @include fluid-type(20px, 30px);
             letter-spacing: 0.04em;
             margin-bottom: 15px;
@@ -787,6 +788,7 @@
 
     &__title {
         font-family: $titleFont;
+        font-weight: 700;
         font-size: em(30);
         letter-spacing: 0.02em;
         overflow: hidden;
@@ -801,6 +803,7 @@
     }
     &__price {
         font-family: $titleFont;
+        font-weight: 700;
         font-size: em(30);
         letter-spacing: 0.02em;
         @media(max-width: 576px) {   

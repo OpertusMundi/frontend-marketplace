@@ -112,12 +112,11 @@ localize({
 });
 const phoneNumber = {
   validate(value) {
-    // eslint-disable-next-line
+    /* eslint-disable */
     const phone = new PhoneNumber(value);
     if (phone.isValid()) {
       return true;
     }
-    // eslint-disable-next-line
     return `The Phone field is ${phone.a.possibility.replace(/-/g, ' ')}`;
   },
 };

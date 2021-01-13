@@ -28,6 +28,7 @@
             &__title {
                 color :#fff;
                 font-family: $titleFont;
+                font-weight: 700;
                 @include fluid-type(30px, 45px);
                 margin-bottom: 40px;
                 span {
@@ -87,6 +88,7 @@
             }
             &__title {
                 font-family: $titleFont;
+                font-weight: 700;
                 font-size: em(25);
                 margin: 30px 0;
                 letter-spacing: 0.02em;
@@ -112,6 +114,7 @@
         &__title {
             font-size: em(45);
             font-family: $titleFont;
+            font-weight: 700;
             width: 100%;
             text-align: center;
             letter-spacing: 0.03em;
@@ -166,6 +169,7 @@
         &__title {
             font-size: em(45);
             font-family: $titleFont;
+            font-weight: 700;
             width: 100%;
             text-align: center;
             letter-spacing: 0.03em;
