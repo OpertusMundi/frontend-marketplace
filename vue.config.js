@@ -4,15 +4,15 @@ module.exports = {
    */
   assetsDir: 'assets',
   /*
-   * Update output directory for production build to add static assets to the final jar/war file
+   * Output directory
    */
-  outputDir: process.env.NODE_ENV === 'development' ? 'dist' : '../resources/public',
+  outputDir: 'dist',
   /*
-   * For production build, index.html is treated as a Spring Thymeleaf template
+   * When deployed as a static resource in a Spring application, index.html is treated as a Spring Thymeleaf template
    *
    * https://www.thymeleaf.org/documentation.html
    */
-  indexPath: process.env.NODE_ENV === 'development' ? 'index.html' : '../templates/index.html',
+  indexPath: 'index.html',
   /* For development, proxy all action requests
    *
    * https://github.com/chimurai/http-proxy-middleware#http-proxy-options
