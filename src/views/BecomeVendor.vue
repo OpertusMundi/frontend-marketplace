@@ -112,12 +112,11 @@ localize({
 });
 const phoneNumber = {
   validate(value) {
-    /* eslint-disable */
     const phone = new PhoneNumber(value);
     if (phone.isValid()) {
       return true;
     }
-    return `The Phone field is ${phone.a.possibility.replace(/-/g, ' ')}`;
+    return `Phone field ${phone.toJSON().possibility.replace(/-/g, ' ')}`;
   },
 };
 extend('phoneNumber', phoneNumber);
