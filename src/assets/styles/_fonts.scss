@@ -7,6 +7,20 @@
 }
 @font-face {
     font-family: 'Space Grotesk';
+    src:  url('~@/assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2'),
+          url('~@/assets/fonts/SpaceGrotesk-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    src:  url('~@/assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2'),
+          url('~@/assets/fonts/SpaceGrotesk-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Space Grotesk';
     src:  url('~@/assets/fonts/SpaceGrotesk-Light.woff2') format('woff2'),
           url('~@/assets/fonts/SpaceGrotesk-Light.woff') format('woff');
     font-weight: 300;

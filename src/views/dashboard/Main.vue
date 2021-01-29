@@ -22,6 +22,12 @@
               </router-link>
             </li>
             <li @click="toggleMobileMenu">
+              <router-link to="/dashboard/storage" data-name="Storage">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.9" viewBox="0 0 24 23.9"><g id="Group_2758" data-name="Group 2758" transform="translate(-8.26 -339.4)"><path id="Path_9490" data-name="Path 9490" d="M30.36,348.2c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8a1.012,1.012,0,1,0-1.7-1.1Z" fill="#333"/><path id="Path_9491" data-name="Path 9491" d="M31.76,353a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,353Z" fill="#333"/><path id="Path_9492" data-name="Path 9492" d="M31.76,358.1a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,0,0-1.5,1.3c1.6,1.8,5.9,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,358.1Z" fill="#333"/><path id="Path_9493" data-name="Path 9493" d="M20.26,348c5.8,0,12-1.4,12-4.3,0-3-6.2-4.3-12-4.3s-12,1.4-12,4.3S14.46,348,20.26,348Zm0-6.7c6.5,0,10,1.7,10,2.3s-3.5,2.3-10,2.3-10-1.7-10-2.3S13.76,341.3,20.26,341.3Z" fill="#333"/></g></svg>
+                <span>Storage</span>
+              </router-link>
+            </li>
+            <li @click="toggleMobileMenu">
               <router-link to="/dashboard/profile" data-name="Profile">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g id="Group_556" data-name="Group 556" transform="translate(0 -0.259)"><path id="Union_1" data-name="Union 1" d="M0 24V21c0-3.3 5.4-6 12-6s12 2.7 12 6v3zM6 6a6 6 0 1 1 6 6A6 6 0 0 1 6 6z" transform="translate(0 0.259)" fill="#333"/></g></svg>
                 <span>Profile</span>

@@ -56,6 +56,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
       },
       {
+        path: 'storage',
+        name: 'Storage',
+        component: () => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
+      {
         path: 'assets/create',
         name: 'CreateAsset',
         component: () => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
