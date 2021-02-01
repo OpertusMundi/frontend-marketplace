@@ -55,7 +55,7 @@ export interface FixedPricingModel extends BasePricingModel {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type:  EnumPricingModel.FIXED;
+  type: EnumPricingModel.FIXED;
   /*
    * True if pricing model includes updates
    */
@@ -70,7 +70,7 @@ export interface SubscriptionPricingModel extends BasePricingModel {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type:  EnumPricingModel.SUBSCRIPTION;
+  type: EnumPricingModel.SUBSCRIPTION;
   /*
    * Subscription duration in months
    */
@@ -96,7 +96,7 @@ export interface FixedPricingModelCommand extends BasePricingModelCommand {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type:  EnumPricingModel.FIXED;
+  type: EnumPricingModel.FIXED;
   /*
    * True if pricing model includes updates
    */
@@ -115,7 +115,7 @@ export interface SubscriptionPricingModelCommand extends BasePricingModelCommand
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type:  EnumPricingModel.SUBSCRIPTION;
+  type: EnumPricingModel.SUBSCRIPTION;
   /*
    * Subscription duration in months
    */

@@ -26,7 +26,7 @@ export default class ProfileApi extends Api {
 
   /**
    * Update profile data
-   * 
+   *
    * @param command Profile update command
    */
   public async updateProfile(command: AccountProfileCommand): Promise<ServerResponse<Account>> {
@@ -39,5 +39,4 @@ export default class ProfileApi extends Api {
         return data;
       });
   }
-
 }

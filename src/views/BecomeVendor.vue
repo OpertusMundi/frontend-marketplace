@@ -112,6 +112,7 @@ localize({
 });
 const phoneNumber = {
   validate(value) {
+    /* eslint-disable */
     const phone = new PhoneNumber(value);
     if (phone.isValid()) {
       return true;

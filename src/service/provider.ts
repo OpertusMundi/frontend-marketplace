@@ -10,10 +10,10 @@ export default class ProviderApi extends Api {
 
   /**
    * Update provider data.
-   * 
+   *
    * If a draft request already exists, it is updated; Otherwise a new request is created. A
    * draft request is locked once the submitRegistration method is called.
-   * 
+   *
    * @param command Provider update command
    */
   public async updateRegistration(command: ProviderProfessionalCommand): Promise<ServerResponse<Profile>> {
@@ -29,10 +29,10 @@ export default class ProviderApi extends Api {
 
   /**
    * Update and submit for review provider data.
-   * 
+   *
    * If a draft request already exists, it is updated; Otherwise a new request is created. The
    * request is locked and submitted for review by the HelpDesk users.
-   * 
+   *
    * @param command Provider update command
    */
   public async submitRegistration(command: ProviderProfessionalCommand): Promise<ServerResponse<Profile>> {
@@ -59,5 +59,4 @@ export default class ProviderApi extends Api {
         return data;
       });
   }
-
 }

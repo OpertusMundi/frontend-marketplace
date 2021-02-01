@@ -46,26 +46,52 @@
 
   &-files {
     width: 100%;
-    h4 {
-      font-size: em(25);
-      font-weight: 700;;
+    &__nav {
+      margin-bottom: -10px;
+      ul {
+        li{
+          font-size: em(25);
+          font-weight: 700;
+          opacity: 0.5;
+          position: relative;
+          padding-left: 20px;
+          display: inline-block;
+          a {
+            color: $mainFontColor;
+          }
+          &::after {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -15px;
+            height: 35px;
+            content: url('~@/assets/images/icons/dashboard/left_small.svg')
+          }
+          &:last-child {
+            opacity: 1;
+            &:after {
+              display: none;
+            }
+          }
+        }
+      }
     }
     &__table {
       width: 100%;
-      border-collapse: separate;  border-spacing: 0px 20px;
+      border-collapse: separate;  
+      border-spacing: 0px 20px;
       th {
-        padding-bottom: 15px;
         font-size: em(20);
         text-align: left; 
         input[type=checkbox] {
           display: block;
-          margin-top: -18px;
+          margin-top: 18px;
         }
         &:last-child {
           padding:15px;
         }
         &:first-child {
-          padding:15px;
+          padding:0 15px 5px 15px;
           padding-top: 0;
         }
       }
@@ -93,7 +119,14 @@
           opacity: 1;
         }
       }
+      &--new {
+        background-color: rgba(255, 255, 255, 1);
+        td {
+          cursor: default!important;
+        }
+      }
       td {
+        position: relative;
         padding: 15px 0;
         text-align: left; 
         vertical-align: middle;
@@ -102,6 +135,20 @@
         img {
           vertical-align: middle;
           padding-right: 15px;
+          height: 20px;
+        }
+        input[type=text] {
+          position: absolute;
+          left: 45px;
+          top: 50%;
+          transform: translateY(-50%);
+          border: none;
+          background: #F2F2F2;
+          outline: none;
+          font-size: em(18);
+          padding: 5px 10px;
+          width: 100%;
+          max-width: 250px;
         }
       }
       &__actions {

@@ -17,9 +17,7 @@ interface FileSystemEntry {
   size: number;
 }
 
-export interface FileInfo extends FileSystemEntry {
-
-}
+export type FileInfo = FileSystemEntry
 
 export interface DirectoryInfo extends FileSystemEntry {
   /**

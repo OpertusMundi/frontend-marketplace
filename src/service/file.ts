@@ -43,7 +43,7 @@ export default class FileSystemApi extends Api {
 
   /**
    * Download an existing file
-   * 
+   *
    * @param path File path e.g. /tutorials/data.csv
    */
   public async downloadFile(path: string): Promise<SimpleResponse> {
@@ -83,7 +83,7 @@ export default class FileSystemApi extends Api {
 
   /**
    * Upload a file
-   * 
+   *
    * @param file File to upload
    * @param command Upload command with file metadata
    */

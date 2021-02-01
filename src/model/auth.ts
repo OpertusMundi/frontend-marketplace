@@ -3,6 +3,6 @@ export interface AuthResult {
   csrfToken: string;
 }
 
-export interface LoginResult extends AuthResult { }
+export type LoginResult = AuthResult
 
-export interface LogoutResult extends AuthResult { }
+export type LogoutResult = AuthResult
