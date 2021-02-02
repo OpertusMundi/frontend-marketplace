@@ -14,7 +14,8 @@
     <div class="dashboard__head">
       <div class="dashboard__head__btns">
         <a href="#" class="btn--std btn--blue" @click.prevent="newFolder.show = true;">create folder</a>
-        <a href="#" class="btn btn--outlineblue">Upload</a>
+        <a href="#" class="btn btn--outlineblue" @click.prevent="$refs.file.click();">Upload</a>
+        <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display:none"/>
       </div>
       <div class="dashboard__head__helpers">
         <div class="asset_search asset_search--grey-border">
@@ -36,6 +37,11 @@
             </li>
           </ul>
         </nav>
+        <div class="storage__uploadprocess" v-if="newFile">
+          <div class="storage__uploadprocess__info">{{newFile.name}} <span>{{newFile.size}} kB</span><a href=""><img src="@/assets/images/icons/close_icon.svg" alt=""></a></div>
+          <div class="storage__uploadprocess__bar"><span :style="{ width: `${uploadPercentage}%` }"></span></div>
+          <div class="storage__uploadprocess__bottom"><span>{{ uploadPercentage }}%</span><span>0 KB / sec</span></div>
+        </div>
         <table class="storage-files__table">
           <tr>
             <th width="10px"><input type="checkbox" name="" id=""></th>
@@ -55,7 +61,7 @@
             <td><input type="checkbox" name="" id=""></td>
             <td @click="goToFolder(folder)"><img src="@/assets/images/icons/dashboard/folder.svg" alt="">{{folder.name}}</td>
             <td>{{folder.size}}b</td>
-            <td> {{ folder.modified }}</td>
+            <td> {{ folder.modified | timestampToDate }}</td>
             <td>
               <div class="storage-files__item__actions">
                 <a href="#"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
@@ -76,10 +82,16 @@ import { Component, Vue } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
 import { ServerResponse } from '@/model';
 import { DirectoryInfo, FilePathCommand, FileUploadCommand } from '@/model/file';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
+import moment from 'moment';
 
-
-@Component
+@Component({
+  filters: {
+    timestampToDate(value: any) {
+      return moment(value).format('d MMMM YYYY - HH:mm');
+    },
+  },
+})
 export default class DashboardStorage extends Vue {
   fileSystemApi: FileSystemApi;
 
@@ -92,6 +104,12 @@ export default class DashboardStorage extends Vue {
   errors: any;
 
   newFolder: any;
+
+  newFile: any;
+
+  newFileData: FileUploadCommand;
+
+  uploadPercentage: number;
 
   constructor() {
     super();
@@ -120,6 +138,12 @@ export default class DashboardStorage extends Vue {
     this.newFolder = {
       name: '',
       show: false,
+    };
+    this.newFile = null;
+    this.uploadPercentage = 0;
+    this.newFileData = {
+      filename: '',
+      path: '',
     };
   }
 
@@ -206,6 +230,36 @@ export default class DashboardStorage extends Vue {
       }
     }
     return null;
+  }
+
+  handleFileUpload():void {
+    const file = this.$refs.file as HTMLInputElement;
+    const files = file.files;
+    if (!files || !files[0]) return;
+    this.newFile = files[0];
+    this.newFileData = {
+      path: this.activeFolder.path,
+      filename: this.newFile.name
+    }
+    const config: AxiosRequestConfig = {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent: any): void => {
+        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+        if (totalLength !== null) {
+          this.uploadPercentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+          console.log(this.uploadPercentage);
+        }
+      },
+    };
+    this.fileSystemApi.uploadFile(this.newFile, this.newFileData, config).then((response: ServerResponse<DirectoryInfo>) => {
+      console.log(response);
+    }).catch((error: AxiosError) => {
+      if (error.response) {
+        this.newFile = null;
+        this.errors = error.response.data.messages;
+        this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
+      }
+    });
   }
 }
 </script>

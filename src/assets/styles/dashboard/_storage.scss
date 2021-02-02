@@ -169,4 +169,54 @@
     }
   }
 
+  &__uploadprocess {
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    margin-top: 20px;
+    margin-left: 20px;
+    &__info {
+      display:flex;
+      align-items: center;
+      font-size: em(15);
+      font-weight: 500;
+      span {
+        font-size: 13px;
+        padding-left: 15px;
+        color: #6C6C6C;
+      };
+      a {
+        margin-left: auto;
+        img {
+          width: 15px;
+        }
+      }
+    }
+    &__bar {
+      position: relative;
+      width: 100%;
+      background: #fff;
+      border-radius: 5px;
+      height: 10px;
+      margin:10px 0;
+      overflow: hidden;
+      span {
+        position: absolute;
+        border-radius: 5px;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        background: $secondColor;
+      }
+    }
+    &__bottom {
+      display: flex;
+      justify-content: space-between;
+      font-size: em(13);
+      color: #6C6C6C;
+    }
+
+  }
+
 }

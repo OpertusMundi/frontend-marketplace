@@ -2,7 +2,7 @@ import { saveAs } from 'file-saver';
 
 import Api from '@/service/api';
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import { DirectoryInfo, FilePathCommand, FileUploadCommand } from '@/model/file';
 
@@ -87,8 +87,8 @@ export default class FileSystemApi extends Api {
    * @param file File to upload
    * @param command Upload command with file metadata
    */
-  public async uploadFile(file: File, command: FileUploadCommand): Promise<ServerResponse<DirectoryInfo>> {
-    const url = 'action/file-system/files';
+  public async uploadFile(file: File, command: FileUploadCommand, config?: AxiosRequestConfig): Promise<ServerResponse<DirectoryInfo>> {
+    const url = '/action/file-system/files';
 
     const form = new FormData();
 
@@ -97,9 +97,7 @@ export default class FileSystemApi extends Api {
       type: 'application/json',
     }));
 
-    return this.post<FormData, ServerResponse<DirectoryInfo>>(url, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }).then((response: AxiosServerResponse<DirectoryInfo>) => {
+    return this.post<FormData, ServerResponse<DirectoryInfo>>(url, form, config).then((response: AxiosServerResponse<DirectoryInfo>) => {
       const { data } = response;
 
       return data;
