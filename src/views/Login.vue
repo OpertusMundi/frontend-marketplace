@@ -62,7 +62,6 @@ export default class Login extends Vue {
 
   constructor() {
     super();
-    // Default credentials for MPV
     this.email = '';
     this.password = '';
     this.loading = false;
