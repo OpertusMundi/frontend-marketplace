@@ -20,7 +20,7 @@
       <div class="dashboard__head__helpers">
         <div class="asset_search asset_search--grey-border">
           <div class="asset_search__upper asset_search__upper--sm">
-            <input type="text" name="" id="" placeholder="Search in storage" class="asset_search__upper__input">
+            <input type="text" name="" id="" v-model="searchString" placeholder="Search in folder" class="asset_search__upper__input">
             <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
             <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="@/assets/images/icons/close_icon.svg" alt=""></div>
           </div>
@@ -57,7 +57,7 @@
             <td></td>
             <td style="text-align:right;"><a href="#" @click.prevent="newFolder.show = false; newFolder.name= '';" ><img src="@/assets/images/icons/close_icon.svg" alt=""></a></td>
           </tr>
-          <tr class="storage-files__item" v-for="(folder, n) in activeFolder.folders" v-bind:key="`${n}_folder`">
+          <tr class="storage-files__item" v-for="(folder, n) in filteredFolders" v-bind:key="`${n}_folder`">
             <td><input type="checkbox" name="" id=""></td>
             <td @click="goToFolder(folder)"><img src="@/assets/images/icons/dashboard/folder.svg" alt="">{{folder.name}}</td>
             <td>{{folder.size | bytesToMb}} MB</td>
@@ -69,7 +69,7 @@
               </div>
             </td>
           </tr>
-          <tr class="storage-files__item" v-for="(file, n) in activeFolder.files" v-bind:key="`${n}_file`">
+          <tr class="storage-files__item" v-for="(file, n) in filteredFiles" v-bind:key="`${n}_file`">
             <td><input type="checkbox" name="" id=""></td>
             <td><img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}</td>
             <td>{{file.size | bytesToMb}} MB</td>
@@ -109,6 +109,14 @@ import moment from 'moment';
   },
 })
 export default class DashboardStorage extends Vue {
+  get filteredFolders():any {
+    return this.activeFolder.folders.filter((folder) => folder.name.toLowerCase().includes(this.searchString.toLowerCase()));
+  }
+
+  get filteredFiles():any {
+    return this.activeFolder.files.filter((file) => file.name.toLowerCase().includes(this.searchString.toLowerCase()));
+  }
+
   fileSystemApi: FileSystemApi;
 
   fileSystem: DirectoryInfo;
@@ -130,6 +138,8 @@ export default class DashboardStorage extends Vue {
   uploadSpeed: number;
 
   uploadTokenSource: any;
+
+  searchString: string;
 
   constructor() {
     super();
@@ -167,6 +177,7 @@ export default class DashboardStorage extends Vue {
       path: '',
     };
     this.uploadTokenSource = axios.CancelToken.source();
+    this.searchString = '';
   }
 
   mounted():void {
