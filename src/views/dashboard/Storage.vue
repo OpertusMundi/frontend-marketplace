@@ -8,7 +8,7 @@
     <div class="storage">
       <div class="storage__status">
         <div class="storage__status__label"><span>45% out of 20GB used</span><a href="">Upgrade</a></div>
-        <div class="storage__status__bar"><span></span></div>
+        <div class="storage__status__bar"><span style="width: 45%"></span></div>
       </div>
     </div>
     <div class="dashboard__head">
@@ -46,7 +46,7 @@
           <tr>
             <th width="10px"><input type="checkbox" name="" id=""></th>
             <th width="50%">Name</th>
-            <th width="15%">File size</th>
+            <th width="15%">Size</th>
             <th>Modified</th>
             <th width="10%"></th>
           </tr>
