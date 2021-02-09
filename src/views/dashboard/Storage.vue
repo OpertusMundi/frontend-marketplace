@@ -38,9 +38,9 @@
           </ul>
         </nav>
         <div class="storage__uploadprocess" v-if="newFile">
-          <div class="storage__uploadprocess__info">{{newFile.name}} <span>{{newFile.size}} kB</span><a href=""><img src="@/assets/images/icons/close_icon.svg" alt=""></a></div>
+          <div class="storage__uploadprocess__info">{{newFile.name}} <span>{{newFile.size | bytesToMb}} MB</span><a href="" @click.prevent="uploadTokenSource.cancel('Canceled by the user')"><img src="@/assets/images/icons/close_icon.svg" alt=""></a></div>
           <div class="storage__uploadprocess__bar"><span :style="{ width: `${uploadPercentage}%` }"></span></div>
-          <div class="storage__uploadprocess__bottom"><span>{{ uploadPercentage }}%</span><span>0 KB / sec</span></div>
+          <div class="storage__uploadprocess__bottom"><span>{{ uploadPercentage }}%</span><span>{{ uploadSpeed }} MB / s</span></div>
         </div>
         <table class="storage-files__table">
           <tr>
@@ -55,18 +55,30 @@
             <td><img src="@/assets/images/icons/dashboard/folder.svg" alt=""><input type="text" name="newfolder" placeholder="Folder name.." v-model="newFolder.name" required @keyup.enter="createFolder()" ref="newFolderName"></td>
             <td></td>
             <td></td>
-            <td></td>
+            <td style="text-align:right;"><a href="#" @click.prevent="newFolder.show = false; newFolder.name= '';" ><img src="@/assets/images/icons/close_icon.svg" alt=""></a></td>
           </tr>
           <tr class="storage-files__item" v-for="(folder, n) in activeFolder.folders" v-bind:key="`${n}_folder`">
             <td><input type="checkbox" name="" id=""></td>
             <td @click="goToFolder(folder)"><img src="@/assets/images/icons/dashboard/folder.svg" alt="">{{folder.name}}</td>
-            <td>{{folder.size}}b</td>
+            <td>{{folder.size | bytesToMb}} MB</td>
             <td> {{ folder.modified | timestampToDate }}</td>
             <td>
               <div class="storage-files__item__actions">
-                <a href="#"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
                 <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
-                <a href="#" @click.prevent="deletePath(folder.path)"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
+                <a href="#" @click.prevent="deleteRequest(folder.path, 'Folder')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
+              </div>
+            </td>
+          </tr>
+          <tr class="storage-files__item" v-for="(file, n) in activeFolder.files" v-bind:key="`${n}_file`">
+            <td><input type="checkbox" name="" id=""></td>
+            <td><img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}</td>
+            <td>{{file.size | bytesToMb}} MB</td>
+            <td> {{ file.modified | timestampToDate }}</td>
+            <td>
+              <div class="storage-files__item__actions">
+                <a href="#" @click.prevent="download(file.path)"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
+                <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
+                <a href="#" @click.prevent="deleteRequest(file.path, 'File')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
               </div>
             </td>
           </tr>
@@ -81,14 +93,18 @@
 import { Component, Vue } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
 import { ServerResponse } from '@/model';
-import { DirectoryInfo, FilePathCommand, FileUploadCommand } from '@/model/file';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { SimpleResponse } from '@/model/response';
+import { DirectoryInfo, FileUploadCommand } from '@/model/file';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 
 @Component({
   filters: {
     timestampToDate(value: any) {
       return moment(value).format('d MMMM YYYY - HH:mm');
+    },
+    bytesToMb(value: number) {
+      return (value / (1024 * 1024)).toFixed(2);
     },
   },
 })
@@ -110,6 +126,10 @@ export default class DashboardStorage extends Vue {
   newFileData: FileUploadCommand;
 
   uploadPercentage: number;
+
+  uploadSpeed: number;
+
+  uploadTokenSource: any;
 
   constructor() {
     super();
@@ -141,10 +161,12 @@ export default class DashboardStorage extends Vue {
     };
     this.newFile = null;
     this.uploadPercentage = 0;
+    this.uploadSpeed = 0;
     this.newFileData = {
       filename: '',
       path: '',
     };
+    this.uploadTokenSource = axios.CancelToken.source();
   }
 
   mounted():void {
@@ -156,7 +178,10 @@ export default class DashboardStorage extends Vue {
       this.fileSystem = response.result;
       this.activeFolder = this.fileSystem;
     }).catch((error: AxiosError) => {
-      console.log(error);
+      if (error.response) {
+        this.errors = error.response.data.messages;
+        this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
+      }
     });
   }
 
@@ -182,14 +207,25 @@ export default class DashboardStorage extends Vue {
     });
   }
 
-  deletePath(path: string):void {
+  deleteRequest(path: string, type:string):void {
+    this.$vToastify.prompt({
+      body: 'Are you sure?',
+      answers: { YES: true, NO: false },
+    }).then((value) => {
+      if (value) {
+        this.deletePath(path, type);
+      }
+    });
+  }
+
+  deletePath(path: string, type:string):void {
     this.fileSystemApi.deletePath(path).then((response: ServerResponse<DirectoryInfo>) => {
       if (!response.success) {
         this.errors = response.messages;
         this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
       } else {
         this.fileSystem = response.result;
-        this.$vToastify.success(`Folder "${path}" deleted!`);
+        this.$vToastify.success(`${type} "${path}" deleted!`);
         this.newFolder.show = false;
         this.newFolder.name = '';
         this.goToPath(this.activeFolder.name);
@@ -241,18 +277,56 @@ export default class DashboardStorage extends Vue {
       path: this.activeFolder.path,
       filename: this.newFile.name
     }
+    const timeStart = new Date().getTime();
     const config: AxiosRequestConfig = {
       headers: { 'Content-Type': 'multipart/form-data' },
+      cancelToken: this.uploadTokenSource.token,
       onUploadProgress: (progressEvent: any): void => {
         const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
         if (totalLength !== null) {
           this.uploadPercentage = (Math.round((progressEvent.loaded * 100) / totalLength));
-          console.log(this.uploadPercentage);
         }
+        const timePassedSeconds = Math.abs(Math.round (new Date().getTime() - timeStart) / 1000);
+        const MBLoaded:number = progressEvent.loaded / 1048576;
+        const speedMbps:any = (MBLoaded / timePassedSeconds).toFixed(1);
+        this.uploadSpeed = speedMbps;
       },
     };
     this.fileSystemApi.uploadFile(this.newFile, this.newFileData, config).then((response: ServerResponse<DirectoryInfo>) => {
-      console.log(response);
+      if (!response.success) {
+        this.newFile = null;
+        this.errors = response.messages;
+        this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
+      } else {
+        this.newFile = null;
+        this.uploadPercentage = 0;
+        this.uploadSpeed = 0;
+        this.fileSystem = response.result;
+        this.$vToastify.success(`File uploaded successfully!`);
+        this.goToPath(this.activeFolder.name);
+      }
+    }).catch((error: AxiosError) => {
+      if (axios.isCancel(error)) {
+        this.newFile = null;
+        this.errors = error.message;
+        this.uploadPercentage = 0;
+        this.uploadSpeed = 0;
+        this.uploadTokenSource = axios.CancelToken.source();
+        this.$vToastify.error(this.errors);
+        return;
+      }
+      if (error.response) {
+        this.newFile = null;
+        this.uploadPercentage = 0;
+        this.uploadSpeed = 0;
+        this.errors = error.response.data.messages;
+        this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
+      }
+    });
+  }
+
+  download(path: string):void {
+    this.fileSystemApi.downloadFile(path).then((response: SimpleResponse) => {
     }).catch((error: AxiosError) => {
       if (error.response) {
         this.newFile = null;

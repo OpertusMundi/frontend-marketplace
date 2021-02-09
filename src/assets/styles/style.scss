@@ -123,3 +123,52 @@ h1, h2, h3, h4, h4, h6 {
 .fade-leave-active {
   opacity: 0
 }
+
+.vt-theme-light.vt-notification {
+    background: #fff;
+    min-height: unset;
+    min-width: 270px;
+    max-width: 340px;
+    justify-content: space-between;
+    .vt-circle {
+      width: 40px;
+      height: 40px;
+      svg {
+        width: 27px;
+      }
+    }
+    .vt-content .vt-title {
+    //   display: none;
+      // font-family:"hero-new";
+      // font-size: em(14);
+    }
+    .vt-paragraph {
+      padding-right: 15px;
+      font-family: $mainFont;
+      color: #46454C;
+      max-width: 240px;
+    }
+    .vt-buttons {
+      margin: 0;
+      font-family: $mainFont;
+      font-size: 0.7em!important;
+      padding-top: 10px;
+      button {
+        padding: 8px 10px;
+        border: none;
+        color: #fff!important;
+        outline: none!important;
+        box-shadow: none!important;
+        &:hover {
+          color: #fff;
+          opacity: 0.6;
+        }
+        &:first-child {
+          background-color: rgb(90, 191, 90);
+        }
+        &:last-child {
+          background-color: rgb(223, 70, 70);
+        }
+      }
+    }
+  }
