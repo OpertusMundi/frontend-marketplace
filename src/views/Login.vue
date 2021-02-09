@@ -63,8 +63,8 @@ export default class Login extends Vue {
   constructor() {
     super();
     // Default credentials for MPV
-    this.email = 'admin@opertus-mundi.eu';
-    this.password = 'enaelafaki';
+    this.email = '';
+    this.password = '';
     this.loading = false;
     this.formErrors = '';
 
