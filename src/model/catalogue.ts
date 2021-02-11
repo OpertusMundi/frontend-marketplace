@@ -1,6 +1,51 @@
 import { PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
 import { BasePricingModel, BasePricingModelCommand } from '@/model/pricing-model';
+import { AssetResource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
+
+export enum EnumConformity {
+  CONFORMANT = 'CONFORMANT',
+  NOT_CONFORMANT = 'NOT_CONFORMANT',
+  NOT_EVALUATED = 'NOT_EVALUATED',
+}
+
+export enum EnumSpatialDataServiceType {
+  TMS = 'TMS',
+  WMS = 'WMS',
+  WFS = 'WFS',
+  WCS = 'WCS',
+  CSW = 'CSW',
+  DATA_API = 'DATA_API',
+  OGC_API = 'OGC_API',
+}
+
+export enum EnumTopicCategory {
+  BIOTA = 'BIOTA',
+  BOUNDARIES = 'BOUNDARIES',
+  CLIMA = 'CLIMA',
+  ECONOMY = 'ECONOMY',
+  ELEVATION = 'ELEVATION',
+  ENVIRONMENT = 'ENVIRONMENT',
+  FARMING = 'FARMING',
+  GEO_SCIENTIFIC = 'GEO_SCIENTIFIC',
+  HEALTH = 'HEALTH',
+  IMAGERY = 'IMAGERY',
+  INLAND_WATERS = 'INLAND_WATERS',
+  INTELLIGENCE_MILITARY = 'INTELLIGENCE_MILITARY',
+  LOCATION = 'LOCATION',
+  OCEANS = 'OCEANS',
+  PLANNING_CADASTRE = 'PLANNING_CADASTRE',
+  SOCIETY = 'SOCIETY',
+  STRUCTURE = 'STRUCTURE',
+  TRANSPORTATION = 'TRANSPORTATION',
+  UTILITIES_COMMUNICATION = 'UTILITIES_COMMUNICATION',
+}
+
+export enum EnumType {
+  RASTER = 'RASTER',
+  SERVICE = 'SERVICE',
+  VECTOR = 'VECTOR',
+}
 
 export interface CatalogueQuery extends PageRequest {
   /*
@@ -9,23 +54,41 @@ export interface CatalogueQuery extends PageRequest {
   query: string;
 }
 
+interface Keyword {
+  /**
+   * Keyword value
+   */
+  keyword: string;
+  /**
+   * A related theme
+   */
+  theme: string;
+}
+
+interface Scale {
+  /**
+   * Scale value
+   */
+  scale: number;
+  /**
+   * A short description
+   */
+  theme: string;
+}
+
 interface BaseCatalogueItem {
   /*
    * An abstract of the resource
    */
-  abstractText: string;
-  /*
-   * Auxiliary files or additional resources to the dataset
+  abstract: string;
+  /**
+   * Automated metadata
    */
-  additionalResources: string;
+  automatedMetadata?: any;
   /*
    * Degree of conformity with the implementing rules/standard of the metadata followed
    */
-  conformity: string;
-  /*
-   * Provides information about the datasets that the service operates on
-   */
-  coupledResource: string;
+  conformity: EnumConformity;
   /**
    * A point or period of time associated with the creation event in the lifecycle of the resource
    */
@@ -43,9 +106,13 @@ interface BaseCatalogueItem {
    */
   format: string;
   /*
+   * Geometry as GeoJSON
+   */
+  geometry: GeoJSON.Polygon;
+  /*
    * The topic of the resource
    */
-  keywords: string[];
+  keywords: Keyword[];
   /*
    * A language of the resource
    */
@@ -55,7 +122,7 @@ interface BaseCatalogueItem {
    */
   license: string;
   /*
-   * General explanation of the data producer’s knowledge about the lineage of a dataset
+   * General explanation of the data producer's knowledge about the lineage of a dataset
    */
   lineage: string;
   /*
@@ -100,7 +167,7 @@ interface BaseCatalogueItem {
    */
   referenceSystem: string;
   /*
-   * The ‘navigation section’ of a metadata record which point users to the location (URL)
+   * The 'navigation section' of a metadata record which point users to the location (URL)
    * where the data can be downloaded, or to where additional information about the resource
    * may be provided
    */
@@ -112,15 +179,19 @@ interface BaseCatalogueItem {
   /*
    * Denominator of the scale of the data set
    */
-  scale: string;
+  scales: Scale[];
   /*
    * The nature or genre of the service
    */
-  spatialDataServiceType: string;
+  spatialDataServiceType: EnumSpatialDataServiceType | null;
   /*
    * Spatial resolution refers to the level of detail of the data set
    */
-  spatialResolution: string;
+  spatialResolution: number | null;
+  /**
+   * A description of geospatial analysis or processing that the dataset is suitable for
+   */
+  suitableFor: string[];
   /*
    * A name given to the resource
    */
@@ -129,19 +200,15 @@ interface BaseCatalogueItem {
    * A high-level classification scheme to assist in the grouping and topic-based
    * search of available spatial data resources
    */
-  topicCategory: string;
+  topicCategory: EnumTopicCategory[];
   /*
    * The nature or genre of the resource
    */
-  type: string;
+  type: EnumType | null;
   /*
    * Version of the resource
    */
   version: string;
-  /*
-   * Geometry as GeoJSON
-   */
-  geometry: GeoJSON.Polygon;
 }
 
 export interface Publisher {
@@ -217,15 +284,35 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Id of an entity responsible for making the resource available
    */
   publisherId: string;
+}
+
+export interface CatalogueItemDetails extends CatalogueItem {
+  /**
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
+  /**
+   * A list of resources of the dataset
+   */
+  resources: AssetResource[];
   /*
    * Asset statistics
    */
   statistics: CatalogueItemStatistics;
+  /**
+   * A list of all item versions
+   */
+  versions: string[];
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
-   * True if the file should be imported to PostGIS
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
+  /**
+   * True if the resource files should be imported into PostGIS database and published using WMS/WFS
+   * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
   ingested: boolean;
   /*
@@ -233,9 +320,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    */
   pricingModels: BasePricingModelCommand[];
   /**
-   * Optional relative path to user's remote file system
+   * A list of resources of the dataset
    */
-  source?: string;
+  resources: AssetResource[];
+
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
