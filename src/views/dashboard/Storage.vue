@@ -173,7 +173,7 @@ export default class DashboardStorage extends Vue {
     this.uploadPercentage = 0;
     this.uploadSpeed = 0;
     this.newFileData = {
-      filename: '',
+      fileName: '',
       path: '',
     };
     this.uploadTokenSource = axios.CancelToken.source();
@@ -286,7 +286,7 @@ export default class DashboardStorage extends Vue {
     this.newFile = files[0];
     this.newFileData = {
       path: this.activeFolder.path,
-      filename: this.newFile.name
+      fileName: this.newFile.name
     }
     const timeStart = new Date().getTime();
     const config: AxiosRequestConfig = {

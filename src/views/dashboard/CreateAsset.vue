@@ -588,6 +588,7 @@ import { AxiosError, AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
+import { EnumConformity } from '@/model/catalogue';
 
 Vue.use(VueCardFormat);
 
@@ -638,10 +639,9 @@ export default class CreateAsset extends Vue {
     super();
 
     this.asset = {
-      abstractText: '',
-      additionalResources: '',
-      conformity: '',
-      coupledResource: '',
+      abstract: '',
+      additionalResources: [],
+      conformity: EnumConformity.NOT_EVALUATED,
       creationDate: '2020-06-02',
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
@@ -663,12 +663,14 @@ export default class CreateAsset extends Vue {
       referenceSystem: '',
       resourceLocator: '',
       revisionDate: '2020-06-02',
-      scale: '',
-      spatialDataServiceType: '',
-      spatialResolution: '',
+      resources: [],
+      scales: [],
+      spatialDataServiceType: null,
+      spatialResolution: null,
+      suitableFor: [],
       title: '',
-      topicCategory: '',
-      type: '',
+      topicCategory: [],
+      type: null,
       version: '',
       pricingModels: [],
       geometry: {
@@ -764,7 +766,7 @@ export default class CreateAsset extends Vue {
         }
       },
     };
-    this.draftAssetApi.submitNew(this.asset, config)
+    this.draftAssetApi.create(this.asset, config)
       .then((response: ServerResponse<AssetDraft>) => {
         if (response.success) {
           this.uploading.completed = true;
