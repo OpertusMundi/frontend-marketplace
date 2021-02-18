@@ -81,10 +81,6 @@ interface BaseCatalogueItem {
    * An abstract of the resource
    */
   abstract: string;
-  /**
-   * Automated metadata
-   */
-  automatedMetadata?: any;
   /*
    * Degree of conformity with the implementing rules/standard of the metadata followed
    */
@@ -114,7 +110,9 @@ interface BaseCatalogueItem {
    */
   keywords: Keyword[];
   /*
-   * A language of the resource
+   * A language of the resource as an ISO 639-1 two-letter code
+   *
+   * See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
    */
   language: string;
   /*
@@ -130,7 +128,9 @@ interface BaseCatalogueItem {
    */
   metadataDate: string;
   /*
-   * The language in which the metadata elements are expressed
+   * The language in which the metadata elements are expressed as a ISO 639-1 two-letter code
+   *
+   * See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
    */
   metadataLanguage: string;
   /*
@@ -267,6 +267,131 @@ export interface CatalogueItemStatistics {
   rating: number | null;
 }
 
+export interface Metadata {
+  assetType: 'NetCDF' | 'vector' | 'raster';
+}
+
+export interface VectorMetadata extends Metadata {
+  /**
+   * A list with the names of all attributes of the dataset.
+   */
+  attributes: string[];
+  /**
+   * A GeoJSON containing the clustered geometries.
+   */
+  clusters: GeoJSON.FeatureCollection;
+  /**
+   * A link to a PNG static map with the clustered geometries.
+   */
+  clustersStatic: string;
+  /**
+   * The Well-Known-Text representation of the Convex Hull for all geometries.
+   */
+  convexHull: string;
+  /**
+   * A link to a PNG static map showing the convex hull.
+   */
+  convexHullStatic: string;
+  /**
+   * Count not null values for each attribute in the dataset. The key is the attribute name.
+   */
+  count: { [attribute: string]: number };
+  /**
+   * The short name of the dataset's native Coordinate Reference System (CRS).
+   */
+  crs: string;
+  /**
+   * The data types for each of the dataset's attributes. The key is the attribute name.
+   */
+  datatypes: { [attribute: string]: string };
+  /**
+   * The distinct values for each of the categorical attributes in the dataset. The key is the attribute name.
+   */
+  distinct: { [attribute: string]: string[] };
+  /**
+   * The distribution of the values for each categorical attribute in the dataset.
+   * The first key is the attribute name.
+   * The inner object is the frequency of each value for the specific attribute.
+   * The second key is the value.
+   */
+  distribution: { [attribute: string]: { [value: string]: number } }
+  /**
+   * The number of features in the dataset.
+   */
+  featureCount: number;
+  /**
+   * A link to a GeoJSON with a heatmap of the geometries.
+   */
+  heatmap: string;
+  /**
+   * A link to a PNG static map with a heatmap of the geometries.
+   */
+  heatmapStatic: string;
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The 5, 25, 50, 75, 95 quantiles for each of the numeric attributes in the dataset.
+   */
+  quantiles: { [q: string] : { [attribute: string]: number }};
+  /**
+   * The most frequent values for each of the attributes in the dataset.
+   */
+  recurring: { [attribute: string]: (string | number)[] };
+  /**
+   * Descriptive statistics (min, max, mean, median, std, sum) for the numerical attributes in the dataset.
+   */
+  statistics: {
+    /**
+     * The maximum value for each of the numeric attributes. The key is the attribute name.
+     */
+    max: { [attribute: string]: number };
+    /**
+     * The mean value for each of the numeric attributes. The key is the attribute name.
+     */
+    mean: { [attribute: string]: number };
+    /**
+     * The median value for each of the numeric attributes. The key is the attribute name.
+     */
+    median: { [attribute: string]: number };
+    /**
+     * The min value for each of the numeric attributes. The key is the attribute name.
+     */
+    min: { [attribute: string]: number };
+    /**
+     * The standard deviation for each of the numeric attributes. The key is the attribute name.
+     */
+    std: { [attribute: string]: number };
+    /**
+     * The sum of of all values for each of the numeric attributes. The key is the attribute name.
+     */
+    sum: { [attribute: string]: number };
+  };
+  /**
+   * A link to a PNG thumbnail of the dataset.
+   */
+  thumbnail: string;
+}
+
+export interface RasterMetadata extends Metadata {
+  /**
+   * In case the raster is GeoTiff, whether it is Cloud-Optimized or not.
+   */
+  cog: boolean;
+}
+
+export interface NetCdfMetadata extends Metadata {
+  /**
+   * A list with the dimensions.
+   */
+  dimensionsList: string[];
+}
+
 export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Catalogue item identifier (UUID)
@@ -292,6 +417,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    */
   additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
   /**
+   * Automated metadata. The property is present only for authenticated users
+   */
+  automatedMetadata?: Metadata;
+  /**
    * A list of resources of the dataset
    */
   resources: AssetResource[];
@@ -311,6 +440,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    */
   additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
   /**
+   * Automated metadata. This value will be overwritten by the publish asset workflow
+   */
+  automatedMetadata?: Metadata;
+  /**
    * True if the resource files should be imported into PostGIS database and published using WMS/WFS
    * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
@@ -323,7 +456,6 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * A list of resources of the dataset
    */
   resources: AssetResource[];
-
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
