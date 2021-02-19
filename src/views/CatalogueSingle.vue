@@ -1,8 +1,14 @@
+<!--
+  elements with <<v-if="catalogueItemType == 'api'">> directive
+  are added for APIs metadata
+-->
+
 <template>
   <div class="asset" v-show='itemLoaded'>
     <div class="asset__map">
       <div class="asset__map__inner">
         <l-map
+          ref="map"
           v-if="map.show"
           :zoom="map.zoom"
           :center="map.center"
@@ -11,6 +17,11 @@
         <l-tile-layer
           :url="map.url"
           :attribution="map.attribution"/>
+        <l-geo-json
+          ref="geoJsonLayer"
+          v-if="catalogueItemType == 'api' && geoJson"
+          :geojson="geoJson">
+        </l-geo-json>
         <l-polygon v-if="map.coordinates_type === 'Polygon'"
           :latLngs="this.catalogueItem.geometry.coordinates[0]"
           color="#190AFF"
@@ -44,7 +55,19 @@
               </div>
               <div class="asset__head__rating rating"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
             </div>
-            <div class="asset__head__data">
+            <div class="asset__head__data" v-if="catalogueItemType == 'api'">
+              <ul>
+                <li><strong>Last updated:</strong>{{ formatDate(catalogueItem.revisionDate) }}</li>
+                <li><strong>Created:</strong>{{ formatDate(catalogueItem.publicationDate) }}</li>
+                <!-- <li><strong>Topic:</strong>{{ catalogueItem.topicCategory }}</li>
+                <li><strong>Format:</strong>{{ catalogueItem.format }}</li> -->
+                <li><strong>CRS:</strong>{{ catalogueItemDummyMetadata.crs }}</li>
+                <li><strong>Scale:</strong> 1:5,000 urban areas, 1:10,000 provincial areas</li>
+                <li><strong>Coverage:</strong>97% of Greece</li>
+                <li><strong>Source Type:</strong>{{ catalogueItemDummyMetadata.distinct.sourcetype[0] }}</li>
+              </ul>
+            </div>
+            <div class="asset__head__data" v-else>
               <ul>
                 <li><strong>Last updated:</strong>{{ formatDate(catalogueItem.revisionDate) }}</li>
                 <li><strong>Created:</strong>{{ formatDate(catalogueItem.publicationDate) }}</li>
@@ -82,13 +105,51 @@
                       <strong>Temporal extent:</strong>  Nov. 2019 - Oct. 2020 <br>
                       <strong>Compatibility:</strong> example</p>
                     <h5>Tags</h5>
-                    <p>vector, greece, agriculture,
+                    <p v-if="catalogueItemType == 'api'">
+                      <span v-for="(tag, index) in catalogueItemDummyMetadata.distinct.feat_desc" :key="index">
+                        {{tag}}<span v-if="index < catalogueItemDummyMetadata.distinct.feat_desc.length - 1">,</span>
+                      </span>
+                    </p>
+                    <p v-else>vector, greece, agriculture,
                       commercial, map, analytics</p>
                   </div>
                 </div>
               </div>
               <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
             </section>
+
+            <!-- API'S section -->
+            <section class="asset__section asset__section__overview" v-if="catalogueItemType == 'api'">
+              <div class="asset__section__head">
+                <h4>Usage example</h4>
+                <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+              </div>
+              <div class="asset__section__content">
+                <div class="asset__section__content__inner bg-dark text-light">
+                  <div class="asset__section__overview__left">
+                    <h4>Sample Request</h4>
+                    <pre>
+                      <code>
+                        www.opertus-mundi.eu/api/123456789
+                      </code>
+                    </pre>
+                    <hr>
+                    <h4>Sample Response</h4>
+                    <pre>
+                      <code>
+                        <json-viewer :value="apiSampleResponse" theme="custom-json-viewer-theme"></json-viewer>
+                      </code>
+                    </pre>
+                  </div>
+                  <div class="asset__section__overview__right">
+
+                  </div>
+                </div>
+              </div>
+              <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+            </section>
+            <!-- -->
+
             <section class="asset__section">
               <div class="asset__section__head">
                 <h4>Terms & Restrictions</h4>
@@ -407,8 +468,17 @@ import CartApi from '@/service/cart';
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 
 import L, { latLng } from 'leaflet';
-import { LMap, LTileLayer, LPolygon } from 'vue2-leaflet';
+import {
+  LMap, LTileLayer, LPolygon, LGeoJson,
+} from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// additions
+import axios from 'axios'; // direct use of axios, only to get dummy item metadata
+import JsonViewer from 'vue-json-viewer';
+import { reproject } from 'reproject';
+import { GeoJsonObject } from 'geojson';
+/* */
 
 @Component({
   components: {
@@ -416,12 +486,37 @@ import 'leaflet/dist/leaflet.css';
     LMap,
     LTileLayer,
     LPolygon,
+    LGeoJson,
+    JsonViewer,
   },
 })
 export default class CatalogueSingle extends Vue {
   catalogueApi: CatalogueApi;
 
   catalogueItem: CatalogueItem;
+
+  // variables added for API metadata
+
+  // we currently dont know the exact interface of the API metadata.
+  // we store our dummy API metadata to the following variable as any
+  catalogueItemDummyMetadata: any = {};
+
+  // geojson we fetch from APIs metadata
+  geoJson!: GeoJsonObject;
+
+  // a var for storing item type (value "api" for API)
+  catalogueItemType: string;
+
+  // a dummy API response example
+  apiSampleResponse = {
+    status: 'ok',
+    geometries: {
+      foo: 'foo',
+      bar: 'bar',
+    },
+    fooNumber: 123,
+  }
+  /* */
 
   itemLoaded = false;
 
@@ -438,6 +533,7 @@ export default class CatalogueSingle extends Vue {
     super();
 
     this.catalogueItem = {} as CatalogueItem;
+    this.catalogueItemType = '';
     this.catalogueApi = new CatalogueApi();
     this.selectedPricingModel = '';
     this.cartErrors = '';
@@ -494,8 +590,47 @@ export default class CatalogueSingle extends Vue {
     }
   }
 
+  // custom function for loading a dummy '999' asset
+  loadDummyAsset(): void {
+    axios.get('https://run.mocky.io/v3/edfece73-2f65-422e-acdf-626fc8ef0b8f').then((response) => {
+      const item = response.data;
+
+      this.catalogueItemDummyMetadata = item;
+      this.catalogueItemType = this.catalogueItemDummyMetadata.assetType;
+      this.geoJson = this.reprojectGeoJson(this.catalogueItemDummyMetadata.clusters, this.catalogueItemDummyMetadata.crs, 'EPSG:4326');
+
+      this.itemLoaded = true;
+      setTimeout(() => {
+        this.initMap();
+      }, 200);
+    });
+  }
+  /* */
+
+  reprojectGeoJson(geoJson, sourceProjection, targetProjection) {
+    // EPSG dictionary should be stored externally, outside of this component.
+    // For development/testing purpose, it is temporarily stored here
+    const epsgDictionary = {
+      'EPSG:3857': '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs',
+      'EPSG:4326': '+proj=longlat +datum=WGS84 +no_defs',
+      'EPSG:2100': '+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=-199.87,74.79,246.62,0,0,0,0 +units=m +no_defs',
+      'EPSG:2908': '+proj=lcc +lat_1=41.03333333333333 +lat_2=40.66666666666666 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000.0000000001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs',
+    };
+
+    return reproject(geoJson, sourceProjection, targetProjection, epsgDictionary);
+  }
+
   loadAsset(): void {
     const catalogueItemID = this.$route.params.id;
+
+    // if item ID is 999, load dummy item
+    if (catalogueItemID === '999') {
+      console.log('dummy item 999');
+      this.loadDummyAsset();
+      return;
+    }
+    /* */
+
     this.catalogueApi.findOne(catalogueItemID)
       .then((queryResponse: ServerResponse<CatalogueItem>) => {
         if (queryResponse.success === false && queryResponse.messages[0].code === 'BasicMessageCode.NotFound') {
@@ -510,12 +645,18 @@ export default class CatalogueSingle extends Vue {
       });
   }
 
-  initMap():void {
+  initMap(): void {
     this.map.show = true;
-    this.map.coordinates_type = this.catalogueItem.geometry.type;
+    // this.map.coordinates_type = this.catalogueItem.geometry.type;
     if (this.catalogueItem.geometry) {
+      this.map.coordinates_type = this.catalogueItem.geometry.type;
       this.polygonCenter();
     }
+
+    // my addition
+    this.$nextTick(() => {
+      (this as any).$refs.map.mapObject.fitBounds((this as any).$refs.geoJsonLayer.getBounds());
+    });
   }
 
   polygonCenter():void {
@@ -559,4 +700,40 @@ export default class CatalogueSingle extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+
+  // css additions - overrides
+  .asset__map, .asset__map__inner {
+    height: 100%;
+    background: transparent;
+    opacity: 1;
+  }
+
+  .bg-dark {
+    background: #3d3d3d;
+  }
+
+  .text-light {
+    color: white;
+  }
+
+  .custom-json-viewer-theme {
+    background: #3d3d3d;
+    .jv-button { color: #49b3ff }
+    .jv-key { color: rgb(243, 243, 243) }
+    .jv-item {
+    &.jv-array { color: #111111 }
+    &.jv-boolean { color: #fc1e70 }
+    &.jv-function { color: #067bca }
+    &.jv-number { color: #fc1e70 }
+    &.jv-number-float { color: #fc1e70 }
+    &.jv-number-integer { color: #fc1e70 }
+    &.jv-object { color: rgb(243, 243, 243) }
+    &.jv-undefined { color: #e08331 }
+    &.jv-string {
+      color: #42b983;
+      word-break: break-word;
+      white-space: normal;
+    }
+  }
+  }
 </style>
