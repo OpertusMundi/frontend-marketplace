@@ -338,7 +338,7 @@ export interface VectorMetadata extends Metadata {
   /**
    * The 5, 25, 50, 75, 95 quantiles for each of the numeric attributes in the dataset.
    */
-  quantiles: { [q: string] : { [attribute: string]: number }};
+  quantiles: { [q: string]: { [attribute: string]: number } };
   /**
    * The most frequent values for each of the attributes in the dataset.
    */
@@ -383,6 +383,116 @@ export interface RasterMetadata extends Metadata {
    * In case the raster is GeoTiff, whether it is Cloud-Optimized or not.
    */
   cog: boolean;
+  /**
+   * The Color Interpretation for each band.
+   */
+  colorInterpretation: string[];
+  /**
+   * The short name of the dataset's native Coordinate Reference System (CRS).
+   */
+  crs: string;
+  /**
+   * The data type of each band.
+   */
+  datatypes: string[];
+  /**
+   * The default histogram of the raster for each band.
+   * Each array contains the following values:
+   * - The minimum Pixel Value.
+   * - The maximum Pixel Value.
+   * - The total number of pixel values.
+   * - An array with the frequencies for each Pixel Value (has length equal to the total number of Pixel Values).
+   */
+  histogram: [number, number, number, number[]][];
+  /**
+   * General information about the raster file.
+   */
+  info: {
+    /**
+     * A list with the bands included in the raster.
+     */
+    bands: string[];
+    /**
+     * The driver used to open the raster.
+     */
+    driver: string;
+    /**
+     * A list of the files associated with the raster.
+     */
+    files: string[];
+    /**
+     * The height in pixels.
+     */
+    height: number;
+    /**
+     * Various values describing the image structure. The keys depend on the raster.
+     */
+    imageStructure: { [key: string]: string | number };
+    /**
+     * Metadata of the the raster as written in the file. The keys are free-text.
+     */
+    metadata: { [key: string]: string };
+    /**
+     * The width in pixels.
+     */
+    width: number;
+  };
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The no-data value of each band.
+   */
+  noDataValue: { [band: string]: number };
+  /**
+   * The number of bands in the raster.
+   */
+  numberOfBands: number;
+  /**
+   * The resolution for each axis, and the unit of measurement.
+   */
+  resolution: {
+    /**
+     * The unit of resolution.
+     */
+    unit: string;
+    /**
+     * Resolution in x-axis.
+     */
+    x: number;
+    /**
+     * Resolution in y-axis.
+     */
+    y: number;
+  };
+  /**
+   * A list with descriptive statistics for each band of the raster file.
+   */
+  statistics: {
+    [band: string]: {
+      /**
+       * The maximum value in the band.
+       */
+      max: number;
+      /**
+       * The mean value in the band.
+       */
+      mean: number;
+      /**
+       * The minimum value in the band.
+       */
+      min: number;
+      /**
+       * The standard deviation in the band.
+       */
+      std: number;
+    }
+  };
 }
 
 export interface NetCdfMetadata extends Metadata {
@@ -390,6 +500,87 @@ export interface NetCdfMetadata extends Metadata {
    * A list with the dimensions.
    */
   dimensionsList: string[];
+  /**
+   * The properties of each dimension. The key is the dimension.
+   */
+  dimensionsProperties: { [d: string]: { [property: string]: string | number } };
+  /**
+   * The number of the dimensions.
+   */
+  dimensionsSize: number;
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The metadata object as written in the file. The key is a free field for the 
+   * data provider, usually describing the given information.
+   */
+  metadata: { [m: string]: string };
+  /**
+   * The no-data value for each the variables. The key is the variable.
+   */
+  noDataValues: { [v: string]: number };
+  /**
+   * Descriptive statistics for each of the variables. The key is the variable.
+   */
+  statistics: {
+    [v: string]: {
+      /**
+       * Whether the data are contiguous or not.
+       */
+      contiguous: boolean;
+      /**
+       * The number of values for the specific variable.
+       */
+      count: number;
+      /**
+       * The maximum value of the specific variable.
+       */
+      max: number;
+      /**
+       * The mean value of the specific variable.
+       */
+      mean: number;
+      /**
+       * The minimum value of the specific variable.
+       */
+      min: number;
+      /**
+       * The number of missing values for the specific variable.
+       */
+      missing: number;
+      /**
+       * The standard deviation for the specific variable.
+       */
+      std: number;
+      /**
+       * The variance of the specific variable.
+       */
+      variance: number;
+      /**
+       * A free-text string representing the temporal extend of the dataset.
+       */
+      temporalExtent: string;
+      /**
+       * A list with the variables.
+       */
+      variablesList: string[];
+      /**
+       * The properties for each variable. The key is the variable.
+       */
+      variablesProperties: { [v: string]: { [property: string]: string | number } };
+      /**
+       * Number of variables.
+       */
+      variablesSize: number;
+    }
+  };
+
 }
 
 export interface CatalogueItem extends BaseCatalogueItem {
