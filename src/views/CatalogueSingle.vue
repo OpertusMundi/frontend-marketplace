@@ -477,6 +477,7 @@ import 'leaflet/dist/leaflet.css';
 import axios from 'axios'; // direct use of axios, only to get dummy item metadata
 import JsonViewer from 'vue-json-viewer';
 import { reproject } from 'reproject';
+// eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 /* */
 
@@ -607,7 +608,7 @@ export default class CatalogueSingle extends Vue {
   }
   /* */
 
-  reprojectGeoJson(geoJson, sourceProjection, targetProjection) {
+  reprojectGeoJson(geoJson: GeoJsonObject, sourceProjection: string, targetProjection: string): GeoJsonObject {
     // EPSG dictionary should be stored externally, outside of this component.
     // For development/testing purpose, it is temporarily stored here
     const epsgDictionary = {
@@ -700,40 +701,4 @@ export default class CatalogueSingle extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
-
-  // css additions - overrides
-  .asset__map, .asset__map__inner {
-    height: 100%;
-    background: transparent;
-    opacity: 1;
-  }
-
-  .bg-dark {
-    background: #3d3d3d;
-  }
-
-  .text-light {
-    color: white;
-  }
-
-  .custom-json-viewer-theme {
-    background: #3d3d3d;
-    .jv-button { color: #49b3ff }
-    .jv-key { color: rgb(243, 243, 243) }
-    .jv-item {
-    &.jv-array { color: #111111 }
-    &.jv-boolean { color: #fc1e70 }
-    &.jv-function { color: #067bca }
-    &.jv-number { color: #fc1e70 }
-    &.jv-number-float { color: #fc1e70 }
-    &.jv-number-integer { color: #fc1e70 }
-    &.jv-object { color: rgb(243, 243, 243) }
-    &.jv-undefined { color: #e08331 }
-    &.jv-string {
-      color: #42b983;
-      word-break: break-word;
-      white-space: normal;
-    }
-  }
-  }
 </style>
