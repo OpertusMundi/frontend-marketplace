@@ -16,74 +16,74 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT number" rules="required|length:9">
+                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
                   <div class="form-group">
                     <label for="vat_number">VAT number:</label>
-                    <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="firstName">
+                    <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Last name" rules="required">
+                <validation-provider v-slot="{ errors }" name="Name" rules="required">
                   <div class="form-group">
-                    <label for="last_name">Name:</label>
-                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="lastName">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
+                <validation-provider v-slot="{ errors }" name="Website">
                   <div class="form-group">
-                    <label for="email">Website:</label>
-                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.email">
+                    <label for="website">Website:</label>
+                    <input type="text" class="form-group__text" name="website" id="website" v-model="vendorData.website">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Phone" rules="required|phoneNumber">
+                <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                   <div class="form-group">
-                    <label for="phone">Address Line 1:</label>
-                    <input type="text" class="form-group__text" name="phone" id="phone" v-model="vendorData.phone">
+                    <label for="address_line_1">Address Line 1:</label>
+                    <input type="text" class="form-group__text" name="address_line_1" id="address_line_1" v-model="vendorData.headquartersAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Phone" rules="required|phoneNumber">
+                <validation-provider v-slot="{ errors }" name="Address Line 2">
                   <div class="form-group">
-                    <label for="phone">Address Line 2:</label>
-                    <input type="text" class="form-group__text" name="phone" id="phone" v-model="vendorData.phone">
+                    <label for="address_line_2">Address Line 2:</label>
+                    <input type="text" class="form-group__text" name="address_line_2" id="address_line_2" v-model="vendorData.headquartersAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Username" rules="required|min:4">
+                <validation-provider v-slot="{ errors }" name="Country" rules="required">
                   <div class="form-group">
-                    <label for="username">Country:</label>
-                    <input type="text" class="form-group__text" name="username" id="username" v-model="vendorData.username">
+                    <label for="country">Country:</label>
+                    <input type="text" class="form-group__text" name="country" id="country" v-model="vendorData.headquartersAddress.country">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Password" rules="required|min:6">
+                <validation-provider v-slot="{ errors }" name="Region" rules="required">
                   <div class="form-group">
-                    <label for="password">Region:</label>
-                    <input type="password" class="form-group__text" name="password" id="password" v-model="vendorData.password">
+                    <label for="region">Region:</label>
+                    <input type="text" class="form-group__text" name="region" id="region" v-model="vendorData.headquartersAddress.region">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Password Repeat" rules="required|confirmed:Password">
+                <validation-provider v-slot="{ errors }" name="City" rules="required">
                   <div class="form-group">
-                    <label for="password_repeat">City:</label>
-                    <input type="password" class="form-group__text" name="password_repeat" id="password_repeat" v-model="vendorData.password_repeat">
+                    <label for="city">City:</label>
+                    <input type="text" class="form-group__text" name="city" id="city" v-model="vendorData.headquartersAddress.city">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Password Repeat" rules="required|confirmed:Password">
+                <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
                   <div class="form-group">
-                    <label for="password_repeat">ZIP code:</label>
-                    <input type="password" class="form-group__text" name="password_repeat" id="password_repeat" v-model="vendorData.password_repeat">
+                    <label for="postal_code">ZIP code:</label>
+                    <input type="text" class="form-group__text" name="postal_code" id="postal_code" v-model="vendorData.headquartersAddress.postalCode">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -149,56 +149,39 @@
             <!-- STEP 2 - Legal Representative -->
             <validation-observer ref="step2">
               <div class="dashboard__form__step" v-if="currentStep == 2">
+
                 <validation-provider v-slot="{ errors }" name="First name" rules="required">
                   <div class="form-group">
                     <label for="first_name">First name:</label>
-                    <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="firstName">
+                    <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="vendorData.legalRepresentative.firstName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
+
                 <validation-provider v-slot="{ errors }" name="Last name" rules="required">
                   <div class="form-group">
                     <label for="last_name">Last name:</label>
-                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="lastName">
+                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="vendorData.legalRepresentative.lastName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
+
                 <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
                   <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.email">
+                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.legalRepresentative.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Phone" rules="required|phoneNumber">
+
+                <validation-provider v-slot="{ errors }" name="Birthdate" rules="required|email">
                   <div class="form-group">
-                    <label for="phone">Phone:</label>
-                    <input type="text" class="form-group__text" name="phone" id="phone" v-model="vendorData.phone">
-                    <!-- <VuePhoneNumberInput required v-model="vendorData.phone" @update="checkPhoneNumber" /> -->
+                    <label for="email">Birthdate:</label>
+                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.legalRepresentative.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Username" rules="required|min:4">
-                  <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" class="form-group__text" name="username" id="username" v-model="vendorData.username">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Password" rules="required|min:6">
-                  <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-group__text" name="password" id="password" v-model="vendorData.password">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Password Repeat" rules="required|confirmed:Password">
-                  <div class="form-group">
-                    <label for="password_repeat">Password repeat:</label>
-                    <input type="password" class="form-group__text" name="password_repeat" id="password_repeat" v-model="vendorData.password_repeat">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
+
               </div>
             </validation-observer>
 
@@ -282,20 +265,21 @@ export default class BecomeVendor extends Vue {
 
   vendorData: ProviderProfessionalCommand;
 
-  firstName: '';
+  // firstName: '';
 
-  lastName: '';
+  // lastName: '';
 
   phoneValid: boolean;
 
   constructor() {
     super();
 
-    this.firstName = '';
-    this.lastName = '';
+    // this.firstName = '';
+    // this.lastName = '';
     this.phoneValid = true;
     this.vendorData = {
-      name: `${this.firstName} ${this.lastName}`,
+      // name: `${this.firstName} ${this.lastName}`,
+      name: '',
       phone: '',
       email: '',
       type: EnumCustomerType.PROFESSIONAL,
@@ -357,6 +341,7 @@ export default class BecomeVendor extends Vue {
   }
 
   nextStep():void {
+    console.log(this.vendorData);
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
         if (this.currentStep === this.totalSteps) {
