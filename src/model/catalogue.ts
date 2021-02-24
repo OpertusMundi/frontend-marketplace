@@ -1,6 +1,51 @@
 import { PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
 import { BasePricingModel, BasePricingModelCommand } from '@/model/pricing-model';
+import { AssetResource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
+
+export enum EnumConformity {
+  CONFORMANT = 'CONFORMANT',
+  NOT_CONFORMANT = 'NOT_CONFORMANT',
+  NOT_EVALUATED = 'NOT_EVALUATED',
+}
+
+export enum EnumSpatialDataServiceType {
+  TMS = 'TMS',
+  WMS = 'WMS',
+  WFS = 'WFS',
+  WCS = 'WCS',
+  CSW = 'CSW',
+  DATA_API = 'DATA_API',
+  OGC_API = 'OGC_API',
+}
+
+export enum EnumTopicCategory {
+  BIOTA = 'BIOTA',
+  BOUNDARIES = 'BOUNDARIES',
+  CLIMA = 'CLIMA',
+  ECONOMY = 'ECONOMY',
+  ELEVATION = 'ELEVATION',
+  ENVIRONMENT = 'ENVIRONMENT',
+  FARMING = 'FARMING',
+  GEO_SCIENTIFIC = 'GEO_SCIENTIFIC',
+  HEALTH = 'HEALTH',
+  IMAGERY = 'IMAGERY',
+  INLAND_WATERS = 'INLAND_WATERS',
+  INTELLIGENCE_MILITARY = 'INTELLIGENCE_MILITARY',
+  LOCATION = 'LOCATION',
+  OCEANS = 'OCEANS',
+  PLANNING_CADASTRE = 'PLANNING_CADASTRE',
+  SOCIETY = 'SOCIETY',
+  STRUCTURE = 'STRUCTURE',
+  TRANSPORTATION = 'TRANSPORTATION',
+  UTILITIES_COMMUNICATION = 'UTILITIES_COMMUNICATION',
+}
+
+export enum EnumType {
+  RASTER = 'RASTER',
+  SERVICE = 'SERVICE',
+  VECTOR = 'VECTOR',
+}
 
 export interface CatalogueQuery extends PageRequest {
   /*
@@ -9,23 +54,37 @@ export interface CatalogueQuery extends PageRequest {
   query: string;
 }
 
+interface Keyword {
+  /**
+   * Keyword value
+   */
+  keyword: string;
+  /**
+   * A related theme
+   */
+  theme: string;
+}
+
+interface Scale {
+  /**
+   * Scale value
+   */
+  scale: number;
+  /**
+   * A short description
+   */
+  theme: string;
+}
+
 interface BaseCatalogueItem {
   /*
    * An abstract of the resource
    */
-  abstractText: string;
-  /*
-   * Auxiliary files or additional resources to the dataset
-   */
-  additionalResources: string;
+  abstract: string;
   /*
    * Degree of conformity with the implementing rules/standard of the metadata followed
    */
-  conformity: string;
-  /*
-   * Provides information about the datasets that the service operates on
-   */
-  coupledResource: string;
+  conformity: EnumConformity;
   /**
    * A point or period of time associated with the creation event in the lifecycle of the resource
    */
@@ -43,11 +102,17 @@ interface BaseCatalogueItem {
    */
   format: string;
   /*
+   * Geometry as GeoJSON
+   */
+  geometry: GeoJSON.Polygon;
+  /*
    * The topic of the resource
    */
-  keywords: string[];
+  keywords: Keyword[];
   /*
-   * A language of the resource
+   * A language of the resource as an ISO 639-1 two-letter code
+   *
+   * See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
    */
   language: string;
   /*
@@ -55,7 +120,7 @@ interface BaseCatalogueItem {
    */
   license: string;
   /*
-   * General explanation of the data producer’s knowledge about the lineage of a dataset
+   * General explanation of the data producer's knowledge about the lineage of a dataset
    */
   lineage: string;
   /*
@@ -63,7 +128,9 @@ interface BaseCatalogueItem {
    */
   metadataDate: string;
   /*
-   * The language in which the metadata elements are expressed
+   * The language in which the metadata elements are expressed as a ISO 639-1 two-letter code
+   *
+   * See: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
    */
   metadataLanguage: string;
   /*
@@ -100,7 +167,7 @@ interface BaseCatalogueItem {
    */
   referenceSystem: string;
   /*
-   * The ‘navigation section’ of a metadata record which point users to the location (URL)
+   * The 'navigation section' of a metadata record which point users to the location (URL)
    * where the data can be downloaded, or to where additional information about the resource
    * may be provided
    */
@@ -112,15 +179,19 @@ interface BaseCatalogueItem {
   /*
    * Denominator of the scale of the data set
    */
-  scale: string;
+  scales: Scale[];
   /*
    * The nature or genre of the service
    */
-  spatialDataServiceType: string;
+  spatialDataServiceType: EnumSpatialDataServiceType | null;
   /*
    * Spatial resolution refers to the level of detail of the data set
    */
-  spatialResolution: string;
+  spatialResolution: number | null;
+  /**
+   * A description of geospatial analysis or processing that the dataset is suitable for
+   */
+  suitableFor: string[];
   /*
    * A name given to the resource
    */
@@ -129,19 +200,15 @@ interface BaseCatalogueItem {
    * A high-level classification scheme to assist in the grouping and topic-based
    * search of available spatial data resources
    */
-  topicCategory: string;
+  topicCategory: EnumTopicCategory[];
   /*
    * The nature or genre of the resource
    */
-  type: string;
+  type: EnumType | null;
   /*
    * Version of the resource
    */
   version: string;
-  /*
-   * Geometry as GeoJSON
-   */
-  geometry: GeoJSON.Polygon;
 }
 
 export interface Publisher {
@@ -200,6 +267,322 @@ export interface CatalogueItemStatistics {
   rating: number | null;
 }
 
+export interface Metadata {
+  assetType: 'NetCDF' | 'vector' | 'raster';
+}
+
+export interface VectorMetadata extends Metadata {
+  /**
+   * A list with the names of all attributes of the dataset.
+   */
+  attributes: string[];
+  /**
+   * A GeoJSON containing the clustered geometries.
+   */
+  clusters: GeoJSON.FeatureCollection;
+  /**
+   * A link to a PNG static map with the clustered geometries.
+   */
+  clustersStatic: string;
+  /**
+   * The Well-Known-Text representation of the Convex Hull for all geometries.
+   */
+  convexHull: string;
+  /**
+   * A link to a PNG static map showing the convex hull.
+   */
+  convexHullStatic: string;
+  /**
+   * Count not null values for each attribute in the dataset. The key is the attribute name.
+   */
+  count: { [attribute: string]: number };
+  /**
+   * The short name of the dataset's native Coordinate Reference System (CRS).
+   */
+  crs: string;
+  /**
+   * The data types for each of the dataset's attributes. The key is the attribute name.
+   */
+  datatypes: { [attribute: string]: string };
+  /**
+   * The distinct values for each of the categorical attributes in the dataset. The key is the attribute name.
+   */
+  distinct: { [attribute: string]: string[] };
+  /**
+   * The distribution of the values for each categorical attribute in the dataset.
+   * The first key is the attribute name.
+   * The inner object is the frequency of each value for the specific attribute.
+   * The second key is the value.
+   */
+  distribution: { [attribute: string]: { [value: string]: number } }
+  /**
+   * The number of features in the dataset.
+   */
+  featureCount: number;
+  /**
+   * A link to a GeoJSON with a heatmap of the geometries.
+   */
+  heatmap: string;
+  /**
+   * A link to a PNG static map with a heatmap of the geometries.
+   */
+  heatmapStatic: string;
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The 5, 25, 50, 75, 95 quantiles for each of the numeric attributes in the dataset.
+   */
+  quantiles: { [q: string]: { [attribute: string]: number } };
+  /**
+   * The most frequent values for each of the attributes in the dataset.
+   */
+  recurring: { [attribute: string]: (string | number)[] };
+  /**
+   * Descriptive statistics (min, max, mean, median, std, sum) for the numerical attributes in the dataset.
+   */
+  statistics: {
+    /**
+     * The maximum value for each of the numeric attributes. The key is the attribute name.
+     */
+    max: { [attribute: string]: number };
+    /**
+     * The mean value for each of the numeric attributes. The key is the attribute name.
+     */
+    mean: { [attribute: string]: number };
+    /**
+     * The median value for each of the numeric attributes. The key is the attribute name.
+     */
+    median: { [attribute: string]: number };
+    /**
+     * The min value for each of the numeric attributes. The key is the attribute name.
+     */
+    min: { [attribute: string]: number };
+    /**
+     * The standard deviation for each of the numeric attributes. The key is the attribute name.
+     */
+    std: { [attribute: string]: number };
+    /**
+     * The sum of of all values for each of the numeric attributes. The key is the attribute name.
+     */
+    sum: { [attribute: string]: number };
+  };
+  /**
+   * A link to a PNG thumbnail of the dataset.
+   */
+  thumbnail: string;
+}
+
+export interface RasterMetadata extends Metadata {
+  /**
+   * In case the raster is GeoTiff, whether it is Cloud-Optimized or not.
+   */
+  cog: boolean;
+  /**
+   * The Color Interpretation for each band.
+   */
+  colorInterpretation: string[];
+  /**
+   * The short name of the dataset's native Coordinate Reference System (CRS).
+   */
+  crs: string;
+  /**
+   * The data type of each band.
+   */
+  datatypes: string[];
+  /**
+   * The default histogram of the raster for each band.
+   * Each array contains the following values:
+   * - The minimum Pixel Value.
+   * - The maximum Pixel Value.
+   * - The total number of pixel values.
+   * - An array with the frequencies for each Pixel Value (has length equal to the total number of Pixel Values).
+   */
+  histogram: [number, number, number, number[]][];
+  /**
+   * General information about the raster file.
+   */
+  info: {
+    /**
+     * A list with the bands included in the raster.
+     */
+    bands: string[];
+    /**
+     * The driver used to open the raster.
+     */
+    driver: string;
+    /**
+     * A list of the files associated with the raster.
+     */
+    files: string[];
+    /**
+     * The height in pixels.
+     */
+    height: number;
+    /**
+     * Various values describing the image structure. The keys depend on the raster.
+     */
+    imageStructure: { [key: string]: string | number };
+    /**
+     * Metadata of the the raster as written in the file. The keys are free-text.
+     */
+    metadata: { [key: string]: string };
+    /**
+     * The width in pixels.
+     */
+    width: number;
+  };
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The no-data value of each band.
+   */
+  noDataValue: { [band: string]: number };
+  /**
+   * The number of bands in the raster.
+   */
+  numberOfBands: number;
+  /**
+   * The resolution for each axis, and the unit of measurement.
+   */
+  resolution: {
+    /**
+     * The unit of resolution.
+     */
+    unit: string;
+    /**
+     * Resolution in x-axis.
+     */
+    x: number;
+    /**
+     * Resolution in y-axis.
+     */
+    y: number;
+  };
+  /**
+   * A list with descriptive statistics for each band of the raster file.
+   */
+  statistics: {
+    [band: string]: {
+      /**
+       * The maximum value in the band.
+       */
+      max: number;
+      /**
+       * The mean value in the band.
+       */
+      mean: number;
+      /**
+       * The minimum value in the band.
+       */
+      min: number;
+      /**
+       * The standard deviation in the band.
+       */
+      std: number;
+    }
+  };
+}
+
+export interface NetCdfMetadata extends Metadata {
+  /**
+   * A list with the dimensions.
+   */
+  dimensionsList: string[];
+  /**
+   * The properties of each dimension. The key is the dimension.
+   */
+  dimensionsProperties: { [d: string]: { [property: string]: string | number } };
+  /**
+   * The number of the dimensions.
+   */
+  dimensionsSize: number;
+  /**
+   * The Well-Known-Text representation of the Minimum Bounding Rectangle (MBR).
+   */
+  mbr: string;
+  /**
+   * A link to a PNG static map with the MBR.
+   */
+  mbrStatic: string;
+  /**
+   * The metadata object as written in the file. The key is a free field for the 
+   * data provider, usually describing the given information.
+   */
+  metadata: { [m: string]: string };
+  /**
+   * The no-data value for each the variables. The key is the variable.
+   */
+  noDataValues: { [v: string]: number };
+  /**
+   * Descriptive statistics for each of the variables. The key is the variable.
+   */
+  statistics: {
+    [v: string]: {
+      /**
+       * Whether the data are contiguous or not.
+       */
+      contiguous: boolean;
+      /**
+       * The number of values for the specific variable.
+       */
+      count: number;
+      /**
+       * The maximum value of the specific variable.
+       */
+      max: number;
+      /**
+       * The mean value of the specific variable.
+       */
+      mean: number;
+      /**
+       * The minimum value of the specific variable.
+       */
+      min: number;
+      /**
+       * The number of missing values for the specific variable.
+       */
+      missing: number;
+      /**
+       * The standard deviation for the specific variable.
+       */
+      std: number;
+      /**
+       * The variance of the specific variable.
+       */
+      variance: number;
+      /**
+       * A free-text string representing the temporal extend of the dataset.
+       */
+      temporalExtent: string;
+      /**
+       * A list with the variables.
+       */
+      variablesList: string[];
+      /**
+       * The properties for each variable. The key is the variable.
+       */
+      variablesProperties: { [v: string]: { [property: string]: string | number } };
+      /**
+       * Number of variables.
+       */
+      variablesSize: number;
+    }
+  };
+
+}
+
 export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Catalogue item identifier (UUID)
@@ -217,15 +600,43 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Id of an entity responsible for making the resource available
    */
   publisherId: string;
+}
+
+export interface CatalogueItemDetails extends CatalogueItem {
+  /**
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
+  /**
+   * Automated metadata. The property is present only for authenticated users
+   */
+  automatedMetadata?: Metadata;
+  /**
+   * A list of resources of the dataset
+   */
+  resources: AssetResource[];
   /*
    * Asset statistics
    */
   statistics: CatalogueItemStatistics;
+  /**
+   * A list of all item versions
+   */
+  versions: string[];
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
-   * True if the file should be imported to PostGIS
+   * Auxiliary files or additional resources to the dataset
+   */
+  additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
+  /**
+   * Automated metadata. This value will be overwritten by the publish asset workflow
+   */
+  automatedMetadata?: Metadata;
+  /**
+   * True if the resource files should be imported into PostGIS database and published using WMS/WFS
+   * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
   ingested: boolean;
   /*
@@ -233,9 +644,9 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    */
   pricingModels: BasePricingModelCommand[];
   /**
-   * Optional relative path to user's remote file system
+   * A list of resources of the dataset
    */
-  source?: string;
+  resources: AssetResource[];
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;

@@ -1,5 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
-
 import Api from '@/service/api';
 
 import { PageRequest, Sorting } from '@/model/request';
@@ -10,6 +8,10 @@ import { CatalogueItemCommand } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
 } from '@/model/draft';
+import {
+  AssetFileAdditionalResourceCommand, AssetResourceCommand,
+} from '@/model/asset';
+import { AxiosRequestConfig } from 'axios';
 
 export default class DraftAssetApi extends Api {
   constructor() {
@@ -23,7 +25,9 @@ export default class DraftAssetApi extends Api {
    * @param pageRequest
    * @param sorting
    */
-  public async find(query: Partial<AssetDraftQuery>, pageRequest: PageRequest, sorting: Sorting<EnumSortField>): Promise<AxiosPageResponse<AssetDraft>> {
+  public async find(
+    query: Partial<AssetDraftQuery>, pageRequest: PageRequest, sorting: Sorting<EnumSortField>,
+  ): Promise<AxiosPageResponse<AssetDraft>> {
     const { page, size } = pageRequest;
     const { id: field, order } = sorting;
 
@@ -33,7 +37,7 @@ export default class DraftAssetApi extends Api {
         return value;
       }, []);
 
-    const url = `/action/provider/drafts?page=${page}&size=${size}&${queryString.join('&')}&orderBy=${field}&order=${order}`;
+    const url = `/action/drafts?page=${page}&size=${size}&${queryString.join('&')}&orderBy=${field}&order=${order}`;
 
     return this.get<ServerResponse<PageResult<AssetDraft>>>(url);
   }
@@ -44,8 +48,7 @@ export default class DraftAssetApi extends Api {
    * @param key
    */
   public async findOne(key: string): Promise<ServerResponse<AssetDraft>> {
-    const url = `/action/provider/drafts/${key}`;
-
+    const url = `/action/drafts/${key}`;
 
     return this.get<ServerResponse<AssetDraft>>(url)
       .then((response: AxiosServerResponse<AssetDraft>) => {
@@ -60,11 +63,10 @@ export default class DraftAssetApi extends Api {
    *
    * @param command
    */
-  public async create(command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
-    const url = '/action/provider/drafts';
+  public async create(command: CatalogueItemCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
+    const url = '/action/drafts';
 
-
-    return this.post<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
+    return this.post<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
@@ -75,11 +77,14 @@ export default class DraftAssetApi extends Api {
   /**
    * Update an existing draft
    *
+   * If a resource file or an additional file resource entry is deleted from {@link CatalogueItemCommand#resources}
+   * or {@link CatalogueItemCommand#additionalResources} arrays, it will be also be deleted at the server.
+   *
    * @param key
    * @param command
    */
   public async update(key: string, command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
-    const url = `/action/provider/drafts/${key}`;
+    const url = `/action/drafts/${key}`;
 
 
     return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
@@ -91,30 +96,16 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
-   * Crate and submit a new draft
+   * Update and submit an existing draft.
    *
-   * @param command
-   * @param config
-   */
-  public async submitNew(command: CatalogueItemCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
-    const url = '/action/provider/drafts';
-
-    return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command, config)
-      .then((response: AxiosServerResponse<AssetDraft>) => {
-        const { data } = response;
-
-        return data;
-      });
-  }
-
-  /**
-   * Update and submit an existing draft
+   * If a resource file or an additional file resource entry is deleted from {@link CatalogueItemCommand#resources}
+   * or {@link CatalogueItemCommand#additionalResources} arrays, it will be also be deleted at the server.
    *
    * @param key
    * @param command
    */
-  public async submitExisting(key: string, command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
-    const url = `/provider/drafts/${key}/submit`;
+  public async updateAndSubmit(key: string, command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/submit`;
 
     return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
       .then((response: AxiosServerResponse<AssetDraft>) => {
@@ -130,7 +121,7 @@ export default class DraftAssetApi extends Api {
    * @param key
    */
   public async acceptDraft(key: string): Promise<AxiosServerResponse<void>> {
-    const url = `/action/provider/drafts/${key}/review"`;
+    const url = `/action/drafts/${key}/review"`;
 
     const command: AssetDraftReviewCommand = {
       rejected: false,
@@ -147,7 +138,7 @@ export default class DraftAssetApi extends Api {
    * @param reason
    */
   public async rejectDraft(key: string, reason: string): Promise<AxiosServerResponse<void>> {
-    const url = `/action/provider/drafts/${key}/review"`;
+    const url = `/action/drafts/${key}/review"`;
 
     const command: AssetDraftReviewCommand = {
       rejected: true,
@@ -163,25 +154,28 @@ export default class DraftAssetApi extends Api {
    * @param key
    */
   public async deleteDraft(key: string): Promise<AxiosServerResponse<void>> {
-    const url = `/action/provider/drafts/${key}`;
+    const url = `/action/drafts/${key}`;
 
 
     return this.delete<ServerResponse<void>>(url);
   }
 
   /**
-   * Upload files
+   * Upload resource file
    *
    * @param key Draft unique key
-   * @param files Files to upload
-   * @param command Upload command with file metadata
+   * @param resource File to upload
+   * @param command Command object with resource metadata
    */
-  public async uploadFile(key: string, files: File[]): Promise<ServerResponse<AssetDraft>> {
-    const url = `/provider/drafts/${key}/files`;
+  public async uploadResource(key: string, resource: File, command: AssetResourceCommand): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/resources`;
 
     const form = new FormData();
 
-    files.forEach((f) => form.append('file', f));
+    form.append('file', resource);
+    form.append('data', new Blob([JSON.stringify(command)], {
+      type: 'application/json',
+    }));
 
     return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -193,19 +187,30 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
-   * Delete file
+   * Upload additional file resource
    *
    * @param key Draft unique key
-   * @param path Path of the file to delete e.g., /data.zip
+   * @param resource File to upload
+   * @param command Command object with resource metadata
    */
-  public async deletePath(key: string, path: string): Promise<ServerResponse<AssetDraft>> {
-    const url = `/provider/drafts/${key}/files?path=${path}`;
+  public async uploadAdditionalResource(
+    key: string, resource: File, command: AssetFileAdditionalResourceCommand,
+  ): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/additional-resources`;
 
-    return this.delete<ServerResponse<AssetDraft>>(url)
-      .then((response: AxiosServerResponse<AssetDraft>) => {
-        const { data } = response;
+    const form = new FormData();
 
-        return data;
-      });
+    form.append('file', resource);
+    form.append('data', new Blob([JSON.stringify(command)], {
+      type: 'application/json',
+    }));
+
+    return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+
+      return data;
+    });
   }
 }

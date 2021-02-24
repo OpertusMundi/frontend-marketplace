@@ -47,7 +47,10 @@ export interface FilePathCommand {
 
 export interface FileUploadCommand {
   comment?: string;
-  filename: string;
+  /**
+   * Optional file name. If no name is specified, the uploaded file name is used.
+   */
+  fileName: string;
   /**
    * True if an existing file should be overwritten
    */
