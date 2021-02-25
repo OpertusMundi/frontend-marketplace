@@ -18,7 +18,7 @@
 
                 <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
                   <div class="form-group">
-                    <label for="vat_number">VAT number:</label>
+                    <label for="vat_number">VAT number *</label>
                     <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -26,7 +26,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Name" rules="required">
                   <div class="form-group">
-                    <label for="name">Name:</label>
+                    <label for="name">Name *</label>
                     <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -34,15 +34,15 @@
 
                 <validation-provider v-slot="{ errors }" name="Website">
                   <div class="form-group">
-                    <label for="website">Website:</label>
-                    <input type="text" class="form-group__text" name="website" id="website" v-model="vendorData.website">
+                    <label for="website">Website</label>
+                    <input type="text" class="form-group__text" name="website" id="website" v-model="vendorData.siteUrl">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
                 <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                   <div class="form-group">
-                    <label for="address_line_1">Address Line 1:</label>
+                    <label for="address_line_1">Address Line 1 *</label>
                     <input type="text" class="form-group__text" name="address_line_1" id="address_line_1" v-model="vendorData.headquartersAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -50,7 +50,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Address Line 2">
                   <div class="form-group">
-                    <label for="address_line_2">Address Line 2:</label>
+                    <label for="address_line_2">Address Line 2</label>
                     <input type="text" class="form-group__text" name="address_line_2" id="address_line_2" v-model="vendorData.headquartersAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -58,7 +58,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Country" rules="required">
                   <div class="form-group">
-                    <label for="country">Country:</label>
+                    <label for="country">Country *</label>
                     <input type="text" class="form-group__text" name="country" id="country" v-model="vendorData.headquartersAddress.country">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -66,7 +66,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Region" rules="required">
                   <div class="form-group">
-                    <label for="region">Region:</label>
+                    <label for="region">Region *</label>
                     <input type="text" class="form-group__text" name="region" id="region" v-model="vendorData.headquartersAddress.region">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -74,7 +74,7 @@
 
                 <validation-provider v-slot="{ errors }" name="City" rules="required">
                   <div class="form-group">
-                    <label for="city">City:</label>
+                    <label for="city">City *</label>
                     <input type="text" class="form-group__text" name="city" id="city" v-model="vendorData.headquartersAddress.city">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -82,7 +82,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
                   <div class="form-group">
-                    <label for="postal_code">ZIP code:</label>
+                    <label for="postal_code">ZIP code *</label>
                     <input type="text" class="form-group__text" name="postal_code" id="postal_code" v-model="vendorData.headquartersAddress.postalCode">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -152,7 +152,7 @@
 
                 <validation-provider v-slot="{ errors }" name="First name" rules="required">
                   <div class="form-group">
-                    <label for="first_name">First name:</label>
+                    <label for="first_name">First name *</label>
                     <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="vendorData.legalRepresentative.firstName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -160,7 +160,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Last name" rules="required">
                   <div class="form-group">
-                    <label for="last_name">Last name:</label>
+                    <label for="last_name">Last name *</label>
                     <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="vendorData.legalRepresentative.lastName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -168,7 +168,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
                   <div class="form-group">
-                    <label for="email">Email:</label>
+                    <label for="email">Email *</label>
                     <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.legalRepresentative.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -176,7 +176,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                   <div class="form-group">
-                    <label for="birthdate">Birthdate:</label>
+                    <label for="birthdate">Birthdate *</label>
                     <input type="text" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.legalRepresentative.birthdate">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -184,7 +184,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
                   <div class="form-group">
-                    <label for="nationality">Nationality:</label>
+                    <label for="nationality">Nationality *</label>
                     <input type="text" class="form-group__text" name="nationality" id="nationality" v-model="vendorData.legalRepresentative.nationality">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -192,7 +192,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                   <div class="form-group">
-                    <label for="lr_country_of_residence">Country of residence:</label>
+                    <label for="lr_country_of_residence">Country of residence *</label>
                     <input type="text" class="form-group__text" name="lr_country_of_residence" id="lr_country_of_residence" v-model="vendorData.legalRepresentative.countryOfResidence">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -200,7 +200,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                   <div class="form-group">
-                    <label for="lr_address_line_1">Address Line 1:</label>
+                    <label for="lr_address_line_1">Address Line 1 *</label>
                     <input type="text" class="form-group__text" name="lr_address_line_1" id="lr_address_line_1" v-model="vendorData.legalRepresentative.address.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -208,7 +208,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Address Line 2">
                   <div class="form-group">
-                    <label for="lr_address_line_2">Address Line 2:</label>
+                    <label for="lr_address_line_2">Address Line 2</label>
                     <input type="text" class="form-group__text" name="lr_address_line_2" id="lr_address_line_2" v-model="vendorData.legalRepresentative.address.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -216,7 +216,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Country" rules="required">
                   <div class="form-group">
-                    <label for="lr_country">Country:</label>
+                    <label for="lr_country">Country *</label>
                     <input type="text" class="form-group__text" name="lr_country" id="lr_country" v-model="vendorData.legalRepresentative.address.country">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -224,7 +224,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Region" rules="required">
                   <div class="form-group">
-                    <label for="lr_region">Region:</label>
+                    <label for="lr_region">Region *</label>
                     <input type="text" class="form-group__text" name="lr_region" id="lr_region" v-model="vendorData.legalRepresentative.address.region">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -232,7 +232,7 @@
 
                 <validation-provider v-slot="{ errors }" name="City" rules="required">
                   <div class="form-group">
-                    <label for="lr_city">City:</label>
+                    <label for="lr_city">City *</label>
                     <input type="text" class="form-group__text" name="lr_city" id="lr_city" v-model="vendorData.legalRepresentative.address.city">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -240,7 +240,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
                   <div class="form-group">
-                    <label for="lr_postal_code">ZIP code:</label>
+                    <label for="lr_postal_code">ZIP code *</label>
                     <input type="text" class="form-group__text" name="lr_postal_code" id="lr_postal_code" v-model="vendorData.legalRepresentative.address.postalCode">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -255,7 +255,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Holder name" rules="required">
                   <div class="form-group">
-                    <label for="holder_name">Holder name:</label>
+                    <label for="holder_name">Holder name *</label>
                     <input type="text" class="form-group__text" name="holder_name" id="holder_name" v-model="vendorData.bankAccount.ownerName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -263,7 +263,7 @@
 
                 <validation-provider v-slot="{ errors }" name="IBAN" rules="required">
                   <div class="form-group">
-                    <label for="iban">IBAN:</label>
+                    <label for="iban">IBAN *</label>
                     <input type="text" class="form-group__text" name="iban" id="iban" v-model="vendorData.bankAccount.iban">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -271,7 +271,7 @@
 
                 <validation-provider v-slot="{ errors }" name="BIC" rules="required">
                   <div class="form-group">
-                    <label for="bic">BIC:</label>
+                    <label for="bic">BIC *</label>
                     <input type="text" class="form-group__text" name="bic" id="bic" v-model="vendorData.bankAccount.bic">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -279,7 +279,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                   <div class="form-group">
-                    <label for="ba_address_line_1">Address Line 1:</label>
+                    <label for="ba_address_line_1">Address Line 1 *</label>
                     <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" v-model="vendorData.bankAccount.ownerAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -287,7 +287,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Address Line 2">
                   <div class="form-group">
-                    <label for="ba_address_line_2">Address Line 2:</label>
+                    <label for="ba_address_line_2">Address Line 2</label>
                     <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" v-model="vendorData.bankAccount.ownerAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -295,7 +295,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Country" rules="required">
                   <div class="form-group">
-                    <label for="ba_country">Country:</label>
+                    <label for="ba_country">Country *</label>
                     <input type="text" class="form-group__text" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -303,7 +303,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Region" rules="required">
                   <div class="form-group">
-                    <label for="ba_region">Region:</label>
+                    <label for="ba_region">Region *</label>
                     <input type="text" class="form-group__text" name="ba_region" id="ba_region" v-model="vendorData.bankAccount.ownerAddress.region">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -311,7 +311,7 @@
 
                 <validation-provider v-slot="{ errors }" name="City" rules="required">
                   <div class="form-group">
-                    <label for="ba_city">City:</label>
+                    <label for="ba_city">City *</label>
                     <input type="text" class="form-group__text" name="ba_city" id="ba_city" v-model="vendorData.bankAccount.ownerAddress.city">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -319,7 +319,7 @@
 
                 <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
                   <div class="form-group">
-                    <label for="ba_postal_code">ZIP code:</label>
+                    <label for="ba_postal_code">ZIP code *</label>
                     <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" v-model="vendorData.bankAccount.ownerAddress.postalCode">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -327,6 +327,70 @@
 
               </div>
             </validation-observer>
+
+            <!-- STEP 4 - Review -->
+            <div class="dashboard__form__step" v-if="currentStep == 4">
+
+              <div class="wrapper-50-50">
+                <div>
+                  <h3>Company</h3>
+                  <hr>
+                  <div class="wrapper-cells">
+                    <span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span>
+                    <span>Name: </span> <span> {{ this.vendorData.name }} </span>
+                    <div v-if="this.vendorData.siteUrl">
+                      <span>Website: </span> <span> {{ this.vendorData.siteUrl }} </span>
+                    </div>
+                    <span>Country: </span> <span> {{ this.vendorData.headquartersAddress.country }} </span>
+                    <span>Region: </span> <span> {{ this.vendorData.headquartersAddress.region }} </span>
+                    <span>City: </span> <span> {{ this.vendorData.headquartersAddress.city }} </span>
+                    <span>Zip code: </span> <span> {{ this.vendorData.headquartersAddress.postalCode }} </span>
+                    <span>Address line 1: </span> <span> {{ this.vendorData.headquartersAddress.line1 }} </span>
+                    <div v-if="this.vendorData.headquartersAddress.line2">
+                      <span>Address line 2: </span> <span> {{ this.vendorData.headquartersAddress.line2 }} </span>
+                    </div>
+                  </div>
+
+                  <h3 class="mt-5">Bank account</h3>
+                  <hr>
+                  <div class="wrapper-cells">
+                    <span>Holder name: </span> <span> {{ this.vendorData.bankAccount.ownerName }} </span>
+                    <span>IBAN: </span> <span> {{ this.vendorData.bankAccount.iban }} </span>
+                    <span>BIC: </span> <span> {{ this.vendorData.bankAccount.bic }} </span>
+                    <span>Country: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.country }} </span>
+                    <span>Region: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.region }} </span>
+                    <span>City: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.city }} </span>
+                    <span>Zip code: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.postalCode }} </span>
+                    <span>Address line 1: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line1 }} </span>
+                    <div v-if="this.vendorData.bankAccount.ownerAddress.line2">
+                      <span>Address line 2: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line2 }} </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3>Legal Representative</h3>
+                  <hr>
+                  <div class="wrapper-cells">
+                    <span>First name: </span> <span> {{ this.vendorData.legalRepresentative.firstName }} </span>
+                    <span>Last name: </span> <span> {{ this.vendorData.legalRepresentative.lastName }} </span>
+                    <span>Email: </span> <span> {{ this.vendorData.legalRepresentative.email }} </span>
+                    <span>Birthdate: </span> <span> {{ this.vendorData.legalRepresentative.birthdate }} </span>
+                    <span>Nationality: </span> <span> {{ this.vendorData.legalRepresentative.nationality }} </span>
+                    <span>Country of residence: </span> <span> {{ this.vendorData.legalRepresentative.countryOfResidence }} </span>
+                    <span>Country: </span> <span> {{ this.vendorData.legalRepresentative.address.country }} </span>
+                    <span>Region: </span> <span> {{ this.vendorData.legalRepresentative.address.region }} </span>
+                    <span>City: </span> <span> {{ this.vendorData.legalRepresentative.address.city }} </span>
+                    <span>Zip code: </span> <span> {{ this.vendorData.legalRepresentative.address.postalCode }} </span>
+                    <span>Address line 1: </span> <span> {{ this.vendorData.legalRepresentative.address.line1 }} </span>
+                    <div v-if="this.vendorData.legalRepresentative.address.line2">
+                      <span>Address line 2: </span> <span> {{ this.vendorData.legalRepresentative.address.line2 }} </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
 
           </div>
           <div class="dashboard__form__navbuttons">
@@ -484,7 +548,7 @@ export default class BecomeVendor extends Vue {
   }
 
   nextStep():void {
-    console.log(this.vendorData);
+    // console.log(this.vendorData);
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
         if (this.currentStep === this.totalSteps) {
@@ -509,4 +573,46 @@ export default class BecomeVendor extends Vue {
   @import "@/assets/styles/_page.scss";
   @import "@/assets/styles/_becomevendor.scss";
   @import "@/assets/styles/_forms.scss";
+
+  .wrapper-50-50 {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+  }
+
+  .wrapper-cells {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 10px;
+  }
+
+  .wrapper-cells span:nth-child(2n - 1) {
+    color: #474747;
+    font-weight: 500;
+  }
+
+  .wrapper-cells span:nth-child(2n) {
+    color: #5f5f5f;
+  }
+
+  /*
+  @media (min-width: 500px) {
+    .row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  */
+
+  /*
+  .col-50 {
+    margin-left: 20px;
+    margin-right: 20px;
+    flex: 50%;
+  }
+  */
+
+  .mt-5 {
+    margin-top: 5rem;
+  }
 </style>
