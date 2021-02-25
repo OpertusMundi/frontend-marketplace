@@ -556,20 +556,28 @@ export default class BecomeVendor extends Vue {
   }
 
   nextStep():void {
-    // console.log(this.vendorData);
+    if (this.currentStep === this.totalSteps) {
+      this.submitForm();
+      return;
+    }
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
+        /*
         if (this.currentStep === this.totalSteps) {
-          // this.submitForm();
+          this.submitForm();
         } else {
-          this.currentStep += 1;
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-          });
-        }
+        */
+        this.currentStep += 1;
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
       }
     });
+  }
+
+  submitForm() {
+    console.log('submit form!!');
   }
 
   checkPhoneNumber(phone:string):void {
