@@ -159,9 +159,9 @@ export default class App extends Vue {
   }
 
   getCartItems():void {
-    console.log('server down fix');
-    // commented out the following block to work when server is down
-    /*
+    if (serverIsDown) {
+      return;
+    }
     this.cartApi.getCart()
       .then((cartResponse: ServerResponse<Cart>) => {
         if (cartResponse.success) {
@@ -171,7 +171,6 @@ export default class App extends Vue {
           console.error('cannot add item to cart!');
         }
       });
-    */
   }
 
   logout(): void {
