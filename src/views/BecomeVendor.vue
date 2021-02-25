@@ -336,17 +336,15 @@
                   <h3>Company</h3>
                   <hr>
                   <div class="wrapper-cells">
-                    <span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span>
-                    <span>Name: </span> <span> {{ this.vendorData.name }} </span>
-                    <div v-if="this.vendorData.siteUrl">
-                      <span>Website: </span> <span> {{ this.vendorData.siteUrl }} </span>
-                    </div>
-                    <span>Country: </span> <span> {{ this.vendorData.headquartersAddress.country }} </span>
-                    <span>Region: </span> <span> {{ this.vendorData.headquartersAddress.region }} </span>
-                    <span>City: </span> <span> {{ this.vendorData.headquartersAddress.city }} </span>
-                    <span>Zip code: </span> <span> {{ this.vendorData.headquartersAddress.postalCode }} </span>
-                    <span>Address line 1: </span> <span> {{ this.vendorData.headquartersAddress.line1 }} </span>
-                    <div v-if="this.vendorData.headquartersAddress.line2">
+                    <div><span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span></div>
+                    <div><span>Name: </span> <span> {{ this.vendorData.name }} </span></div>
+                    <div v-if="this.vendorData.siteUrl"><span>Website: </span> <span> {{ this.vendorData.siteUrl }} </span></div>
+                    <div><span>Country: </span> <span> {{ this.vendorData.headquartersAddress.country }} </span></div>
+                    <div><span>Region: </span> <span> {{ this.vendorData.headquartersAddress.region }} </span></div>
+                    <div><span>City: </span> <span> {{ this.vendorData.headquartersAddress.city }} </span></div>
+                    <div><span>Zip code: </span> <span> {{ this.vendorData.headquartersAddress.postalCode }} </span></div>
+                    <div><span>Address line 1: </span> <span> {{ this.vendorData.headquartersAddress.line1 }} </span></div>
+                    <div style="display: contents" v-if="this.vendorData.headquartersAddress.line2">
                       <span>Address line 2: </span> <span> {{ this.vendorData.headquartersAddress.line2 }} </span>
                     </div>
                   </div>
@@ -362,7 +360,7 @@
                     <span>City: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.city }} </span>
                     <span>Zip code: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.postalCode }} </span>
                     <span>Address line 1: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line1 }} </span>
-                    <div v-if="this.vendorData.bankAccount.ownerAddress.line2">
+                    <div style="display: contents" v-if="this.vendorData.bankAccount.ownerAddress.line2">
                       <span>Address line 2: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line2 }} </span>
                     </div>
                   </div>
@@ -383,7 +381,7 @@
                     <span>City: </span> <span> {{ this.vendorData.legalRepresentative.address.city }} </span>
                     <span>Zip code: </span> <span> {{ this.vendorData.legalRepresentative.address.postalCode }} </span>
                     <span>Address line 1: </span> <span> {{ this.vendorData.legalRepresentative.address.line1 }} </span>
-                    <div v-if="this.vendorData.legalRepresentative.address.line2">
+                    <div style="display: contents" v-if="this.vendorData.legalRepresentative.address.line2">
                       <span>Address line 2: </span> <span> {{ this.vendorData.legalRepresentative.address.line2 }} </span>
                     </div>
                   </div>
@@ -585,6 +583,10 @@ export default class BecomeVendor extends Vue {
     display: grid;
     grid-template-columns: auto auto;
     grid-gap: 10px;
+  }
+
+  .wrapper-cells div {
+    display: contents;
   }
 
   .wrapper-cells span:nth-child(2n - 1) {
