@@ -32,9 +32,6 @@ import { AxiosError } from 'axios';
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 
-// eslint-disable-next-line
-const serverIsDown: boolean = true;
-
 @Component({
   components: { AppHeader, AppFooter },
 })
@@ -122,12 +119,6 @@ export default class App extends Vue {
       store.commit('setCsrfToken', { token, header });
     }
 
-    // Server-down fix
-    if (serverIsDown) {
-      store.commit('setLoading', false);
-      return;
-    }
-
     // Get initial configuration
     this.configApi
       .getConfiguration()
@@ -149,6 +140,9 @@ export default class App extends Vue {
             console.log(error);
             store.commit('setLoading', false);
           });
+      }).catch((err) => {
+        console.log('getConfiguration error', err);
+        store.commit('setLoading', false);
       });
 
     this.getCartItems();
@@ -159,9 +153,6 @@ export default class App extends Vue {
   }
 
   getCartItems():void {
-    if (serverIsDown) {
-      return;
-    }
     this.cartApi.getCart()
       .then((cartResponse: ServerResponse<Cart>) => {
         if (cartResponse.success) {
@@ -170,6 +161,9 @@ export default class App extends Vue {
           // TODO: Handle error
           console.error('cannot add item to cart!');
         }
+      })
+      .catch((err) => {
+        console.log('getCartItems error: ', err);
       });
   }
 
