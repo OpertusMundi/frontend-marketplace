@@ -438,6 +438,7 @@ import {
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
+import ProviderAPI from '@/service/provider';
 
 extend('required', required);
 extend('email', email);
@@ -467,6 +468,8 @@ extend('phoneNumber', phoneNumber);
   },
 })
 export default class BecomeVendor extends Vue {
+  providerAPI: ProviderAPI;
+
   $refs!: {
     step1: InstanceType<typeof ValidationObserver>,
     step2: InstanceType<typeof ValidationObserver>,
@@ -488,6 +491,8 @@ export default class BecomeVendor extends Vue {
 
   constructor() {
     super();
+
+    this.providerAPI = new ProviderAPI();
 
     // this.firstName = '';
     // this.lastName = '';
@@ -577,7 +582,14 @@ export default class BecomeVendor extends Vue {
   }
 
   submitForm() {
-    console.log('submit form!!');
+    console.log('submit form');
+    this.providerAPI.submitRegistration(this.vendorData)
+      .then(() => {
+        console.log('form was submitted');
+      })
+      .catch((err) => {
+        console.log('error in submitting form: ', err);
+      })
   }
 
   checkPhoneNumber(phone:string):void {
