@@ -329,11 +329,21 @@
             </validation-observer>
 
             <!-- STEP 4 - Review -->
+
+            <!--
+              Instead of hardcoding the fields, we could also loop through vendorData
+              object properties and only display the ones with non-empty values
+              I leave it hardcoded as it is more straight-forward and seems easier
+              to maintain/understand in the furure.
+            -->
+
             <div class="dashboard__form__step" v-if="currentStep == 4">
 
               <div class="wrapper-50-50">
                 <div>
-                  <h3>Company</h3>
+                  <h3 class="align-left">Company</h3>
+                  <span class="align-right edit-button" @click="goToStep(1)">EDIT</span>
+                  <div class="clear"></div>
                   <hr>
                   <div class="wrapper-cells">
                     <div><span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span></div>
@@ -344,13 +354,15 @@
                     <div><span>City: </span> <span> {{ this.vendorData.headquartersAddress.city }} </span></div>
                     <div><span>Zip code: </span> <span> {{ this.vendorData.headquartersAddress.postalCode }} </span></div>
                     <div><span>Address line 1: </span> <span> {{ this.vendorData.headquartersAddress.line1 }} </span></div>
-                    <div style="display: contents" v-if="this.vendorData.headquartersAddress.line2">
-                      <span>Address line 2: </span> <span> {{ this.vendorData.headquartersAddress.line2 }} </span>
-                    </div>
+                    <div v-if="this.vendorData.headquartersAddress.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.headquartersAddress.line2 }} </span> </div>
                   </div>
 
-                  <h3 class="mt-5">Bank account</h3>
-                  <hr>
+                  <div class="mt-5">
+                    <h3 class="align-left">Bank account</h3>
+                    <span class="align-right edit-button" @click="goToStep(3)">EDIT</span>
+                    <div class="clear"></div>
+                    <hr>
+                  </div>
                   <div class="wrapper-cells">
                     <span>Holder name: </span> <span> {{ this.vendorData.bankAccount.ownerName }} </span>
                     <span>IBAN: </span> <span> {{ this.vendorData.bankAccount.iban }} </span>
@@ -360,14 +372,14 @@
                     <span>City: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.city }} </span>
                     <span>Zip code: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.postalCode }} </span>
                     <span>Address line 1: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line1 }} </span>
-                    <div style="display: contents" v-if="this.vendorData.bankAccount.ownerAddress.line2">
-                      <span>Address line 2: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line2 }} </span>
-                    </div>
+                    <div v-if="this.vendorData.bankAccount.ownerAddress.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line2 }} </span> </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3>Legal Representative</h3>
+                  <h3 class="align-left">Legal Representative</h3>
+                  <span class="align-right edit-button" @click="goToStep(2)">EDIT</span>
+                  <div class="clear"></div>
                   <hr>
                   <div class="wrapper-cells">
                     <span>First name: </span> <span> {{ this.vendorData.legalRepresentative.firstName }} </span>
@@ -381,9 +393,7 @@
                     <span>City: </span> <span> {{ this.vendorData.legalRepresentative.address.city }} </span>
                     <span>Zip code: </span> <span> {{ this.vendorData.legalRepresentative.address.postalCode }} </span>
                     <span>Address line 1: </span> <span> {{ this.vendorData.legalRepresentative.address.line1 }} </span>
-                    <div style="display: contents" v-if="this.vendorData.legalRepresentative.address.line2">
-                      <span>Address line 2: </span> <span> {{ this.vendorData.legalRepresentative.address.line2 }} </span>
-                    </div>
+                    <div v-if="this.vendorData.legalRepresentative.address.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.legalRepresentative.address.line2 }} </span> </div>
                   </div>
                 </div>
               </div>
@@ -576,7 +586,7 @@ export default class BecomeVendor extends Vue {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-gap: 20px;
+    grid-gap: 50px;
   }
 
   .wrapper-cells {
@@ -589,12 +599,12 @@ export default class BecomeVendor extends Vue {
     display: contents;
   }
 
-  .wrapper-cells span:nth-child(2n - 1) {
+  .wrapper-cells span:nth-child(odd) {
     color: #474747;
     font-weight: 500;
   }
 
-  .wrapper-cells span:nth-child(2n) {
+  .wrapper-cells span:nth-child(even) {
     color: #5f5f5f;
   }
 
@@ -616,5 +626,29 @@ export default class BecomeVendor extends Vue {
 
   .mt-5 {
     margin-top: 5rem;
+  }
+
+  .align-left {
+    float: left;
+  }
+
+  .align-right {
+    float: right;
+  }
+
+  .clear {
+    clear: both;
+  }
+
+  .edit-button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    font-weight: 200;
+    /*optional*/
+    // font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    color: #5f5f5f;
+    cursor: pointer;
   }
 </style>
