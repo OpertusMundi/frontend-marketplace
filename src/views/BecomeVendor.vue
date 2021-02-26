@@ -16,13 +16,6 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <!-- <div class="form-group">
-                  <label for="test">Test *</label>
-                  <select class="form-group__select" type="text" name="test" id="test">
-                    <option v-for="country in countries" :key="country"> {{country}} </option>
-                  </select>
-                </div> -->
-
                 <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
                   <div class="form-group">
                     <label for="vat_number">VAT number *</label>
@@ -135,7 +128,7 @@
                 <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                   <div class="form-group">
                     <label for="birthdate">Birthdate *</label>
-                    <input type="text" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.legalRepresentative.birthdate">
+                    <input type="date" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.legalRepresentative.birthdate">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -173,13 +166,6 @@
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                    <div class="form-group">
-                      <label for="lr_country">Country *</label>
-                      <input type="text" class="form-group__text" name="lr_country" id="lr_country" v-model="vendorData.legalRepresentative.address.country">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider> -->
                   <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="lr_country">Country *</label>
@@ -265,14 +251,6 @@
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                    <div class="form-group">
-                      <label for="ba_country">Country *</label>
-                      <input type="text" class="form-group__text" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider> -->
-
                   <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="ba_country">Country *</label>
@@ -370,7 +348,7 @@
                     <span>First name: </span> <span> {{ this.vendorData.legalRepresentative.firstName }} </span>
                     <span>Last name: </span> <span> {{ this.vendorData.legalRepresentative.lastName }} </span>
                     <span>Email: </span> <span> {{ this.vendorData.legalRepresentative.email }} </span>
-                    <span>Birthdate: </span> <span> {{ this.vendorData.legalRepresentative.birthdate }} </span>
+                    <span>Birthdate: </span> <span> {{ this.vendorData.legalRepresentative.birthdate | formatDate }} </span>
                     <span>Nationality: </span> <span> {{ this.vendorData.legalRepresentative.nationality }} </span>
                     <span>Country of residence: </span> <span> {{ this.vendorData.legalRepresentative.countryOfResidence }} </span>
                     <span>Country: </span> <span> {{ this.vendorData.legalRepresentative.address.country }} </span>
@@ -451,6 +429,15 @@ extend('phoneNumber', phoneNumber);
     ValidationObserver,
     VuePhoneNumberInput,
   },
+  filters: {
+    // input format: yyyy-mm-dd
+    // output format: dd Mon yyyy
+    formatDate: function(date) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const splitted = date.split('-');
+      return splitted[2] + ' ' + months[parseInt(splitted[1]) - 1] + ' ' + splitted[0];
+    }
+  }
 })
 export default class BecomeVendor extends Vue {
   providerAPI: ProviderAPI;
@@ -471,22 +458,12 @@ export default class BecomeVendor extends Vue {
 
   vendorData: ProviderProfessionalCommand;
 
-  // firstName: '';
-
-  // lastName: '';
-
-  phoneValid: boolean;
-
   constructor() {
     super();
 
     this.providerAPI = new ProviderAPI();
 
-    // this.firstName = '';
-    // this.lastName = '';
-    this.phoneValid = true;
     this.vendorData = {
-      // name: `${this.firstName} ${this.lastName}`,
       name: '',
       phone: '',
       email: '',
@@ -555,11 +532,6 @@ export default class BecomeVendor extends Vue {
     }
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
-        /*
-        if (this.currentStep === this.totalSteps) {
-          this.submitForm();
-        } else {
-        */
         this.currentStep += 1;
         window.scrollTo({
           top: 0,
@@ -578,10 +550,6 @@ export default class BecomeVendor extends Vue {
       .catch((err) => {
         console.log('error in submitting form: ', err);
       })
-  }
-
-  checkPhoneNumber(phone:string):void {
-    console.log('ok');
   }
 }
 </script>
@@ -616,22 +584,6 @@ export default class BecomeVendor extends Vue {
     color: #5f5f5f;
   }
 
-  /*
-  @media (min-width: 500px) {
-    .row {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  */
-
-  /*
-  .col-50 {
-    margin-left: 20px;
-    margin-right: 20px;
-    flex: 50%;
-  }
-  */
-
   .mt-5 {
     margin-top: 5rem;
   }
@@ -653,9 +605,6 @@ export default class BecomeVendor extends Vue {
     border: none;
     padding: 0!important;
     font-weight: 200;
-    /*optional*/
-    // font-family: arial, sans-serif;
-    /*input has OS specific font-family*/
     color: #5f5f5f;
     cursor: pointer;
   }
