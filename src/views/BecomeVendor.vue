@@ -60,7 +60,7 @@
                   <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="country">Country *</label>
-                      <select class="form-group__select" type="text" name="country" id="country" v-model="vendorData.headquartersAddress.country">
+                      <select class="form-group__select" name="country" id="country" v-model="vendorData.headquartersAddress.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -169,7 +169,7 @@
                   <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="lr_country">Country *</label>
-                      <select class="form-group__select" type="text" name="lr_country" id="lr_country" v-model="vendorData.legalRepresentative.address.country">
+                      <select class="form-group__select" name="lr_country" id="lr_country" v-model="vendorData.legalRepresentative.address.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -254,7 +254,7 @@
                   <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="ba_country">Country *</label>
-                      <select class="form-group__select" type="text" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
+                      <select class="form-group__select" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
