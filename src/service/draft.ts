@@ -4,7 +4,9 @@ import { PageRequest, Sorting } from '@/model/request';
 import {
   AxiosServerResponse, AxiosPageResponse, ServerResponse, PageResult,
 } from '@/model/response';
-import { CatalogueItemCommand } from '@/model/catalogue';
+import {
+  CatalogueItemCommand, DraftApiCommand,
+} from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
 } from '@/model/draft';
@@ -67,6 +69,22 @@ export default class DraftAssetApi extends Api {
     const url = '/action/drafts';
 
     return this.post<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command, config)
+      .then((response: AxiosServerResponse<AssetDraft>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  /**
+   * Create a new API draft
+   *
+   * @param command
+   */
+  public async createApi(command: DraftApiCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
+    const url = '/action/drafts/api';
+
+    return this.post<DraftApiCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
