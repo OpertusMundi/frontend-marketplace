@@ -5,66 +5,364 @@
         <h1>Become a vendor</h1>
         <div class="dashboard__form pb-sm-100">
           <ul class="dashboard__form__nav">
-            <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Account Info</a></li>
-            <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Business Info</a></li>
-            <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Payout Info</a></li>
-            <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Summary</a></li>
+            <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Company</a></li>
+            <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Legal representative</a></li>
+            <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Bank account</a></li>
+            <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Review</a></li>
           </ul>
           <div class="dashboard__form__steps">
+
+            <!-- STEP 1 - Company -->
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
-                <validation-provider v-slot="{ errors }" name="First name" rules="required">
+
+                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
                   <div class="form-group">
-                    <label for="first_name">First name:</label>
-                    <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="firstName">
+                    <label for="vat_number">VAT number *</label>
+                    <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Last name" rules="required">
+
+                <validation-provider v-slot="{ errors }" name="Name" rules="required">
                   <div class="form-group">
-                    <label for="last_name">Last name:</label>
-                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="lastName">
+                    <label for="name">Name *</label>
+                    <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
+
+                <validation-provider v-slot="{ errors }" name="Website">
                   <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.email">
+                    <label for="website">Website</label>
+                    <input type="text" class="form-group__text" name="website" id="website" v-model="vendorData.siteUrl">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Phone" rules="required|phoneNumber">
+
+                <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                   <div class="form-group">
-                    <label for="phone">Phone:</label>
-                    <input type="text" class="form-group__text" name="phone" id="phone" v-model="vendorData.phone">
-                    <!-- <VuePhoneNumberInput required v-model="vendorData.phone" @update="checkPhoneNumber" /> -->
+                    <label for="address_line_1">Address Line 1 *</label>
+                    <input type="text" class="form-group__text" name="address_line_1" id="address_line_1" v-model="vendorData.headquartersAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Username" rules="required|min:4">
+
+                <validation-provider v-slot="{ errors }" name="Address Line 2">
                   <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" class="form-group__text" name="username" id="username" v-model="vendorData.username">
+                    <label for="address_line_2">Address Line 2</label>
+                    <input type="text" class="form-group__text" name="address_line_2" id="address_line_2" v-model="vendorData.headquartersAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Password" rules="required|min:6">
-                  <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-group__text" name="password" id="password" v-model="vendorData.password">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Password Repeat" rules="required|confirmed:Password">
-                  <div class="form-group">
-                    <label for="password_repeat">Password repeat:</label>
-                    <input type="password" class="form-group__text" name="password_repeat" id="password_repeat" v-model="vendorData.password_repeat">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                    <div class="form-group">
+                      <label for="country">Country *</label>
+                      <select class="form-group__select" name="country" id="country" v-model="vendorData.headquartersAddress.country">
+                        <option v-for="country in countries" :key="country"> {{country}} </option>
+                      </select>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                    <div class="form-group">
+                      <label for="region">Region *</label>
+                      <input type="text" class="form-group__text" name="region" id="region" v-model="vendorData.headquartersAddress.region">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="City" rules="required">
+                    <div class="form-group">
+                      <label for="city">City *</label>
+                      <input type="text" class="form-group__text" name="city" id="city" v-model="vendorData.headquartersAddress.city">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
+                    <div class="form-group">
+                      <label for="postal_code">ZIP code *</label>
+                      <input type="text" class="form-group__text" name="postal_code" id="postal_code" v-model="vendorData.headquartersAddress.postalCode">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
               </div>
             </validation-observer>
+
+            <!-- STEP 2 - Legal Representative -->
+            <validation-observer ref="step2">
+              <div class="dashboard__form__step" v-if="currentStep == 2">
+
+                <validation-provider v-slot="{ errors }" name="First name" rules="required">
+                  <div class="form-group">
+                    <label for="first_name">First name *</label>
+                    <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="vendorData.legalRepresentative.firstName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Last name" rules="required">
+                  <div class="form-group">
+                    <label for="last_name">Last name *</label>
+                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="vendorData.legalRepresentative.lastName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
+                  <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.legalRepresentative.email">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
+                  <div class="form-group">
+                    <label for="birthdate">Birthdate *</label>
+                    <input type="date" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.legalRepresentative.birthdate">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
+                  <div class="form-group">
+                    <label for="nationality">Nationality *</label>
+                    <input type="text" class="form-group__text" name="nationality" id="nationality" v-model="vendorData.legalRepresentative.nationality">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
+                  <div class="form-group">
+                    <label for="lr_country_of_residence">Country of residence *</label>
+                    <input type="text" class="form-group__text" name="lr_country_of_residence" id="lr_country_of_residence" v-model="vendorData.legalRepresentative.countryOfResidence">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                  <div class="form-group">
+                    <label for="lr_address_line_1">Address Line 1 *</label>
+                    <input type="text" class="form-group__text" name="lr_address_line_1" id="lr_address_line_1" v-model="vendorData.legalRepresentative.address.line1">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Address Line 2">
+                  <div class="form-group">
+                    <label for="lr_address_line_2">Address Line 2</label>
+                    <input type="text" class="form-group__text" name="lr_address_line_2" id="lr_address_line_2" v-model="vendorData.legalRepresentative.address.line2">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                    <div class="form-group">
+                      <label for="lr_country">Country *</label>
+                      <select class="form-group__select" name="lr_country" id="lr_country" v-model="vendorData.legalRepresentative.address.country">
+                        <option v-for="country in countries" :key="country"> {{country}} </option>
+                      </select>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                    <div class="form-group">
+                      <label for="lr_region">Region *</label>
+                      <input type="text" class="form-group__text" name="lr_region" id="lr_region" v-model="vendorData.legalRepresentative.address.region">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="City" rules="required">
+                    <div class="form-group">
+                      <label for="lr_city">City *</label>
+                      <input type="text" class="form-group__text" name="lr_city" id="lr_city" v-model="vendorData.legalRepresentative.address.city">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
+                    <div class="form-group">
+                      <label for="lr_postal_code">ZIP code *</label>
+                      <input type="text" class="form-group__text" name="lr_postal_code" id="lr_postal_code" v-model="vendorData.legalRepresentative.address.postalCode">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
+              </div>
+            </validation-observer>
+
+            <!-- STEP 3 - Bank account -->
+            <validation-observer ref="step3">
+              <div class="dashboard__form__step" v-if="currentStep == 3">
+
+                <validation-provider v-slot="{ errors }" name="Holder name" rules="required">
+                  <div class="form-group">
+                    <label for="holder_name">Holder name *</label>
+                    <input type="text" class="form-group__text" name="holder_name" id="holder_name" v-model="vendorData.bankAccount.ownerName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="IBAN" rules="required">
+                  <div class="form-group">
+                    <label for="iban">IBAN *</label>
+                    <input type="text" class="form-group__text" name="iban" id="iban" v-model="vendorData.bankAccount.iban">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="BIC" rules="required">
+                  <div class="form-group">
+                    <label for="bic">BIC *</label>
+                    <input type="text" class="form-group__text" name="bic" id="bic" v-model="vendorData.bankAccount.bic">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                  <div class="form-group">
+                    <label for="ba_address_line_1">Address Line 1 *</label>
+                    <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" v-model="vendorData.bankAccount.ownerAddress.line1">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Address Line 2">
+                  <div class="form-group">
+                    <label for="ba_address_line_2">Address Line 2</label>
+                    <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" v-model="vendorData.bankAccount.ownerAddress.line2">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                    <div class="form-group">
+                      <label for="ba_country">Country *</label>
+                      <select class="form-group__select" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
+                        <option v-for="country in countries" :key="country"> {{country}} </option>
+                      </select>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                    <div class="form-group">
+                      <label for="ba_region">Region *</label>
+                      <input type="text" class="form-group__text" name="ba_region" id="ba_region" v-model="vendorData.bankAccount.ownerAddress.region">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
+                <div class="wrapper-50-50">
+                  <validation-provider v-slot="{ errors }" name="City" rules="required">
+                    <div class="form-group">
+                      <label for="ba_city">City *</label>
+                      <input type="text" class="form-group__text" name="ba_city" id="ba_city" v-model="vendorData.bankAccount.ownerAddress.city">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
+                    <div class="form-group">
+                      <label for="ba_postal_code">ZIP code *</label>
+                      <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" v-model="vendorData.bankAccount.ownerAddress.postalCode">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
+
+              </div>
+            </validation-observer>
+
+            <!-- STEP 4 - Review -->
+
+            <!--
+              Instead of hardcoding the fields, we could also loop through vendorData
+              object properties and only display the ones with non-empty values
+              I leave it hardcoded as it is more straight-forward and seems easier
+              to maintain/understand in the furure.
+            -->
+
+            <div class="dashboard__form__step" v-if="currentStep == 4">
+
+              <div class="wrapper-50-50">
+                <div>
+                  <h3 class="align-left">Company</h3>
+                  <span class="align-right edit-button" @click="goToStep(1)">EDIT</span>
+                  <div class="clear"></div>
+                  <hr>
+                  <div class="wrapper-cells">
+                    <div><span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span></div>
+                    <div><span>Name: </span> <span> {{ this.vendorData.name }} </span></div>
+                    <div v-if="this.vendorData.siteUrl"><span>Website: </span> <span> {{ this.vendorData.siteUrl }} </span></div>
+                    <div><span>Country: </span> <span> {{ this.vendorData.headquartersAddress.country }} </span></div>
+                    <div><span>Region: </span> <span> {{ this.vendorData.headquartersAddress.region }} </span></div>
+                    <div><span>City: </span> <span> {{ this.vendorData.headquartersAddress.city }} </span></div>
+                    <div><span>Zip code: </span> <span> {{ this.vendorData.headquartersAddress.postalCode }} </span></div>
+                    <div><span>Address line 1: </span> <span> {{ this.vendorData.headquartersAddress.line1 }} </span></div>
+                    <div v-if="this.vendorData.headquartersAddress.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.headquartersAddress.line2 }} </span> </div>
+                  </div>
+
+                  <div class="mt-5">
+                    <h3 class="align-left">Bank account</h3>
+                    <span class="align-right edit-button" @click="goToStep(3)">EDIT</span>
+                    <div class="clear"></div>
+                    <hr>
+                  </div>
+                  <div class="wrapper-cells">
+                    <span>Holder name: </span> <span> {{ this.vendorData.bankAccount.ownerName }} </span>
+                    <span>IBAN: </span> <span> {{ this.vendorData.bankAccount.iban }} </span>
+                    <span>BIC: </span> <span> {{ this.vendorData.bankAccount.bic }} </span>
+                    <span>Country: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.country }} </span>
+                    <span>Region: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.region }} </span>
+                    <span>City: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.city }} </span>
+                    <span>Zip code: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.postalCode }} </span>
+                    <span>Address line 1: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line1 }} </span>
+                    <div v-if="this.vendorData.bankAccount.ownerAddress.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.bankAccount.ownerAddress.line2 }} </span> </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 class="align-left">Legal Representative</h3>
+                  <span class="align-right edit-button" @click="goToStep(2)">EDIT</span>
+                  <div class="clear"></div>
+                  <hr>
+                  <div class="wrapper-cells">
+                    <span>First name: </span> <span> {{ this.vendorData.legalRepresentative.firstName }} </span>
+                    <span>Last name: </span> <span> {{ this.vendorData.legalRepresentative.lastName }} </span>
+                    <span>Email: </span> <span> {{ this.vendorData.legalRepresentative.email }} </span>
+                    <span>Birthdate: </span> <span> {{ this.vendorData.legalRepresentative.birthdate | formatDate }} </span>
+                    <span>Nationality: </span> <span> {{ this.vendorData.legalRepresentative.nationality }} </span>
+                    <span>Country of residence: </span> <span> {{ this.vendorData.legalRepresentative.countryOfResidence }} </span>
+                    <span>Country: </span> <span> {{ this.vendorData.legalRepresentative.address.country }} </span>
+                    <span>Region: </span> <span> {{ this.vendorData.legalRepresentative.address.region }} </span>
+                    <span>City: </span> <span> {{ this.vendorData.legalRepresentative.address.city }} </span>
+                    <span>Zip code: </span> <span> {{ this.vendorData.legalRepresentative.address.postalCode }} </span>
+                    <span>Address line 1: </span> <span> {{ this.vendorData.legalRepresentative.address.line1 }} </span>
+                    <div v-if="this.vendorData.legalRepresentative.address.line2"> <span>Address line 2: </span> <span> {{ this.vendorData.legalRepresentative.address.line2 }} </span> </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
           </div>
           <div class="dashboard__form__navbuttons">
             <button class="btn--std btn--blue" @click.prevent="previousStep()" v-if="currentStep > 1">PREVIOUS</button>
@@ -93,6 +391,7 @@ import {
   email,
   confirmed,
   min,
+  length,
 } from 'vee-validate/dist/rules';
 import {
   ValidationProvider,
@@ -102,11 +401,13 @@ import {
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
+import ProviderAPI from '@/service/provider';
 
 extend('required', required);
 extend('email', email);
 extend('confirmed', confirmed);
 extend('min', min);
+extend('length', length);
 localize({
   en,
 });
@@ -128,8 +429,22 @@ extend('phoneNumber', phoneNumber);
     ValidationObserver,
     VuePhoneNumberInput,
   },
+  filters: {
+    // input format: yyyy-mm-dd
+    // output format: dd Mon yyyy
+    formatDate: function(date) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const splitted = date.split('-');
+      return splitted[2] + ' ' + months[parseInt(splitted[1]) - 1] + ' ' + splitted[0];
+    }
+  }
 })
 export default class BecomeVendor extends Vue {
+  providerAPI: ProviderAPI;
+
+  // temporarily? using the following array of countries to populate options of country-select inputs 
+  countries: string[] = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova", "Monaco", "Montenegro", "The Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City",];
+
   $refs!: {
     step1: InstanceType<typeof ValidationObserver>,
     step2: InstanceType<typeof ValidationObserver>,
@@ -143,20 +458,13 @@ export default class BecomeVendor extends Vue {
 
   vendorData: ProviderProfessionalCommand;
 
-  firstName: '';
-
-  lastName: '';
-
-  phoneValid: boolean;
-
   constructor() {
     super();
 
-    this.firstName = '';
-    this.lastName = '';
-    this.phoneValid = true;
+    this.providerAPI = new ProviderAPI();
+
     this.vendorData = {
-      name: `${this.firstName} ${this.lastName}`,
+      name: '',
       phone: '',
       email: '',
       type: EnumCustomerType.PROFESSIONAL,
@@ -218,23 +526,30 @@ export default class BecomeVendor extends Vue {
   }
 
   nextStep():void {
+    if (this.currentStep === this.totalSteps) {
+      this.submitForm();
+      return;
+    }
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
-        if (this.currentStep === this.totalSteps) {
-          // this.submitForm();
-        } else {
-          this.currentStep += 1;
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-          });
-        }
+        this.currentStep += 1;
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
       }
     });
   }
 
-  checkPhoneNumber(phone:string):void {
-    console.log('ok');
+  submitForm() {
+    console.log('submit form');
+    this.providerAPI.submitRegistration(this.vendorData)
+      .then(() => {
+        console.log('form was submitted');
+      })
+      .catch((err) => {
+        console.log('error in submitting form: ', err);
+      })
   }
 }
 </script>

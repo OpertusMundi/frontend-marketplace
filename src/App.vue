@@ -140,6 +140,9 @@ export default class App extends Vue {
             console.log(error);
             store.commit('setLoading', false);
           });
+      }).catch((err) => {
+        console.log('getConfiguration error', err);
+        store.commit('setLoading', false);
       });
 
     this.getCartItems();
@@ -158,6 +161,9 @@ export default class App extends Vue {
           // TODO: Handle error
           console.error('cannot add item to cart!');
         }
+      })
+      .catch((err) => {
+        console.log('getCartItems error: ', err);
       });
   }
 

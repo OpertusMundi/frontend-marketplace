@@ -4,3 +4,54 @@
     padding: 20px 0;
   }
 }
+
+.wrapper-50-50 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 50px;
+}
+
+.wrapper-cells {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 10px;
+}
+
+.wrapper-cells div {
+  display: contents;
+}
+
+.wrapper-cells span:nth-child(odd) {
+  color: #474747;
+  font-weight: 500;
+}
+
+.wrapper-cells span:nth-child(even) {
+  color: #5f5f5f;
+}
+
+.mt-5 {
+  margin-top: 5rem;
+}
+
+.align-left {
+  float: left;
+}
+
+.align-right {
+  float: right;
+}
+
+.clear {
+  clear: both;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 200;
+  color: #5f5f5f;
+  cursor: pointer;
+}

@@ -411,6 +411,17 @@
             flex: 1;
         }
     }
+    &__select {
+        width: 100%;
+        display: block;
+        border: 1px solid $darkColor;
+        border-radius: 6px;
+        font-size: em(16);
+        padding: 11px 20px 10px;
+        margin-bottom: 10px;
+        outline: none;
+        font-family: $mainFont;
+    }
     textarea {
         font-family: $mainFont;
         max-width: 100%;
