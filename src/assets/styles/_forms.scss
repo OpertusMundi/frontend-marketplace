@@ -1,49 +1,59 @@
 .dashboard__form {
-
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
     &__nav {
         width: 100%;
 		background-color: transparent;
         padding: 0;
         display: flex;
         justify-content: space-between;
-        border: 2px solid $secondColor;
         position: sticky;
-        top: calc(#{$header_height} + 20px);
-        background: #f2f2f2;
+        // top: calc(#{$header_height} + 20px);
+        background: #ffffff;
         z-index: 2;
-        &:before {
-            content: "";
-            background: #f2f2f2;
-            // background: red;
-            height: 20px;
-            width: calc(100% + 4px);
-            top: -22px;
-            left: -2px;
-            position: absolute;
-        }
         li {
             position: relative;
             text-align: center;
             flex: 1;
+            align-items: center;
+            justify-content: center;
+            display: flex;
             // overflow-y: hidden;
+            &:after {
+                content: "";
+                position: absolute;
+                top: 52%;
+                transform: translateY(-50%);
+                right: 0;
+                width: 12px;
+                height: 25px;
+                background-image: url('~@/assets/images/icons/right_arrow_menu.svg');
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
             a {
                 position: relative;
                 display: block;
                 width: 100%;
                 font-family: $mainFont;
-                font-size: em(20);
+                font-size: em(25);
+                @include fluid-type(5px, 25px);
                 font-weight: 700;
-                color: $mainFontColor;
-                padding: 15px 0;
+                padding: 25px 10px;
                 letter-spacing: 0.03em;
                 transition: all 0.2s;
-                color: $secondColor;
-                padding-left: 27px;
+                color: #a7a7a7;
+                // padding-left: 27px;
                 pointer-events: none;
                 @media(max-width: 1300px) {
                     font-size: em(16);
                 }
-                &:before {
+                @media(max-width: 576px) {
+                    font-size: em(13);
+                }
+                &:before { //old style
+                    display: none;
                     content: '';
                     position: absolute;
                     top: 0px;
@@ -53,7 +63,7 @@
                     transform: scale(0.719) rotate(45deg);
                     z-index: 1;
                     border-radius: 0 0px 0 50px;
-                    background: #f2f2f2;
+                    background: #ffffff;
                     transition: background 0.2s;
                     box-shadow: 2px -2px 0 1px $secondColor;
                     @media(max-width: 1300px) { 
@@ -63,8 +73,7 @@
                     }
                 }
                 &.active {
-                    background: $secondColor;
-                    color: #fff;
+                    color: $secondColor;
                     &:before {
                         background: $secondColor;
                     }
@@ -76,8 +85,11 @@
                 }
             }
             &:last-child {
+                &:after { 
+                    display: none;
+                }
                 a {
-                    &:before {
+                    &:before, &:after {
                         display: none;
                     }
                 }
@@ -86,9 +98,14 @@
     }
 
     &__steps {
-        background: #fff;
-        padding: 30px;
         // min-height: 1000px;
+        padding: 10px;
+        padding-top: 0;
+        &__inner {
+            background: #f2f2f2;
+            border-radius: 10px;
+            padding: 20px;
+        }
     }
     &__step {
         max-width: 700px;
@@ -209,7 +226,7 @@
     &__navbuttons {
         display: flex;
         justify-content: space-between;
-        margin-top: 20px;
+        padding: 15px 20px 25px;
         button {
             &:last-child {
                 margin-left: auto;
@@ -364,7 +381,7 @@
         label {
             width: unset!important;
             padding-right: 20px;
-            color: $darkColor;
+            color: $labelColor;
             font-weight: 400!important;
         }
         input {
@@ -389,6 +406,7 @@
         margin-bottom: 10px;
         font-weight: 500;
         letter-spacing: 0.03em;
+        color: $labelColor;
     }
     &__text {
         width: 100%;
