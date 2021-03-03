@@ -517,7 +517,7 @@ export interface NetCdfMetadata extends Metadata {
    */
   mbrStatic: string;
   /**
-   * The metadata object as written in the file. The key is a free field for the 
+   * The metadata object as written in the file. The key is a free field for the
    * data provider, usually describing the given information.
    */
   metadata: { [m: string]: string };

@@ -16,7 +16,7 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
+                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:11">
                   <div class="form-group">
                     <label for="vat_number">VAT number *</label>
                     <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
