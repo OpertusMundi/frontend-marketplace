@@ -649,4 +649,57 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
   resources: AssetResource[];
 }
 
+export enum EnumDraftCommandType {
+  ASSET = 'ASSET',
+  FILE = 'FILE',
+}
+
+export interface DraftApiCommand {
+  /**
+   * Command type
+   */
+  type: EnumDraftCommandType;
+  /**
+   * Service type
+   */
+  serviceType: 'WMS' | 'WFS' | 'DATA_API';
+  /**
+   * A name given to the resource
+   */
+  title: string;
+  /**
+   * Version of the resource
+   */
+  version: string;
+}
+
+export interface DraftApiFromAssetCommand extends DraftApiCommand {
+  /**
+   * Published asset unique PID
+   */
+  pid: string;
+}
+
+export interface DraftApiFromFileCommand extends DraftApiCommand {
+  /**
+   * Path to user's file system
+   */
+  path: string;
+  /**
+   * File format
+   */
+  format: string;
+}
+
+export enum EnumCatalogueType {
+  OPERTUSMUNDI = 'OPERTUSMUNDI',
+  CKAN = 'CKAN',
+  CSW = 'CSW',
+}
+
+export interface CatalogueHarvestCommand {
+  type: EnumCatalogueType | null;
+  url: string;
+}
+
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
