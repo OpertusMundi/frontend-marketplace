@@ -22,17 +22,82 @@
 
       <div v-if="filterMenuItem" class="filter-dialog-wrapper">
         <div class="filter-container">
+
+          <!-- TYPE -->
           <div v-if="filterMenuItem == 'type'">
-            <h3>type filter</h3>
-            <span v-for="type in filterTypes" :key="type"> {{type}} </span>
+            <div class="checkbox-group" v-for="(type, i) in filterTypeOptions" :key="type">
+              <input type="checkbox" :id="`type_${type}`" v-model="filterTypeSelection[i]">
+              <label :for="`type_${type}`"> {{type}} </label>
+            </div>
+            <div>{{filterTypeSelection}}</div>
           </div>
-          <div v-if="filterMenuItem == 'update'"><h3>update filter</h3></div>
-          <div v-if="filterMenuItem == 'topic'"><h3>topic filter</h3></div>
-          <div v-if="filterMenuItem == 'format'"><h3>format filter</h3></div>
-          <div v-if="filterMenuItem == 'crs'"><h3>crs filter</h3></div>
+
+          <!-- UPDATE -->
+          <div v-if="filterMenuItem == 'update'">
+            <h5>Updated after</h5>
+            <datepicker placeholder="select date"></datepicker>
+
+            <h5 class="mt-2">Updated before</h5>
+            <datepicker placeholder="select date"></datepicker>
+          </div>
+
+          <!-- TOPIC -->
+          <div v-if="filterMenuItem == 'topic'">
+            <div class="checkbox-group" v-for="(topic, i) in filterTopicOptions" :key="topic">
+              <input type="checkbox" :id="`topic_${topic}`" v-model="filterTopicSelection[i]">
+              <label :for="`topic_${topic}`"> {{topic}} </label>
+            </div>
+          </div>
+
+          <!-- FORMAT -->
+          <div v-if="filterMenuItem == 'format'">
+            <p><i>it has to change according to TYPE</i></p>
+          </div>
+
+          <!-- CRS -->
+          <div v-if="filterMenuItem == 'crs'">
+            <h5>Popular CRS</h5>
+            <div class="checkbox-group mt-1">
+              <input type="checkbox" id="EPSG:4326">
+              <label for="EPSG:4326">WGS84 | EPSG:4326</label>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="EPSG:3857">
+              <label for="EPSG:3857">EPSG:3857</label>
+            </div>
+
+            <input type="text" class="form-group__text mt-3" placeholder="Search for CRS">
+          </div>
+
+          <!-- SCALE -->
           <div v-if="filterMenuItem == 'scale'"><h3>scale filter</h3></div>
-          <div v-if="filterMenuItem == 'coverage'"><h3>coverage filter</h3></div>
-          <div v-if="filterMenuItem == 'price'"><h3>price filter</h3></div>
+
+          <!-- COVERAGE -->
+          <div v-if="filterMenuItem == 'coverage'">
+            <div class="container-map-menu">
+              <div id="mapCoverage"></div>
+              <div class="map-coverage-menu">
+                <input type="radio" id="male" name="gender" value="male">
+                <label for="male">Male</label><br>
+                <input type="radio" id="female" name="gender" value="female">
+                <label for="female">Female</label><br>
+                <input type="radio" id="other" name="gender" value="other">
+                <label for="other">Other</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRICE -->
+          <div v-if="filterMenuItem == 'price'">
+            <vue-range-slider ref="slider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep"></vue-range-slider>
+            <div class="mt-3">
+              <input type="number" v-model="priceValues[0]">
+              <input type="number" v-model="priceValues[1]">
+            </div>
+          </div>
+
+          <!-- MORE -->
           <div v-if="filterMenuItem == 'more'"><h3>more filter</h3></div>
         </div>
         <div class="filter-buttons-container">
@@ -51,17 +116,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
 import CatalogueApi from '@/service/catalogue';
-import { EnumType } from '@/model/catalogue';
+// import { EnumType } from '@/model/catalogue';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
 import { AxiosError } from 'axios';
+import Datepicker from 'vuejs-datepicker';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+// we should maybe not include default CSS
+import 'vue-range-component/dist/vue-range-slider.css';
+// there is a known bug: https://github.com/xwpongithub/vue-range-slider/issues/18
+// fixed it by editing lib's js files as proposed
+import VueRangeSlider from 'vue-range-component';
 
 @Component({
-  components: { CatalogueCard },
+  components: { CatalogueCard, Datepicker, VueRangeSlider },
 })
 export default class Catalogue extends Vue {
   catalogQuery: CatalogueQuery;
@@ -76,7 +149,23 @@ export default class Catalogue extends Vue {
 
   filterMenuItem: string;
 
-  filterTypes: string[];
+  filterTypeOptions: string[];
+
+  filterTypeSelection: string[];
+
+  filterTopicOptions: string[];
+
+  filterTopicSelection: string[];
+
+  mapCoverageSelect: any;
+
+  priceValues: number[];
+
+  priceMin: number;
+
+  priceMax: number;
+
+  priceStep: number;
 
   constructor() {
     super();
@@ -92,8 +181,29 @@ export default class Catalogue extends Vue {
 
     this.filterMenuItem = '';
 
-    this.filterTypes = Object.keys(EnumType);
-    console.log('types: ', this.filterTypes);
+    // this.filterTypeOptions = Object.keys(EnumType);
+    this.filterTypeOptions = ['Vector dataset', 'Raster dataset', 'API'];
+    this.filterTypeSelection = [];
+
+    this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
+    this.filterTopicSelection = [];
+
+    this.priceValues = [0, 5000];
+    this.priceMin = 0;
+    this.priceMax = 5000;
+    this.priceStep = 1;
+  }
+
+  @Watch('filterMenuItem')
+  onPropertyChanged(menuItem: string): void {
+    if (menuItem === 'coverage') {
+      setTimeout(() => {
+        this.mapCoverageSelect = L.map('mapCoverage').setView([0, 0], 4);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(this.mapCoverageSelect);
+      }, 0);
+    }
   }
 
   mounted(): void {
@@ -160,6 +270,14 @@ export default class Catalogue extends Vue {
     font-size: .8rem;
   }
 
+  .mt-1 {
+    margin-top: 1rem;
+  }
+
+  .mt-2 {
+    margin-top: 2rem;
+  }
+
   .mt-3 {
     margin-top: 3rem;
   }
@@ -192,5 +310,23 @@ export default class Catalogue extends Vue {
 
   .filter-buttons-container button {
     float: right;
+  }
+
+  input[type="checkbox"] {
+    vertical-align:middle;
+  }
+
+  .container-map-menu {
+    display: flex;
+  }
+
+  #mapCoverage {
+    height: 300px;
+    width: 100%;
+  }
+
+  .map-coverage-menu {
+    flex-grow: 1;
+    margin-left: 20px;
   }
 </style>
