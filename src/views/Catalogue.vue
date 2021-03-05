@@ -147,8 +147,10 @@ import {
 } from '@/model';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
-import L from 'leaflet';
+import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-editable';
+import 'leaflet-easybutton';
 // we should maybe not include default CSS
 import 'vue-range-component/dist/vue-range-slider.css';
 // there is a known bug: https://github.com/xwpongithub/vue-range-slider/issues/18
@@ -179,7 +181,11 @@ export default class Catalogue extends Vue {
 
   filterTopicSelection: string[];
 
-  mapCoverageSelect: any;
+  mapCoverage: any;
+
+  mapCoverageSelectionRectangle: any;
+
+  mapCoverageSelectionBBox: string;
 
   priceValues: number[];
 
@@ -209,6 +215,8 @@ export default class Catalogue extends Vue {
 
     this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
     this.filterTopicSelection = [];
+
+    this.mapCoverageSelectionBBox = 'bboxstring';
 
     this.priceValues = [0, 5000];
     this.priceMin = 0;
@@ -255,10 +263,29 @@ export default class Catalogue extends Vue {
   }
 
   initMapCoverage() {
-    this.mapCoverageSelect = L.map('mapCoverage').setView([0, 0], 4);
+    this.mapCoverage = (L as any).map('mapCoverage', { editable: true }).setView([0, 0], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(this.mapCoverageSelect);
+    }).addTo(this.mapCoverage);
+    console.log(this.mapCoverage);
+
+    this.mapCoverageSelectionRectangle = L.rectangle([[-50, -50], [-50, 50], [50, 50], [50, -50], [-50, -50]]).addTo(this.mapCoverage);
+    this.mapCoverageSelectionRectangle.enableEdit();
+
+    this.mapExtendToSelection();
+
+    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+      this.mapExtendToSelection();
+    });
+
+    L.easyButton('[]', () => {
+      this.mapExtendToSelection();
+    }).addTo(this.mapCoverage);
+  }
+
+  mapExtendToSelection() {
+    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
+    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
 
   validateSelectedMinPrice(minPrice: string): void {
