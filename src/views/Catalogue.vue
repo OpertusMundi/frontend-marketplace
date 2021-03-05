@@ -75,34 +75,56 @@
 
           <!-- COVERAGE -->
           <div v-if="filterMenuItem == 'coverage'">
-            <div class="container-map-menu">
-              <div id="mapCoverage"></div>
-              <div class="map-coverage-menu">
-                <input type="radio" id="male" name="gender" value="male">
-                <label for="male">Male</label><br>
-                <input type="radio" id="female" name="gender" value="female">
-                <label for="female">Female</label><br>
-                <input type="radio" id="other" name="gender" value="other">
-                <label for="other">Other</label>
+            <div class="coverage-map-menu-container">
+              <div class="coverage-side-menu">
+                <div class="d-flex align-items-center mb-1">
+                  <span><strong>1</strong></span> <input type="text" class="form-group__text" placeholder="Search City/Area">
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                  <span><strong>2</strong></span>
+                  <select class="form-group__select">
+                    <option value="" disabled selected>Select country/area</option>
+                  </select>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span><strong>3</strong></span> <div class="select-area-text">Or select an area of interest via a bounding box on the map.</div>
+                </div>
               </div>
+              <div id="mapCoverage"></div>
             </div>
           </div>
 
           <!-- PRICE -->
           <div v-if="filterMenuItem == 'price'">
-            <vue-range-slider ref="slider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep"></vue-range-slider>
-            <div class="mt-3">
-              <input type="number" v-model="priceValues[0]">
-              <input type="number" v-model="priceValues[1]">
+            <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false"></vue-range-slider>
+            <div class="price-values-line">
+              <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
+            </div>
+
+            <div class="mt-3 price-min-max-container">
+              <div class="price-min-max-item">
+                <label for="priceSelectedMin">Minimum Price</label>
+                <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateSelectedMinPrice($event.target.value)" class="form-group__text" id="priceSelectedMin">
+              </div>
+              <div class="price-min-max-item">
+                <label for="priceSelectedMax">Maximum Price</label>
+                <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateSelectedMaxPrice($event.target.value)" class="form-group__text" id="priceSelectedMax">
+              </div>
             </div>
           </div>
 
           <!-- MORE -->
           <div v-if="filterMenuItem == 'more'"><h3>more filter</h3></div>
         </div>
-        <div class="filter-buttons-container">
-          <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
-          <button class="btn--std btn--blue">APPLY FILTERS</button>
+
+        <div class="filter-side-menu">
+          <div class="filter-side-menu-main">
+            <p>search & filters sum</p>
+          </div>
+          <div class="filter-side-menu-bottom">
+            <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
+            <button class="btn--std btn--blue">APPLY FILTERS</button>
+          </div>
         </div>
       </div>
 
@@ -198,10 +220,7 @@ export default class Catalogue extends Vue {
   onPropertyChanged(menuItem: string): void {
     if (menuItem === 'coverage') {
       setTimeout(() => {
-        this.mapCoverageSelect = L.map('mapCoverage').setView([0, 0], 4);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(this.mapCoverageSelect);
+        this.initMapCoverage();
       }, 0);
     }
   }
@@ -233,6 +252,25 @@ export default class Catalogue extends Vue {
 
   cancelFilters(): void {
     this.filterMenuItem = '';
+  }
+
+  initMapCoverage() {
+    this.mapCoverageSelect = L.map('mapCoverage').setView([0, 0], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.mapCoverageSelect);
+  }
+
+  validateSelectedMinPrice(minPrice: string): void {
+    const price = Number(minPrice);
+    this.priceValues[0] = price > this.priceValues[1] ? this.priceValues[1] : price;
+    (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+  }
+
+  validateSelectedMaxPrice(maxPrice: string): void {
+    const price = Number(maxPrice);
+    this.priceValues[1] = price < this.priceValues[0] ? this.priceValues[0] : price;
+    (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
   }
 }
 </script>
@@ -270,6 +308,22 @@ export default class Catalogue extends Vue {
     font-size: .8rem;
   }
 
+  .d-flex {
+    display: flex;
+  }
+
+  .align-items-center {
+    align-items: center;
+  }
+
+  .justify-content-center {
+    justify-content: center;
+  }
+
+  .mb-1 {
+    margin-bottom: 1rem;
+  }
+
   .mt-1 {
     margin-top: 1rem;
   }
@@ -290,21 +344,33 @@ export default class Catalogue extends Vue {
     position: absolute;
     z-index: 10;
     display: flex;
-    flex-direction: column;
+    // flex-direction: column;
     box-shadow: 7px 7px 15px rgb(134, 134, 134);
     padding: 20px;
   }
 
-  .filter-buttons-container {
+  .filter-side-menu-bottom {
     display: inline-block;
     width: 100%;
   }
 
-  .filter-buttons-container button {
-    margin-left: 20px;
+  .filter-side-menu-bottom button {
+    margin: 20px 20px 20px 0px;
+    float: right;
   }
 
   .filter-container {
+    flex-grow: 1;
+  }
+
+  .filter-side-menu {
+    width: 360px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filter-side-menu-main {
     flex-grow: 1;
   }
 
@@ -323,10 +389,57 @@ export default class Catalogue extends Vue {
   #mapCoverage {
     height: 300px;
     width: 100%;
+    margin: 0 10px 0 10px;
   }
 
-  .map-coverage-menu {
+  .coverage-side-menu {
     flex-grow: 1;
-    margin-left: 20px;
+    min-width: 300px;
   }
+
+  .coverage-side-menu input,
+  .coverage-side-menu select,
+  .coverage-side-menu .select-area-text {
+    margin-bottom: 0;
+    margin-left: 10px;
+  }
+
+  .coverage-map-menu-container {
+    display: flex;
+  }
+
+  .price-values-line {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .price-values-line span {
+    // background: blue;
+    width: 60px;
+    text-align: center;
+    color: rgb(122, 122, 122);
+  }
+
+  .price-min-max-container {
+    display: flex;
+  }
+
+  .price-min-max-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+  }
+
+  .price-min-max-item label {
+    color: rgb(122, 122, 122);
+  }
+
+  /* css solution cause disabling in props throws error */
+  .slider-tooltip-wrap, .slider-tooltip {
+    display: none !important;
+  }
+
 </style>
