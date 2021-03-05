@@ -25,11 +25,13 @@
 
           <!-- TYPE -->
           <div v-if="filterMenuItem == 'type'">
-            <div class="checkbox-group" v-for="(type, i) in filterTypeOptions" :key="type">
-              <input type="checkbox" :id="`type_${type}`" v-model="filterTypeSelection[i]">
-              <label :for="`type_${type}`"> {{type}} </label>
+            <div class="checkbox-group" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
+              <input type="checkbox" :id="`type_${type.name}`" v-model="type.isChecked">
+              <label :for="`type_${type.name}`"> {{type.name}} </label>
             </div>
-            <div>{{filterTypeSelection}}</div>
+            <!-- <div>{{filters.find(x => x.name == 'type')}}</div> -->
+            <div>{{getFiltersChecked()}}</div>
+            <!-- <div>{{filterTypeSelection}}</div> -->
           </div>
 
           <!-- UPDATE -->
@@ -43,9 +45,9 @@
 
           <!-- TOPIC -->
           <div v-if="filterMenuItem == 'topic'">
-            <div class="checkbox-group" v-for="(topic, i) in filterTopicOptions" :key="topic">
-              <input type="checkbox" :id="`topic_${topic}`" v-model="filterTopicSelection[i]">
-              <label :for="`topic_${topic}`"> {{topic}} </label>
+            <div class="checkbox-group" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
+              <input type="checkbox" :id="`topic_${topic.name}`" v-model="topic.isChecked">
+              <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
             </div>
           </div>
 
@@ -157,6 +159,16 @@ import 'vue-range-component/dist/vue-range-slider.css';
 // fixed it by editing lib's js files as proposed
 import VueRangeSlider from 'vue-range-component';
 
+interface filterOption {
+  name: string,
+  isChecked: boolean
+}
+
+interface filterCategory {
+  name: string,
+  options: filterOption[]
+}
+
 @Component({
   components: { CatalogueCard, Datepicker, VueRangeSlider },
 })
@@ -173,13 +185,20 @@ export default class Catalogue extends Vue {
 
   filterMenuItem: string;
 
-  filterTypeOptions: string[];
+  // filters
+  filters: filterCategory[];
 
-  filterTypeSelection: string[];
+  // filterTypeOptions: string[];
 
-  filterTopicOptions: string[];
+  // filterTypeSelection: string[];
 
-  filterTopicSelection: string[];
+  // filterType: filterOption[];
+
+  // filterTopicOptions: string[];
+
+  // filterTopicSelection: string[];
+
+  // filterTopic: filterOption[];
 
   mapCoverage: any;
 
@@ -209,12 +228,26 @@ export default class Catalogue extends Vue {
 
     this.filterMenuItem = '';
 
-    // this.filterTypeOptions = Object.keys(EnumType);
-    this.filterTypeOptions = ['Vector dataset', 'Raster dataset', 'API'];
-    this.filterTypeSelection = [];
+    this.filters = [
+      {
+        name: 'type',
+        options: [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }],
+      }, {
+        name: 'topic',
+        options: [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }],
+      },
+    ];
 
-    this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
-    this.filterTopicSelection = [];
+    // this.filterTypeOptions = Object.keys(EnumType);
+
+    // this.filterTypeOptions = ['Vector dataset', 'Raster dataset', 'API'];
+    // this.filterTypeSelection = [];
+
+    // this.filterType = [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }];
+    // this.filterTopic = [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }];
+
+    // this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
+    // this.filterTopicSelection = [];
 
     this.mapCoverageSelectionBBox = 'bboxstring';
 
@@ -260,6 +293,10 @@ export default class Catalogue extends Vue {
 
   cancelFilters(): void {
     this.filterMenuItem = '';
+  }
+
+  getFiltersChecked() {
+    return this.filters.map((x) => x.options).flat();
   }
 
   initMapCoverage() {
