@@ -30,7 +30,6 @@
               <label :for="`type_${type.name}`"> {{type.name}} </label>
             </div>
             <!-- <div>{{filters.find(x => x.name == 'type')}}</div> -->
-            <div>{{getFiltersChecked()}}</div>
             <!-- <div>{{filterTypeSelection}}</div> -->
           </div>
 
@@ -120,8 +119,13 @@
         </div>
 
         <div class="filter-side-menu">
+          <!-- DISPLAY OF FILTERS CHECKED -->
           <div class="filter-side-menu-main">
-            <p>search & filters sum</p>
+            <div>
+              <div class="pill" v-for="filter in getFiltersChecked()" :key="filter">
+                {{ filter }} <span @click="removeFilter">x</span>
+              </div>
+            </div>
           </div>
           <div class="filter-side-menu-bottom">
             <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
@@ -291,12 +295,19 @@ export default class Catalogue extends Vue {
     this.filterMenuItem = filterItem;
   }
 
+  removeFilter() {
+    console.log('remove filter');
+  }
+
   cancelFilters(): void {
     this.filterMenuItem = '';
   }
 
   getFiltersChecked() {
-    return this.filters.map((x) => x.options).flat();
+    return this.filters
+      .map((x) => x.options)
+      .flat().filter((x) => x.isChecked)
+      .map((x) => x.name);
   }
 
   initMapCoverage() {
@@ -436,6 +447,17 @@ export default class Catalogue extends Vue {
 
   .filter-side-menu-main {
     flex-grow: 1;
+    display: flex;
+  }
+
+  .pill {
+    width: auto;
+    background: blue;
+    color: #fff;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+    margin: 5px;
+    border-radius: 7px;
   }
 
   .filter-buttons-container button {
