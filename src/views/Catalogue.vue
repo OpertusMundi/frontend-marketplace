@@ -25,8 +25,8 @@
 
           <!-- TYPE -->
           <div v-if="filterMenuItem == 'type'">
-            <div class="checkbox-group" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
-              <input type="checkbox" :id="`type_${type.name}`" v-model="type.isChecked">
+            <div class="checkbox-group mt-md-10" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
+              <input type="checkbox" class="mr-md-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
             </div>
             <!-- <div>{{filters.find(x => x.name == 'type')}}</div> -->
@@ -37,19 +37,19 @@
           <div v-if="filterMenuItem == 'update'">
             <div class="d-flex">
               <div class="d-flex d-column">
-                <h5>From date:</h5>
+                <h5 class="date-labels">From date</h5>
                 <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
-                <div v-if="filters.find((x) => x.name == 'update').options[0].value">
-                  <h5 class="mt-2">From time:</h5>
-                  <vue-timepicker :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[2].value" placeholder="select time"></vue-timepicker>
+                <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[0].value">
+                  <h5 class="mt-md-30 date-labels">From time</h5>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[2].value" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
-              <div class="d-flex d-column ml-2">
-                <h5>To date:</h5>
+              <div class="d-flex d-column ml-md-15">
+                <h5 class="date-labels">To date</h5>
                 <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
-                <div v-if="filters.find((x) => x.name == 'update').options[1].value">
-                  <h5 class="mt-2">To time:</h5>
-                  <vue-timepicker :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[3].value" placeholder="select time"></vue-timepicker>
+                <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[1].value">
+                  <h5 class="date-labels">To time</h5>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[3].value" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
             </div>
@@ -57,8 +57,8 @@
 
           <!-- TOPIC -->
           <div v-if="filterMenuItem == 'topic'">
-            <div class="checkbox-group" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
-              <input type="checkbox" :id="`topic_${topic.name}`" v-model="topic.isChecked">
+            <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
+              <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
             </div>
           </div>
@@ -70,18 +70,18 @@
 
           <!-- CRS -->
           <div v-if="filterMenuItem == 'crs'">
-            <h5>Popular CRS</h5>
-            <div class="checkbox-group mt-1">
-              <input type="checkbox" id="EPSG:4326">
+            <small>Popular CRS:</small>
+            <div class="checkbox-group mt-md-10 mb-md-5">
+              <input type="checkbox" class="mr-md-10" id="EPSG:4326">
               <label for="EPSG:4326">WGS84 | EPSG:4326</label>
             </div>
 
             <div class="checkbox-group">
               <input type="checkbox" id="EPSG:3857">
-              <label for="EPSG:3857">EPSG:3857</label>
+              <label class="ml-md-5" for="EPSG:3857">EPSG:3857</label>
             </div>
 
-            <input type="text" class="form-group__text mt-3" placeholder="Search for CRS">
+            <input type="text" class="form-group__text mt-md-20" placeholder="Search for CRS">
           </div>
 
           <!-- SCALE -->
@@ -91,10 +91,10 @@
           <div v-if="filterMenuItem == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
-                <div class="d-flex align-items-center mb-1">
+                <div class="d-flex align-items-center mb-md-20">
                   <span><strong>1</strong></span> <input type="text" class="form-group__text" placeholder="Search City/Area">
                 </div>
-                <div class="d-flex align-items-center mb-1">
+                <div class="d-flex align-items-center mb-md-20">
                   <span><strong>2</strong></span>
                   <select class="form-group__select">
                     <option value="" disabled selected>Select country/area</option>
@@ -110,12 +110,12 @@
 
           <!-- PRICE -->
           <div v-if="filterMenuItem == 'price'">
-            <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false"></vue-range-slider>
+            <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider>
             <div class="price-values-line">
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
             </div>
 
-            <div class="mt-3 price-min-max-container">
+            <div class="mt-md-40 price-min-max-container">
               <div class="price-min-max-item">
                 <label for="priceSelectedMin">Minimum Price</label>
                 <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateSelectedMinPrice($event.target.value)" class="form-group__text" id="priceSelectedMin">
@@ -141,8 +141,10 @@
 
         <div class="filter-side-menu">
           <!-- DISPLAY OF FILTERS CHECKED -->
-          <div class="filter-side-menu-main">
+          <div class="filter-side-menu-main p-md-10">
             <div>
+              <h3 class="m-md-10">Selections</h3>
+
               <!-- TYPE -->
               <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
                 {{ filter.name }}
@@ -187,7 +189,7 @@
         </div>
       </div>
 
-      <h6 class="mt-3">9999 ASSETS</h6>
+      <h6 class="mt-md-50">9999 ASSETS</h6>
 
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
@@ -211,6 +213,7 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-editable';
 import 'leaflet-easybutton';
+import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
 // we should maybe not include default CSS
 import 'vue-range-component/dist/vue-range-slider.css';
@@ -250,20 +253,7 @@ export default class Catalogue extends Vue {
 
   filterMenuItem: string;
 
-  // filters
   filters: filterCategory[];
-
-  // filterTypeOptions: string[];
-
-  // filterTypeSelection: string[];
-
-  // filterType: filterOption[];
-
-  // filterTopicOptions: string[];
-
-  // filterTopicSelection: string[];
-
-  // filterTopic: filterOption[];
 
   mapCoverage: any;
 
@@ -308,17 +298,6 @@ export default class Catalogue extends Vue {
       },
     ];
 
-    // this.filterTypeOptions = Object.keys(EnumType);
-
-    // this.filterTypeOptions = ['Vector dataset', 'Raster dataset', 'API'];
-    // this.filterTypeSelection = [];
-
-    // this.filterType = [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }];
-    // this.filterTopic = [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }];
-
-    // this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
-    // this.filterTopicSelection = [];
-
     this.mapCoverageSelectionBBox = '';
 
     this.priceValues = [0, 5000];
@@ -361,25 +340,30 @@ export default class Catalogue extends Vue {
     this.filterMenuItem = filterItem;
   }
 
-  removeFilter(category, filterName) {
+  removeFilter(category: string, filterName: string): void {
     switch (category) {
       case 'type':
       case 'topic': {
         const option = this.filters.find((x) => x.name === category)
         ?.options
         .find((x) => x.name === filterName);
+        // eslint-disable-next-line
         option!.isChecked = false;
         break;
       }
       case 'update': {
         switch (filterName) {
           case 'From': {
+            // eslint-disable-next-line
             this.filters.find((x) => x.name === category)!.options[0].value = '';
+            // eslint-disable-next-line
             this.filters.find((x) => x.name === category)!.options[2].value = '00:00 AM';
             break;
           }
           case 'To': {
+            // eslint-disable-next-line
             this.filters.find((x) => x.name === category)!.options[1].value = '';
+            // eslint-disable-next-line
             this.filters.find((x) => x.name === category)!.options[3].value = '23:59 PM';
             break;
           }
@@ -403,7 +387,7 @@ export default class Catalogue extends Vue {
     this.filterMenuItem = '';
   }
 
-  getFiltersChecked(category) {
+  getFiltersChecked(category: string): filterOption[] {
     let result;
     switch (category) {
       case 'type':
@@ -421,7 +405,7 @@ export default class Catalogue extends Vue {
   }
 
   // we use this method cause formatter of vuejs-datepicker lib is buggy
-  dateFormatter(date) {
+  dateFormatter(date: string): string {
     const splitted = date.toString().split(' ');
     const d = splitted[2];
     const m = splitted[1];
@@ -429,7 +413,7 @@ export default class Catalogue extends Vue {
     return `${d} ${m} ${y}`;
   }
 
-  initMapCoverage() {
+  initMapCoverage(): void {
     this.mapCoverage = (L as any).map('mapCoverage', { editable: true }).setView([0, 0], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -457,7 +441,7 @@ export default class Catalogue extends Vue {
     }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
-  mapExtendToSelection() {
+  mapExtendToSelection(): void {
     this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
@@ -479,206 +463,7 @@ export default class Catalogue extends Vue {
   @import "@/assets/styles/_errorpage.scss";
   @import "@/assets/styles/_forms.scss";
   @import "@/assets/styles/_btns.scss";
-
-  #search_assets {
-    width: 50%;
-  }
-
-  .menu-select-style__wrapper {
-    width: 100%;
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-    // grid-gap: 4px;
-  }
-
-  .menu-select-style__wrapper span {
-    border-radius: 3px;
-    background: #fff;
-    margin: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: .85rem;
-    padding: 3px;
-    padding-left: 10px;
-    cursor: pointer;
-  }
-
-  // .menu-select-style__wrapper span span {
-  //   font-size: .8rem;
-  // }
-
-  .d-flex {
-    display: flex;
-  }
-
-  .d-column {
-    flex-direction: column;
-  }
-
-  .align-items-center {
-    align-items: center;
-  }
-
-  .justify-content-center {
-    justify-content: center;
-  }
-
-  .mb-1 {
-    margin-bottom: 1rem;
-  }
-
-  .mt-1 {
-    margin-top: 1rem;
-  }
-
-  .mt-2 {
-    margin-top: 2rem;
-  }
-
-  .mt-3 {
-    margin-top: 3rem;
-  }
-
-  .ml-2 {
-    margin-left: 2rem;
-  }
-
-  .filter-dialog-wrapper {
-    background: white;
-    min-height: 400px;
-    width: 100%;
-    border-radius: 7px;
-    position: absolute;
-    z-index: 10;
-    display: flex;
-    // flex-direction: column;
-    box-shadow: 7px 7px 15px rgb(134, 134, 134);
-    padding: 20px;
-  }
-
-  .filter-side-menu-bottom {
-    display: inline-block;
-    width: 100%;
-  }
-
-  .filter-side-menu-bottom button {
-    margin: 20px 20px 20px 0px;
-    float: right;
-  }
-
-  .filter-container {
-    flex-grow: 1;
-  }
-
-  .filter-side-menu {
-    width: 360px;
-    background: #f2f2f2;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .filter-side-menu-main {
-    flex-grow: 1;
-    display: flex;
-  }
-
-  .time-picker li.active {
-    background: #190AFF !important;
-  }
-
-  .pill {
-    width: auto;
-    background: #190AFF;
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px 10px 5px 10px;
-    margin: 5px;
-    border-radius: 7px;
-  }
-
-  .close-button {
-    cursor: pointer;
-    margin-left: 5px;
-  }
-
-  .filter-buttons-container button {
-    float: right;
-  }
-
-  input[type="checkbox"] {
-    vertical-align:middle;
-  }
-
-  .container-map-menu {
-    display: flex;
-  }
-
-  #mapCoverage {
-    height: 300px;
-    width: 100%;
-    margin: 0 10px 0 10px;
-  }
-
-  .easy-button-button {
-    width: 26px;
-    height: 26px;
-    line-height: 26px;
-    text-align: center;
-    font-size: 10px;
-  }
-
-  .coverage-side-menu {
-    flex-grow: 1;
-    min-width: 300px;
-  }
-
-  .coverage-side-menu input,
-  .coverage-side-menu select,
-  .coverage-side-menu .select-area-text {
-    margin-bottom: 0;
-    margin-left: 10px;
-  }
-
-  .coverage-map-menu-container {
-    display: flex;
-  }
-
-  .price-values-line {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .price-values-line span {
-    // background: blue;
-    width: 60px;
-    text-align: center;
-    color: rgb(122, 122, 122);
-  }
-
-  .price-min-max-container {
-    display: flex;
-  }
-
-  .price-min-max-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-  }
-
-  .price-min-max-item label {
-    color: rgb(122, 122, 122);
-  }
-
-  /* css solution cause disabling in props throws error */
-  .slider-tooltip-wrap, .slider-tooltip {
-    display: none !important;
-  }
-
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/_catalogue-filters.scss";
 </style>
