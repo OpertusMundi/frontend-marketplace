@@ -35,11 +35,24 @@
 
           <!-- UPDATE -->
           <div v-if="filterMenuItem == 'update'">
-            <h5>Updated after</h5>
-            <datepicker v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
-
-            <h5 class="mt-2">Updated before</h5>
-            <datepicker v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
+            <div class="d-flex">
+              <div class="d-flex d-column">
+                <h5>From date:</h5>
+                <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
+                <div v-if="filters.find((x) => x.name == 'update').options[0].value">
+                  <h5 class="mt-2">From time:</h5>
+                  <vue-timepicker :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[2].value" placeholder="select time"></vue-timepicker>
+                </div>
+              </div>
+              <div class="d-flex d-column ml-2">
+                <h5>To date:</h5>
+                <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
+                <div v-if="filters.find((x) => x.name == 'update').options[1].value">
+                  <h5 class="mt-2">To time:</h5>
+                  <vue-timepicker :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[3].value" placeholder="select time"></vue-timepicker>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- TOPIC -->
@@ -130,20 +143,40 @@
           <!-- DISPLAY OF FILTERS CHECKED -->
           <div class="filter-side-menu-main">
             <div>
-              <!-- <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter">
-                {{ filter }} <span @click="removeFilter">x</span>
-              </div> -->
+              <!-- TYPE -->
               <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
                 {{ filter.name }}
                 <div class="close-button" @click="removeFilter('type', filter.name)"><font-awesome-icon icon="times" /></div>
               </div>
 
-              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[0].value">updated after: {{filters.find((x) => x.name == 'update').options[0].value}} <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[1].value">updated before: {{filters.find((x) => x.name == 'update').options[1].value}} <div class="close-button" @click="removeFilter('update', 'To')"><font-awesome-icon icon="times" /></div></div>
+              <!-- UPDATED -->
+              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[0].value">
+                <!-- format data & show time only if different than 00:00 AM -->
+                Updated after {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }}
+                <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
+              </div>
+              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[1].value">
+                <!-- format date & show time only if different than 23:59 PM -->
+                Updated before {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
+                <div class="close-button" @click="removeFilter('update', 'To')"><font-awesome-icon icon="times" /></div>
+              </div>
 
+              <!-- TOPIC -->
               <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
                 <span>{{filter.name}}</span>
                 <div class="close-button" @click="removeFilter('topic', filter.name)"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- COVERAGE -->
+              <div class="pill" v-if="mapCoverageSelectionBBox">
+                Area selection
+                <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- PRICE -->
+              <div class="pill" v-if="priceValues[0] != 0 || priceValues[1] != priceMax">
+                {{priceValues[0]}}€ - {{priceValues[1]}}€
+                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
             </div>
           </div>
@@ -173,10 +206,12 @@ import {
 } from '@/model';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
+import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-editable';
 import 'leaflet-easybutton';
+import { dom } from '@fortawesome/fontawesome-svg-core';
 // we should maybe not include default CSS
 import 'vue-range-component/dist/vue-range-slider.css';
 // there is a known bug: https://github.com/xwpongithub/vue-range-slider/issues/18
@@ -195,7 +230,12 @@ interface filterCategory {
 }
 
 @Component({
-  components: { CatalogueCard, Datepicker, VueRangeSlider },
+  components: {
+    CatalogueCard,
+    Datepicker,
+    VueTimepicker,
+    VueRangeSlider,
+  },
 })
 export default class Catalogue extends Vue {
   catalogQuery: CatalogueQuery;
@@ -242,6 +282,8 @@ export default class Catalogue extends Vue {
   constructor() {
     super();
 
+    dom.watch();
+
     this.query = '';
     this.queryResults = [];
     this.catalogQuery = {
@@ -259,7 +301,7 @@ export default class Catalogue extends Vue {
         options: [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }],
       }, {
         name: 'update',
-        options: [{ name: 'From', value: '' }, { name: 'To', value: '' }],
+        options: [{ name: 'From', value: '' }, { name: 'To', value: '' }, { name: 'timeFrom', value: '00:00 AM' }, { name: 'timeTo', value: '23:59 PM' }],
       }, {
         name: 'topic',
         options: [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }],
@@ -277,7 +319,7 @@ export default class Catalogue extends Vue {
     // this.filterTopicOptions = ['Biota', 'Boundaries', 'Clima', 'Economy', 'Elevation', 'Environment', 'Farming', 'Geo-Scientific', 'Health', 'Imagery', 'Inland waters', 'Military Intelligence', 'Location', 'Oceans', 'Planning Cadastre', 'Society', 'Structure', 'Transportation', 'Utilities Communication'];
     // this.filterTopicSelection = [];
 
-    this.mapCoverageSelectionBBox = 'bboxstring';
+    this.mapCoverageSelectionBBox = '';
 
     this.priceValues = [0, 5000];
     this.priceMin = 0;
@@ -320,18 +362,37 @@ export default class Catalogue extends Vue {
   }
 
   removeFilter(category, filterName) {
-    const option = this.filters.find((x) => x.name === category)
-      ?.options
-      .find((x) => x.name === filterName);
-
     switch (category) {
       case 'type':
       case 'topic': {
+        const option = this.filters.find((x) => x.name === category)
+        ?.options
+        .find((x) => x.name === filterName);
         option!.isChecked = false;
         break;
       }
       case 'update': {
-        option!.value = '';
+        switch (filterName) {
+          case 'From': {
+            this.filters.find((x) => x.name === category)!.options[0].value = '';
+            this.filters.find((x) => x.name === category)!.options[2].value = '00:00 AM';
+            break;
+          }
+          case 'To': {
+            this.filters.find((x) => x.name === category)!.options[1].value = '';
+            this.filters.find((x) => x.name === category)!.options[3].value = '23:59 PM';
+            break;
+          }
+          default:
+        }
+        break;
+      }
+      case 'coverage': {
+        this.mapCoverageSelectionBBox = '';
+        break;
+      }
+      case 'price': {
+        this.priceValues = [0, this.priceMax];
         break;
       }
       default:
@@ -358,11 +419,15 @@ export default class Catalogue extends Vue {
 
     return result;
   }
-  // return this.filters
-  //   .map((x) => x.options)
-  //   .flat().filter((x) => x.isChecked)
-  //   .map((x) => x.name);
-  // }
+
+  // we use this method cause formatter of vuejs-datepicker lib is buggy
+  dateFormatter(date) {
+    const splitted = date.toString().split(' ');
+    const d = splitted[2];
+    const m = splitted[1];
+    const y = splitted[3];
+    return `${d} ${m} ${y}`;
+  }
 
   initMapCoverage() {
     this.mapCoverage = (L as any).map('mapCoverage', { editable: true }).setView([0, 0], 4);
@@ -371,18 +436,25 @@ export default class Catalogue extends Vue {
     }).addTo(this.mapCoverage);
     console.log(this.mapCoverage);
 
-    this.mapCoverageSelectionRectangle = L.rectangle([[-50, -50], [-50, 50], [50, 50], [50, -50], [-50, -50]]).addTo(this.mapCoverage);
+    const latMin = 28.647719;
+    const latMax = 73.426841;
+    const lonMin = -32.519531;
+    const lonMax = 58.359375;
+
+    const selectionLayerOptions = { fillColor: 'transparent', color: '#190AFF', dashArray: '20 20' };
+
+    this.mapCoverageSelectionRectangle = L.rectangle([[latMin, lonMin], [latMin, lonMax], [latMax, lonMax], [latMax, lonMin], [latMin, lonMin]], selectionLayerOptions).addTo(this.mapCoverage);
     this.mapCoverageSelectionRectangle.enableEdit();
 
-    this.mapExtendToSelection();
+    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
 
     this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
       this.mapExtendToSelection();
     });
 
-    L.easyButton('[]', () => {
+    L.easyButton('<i class="fas fa-vector-square"></i>', () => {
       this.mapExtendToSelection();
-    }).addTo(this.mapCoverage);
+    }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
   mapExtendToSelection() {
@@ -441,6 +513,10 @@ export default class Catalogue extends Vue {
     display: flex;
   }
 
+  .d-column {
+    flex-direction: column;
+  }
+
   .align-items-center {
     align-items: center;
   }
@@ -463,6 +539,10 @@ export default class Catalogue extends Vue {
 
   .mt-3 {
     margin-top: 3rem;
+  }
+
+  .ml-2 {
+    margin-left: 2rem;
   }
 
   .filter-dialog-wrapper {
@@ -504,9 +584,13 @@ export default class Catalogue extends Vue {
     display: flex;
   }
 
+  .time-picker li.active {
+    background: #190AFF !important;
+  }
+
   .pill {
     width: auto;
-    background: blue;
+    background: #190AFF;
     color: #fff;
     display: inline-flex;
     align-items: center;
@@ -537,6 +621,14 @@ export default class Catalogue extends Vue {
     height: 300px;
     width: 100%;
     margin: 0 10px 0 10px;
+  }
+
+  .easy-button-button {
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    font-size: 10px;
   }
 
   .coverage-side-menu {
