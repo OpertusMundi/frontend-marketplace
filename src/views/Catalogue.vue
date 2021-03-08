@@ -9,15 +9,15 @@
       </div>
 
       <div class="menu-select-style__wrapper">
-        <span @click="selectFilterMenuItem('type')">TYPE <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('update')">UPDATE <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('topic')">TOPIC <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('format')">FORMAT <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('crs')">CRS <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('scale')">SCALE <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('coverage')">COVERAGE <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('price')">PRICE <span>&or;</span></span>
-        <span @click="selectFilterMenuItem('more')">MORE <span>&or;</span></span>
+        <span @click="selectFilterMenuItem('type')">TYPE <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('update')">UPDATE <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('topic')">TOPIC <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('format')">FORMAT <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('crs')">CRS <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('scale')">SCALE <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('coverage')">COVERAGE <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('price')">PRICE <font-awesome-icon icon="angle-down" /></span>
+        <span @click="selectFilterMenuItem('more')">MORE <font-awesome-icon icon="angle-down" /></span>
       </div>
 
       <div v-if="filterMenuItem" class="filter-dialog-wrapper">
@@ -36,10 +36,10 @@
           <!-- UPDATE -->
           <div v-if="filterMenuItem == 'update'">
             <h5>Updated after</h5>
-            <datepicker placeholder="select date"></datepicker>
+            <datepicker v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
 
             <h5 class="mt-2">Updated before</h5>
-            <datepicker placeholder="select date"></datepicker>
+            <datepicker v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
           </div>
 
           <!-- TOPIC -->
@@ -115,15 +115,35 @@
           </div>
 
           <!-- MORE -->
-          <div v-if="filterMenuItem == 'more'"><h3>more filter</h3></div>
+          <div v-if="filterMenuItem == 'more'">
+            <h3>more filters</h3>
+            <ul>
+              <li>search by vendor</li>
+              <li>search by language</li>
+              <li>search by license</li>
+              <li>search by geometry / number of features</li>
+            </ul>
+          </div>
         </div>
 
         <div class="filter-side-menu">
           <!-- DISPLAY OF FILTERS CHECKED -->
           <div class="filter-side-menu-main">
             <div>
-              <div class="pill" v-for="filter in getFiltersChecked()" :key="filter">
+              <!-- <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter">
                 {{ filter }} <span @click="removeFilter">x</span>
+              </div> -->
+              <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
+                {{ filter.name }}
+                <div class="close-button" @click="removeFilter('type', filter.name)"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[0].value">updated after: {{filters.find((x) => x.name == 'update').options[0].value}} <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[1].value">updated before: {{filters.find((x) => x.name == 'update').options[1].value}} <div class="close-button" @click="removeFilter('update', 'To')"><font-awesome-icon icon="times" /></div></div>
+
+              <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
+                <span>{{filter.name}}</span>
+                <div class="close-button" @click="removeFilter('topic', filter.name)"><font-awesome-icon icon="times" /></div>
               </div>
             </div>
           </div>
@@ -165,7 +185,8 @@ import VueRangeSlider from 'vue-range-component';
 
 interface filterOption {
   name: string,
-  isChecked: boolean
+  isChecked?: boolean
+  value?: string | number
 }
 
 interface filterCategory {
@@ -237,6 +258,9 @@ export default class Catalogue extends Vue {
         name: 'type',
         options: [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }],
       }, {
+        name: 'update',
+        options: [{ name: 'From', value: '' }, { name: 'To', value: '' }],
+      }, {
         name: 'topic',
         options: [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }],
       },
@@ -295,20 +319,50 @@ export default class Catalogue extends Vue {
     this.filterMenuItem = filterItem;
   }
 
-  removeFilter() {
-    console.log('remove filter');
+  removeFilter(category, filterName) {
+    const option = this.filters.find((x) => x.name === category)
+      ?.options
+      .find((x) => x.name === filterName);
+
+    switch (category) {
+      case 'type':
+      case 'topic': {
+        option!.isChecked = false;
+        break;
+      }
+      case 'update': {
+        option!.value = '';
+        break;
+      }
+      default:
+    }
   }
 
   cancelFilters(): void {
     this.filterMenuItem = '';
   }
 
-  getFiltersChecked() {
-    return this.filters
-      .map((x) => x.options)
-      .flat().filter((x) => x.isChecked)
-      .map((x) => x.name);
+  getFiltersChecked(category) {
+    let result;
+    switch (category) {
+      case 'type':
+      case 'topic':
+        result = this.filters
+          .find((x) => x.name === category)
+          ?.options
+          ?.filter((x) => x.isChecked);
+        break;
+
+      default:
+    }
+
+    return result;
   }
+  // return this.filters
+  //   .map((x) => x.options)
+  //   .flat().filter((x) => x.isChecked)
+  //   .map((x) => x.name);
+  // }
 
   initMapCoverage() {
     this.mapCoverage = (L as any).map('mapCoverage', { editable: true }).setView([0, 0], 4);
@@ -379,9 +433,9 @@ export default class Catalogue extends Vue {
     cursor: pointer;
   }
 
-  .menu-select-style__wrapper span span {
-    font-size: .8rem;
-  }
+  // .menu-select-style__wrapper span span {
+  //   font-size: .8rem;
+  // }
 
   .d-flex {
     display: flex;
@@ -454,10 +508,17 @@ export default class Catalogue extends Vue {
     width: auto;
     background: blue;
     color: #fff;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 5px 10px 5px 10px;
     margin: 5px;
     border-radius: 7px;
+  }
+
+  .close-button {
+    cursor: pointer;
+    margin-left: 5px;
   }
 
   .filter-buttons-container button {
