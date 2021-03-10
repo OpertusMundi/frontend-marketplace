@@ -1,0 +1,175 @@
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    -ms-transform: scale(1.3); /* IE */
+    -moz-transform: scale(1.3); /* FF */
+    -webkit-transform: scale(1.3); /* Safari and Chrome */
+    -o-transform: scale(1.3); /* Opera */
+    transform: scale(1.3);
+    padding: 10px;
+}
+
+input[type="checkbox"]:checked {
+    background: $secondColor;
+}
+
+#search_assets {
+    width: 50%;
+}
+
+.menu-select-style__wrapper {
+    width: 100%;
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    grid-gap: 3px;
+}
+
+.menu-select-style__wrapper span {
+    border-radius: 3px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .85rem;
+    padding: 10px 10px 10px 10px;
+    cursor: pointer;
+}
+
+.filter-dialog-wrapper {
+    background: white;
+    min-height: 400px;
+    width: calc(100% - 48px);
+    border-radius: 7px;
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    // flex-direction: column;
+    box-shadow: 7px 7px 15px rgb(134, 134, 134);
+    padding: 0 0 0 20px;
+    margin-top: 5px;
+}
+
+.filter-side-menu-bottom {
+    display: inline-block;
+    width: 100%;
+}
+
+.filter-side-menu-bottom button {
+    margin: 20px 20px 20px 0px;
+    float: right;
+}
+
+.filter-container {
+    flex-grow: 1;
+    margin: 20px 10px 20px 0;
+}
+
+.filter-side-menu {
+    width: 360px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-side-menu-main {
+    flex-grow: 1;
+    display: flex;
+}
+
+.time-picker li.active {
+    background: $secondColor !important;
+}
+
+.date-labels {
+    color: #5e5e5e;
+    margin: 5px;
+}
+
+.pill {
+    width: auto;
+    // background: #190AFF;
+    background: $secondColor;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px 5px 10px;
+    margin: 5px;
+    border-radius: 7px;
+}
+
+.close-button {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.filter-buttons-container button {
+    float: right;
+}
+
+.container-map-menu {
+    display: flex;
+}
+
+#mapCoverage {
+    height: 400px;
+    width: 100%;
+    margin: 0 10px 0 10px;
+}
+
+.coverage-side-menu {
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+.coverage-side-menu input,
+.coverage-side-menu select,
+.coverage-side-menu .select-area-text {
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.coverage-map-menu-container {
+    display: flex;
+}
+
+.price-values-line {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.price-values-line span {
+    width: 60px;
+    text-align: center;
+    color: rgb(122, 122, 122);
+}
+
+.price-min-max-container {
+    display: flex;
+}
+
+.price-min-max-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.price-min-max-item label {
+    color: rgb(122, 122, 122);
+}
+
+/* css solution cause disabling in props throws error */
+.slider-tooltip-wrap, .slider-tooltip {
+    display: none !important;
+}
+
+.slider-process {
+    background: #3a3a3a !important;
+}
