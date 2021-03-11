@@ -40,6 +40,7 @@
     "vue-property-decorator": "^8.4.2",
     "vue-range-component": "^1.0.3",
     "vue-router": "^3.3.2",
+    "vue-slider-component": "^3.2.11",
     "vue-toastify": "^1.8.0",
     "vue2-leaflet": "^2.5.2",
     "vue2-timepicker": "^1.1.6",

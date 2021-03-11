@@ -118,6 +118,15 @@ input[type="checkbox"]:checked {
     float: right;
 }
 
+small {
+    color: $labelColor;
+}
+
+.format-category-title {
+    color: $labelColor;
+    margin-bottom: 10px;
+}
+
 .container-map-menu {
     display: flex;
 }
@@ -153,7 +162,7 @@ input[type="checkbox"]:checked {
 .values-line span {
     width: 60px;
     text-align: center;
-    color: rgb(122, 122, 122);
+    color: $labelColor;
 }
 
 .min-max-container {
@@ -169,12 +178,25 @@ input[type="checkbox"]:checked {
 }
 
 .min-max-input-item label {
-    color: rgb(122, 122, 122);
+    color: $labelColor;
 }
 
 .min-max-scale-input {
     display: inline-flex !important;
     width: auto !important;
+}
+
+.tab-topic {
+    // height: 400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    //grid-template-rows: 25px 25px;
+    // grid-auto-flow: column;
+    grid-gap: 5px;
+}
+
+.tab-more input, .tab-more hr {
+    max-width: 400px;
 }
 
 /* css solution cause disabling in props throws error */

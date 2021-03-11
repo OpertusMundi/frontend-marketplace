@@ -55,7 +55,8 @@
           </div>
 
           <!-- TOPIC -->
-          <div v-if="filterMenuItemSelected == 'topic'">
+          <!-- d-flex flex-column flex-wrap -->
+          <div class="tab-topic" v-if="filterMenuItemSelected == 'topic'">
             <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
               <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
@@ -63,32 +64,65 @@
           </div>
 
           <!-- FORMAT -->
-          <div v-if="filterMenuItemSelected == 'format'">
-            <p><i>it has to change according to TYPE</i></p>
+          <div v-if="filterMenuItemSelected == 'format'" class="d-flex">
+
+            <div class="flex-grow-1" v-if="shownFormatCategories().includes('vector')">
+              <h3 class="format-category-title">Vector</h3>
+              <div class="checkbox-group mb-md-5" v-for="format in formats.vector" :key="format.id">
+                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <label :for="`format_${format.id}`"> {{format.name}} </label>
+              </div>
+            </div>
+
+            <div class="flex-grow-1" v-if="shownFormatCategories().includes('raster')">
+              <h3 class="format-category-title">Raster</h3>
+              <div class="checkbox-group mb-md-5" v-for="format in formats.raster" :key="format.id">
+                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <label :for="`format_${format.id}`"> {{format.name}} </label>
+              </div>
+            </div>
+
+            <div class="flex-grow-1" v-if="shownFormatCategories().includes('api')">
+              <h3 class="format-category-title">API</h3>
+              <div class="checkbox-group mb-md-5" v-for="format in formats.api" :key="format.id">
+                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <label :for="`format_${format.id}`"> {{format.name}} </label>
+              </div>
+            </div>
+
           </div>
 
           <!-- CRS -->
           <div v-if="filterMenuItemSelected == 'crs'">
-            <small>Popular CRS:</small>
+            <small>Popular CRS</small>
             <div class="checkbox-group mt-md-10 mb-md-5">
               <input type="checkbox" class="mr-md-10" id="EPSG:4326">
               <label for="EPSG:4326">WGS84 | EPSG:4326</label>
             </div>
 
             <div class="checkbox-group">
-              <input type="checkbox" id="EPSG:3857">
-              <label class="ml-md-5" for="EPSG:3857">EPSG:3857</label>
+              <input type="checkbox" class="mr-md-10" id="EPSG:3857">
+              <label for="EPSG:3857">EPSG:3857</label>
             </div>
 
-            <input type="text" class="form-group__text mt-md-20" placeholder="Search for CRS">
+            <div class="mt-md-30">
+              <small>Search for CRS</small>
+              <input type="text" class="form-group__text mt-md-20" placeholder="CRS name or Code">
+            </div>
+
           </div>
 
           <!-- SCALE -->
           <div v-if="filterMenuItemSelected == 'scale'">
-            <vue-range-slider ref="scaleRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider>
-            <div class="values-line">
-              <span v-for="index in 5" :key="index"> {{(index-1)*(scaleMax - scaleMin)/4 + scaleMin}}€ </span>
+            <!-- <vue-range-slider ref="scaleRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider> -->
+            <div @click="onScaleSliderClick">
+              <!-- :processStyle="{ background: 'red' }" :railStyle="{ background: 'red' }" -->
+              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 14" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" />
             </div>
+
+            <!-- <div class="values-line">
+              <span v-for="index in 5" :key="index"> {{(index-1)*(scaleMax - scaleMin)/4 + scaleMin}}€ </span>
+            </div> -->
 
             <div class="mt-md-40 min-max-container">
               <div class="min-max-input-item">
@@ -106,6 +140,7 @@
                 </div>
               </div>
             </div>
+
           </div>
 
           <!-- COVERAGE -->
@@ -149,14 +184,28 @@
           </div>
 
           <!-- MORE -->
-          <div v-if="filterMenuItemSelected == 'more'">
-            <h3>more filters</h3>
-            <ul>
-              <li>search by vendor</li>
-              <li>search by language</li>
-              <li>search by license</li>
-              <li>search by geometry / number of features</li>
-            </ul>
+          <div class="tab-more" v-if="filterMenuItemSelected == 'more'">
+            <div class="form-group">
+              <label for="postal_code">Minimum number of Features</label>
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+            </div>
+
+            <hr>
+
+            <div class="form-group">
+              <label for="postal_code">Search by Vendor</label>
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+            </div>
+
+            <div class="form-group">
+              <label for="postal_code">Search by Language</label>
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+            </div>
+
+            <div class="form-group">
+              <label for="postal_code">Search by License</label>
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+            </div>
           </div>
         </div>
 
@@ -190,6 +239,18 @@
                 <div class="close-button" @click="removeFilter('topic', filter.name)"><font-awesome-icon icon="times" /></div>
               </div>
 
+              <!-- FORMAT -->
+              <div class="pill" v-for="filter in getFiltersChecked('format')" :key="filter.name">
+                <span>{{filter.name}}</span>
+                <div class="close-button" @click="removeFilter('format', filter.name)"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- SCALE -->
+              <div class="pill" v-if="scaleValues[0] != scaleMin || scaleValues[1] != scaleMax">
+                1:{{scaleValues[1]}} - 1:{{scaleValues[0]}}€
+                <div class="close-button" @click="removeFilter('scale')"><font-awesome-icon icon="times" /></div>
+              </div>
+
               <!-- COVERAGE -->
               <div class="pill" v-if="mapCoverageSelectionBBox">
                 Area selection
@@ -197,7 +258,7 @@
               </div>
 
               <!-- PRICE -->
-              <div class="pill" v-if="priceValues[0] != 0 || priceValues[1] != priceMax">
+              <div class="pill" v-if="priceValues[0] != priceMin || priceValues[1] != priceMax">
                 {{priceValues[0]}}€ - {{priceValues[1]}}€
                 <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
@@ -236,6 +297,8 @@ import 'leaflet-editable';
 import 'leaflet-easybutton';
 import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/antd.css';
 // we should maybe not include default CSS
 import 'vue-range-component/dist/vue-range-slider.css';
 // there is a known bug: https://github.com/xwpongithub/vue-range-slider/issues/18
@@ -259,6 +322,7 @@ interface filterCategory {
     Datepicker,
     VueTimepicker,
     VueRangeSlider,
+    VueSlider,
   },
 })
 export default class Catalogue extends Vue {
@@ -279,6 +343,8 @@ export default class Catalogue extends Vue {
 
   filters: filterCategory[];
 
+  formats: {api: { id: string, name: string, isChecked: boolean }[], vector: { id: string, name: string, isChecked: boolean }[], raster: { id: string, name: string, isChecked: boolean }[], };
+
   mapCoverage: any;
 
   mapCoverageSelectionRectangle: any;
@@ -287,11 +353,13 @@ export default class Catalogue extends Vue {
 
   scaleValues: number[];
 
+  scaleSliderOptions: {id: number, name: string}[];
+
   scaleMin: number;
 
   scaleMax: number;
 
-  scaleStep: number;
+  // scaleStep: number;
 
   priceValues: number[];
 
@@ -332,12 +400,27 @@ export default class Catalogue extends Vue {
       },
     ];
 
+    this.formats = {
+      vector: [{ id: 'shp', name: 'Shapefile', isChecked: false }, { id: 'geoPackage', name: 'GeoPackage', isChecked: false }, { id: 'geoJson', name: 'GeoJSON', isChecked: false }],
+      raster: [{ id: 'png', name: 'PNG', isChecked: false }, { id: 'jpeg', name: 'JPEG', isChecked: false }, { id: 'tiff', name: 'Tiff', isChecked: false }],
+      api: [{ id: 'wms', name: 'WMS', isChecked: false }, { id: 'wfs', name: 'WFS', isChecked: false }, { id: 'wcs', name: 'WCS', isChecked: false }, { id: 'wmts', name: 'WMTS', isChecked: false }, { id: 'wps', name: 'WPS', isChecked: false }, { id: 'wcps', name: 'WCPS', isChecked: false }],
+    };
+
     this.mapCoverageSelectionBBox = '';
 
-    this.scaleValues = [200, 1000000];
-    this.scaleMin = 200;
-    this.scaleMax = 1000000;
-    this.scaleStep = 10;
+    this.scaleValues = [10, 10000000];
+    this.scaleSliderOptions = [
+      { id: 10, name: '1 : 10' },
+      { id: 100, name: '1 : 100' },
+      { id: 1000, name: '1 : 1.000' },
+      { id: 10000, name: '1 : 10.000' },
+      { id: 100000, name: '1 : 100.000' },
+      { id: 1000000, name: '1 : 1.000.000' },
+      { id: 10000000, name: '1 : 10.000.000' },
+    ];
+    this.scaleMin = 10;
+    this.scaleMax = 10000000;
+    // this.scaleStep = 10;
 
     this.priceValues = [0, 5000];
     this.priceMin = 0;
@@ -410,12 +493,25 @@ export default class Catalogue extends Vue {
         }
         break;
       }
+      case 'format': {
+        const option = Object.values(this.formats)
+          .flat()
+          .find((x) => x.name === filterName);
+        // eslint-disable-next-line
+        option!.isChecked = false;
+
+        break;
+      }
       case 'coverage': {
         this.mapCoverageSelectionBBox = '';
         break;
       }
       case 'price': {
-        this.priceValues = [0, this.priceMax];
+        this.priceValues = [this.priceMin, this.priceMax];
+        break;
+      }
+      case 'scale': {
+        this.scaleValues = [this.scaleMin, this.scaleMax];
         break;
       }
       default:
@@ -437,10 +533,54 @@ export default class Catalogue extends Vue {
           ?.filter((x) => x.isChecked);
         break;
 
+      case 'format':
+        result = Object.values(this.formats)
+          .flat()
+          .filter((x) => x.isChecked);
+        break;
+
       default:
     }
 
     return result;
+  }
+
+  shownFormatCategories(): string[] {
+    const isVectorChecked = this.filters.find((x) => x.name === 'type')?.options.find((x) => x.name === 'Vector dataset')?.isChecked;
+    const isRasterChecked = this.filters.find((x) => x.name === 'type')?.options.find((x) => x.name === 'Raster dataset')?.isChecked;
+    const isApiChecked = this.filters.find((x) => x.name === 'type')?.options.find((x) => x.name === 'API')?.isChecked;
+
+    let res: string[] = [];
+
+    // if no selection, return results for all
+    if (!isVectorChecked && !isRasterChecked && !isApiChecked) {
+      res = ['vector', 'raster', 'api'];
+      return res;
+    }
+
+    if (isVectorChecked) {
+      res.push('vector');
+    }
+    if (isRasterChecked) {
+      res.push('raster');
+    }
+    if (isApiChecked) {
+      res.push('api');
+    }
+    return res;
+  }
+
+  isScaleSliderDisabled(): boolean {
+    if (this.scaleSliderOptions.map((x) => x.id).includes(this.scaleValues[0]) && this.scaleSliderOptions.map((x) => x.id).includes(this.scaleValues[1])) {
+      return false;
+    }
+    return true;
+  }
+
+  onScaleSliderClick(): void {
+    if (this.isScaleSliderDisabled()) {
+      this.scaleValues = [this.scaleMin, this.scaleMax];
+    }
   }
 
   // we use this method cause formatter of vuejs-datepicker lib is buggy
@@ -512,15 +652,16 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'minScale': {
+        console.log('min scale');
         const minScale = Number(value);
-        this.scaleValues[0] = minScale > this.scaleValues[1] ? this.scaleValues[1] : minScale;
-        (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
+        this.scaleValues = [minScale > this.scaleValues[1] ? this.scaleValues[1] : minScale, this.scaleValues[1]];
+        // (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
         break;
       }
       case 'maxScale': {
         const maxScale = Number(value);
-        this.scaleValues[1] = maxScale < this.scaleValues[0] ? this.scaleValues[0] : maxScale;
-        (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
+        this.scaleValues = [this.scaleValues[0], maxScale < this.scaleValues[0] ? this.scaleValues[0] : maxScale];
+        // (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
         break;
       }
       default:
