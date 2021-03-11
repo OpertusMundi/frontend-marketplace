@@ -39,6 +39,11 @@ input[type="checkbox"]:checked {
     cursor: pointer;
 }
 
+.menu-select-style__wrapper span.active {
+    background: $secondColor;
+    color: #fff;
+}
+
 .filter-dialog-wrapper {
     background: white;
     min-height: 400px;
@@ -73,6 +78,8 @@ input[type="checkbox"]:checked {
     background: #f2f2f2;
     display: flex;
     flex-direction: column;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
 }
 
 .filter-side-menu-main {
@@ -170,6 +177,6 @@ input[type="checkbox"]:checked {
     display: none !important;
 }
 
-.slider-process {
-    background: #3a3a3a !important;
+.slider-process, .slider-dot {
+    background: $secondColor !important;
 }

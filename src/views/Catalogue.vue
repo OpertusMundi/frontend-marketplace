@@ -8,23 +8,22 @@
         <input placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
       </div>
 
+      <!-- FILTERS MENU TAB-BAR -->
       <div class="menu-select-style__wrapper">
-        <span @click="selectFilterMenuItem('type')">TYPE <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('update')">UPDATE <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('topic')">TOPIC <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('format')">FORMAT <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('crs')">CRS <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('scale')">SCALE <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('coverage')">COVERAGE <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('price')">PRICE <font-awesome-icon icon="angle-down" /></span>
-        <span @click="selectFilterMenuItem('more')">MORE <font-awesome-icon icon="angle-down" /></span>
+        <span v-for="item in filterMenuItems"
+          :key="item.id"
+          :class="{ active: filterMenuItemSelected == item.id }"
+          @click="selectfilterMenuItem(item.id)">
+            {{ item.name }}
+            <font-awesome-icon :icon="filterMenuItemSelected == item.id? 'angle-up' : 'angle-down'" />
+        </span>
       </div>
 
-      <div v-if="filterMenuItem" class="filter-dialog-wrapper">
+      <div v-if="filterMenuItemSelected" class="filter-dialog-wrapper">
         <div class="filter-container">
 
           <!-- TYPE -->
-          <div v-if="filterMenuItem == 'type'">
+          <div v-if="filterMenuItemSelected == 'type'">
             <div class="checkbox-group mt-md-10" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
               <input type="checkbox" class="mr-md-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
@@ -34,7 +33,7 @@
           </div>
 
           <!-- UPDATE -->
-          <div v-if="filterMenuItem == 'update'">
+          <div v-if="filterMenuItemSelected == 'update'">
             <div class="d-flex">
               <div class="d-flex d-column">
                 <h5 class="date-labels">From date</h5>
@@ -56,7 +55,7 @@
           </div>
 
           <!-- TOPIC -->
-          <div v-if="filterMenuItem == 'topic'">
+          <div v-if="filterMenuItemSelected == 'topic'">
             <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
               <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
@@ -64,12 +63,12 @@
           </div>
 
           <!-- FORMAT -->
-          <div v-if="filterMenuItem == 'format'">
+          <div v-if="filterMenuItemSelected == 'format'">
             <p><i>it has to change according to TYPE</i></p>
           </div>
 
           <!-- CRS -->
-          <div v-if="filterMenuItem == 'crs'">
+          <div v-if="filterMenuItemSelected == 'crs'">
             <small>Popular CRS:</small>
             <div class="checkbox-group mt-md-10 mb-md-5">
               <input type="checkbox" class="mr-md-10" id="EPSG:4326">
@@ -85,10 +84,10 @@
           </div>
 
           <!-- SCALE -->
-          <div v-if="filterMenuItem == 'scale'"><h3>scale filter</h3></div>
+          <div v-if="filterMenuItemSelected == 'scale'"><h3>scale filter</h3></div>
 
           <!-- COVERAGE -->
-          <div v-if="filterMenuItem == 'coverage'">
+          <div v-if="filterMenuItemSelected == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
                 <div class="d-flex align-items-center mb-md-20">
@@ -109,7 +108,7 @@
           </div>
 
           <!-- PRICE -->
-          <div v-if="filterMenuItem == 'price'">
+          <div v-if="filterMenuItemSelected == 'price'">
             <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider>
             <div class="price-values-line">
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
@@ -128,7 +127,7 @@
           </div>
 
           <!-- MORE -->
-          <div v-if="filterMenuItem == 'more'">
+          <div v-if="filterMenuItemSelected == 'more'">
             <h3>more filters</h3>
             <ul>
               <li>search by vendor</li>
@@ -251,7 +250,10 @@ export default class Catalogue extends Vue {
 
   loading = false;
 
-  filterMenuItem: string;
+  // filterMenuItems: string[];
+  filterMenuItems: {id: string, name: string}[];
+
+  filterMenuItemSelected: string;
 
   filters: filterCategory[];
 
@@ -274,6 +276,8 @@ export default class Catalogue extends Vue {
 
     dom.watch();
 
+    this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'update', name: 'UPDATE' }, { id: 'topic', name: 'TOPIC' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'more', name: 'MORE' }];
+
     this.query = '';
     this.queryResults = [];
     this.catalogQuery = {
@@ -283,7 +287,7 @@ export default class Catalogue extends Vue {
     };
     this.catalogueApi = new CatalogueApi();
 
-    this.filterMenuItem = '';
+    this.filterMenuItemSelected = '';
 
     this.filters = [
       {
@@ -306,7 +310,7 @@ export default class Catalogue extends Vue {
     this.priceStep = 1;
   }
 
-  @Watch('filterMenuItem')
+  @Watch('filterMenuItemSelected')
   onPropertyChanged(menuItem: string): void {
     if (menuItem === 'coverage') {
       setTimeout(() => {
@@ -336,8 +340,8 @@ export default class Catalogue extends Vue {
       });
   }
 
-  selectFilterMenuItem(filterItem: string): void {
-    this.filterMenuItem = filterItem;
+  selectfilterMenuItem(filterItem: string): void {
+    this.filterMenuItemSelected = filterItem;
   }
 
   removeFilter(category: string, filterName: string): void {
@@ -384,7 +388,7 @@ export default class Catalogue extends Vue {
   }
 
   cancelFilters(): void {
-    this.filterMenuItem = '';
+    this.filterMenuItemSelected = '';
   }
 
   getFiltersChecked(category: string): filterOption[] {
