@@ -35,7 +35,7 @@
           <!-- UPDATE -->
           <div v-if="filterMenuItemSelected == 'update'">
             <div class="d-flex">
-              <div class="d-flex d-column">
+              <div class="d-flex flex-column">
                 <h5 class="date-labels">From date</h5>
                 <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
                 <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[0].value">
@@ -43,7 +43,7 @@
                   <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[2].value" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
-              <div class="d-flex d-column ml-md-15">
+              <div class="d-flex flex-column ml-md-15">
                 <h5 class="date-labels">To date</h5>
                 <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
                 <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[1].value">
@@ -85,19 +85,22 @@
 
           <!-- SCALE -->
           <div v-if="filterMenuItemSelected == 'scale'">
-            <vue-range-slider ref="priceRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider>
+            <vue-range-slider ref="scaleRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider>
             <div class="values-line">
-              <span v-for="index in 5" :key="index"> {{(index-1)*scaleMax/4}}€ </span>
+              <span v-for="index in 5" :key="index"> {{(index-1)*(scaleMax - scaleMin)/4 + scaleMin}}€ </span>
             </div>
 
-            <div class="mt-md-40 price-min-max-container">
+            <div class="mt-md-40 min-max-container">
               <div class="min-max-input-item">
                 <label for="scaleSelectedMin">Minimum Scale</label>
-                <input type="number" :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text" id="scaleSelectedMin">
+                <div>
+                  <div class="flex-row d-inline-flex">1 :</div>
+                  <input class="d-inline-flex form-group__text" type="number" :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" id="scaleSelectedMin">
+                </div>
               </div>
               <div class="min-max-input-item">
                 <label for="scaleSelectedMax">Maximum Scale</label>
-                <input type="number" :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text" id="scaleSelectedMax">
+                1 : <input type="number" :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text" id="scaleSelectedMax">
               </div>
             </div>
           </div>
@@ -130,7 +133,7 @@
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
             </div>
 
-            <div class="mt-md-40 price-min-max-container">
+            <div class="mt-md-40 min-max-container">
               <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price</label>
                 <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin">
@@ -331,7 +334,7 @@ export default class Catalogue extends Vue {
     this.scaleValues = [200, 1000000];
     this.scaleMin = 200;
     this.scaleMax = 1000000;
-    this.scaleStep = 200;
+    this.scaleStep = 10;
 
     this.priceValues = [0, 5000];
     this.priceMin = 0;
@@ -503,6 +506,18 @@ export default class Catalogue extends Vue {
         const maxPrice = Number(value);
         this.priceValues[1] = maxPrice < this.priceValues[0] ? this.priceValues[0] : maxPrice;
         (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+        break;
+      }
+      case 'minScale': {
+        const minScale = Number(value);
+        this.scaleValues[0] = minScale > this.scaleValues[1] ? this.scaleValues[1] : minScale;
+        (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
+        break;
+      }
+      case 'maxScale': {
+        const maxScale = Number(value);
+        this.scaleValues[1] = maxScale < this.scaleValues[0] ? this.scaleValues[0] : maxScale;
+        (this as any).$refs.scaleRangeSlider.setValue(this.scaleValues);
         break;
       }
       default:
