@@ -172,6 +172,11 @@ input[type="checkbox"]:checked {
     color: rgb(122, 122, 122);
 }
 
+.min-max-scale-input {
+    display: inline-flex !important;
+    width: auto !important;
+}
+
 /* css solution cause disabling in props throws error */
 .slider-tooltip-wrap, .slider-tooltip {
     display: none !important;

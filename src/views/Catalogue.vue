@@ -94,13 +94,16 @@
               <div class="min-max-input-item">
                 <label for="scaleSelectedMin">Minimum Scale</label>
                 <div>
-                  <div class="flex-row d-inline-flex">1 :</div>
-                  <input class="d-inline-flex form-group__text" type="number" :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" id="scaleSelectedMin">
+                  <span>1 : </span>
+                  <input :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
                 </div>
               </div>
-              <div class="min-max-input-item">
+              <div class="min-max-input-item ml-md-20">
                 <label for="scaleSelectedMax">Maximum Scale</label>
-                1 : <input type="number" :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text" id="scaleSelectedMax">
+                <div>
+                  <span>1 : </span>
+                  <input :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
+                </div>
               </div>
             </div>
           </div>
@@ -138,7 +141,7 @@
                 <label for="priceSelectedMin">Minimum Price</label>
                 <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin">
               </div>
-              <div class="min-max-input-item">
+              <div class="min-max-input-item ml-md-20">
                 <label for="priceSelectedMax">Maximum Price</label>
                 <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax">
               </div>
