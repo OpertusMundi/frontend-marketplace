@@ -144,13 +144,13 @@ input[type="checkbox"]:checked {
     display: flex;
 }
 
-.price-values-line {
+.values-line, .values-line {
     width: 100%;
     display: flex;
     justify-content: space-between;
 }
 
-.price-values-line span {
+.values-line span {
     width: 60px;
     text-align: center;
     color: rgb(122, 122, 122);
@@ -160,7 +160,7 @@ input[type="checkbox"]:checked {
     display: flex;
 }
 
-.price-min-max-item {
+.min-max-input-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -168,7 +168,7 @@ input[type="checkbox"]:checked {
     margin-right: 10px;
 }
 
-.price-min-max-item label {
+.min-max-input-item label {
     color: rgb(122, 122, 122);
 }
 

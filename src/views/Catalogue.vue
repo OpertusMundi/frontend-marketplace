@@ -84,7 +84,23 @@
           </div>
 
           <!-- SCALE -->
-          <div v-if="filterMenuItemSelected == 'scale'"><h3>scale filter</h3></div>
+          <div v-if="filterMenuItemSelected == 'scale'">
+            <vue-range-slider ref="priceRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider>
+            <div class="values-line">
+              <span v-for="index in 5" :key="index"> {{(index-1)*scaleMax/4}}€ </span>
+            </div>
+
+            <div class="mt-md-40 price-min-max-container">
+              <div class="min-max-input-item">
+                <label for="scaleSelectedMin">Minimum Scale</label>
+                <input type="number" :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text" id="scaleSelectedMin">
+              </div>
+              <div class="min-max-input-item">
+                <label for="scaleSelectedMax">Maximum Scale</label>
+                <input type="number" :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text" id="scaleSelectedMax">
+              </div>
+            </div>
+          </div>
 
           <!-- COVERAGE -->
           <div v-if="filterMenuItemSelected == 'coverage'">
@@ -110,18 +126,18 @@
           <!-- PRICE -->
           <div v-if="filterMenuItemSelected == 'price'">
             <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider>
-            <div class="price-values-line">
+            <div class="values-line">
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
             </div>
 
             <div class="mt-md-40 price-min-max-container">
-              <div class="price-min-max-item">
+              <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price</label>
-                <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateSelectedMinPrice($event.target.value)" class="form-group__text" id="priceSelectedMin">
+                <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin">
               </div>
-              <div class="price-min-max-item">
+              <div class="min-max-input-item">
                 <label for="priceSelectedMax">Maximum Price</label>
-                <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateSelectedMaxPrice($event.target.value)" class="form-group__text" id="priceSelectedMax">
+                <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax">
               </div>
             </div>
           </div>
@@ -263,6 +279,14 @@ export default class Catalogue extends Vue {
 
   mapCoverageSelectionBBox: string;
 
+  scaleValues: number[];
+
+  scaleMin: number;
+
+  scaleMax: number;
+
+  scaleStep: number;
+
   priceValues: number[];
 
   priceMin: number;
@@ -303,6 +327,11 @@ export default class Catalogue extends Vue {
     ];
 
     this.mapCoverageSelectionBBox = '';
+
+    this.scaleValues = [200, 1000000];
+    this.scaleMin = 200;
+    this.scaleMax = 1000000;
+    this.scaleStep = 200;
 
     this.priceValues = [0, 5000];
     this.priceMin = 0;
@@ -450,16 +479,34 @@ export default class Catalogue extends Vue {
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
 
-  validateSelectedMinPrice(minPrice: string): void {
-    const price = Number(minPrice);
-    this.priceValues[0] = price > this.priceValues[1] ? this.priceValues[1] : price;
-    (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
-  }
+  // validateSelectedMinPrice(minPrice: string): void {
+  //   const price = Number(minPrice);
+  //   this.priceValues[0] = price > this.priceValues[1] ? this.priceValues[1] : price;
+  //   (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+  // }
 
-  validateSelectedMaxPrice(maxPrice: string): void {
-    const price = Number(maxPrice);
-    this.priceValues[1] = price < this.priceValues[0] ? this.priceValues[0] : price;
-    (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+  // validateSelectedMaxPrice(maxPrice: string): void {
+  //   const price = Number(maxPrice);
+  //   this.priceValues[1] = price < this.priceValues[0] ? this.priceValues[0] : price;
+  //   (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+  // }
+
+  validateMinMaxInput(input: string, value: number): void {
+    switch (input) {
+      case 'minPrice': {
+        const minPrice = Number(value);
+        this.priceValues[0] = minPrice > this.priceValues[1] ? this.priceValues[1] : minPrice;
+        (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+        break;
+      }
+      case 'maxPrice': {
+        const maxPrice = Number(value);
+        this.priceValues[1] = maxPrice < this.priceValues[0] ? this.priceValues[0] : maxPrice;
+        (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+        break;
+      }
+      default:
+    }
   }
 }
 </script>
