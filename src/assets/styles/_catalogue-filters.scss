@@ -199,6 +199,32 @@ small {
     max-width: 400px;
 }
 
+.vue-slider-dot-handle {
+    background: $secondColor !important;
+    border: none !important;
+    box-shadow: none;
+}
+
+.vue-slider-process, .vue-slider:hover .vue-slider-process {
+    background: $secondColor;
+}
+
+.vue-slider-mark-step {
+    // display: none;
+    margin-left: -3px;
+    margin-top: -3px;
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    border: solid 1px rgba(0, 0, 0, 0.32); 
+    background: #fff;
+    box-shadow: none !important;
+}
+
+.vue-slider-mark-step-active {
+    border-color: $secondColor;
+}
+
 /* css solution cause disabling in props throws error */
 .slider-tooltip-wrap, .slider-tooltip {
     display: none !important;

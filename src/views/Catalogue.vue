@@ -55,7 +55,6 @@
           </div>
 
           <!-- TOPIC -->
-          <!-- d-flex flex-column flex-wrap -->
           <div class="tab-topic" v-if="filterMenuItemSelected == 'topic'">
             <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
               <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
@@ -114,10 +113,8 @@
 
           <!-- SCALE -->
           <div v-if="filterMenuItemSelected == 'scale'">
-            <!-- <vue-range-slider ref="scaleRangeSlider" v-model="scaleValues" :min="scaleMin" :max="scaleMax" :step="scaleStep" :enable-cross="false" :height="2"></vue-range-slider> -->
             <div @click="onScaleSliderClick">
-              <!-- :processStyle="{ background: 'red' }" :railStyle="{ background: 'red' }" -->
-              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 14" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" />
+              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" />
             </div>
 
             <!-- <div class="values-line">
@@ -190,7 +187,9 @@
 
           <!-- PRICE -->
           <div v-if="filterMenuItemSelected == 'price'">
-            <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider>
+            <!-- <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider> -->
+            <vue-slider :dotSize="16" v-model="priceValues" :min="priceMin" :max="priceMax" :tooltip="'none'" :height="2" />
+
             <div class="values-line">
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
             </div>
@@ -202,6 +201,7 @@
               </div>
               <div class="min-max-input-item ml-md-20">
                 <label for="priceSelectedMax">Maximum Price</label>
+                <!-- <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax"> -->
                 <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax">
               </div>
             </div>
@@ -664,15 +664,21 @@ export default class Catalogue extends Vue {
   validateMinMaxInput(input: string, value: number): void {
     switch (input) {
       case 'minPrice': {
-        const minPrice = Number(value);
-        this.priceValues[0] = minPrice > this.priceValues[1] ? this.priceValues[1] : minPrice;
-        (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+        let min = Number(value);
+        min = min > this.priceValues[1] ? this.priceValues[1] : min;
+        min = min < this.priceMin ? this.priceMin : min;
+        this.priceValues = [min, this.priceValues[1]];
+        // this.priceValues = [minPrice > this.priceValues[1] ? this.priceValues[1] : minPrice, this.priceValues[1]];
+        // (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
         break;
       }
       case 'maxPrice': {
-        const maxPrice = Number(value);
-        this.priceValues[1] = maxPrice < this.priceValues[0] ? this.priceValues[0] : maxPrice;
-        (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
+        let max = Number(value);
+        max = max < this.priceValues[0] ? this.priceValues[0] : max;
+        max = max > this.priceMax ? this.priceMax : max;
+        this.priceValues = [this.priceValues[0], max];
+        // this.priceValues = [this.priceValues[0], maxPrice < this.priceValues[0] ? this.priceValues[0] : maxPrice];
+        // (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
         break;
       }
       case 'minScale': {
