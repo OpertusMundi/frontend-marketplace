@@ -156,8 +156,32 @@
                     <option value="" disabled selected>Select country/area</option>
                   </select>
                 </div>
-                <div class="d-flex align-items-center">
-                  <span><strong>3</strong></span> <div class="select-area-text">Or select an area of interest via a bounding box on the map.</div>
+                <div class="d-flex">
+                  <span><strong>3</strong></span>
+                  <div class="select-area-text">
+                    Or select an area of interest via a bounding box on the map.
+                    <div class="form-group mt-md-10">
+                      <label class="control control-radio">
+                        Box overlaps with asset geometry
+                        <input type="radio" name="asset_type" checked />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="control control-radio">
+                        Box fully contains asset geometry
+                        <input type="radio" name="asset_type" />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="control control-radio">
+                        Box is fully covered by asset geometry
+                        <input type="radio" name="asset_type" />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div id="mapCoverage"></div>
@@ -187,7 +211,7 @@
           <div class="tab-more" v-if="filterMenuItemSelected == 'more'">
             <div class="form-group">
               <label for="postal_code">Minimum number of Features</label>
-              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+              <input type="number" class="form-group__text" name="postal_code" id="postal_code" placeholder="e.g. 1500">
             </div>
 
             <hr>
@@ -199,12 +223,12 @@
 
             <div class="form-group">
               <label for="postal_code">Search by Language</label>
-              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Language">
             </div>
 
             <div class="form-group">
               <label for="postal_code">Search by License</label>
-              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+              <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="License">
             </div>
           </div>
         </div>
