@@ -536,8 +536,13 @@ export default class Catalogue extends Vue {
   onPropertyChanged(menuItem: string): void {
     if (menuItem === 'coverage') {
       setTimeout(() => {
-        // this.initMapCoverage();
+        this.initMapCoverage();
       }, 0);
+    } else {
+      if (this.mapCoverage) {
+        this.mapCoverage.remove();
+      }
+      this.mapCoverage = null;
     }
   }
 
@@ -705,23 +710,22 @@ export default class Catalogue extends Vue {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.mapCoverage);
-    console.log(this.mapCoverage);
 
     const latMin = 28.647719;
     const latMax = 73.426841;
     const lonMin = -32.519531;
     const lonMax = 58.359375;
 
-    const selectionLayerOptions = { fillColor: 'transparent', color: '#190AFF', dashArray: '20 20' };
+    // const selectionLayerOptions = { fillColor: 'transparent', color: '#190AFF', dashArray: '20 20' };
 
-    this.mapCoverageSelectionRectangle = L.rectangle([[latMin, lonMin], [latMin, lonMax], [latMax, lonMax], [latMax, lonMin], [latMin, lonMin]], selectionLayerOptions).addTo(this.mapCoverage);
-    this.mapCoverageSelectionRectangle.enableEdit();
+    // this.mapCoverageSelectionRectangle = L.rectangle([[latMin, lonMin], [latMin, lonMax], [latMax, lonMax], [latMax, lonMin], [latMin, lonMin]], selectionLayerOptions).addTo(this.mapCoverage);
+    // this.mapCoverageSelectionRectangle.enableEdit();
 
-    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
+    // this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
 
-    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
-      this.mapExtendToSelection();
-    });
+    // this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+    //   this.mapExtendToSelection();
+    // });
 
     L.easyButton('<i class="fas fa-vector-square"></i>', () => {
       this.mapExtendToSelection();
