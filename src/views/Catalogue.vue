@@ -152,11 +152,11 @@
                 <div class="d-flex align-items-center mb-md-20">
                   <span><strong>2</strong></span>
                   <div class="mr-md-10">
-                    <select v-model="countrySelected" class="form-group__select">
+                    <select :disabled="mapCoverageSelectionBBox ? true : false" @change="onCountrySelectChange" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
                     </select>
-                    <select v-if="countrySelected" v-model="areaSelected" class="form-group__select mt-md-5">
+                    <select :disabled="mapCoverageSelectionBBox ? true : false" v-if="countrySelected" v-model="areaSelected" class="form-group__select mt-md-5">
                       <option value="">(select area)</option>
                       <option v-for="area in getAreas()" :key="area.code"> {{area.name}} </option>
                     </select>
@@ -187,6 +187,7 @@
                         <div class="control_indicator"></div>
                       </label>
                     </div>
+                    <button @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
                   </div>
                 </div>
               </div>
@@ -335,6 +336,15 @@
               </div>
 
               <!-- COVERAGE -->
+              <div v-if="countrySelected && !areaSelected && !mapCoverageSelectionBBox" class="pill">
+                {{ countries.find((x) => x.code == countrySelected).name }}
+                <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
+              </div>
+              <div v-if="areaSelected && !mapCoverageSelectionBBox" class="pill">
+                {{ areaSelected }}
+                <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
+              </div>
+
               <div class="pill" v-if="mapCoverageSelectionBBox">
                 Area selection
                 <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
@@ -386,7 +396,8 @@ import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-editable';
+// import 'leaflet-editable';
+import 'leaflet-shades';
 import 'leaflet-easybutton';
 import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
@@ -450,6 +461,8 @@ export default class Catalogue extends Vue {
   mapCoverageSelectionRectangle: any;
 
   mapCoverageSelectionBBox: string;
+
+  mapShades: any;
 
   scaleValues: number[];
 
@@ -650,7 +663,17 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'coverage': {
+        this.countrySelected = '';
+        this.areaSelected = '';
+
         this.mapCoverageSelectionBBox = '';
+        this.mapShades.removeFrom(this.mapCoverage);
+        this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+        this.mapCoverageSelectionRectangle = null;
+        this.mapShades = null;
+        this.mapCoverage.off();
+        this.mapCoverage.remove();
+        this.initMapCoverage();
         break;
       }
       case 'price': {
@@ -742,7 +765,7 @@ export default class Catalogue extends Vue {
   }
 
   initMapCoverage(): void {
-    this.mapCoverage = (L as any).map('mapCoverage', { editable: true }).setView([0, 0], 4);
+    this.mapCoverage = (L as any).map('mapCoverage', { editable: true });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.mapCoverage);
@@ -751,6 +774,8 @@ export default class Catalogue extends Vue {
     const latMax = 73.426841;
     const lonMin = -32.519531;
     const lonMax = 58.359375;
+
+    this.mapCoverage.fitBounds([[latMin, lonMin], [latMax, lonMax]]);
 
     // const selectionLayerOptions = { fillColor: 'transparent', color: '#190AFF', dashArray: '20 20' };
 
@@ -764,8 +789,19 @@ export default class Catalogue extends Vue {
     // });
 
     L.easyButton('<i class="fas fa-vector-square"></i>', () => {
-      this.mapExtendToSelection();
+      // this.mapExtendToSelection();
+      this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
     }, 'Zoom to Selection').addTo(this.mapCoverage);
+  }
+
+  onCountrySelectChange() {
+    this.areaSelected = '';
+  }
+
+  onSetArea() {
+    this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
+    this.mapShades.addTo(this.mapCoverage);
+    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
 
   mapExtendToSelection(): void {

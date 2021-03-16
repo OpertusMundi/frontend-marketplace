@@ -283,3 +283,13 @@ small {
 // .slider-process, .slider-dot {
 //     background: $secondColor !important;
 // }
+
+.leaflet-areaselect-shade {
+    position: absolute;
+    background: rgba(0,0,0,0.4);
+    z-index: 400;
+  }
+  
+  .leaflet-interactive.leaflet-path-draggable {
+    fill: transparent !important;
+  }
