@@ -198,22 +198,17 @@
 
           <!-- PRICE -->
           <div class="tab tab-price" v-if="filterMenuItemSelected == 'price'">
-            <!-- <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider> -->
-            <!-- <vue-slider :dotSize="16" v-model="priceValues" :min="priceMin" :max="priceMax" :tooltip="'none'" :height="2" /> -->
-
-            <!-- <div class="values-line">
-              <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
-            </div> -->
-
             <div class="min-max-container">
               <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price</label>
-                <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin">
+                <!-- <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin"> -->
+                <input type="number" :min="0" v-model="priceMin" placeholder="Free" class="form-group__text">
               </div>
               <div class="min-max-input-item ml-md-20">
                 <label for="priceSelectedMax">Maximum Price</label>
                 <!-- <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax"> -->
-                <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax">
+                <!-- <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax"> -->
+                <input type="number" :min="0" v-model="priceMax" placeholder="no limit" class="form-group__text">
               </div>
             </div>
           </div>
@@ -289,25 +284,41 @@
 
               <!-- TYPE -->
               <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
-                {{ filter.name }}
+                {{ filter.pillLabel }}
                 <div class="close-button" @click="removeFilter('type', filter.name)"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- UPDATED -->
-              <div class="pill" v-if="filters.find((x) => x.name == 'update').options[0].value">
-                <!-- format data & show time only if different than 00:00 AM -->
+
+              <!-- <div class="pill" v-if="filters.find((x) => x.name == 'update').options[0].value">
+                <!- - format data & show time only if different than 00:00 AM - ->
                 Updated after {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }}
                 <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
               </div>
               <div class="pill" v-if="filters.find((x) => x.name == 'update').options[1].value">
-                <!-- format date & show time only if different than 23:59 PM -->
+                <!- - format date & show time only if different than 23:59 PM - ->
                 Updated before {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
                 <div class="close-button" @click="removeFilter('update', 'To')"><font-awesome-icon icon="times" /></div>
+              </div> -->
+
+              <div v-if="filters.find((x) => x.name == 'update').options[0].value && !filters.find((x) => x.name == 'update').options[1].value" class="pill">
+                After {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }}
+                <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <div v-if="!filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
+                Before {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
+                <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <div v-if="filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
+                {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }} - {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
+                <div class="close-button" @click="removeFilter('update')"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- TOPIC -->
               <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
-                <span>{{filter.name}}</span>
+                <span>{{filter.pillLabel}}</span>
                 <div class="close-button" @click="removeFilter('topic', filter.name)"><font-awesome-icon icon="times" /></div>
               </div>
 
@@ -330,10 +341,20 @@
               </div>
 
               <!-- PRICE -->
-              <div class="pill" v-if="priceValues[0] != priceMin || priceValues[1] != priceMax">
+              <div v-if="priceMin && !priceMax" class="pill">
+                &gt;{{ priceMin }}€
+              </div>
+              <div v-if="!priceMin && priceMax" class="pill">
+                &lt;{{ priceMax }}€
+              </div>
+              <div v-if="priceMin && priceMax" class="pill">
+                {{ priceMin }}€ - {{ priceMax }}€
+              </div>
+
+              <!-- <div class="pill" v-if="priceValues[0] != priceMin || priceValues[1] != priceMax">
                 {{priceValues[0]}}€ - {{priceValues[1]}}€
                 <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="filter-side-menu-bottom">
@@ -379,6 +400,7 @@ interface filterOption {
   name: string,
   isChecked?: boolean
   value?: string | number
+  pillLabel?: string
 }
 
 interface filterCategory {
@@ -439,11 +461,11 @@ export default class Catalogue extends Vue {
 
   // scaleStep: number;
 
-  priceValues: number[];
+  // priceValues: number|null[];
 
-  priceMin: number;
+  priceMin: number|null;
 
-  priceMax: number;
+  priceMax: number|null;
 
   crsList: crs[];
 
@@ -485,13 +507,13 @@ export default class Catalogue extends Vue {
     this.filters = [
       {
         name: 'type',
-        options: [{ name: 'Vector dataset', isChecked: false }, { name: 'Raster dataset', isChecked: false }, { name: 'API', isChecked: false }],
+        options: [{ name: 'Vector dataset', pillLabel: 'Vector', isChecked: false }, { name: 'Raster dataset', pillLabel: 'Raster', isChecked: false }, { name: 'API', pillLabel: 'API', isChecked: false }],
       }, {
         name: 'update',
         options: [{ name: 'From', value: '' }, { name: 'To', value: '' }, { name: 'timeFrom', value: '00:00 AM' }, { name: 'timeTo', value: '23:59 PM' }],
       }, {
         name: 'topic',
-        options: [{ name: 'Biota', isChecked: false }, { name: 'Boundaries', isChecked: false }, { name: 'Clima', isChecked: false }, { name: 'Economy', isChecked: false }, { name: 'Elevation', isChecked: false }, { name: 'Environment', isChecked: false }, { name: 'Farming', isChecked: false }, { name: 'Geo-Scientific', isChecked: false }, { name: 'Health', isChecked: false }, { name: 'Imagery', isChecked: false }, { name: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', isChecked: false }, { name: 'Location', isChecked: false }, { name: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', isChecked: false }, { name: 'Society', isChecked: false }, { name: 'Structure', isChecked: false }, { name: 'Transportation', isChecked: false }, { name: 'Utilities Communication', isChecked: false }],
+        options: [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }],
       },
     ];
 
@@ -517,9 +539,9 @@ export default class Catalogue extends Vue {
     this.scaleMax = 10000000;
     // this.scaleStep = 10;
 
-    this.priceValues = [0, 5000];
-    this.priceMin = 0;
-    this.priceMax = 5000;
+    // this.priceValues = [null, null];
+    this.priceMin = null;
+    this.priceMax = null;
     // this.priceStep = 1;
 
     this.crsList = [{ code: '4326', description: 'EPSG:4326 | WGS84' }, { code: '3857', description: 'EPSG:3857 | Pseudo-Mercator WGS84' }];
@@ -587,6 +609,7 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'update': {
+        /*
         switch (filterName) {
           case 'From': {
             // eslint-disable-next-line
@@ -604,6 +627,17 @@ export default class Catalogue extends Vue {
           }
           default:
         }
+        */
+
+        // eslint-disable-next-line
+        this.filters.find((x) => x.name === category)!.options[0].value = '';
+        // eslint-disable-next-line
+        this.filters.find((x) => x.name === category)!.options[2].value = '00:00 AM';
+
+        // eslint-disable-next-line
+        this.filters.find((x) => x.name === category)!.options[1].value = '';
+        // eslint-disable-next-line
+        this.filters.find((x) => x.name === category)!.options[3].value = '23:59 PM';
         break;
       }
       case 'format': {
@@ -620,7 +654,9 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'price': {
-        this.priceValues = [this.priceMin, this.priceMax];
+        // this.priceValues = [this.priceMin, this.priceMax];
+        this.priceMin = null;
+        this.priceMax = null;
         break;
       }
       case 'scale': {
@@ -769,24 +805,26 @@ export default class Catalogue extends Vue {
 
   validateMinMaxInput(input: string, value: number): void {
     switch (input) {
-      case 'minPrice': {
-        let min = Number(value);
-        min = min > this.priceValues[1] ? this.priceValues[1] : min;
-        min = min < this.priceMin ? this.priceMin : min;
-        this.priceValues = [min, this.priceValues[1]];
+      /*
+      // case 'minPrice': {
+        // let min = Number(value);
+          // min = min > this.priceValues[1] ? this.priceValues[1] : min;
+        // min = min < this.priceMin ? this.priceMin : min;
+        // this.priceValues = [min, this.priceValues[1]];
         // this.priceValues = [minPrice > this.priceValues[1] ? this.priceValues[1] : minPrice, this.priceValues[1]];
         // (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
-        break;
-      }
-      case 'maxPrice': {
-        let max = Number(value);
-        max = max < this.priceValues[0] ? this.priceValues[0] : max;
-        max = max > this.priceMax ? this.priceMax : max;
-        this.priceValues = [this.priceValues[0], max];
+        // break;
+      // }
+      // case 'maxPrice': {
+        // let max = Number(value);
+        // max = max < this.priceValues[0] ? this.priceValues[0] : max;
+        // max = max > this.priceMax ? this.priceMax : max;
+        // this.priceValues = [this.priceValues[0], max];
         // this.priceValues = [this.priceValues[0], maxPrice < this.priceValues[0] ? this.priceValues[0] : maxPrice];
         // (this as any).$refs.priceRangeSlider.setValue(this.priceValues);
-        break;
-      }
+        // break;
+      // }
+      */
       case 'minScale': {
         console.log('min scale');
         const minScale = Number(value);
