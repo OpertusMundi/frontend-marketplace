@@ -137,6 +137,7 @@ small {
     height: 400px;
     width: 100%;
     margin: 0 10px 0 10px;
+    background: orange;
 }
 
 .coverage-side-menu {
@@ -186,6 +187,19 @@ small {
 .min-max-scale-input {
     display: inline-flex !important;
     width: auto !important;
+}
+
+// .crs-search-autocomplete {
+// }
+
+.crs-search-autocomplete ul li {
+    border-bottom: solid 1px #f2f2f2;
+    padding: 10px 10px 10px 20px;
+    cursor: pointer;
+}
+
+.crs-search-autocomplete ul li:hover {
+    background: #f2f2f2;
 }
 
 .tab {

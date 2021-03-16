@@ -94,19 +94,21 @@
           <!-- CRS -->
           <div class="tab tab-crs" v-if="filterMenuItemSelected == 'crs'">
             <small>Popular CRS</small>
-            <div class="checkbox-group mt-md-10 mb-md-5">
-              <input type="checkbox" class="mr-md-10" id="EPSG:4326">
-              <label for="EPSG:4326">WGS84 | EPSG:4326</label>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" class="mr-md-10" id="EPSG:3857">
-              <label for="EPSG:3857">EPSG:3857</label>
+            <div class="mt-md-10">
+              <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-md-5">
+                <input type="checkbox" class="mr-md-10" :id="'EPSG_' + crs.code">
+                <label :for="'EPSG_' + crs.code"> {{ crs.description }} </label>
+              </div>
             </div>
 
             <div class="mt-md-30">
               <small>Search for CRS</small>
-              <input type="text" class="form-group__text mt-md-20" placeholder="CRS name or Code">
+              <input v-model="crsSearchString" @input="searchCrs($event.target.value)" type="text" class="form-group__text mt-md-10" placeholder="CRS name or Code">
+              <div v-if="crsSearchString" class="crs-search-autocomplete">
+                <ul>
+                  <li @click="addCrsToList(crs)" v-for="crs in crsSearchList" :key="crs.code">{{crs.description}}</li>
+                </ul>
+              </div>
             </div>
 
           </div>
@@ -149,9 +151,16 @@
                 </div>
                 <div class="d-flex align-items-center mb-md-20">
                   <span><strong>2</strong></span>
-                  <select class="form-group__select">
-                    <option value="" disabled selected>Select country/area</option>
-                  </select>
+                  <div class="mr-md-10">
+                    <select v-model="countrySelected" class="form-group__select">
+                      <option value="">(Select country)</option>
+                      <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
+                    </select>
+                    <select v-if="countrySelected" v-model="areaSelected" class="form-group__select mt-md-5">
+                      <option value="">(select area)</option>
+                      <option v-for="area in getAreas()" :key="area.code"> {{area.name}} </option>
+                    </select>
+                  </div>
                 </div>
                 <div class="d-flex">
                   <span><strong>3</strong></span>
@@ -181,7 +190,9 @@
                   </div>
                 </div>
               </div>
+
               <div id="mapCoverage"></div>
+
             </div>
           </div>
 
@@ -219,12 +230,6 @@
               </span>
             </div>
 
-            <!-- <div class="tab-more-side-menu d-flex flex-column">
-              <span @click="selectFilterMoreSubmenuItem('numberOfFeatures')" :class="{ active: filterMoreSubmenuItemSelected == 'numberOfFeatures' }"> Number of Features </span>
-              <span @click="selectFilterMoreSubmenuItem('vendor')" :class="{ active: filterMoreSubmenuItemSelected == 'vendor' }"> Vendor </span>
-              <span @click="selectFilterMoreSubmenuItem('language')" :class="{ active: filterMoreSubmenuItemSelected == 'language' }"> Language </span>
-              <span @click="selectFilterMoreSubmenuItem('license')" :class="{ active: filterMoreSubmenuItemSelected == 'license' }"> License </span>
-            </div> -->
             <div class="tab-more-main">
               <div v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <div class="form-group">
@@ -367,6 +372,8 @@ import { dom } from '@fortawesome/fontawesome-svg-core';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
 import epsgList from '../service/lists/epsg';
+import countries from '../service/lists/countries';
+import nuts from '../service/lists/nuts';
 
 interface filterOption {
   name: string,
@@ -377,6 +384,11 @@ interface filterOption {
 interface filterCategory {
   name: string,
   options: filterOption[]
+}
+
+interface crs {
+  code: string,
+  description: string
 }
 
 @Component({
@@ -432,6 +444,20 @@ export default class Catalogue extends Vue {
   priceMin: number;
 
   priceMax: number;
+
+  crsList: crs[];
+
+  crsSearchString: string;
+
+  crsSearchList: crs[];
+
+  countries: { code: string, name: string }[];
+
+  areas: { code: string, name: string }[];
+
+  countrySelected: string;
+
+  areaSelected: string;
 
   constructor() {
     super();
@@ -495,13 +521,22 @@ export default class Catalogue extends Vue {
     this.priceMin = 0;
     this.priceMax = 5000;
     // this.priceStep = 1;
+
+    this.crsList = [{ code: '4326', description: 'EPSG:4326 | WGS84' }, { code: '3857', description: 'EPSG:3857 | Pseudo-Mercator WGS84' }];
+    this.crsSearchString = '';
+    this.crsSearchList = [];
+
+    this.countries = countries;
+    this.areas = nuts;
+    this.countrySelected = '';
+    this.areaSelected = '';
   }
 
   @Watch('filterMenuItemSelected')
   onPropertyChanged(menuItem: string): void {
     if (menuItem === 'coverage') {
       setTimeout(() => {
-        this.initMapCoverage();
+        // this.initMapCoverage();
       }, 0);
     }
   }
@@ -696,6 +731,24 @@ export default class Catalogue extends Vue {
   mapExtendToSelection(): void {
     this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
+  }
+
+  getAreas(): {code: string, name: string}[] {
+    return this.areas.filter((x) => x.code === this.countrySelected);
+  }
+
+  searchCrs(str: string): void {
+    if (!str) {
+      this.crsSearchList = [];
+      return;
+    }
+    const filtered = epsgList.filter((x) => x.code.toLowerCase().includes(str.toLowerCase()) || x.description.toLowerCase().includes(str.toLowerCase()));
+    this.crsSearchList = filtered;
+  }
+
+  addCrsToList(crs: crs): void {
+    this.crsList.push(crs);
+    this.crsSearchString = '';
   }
 
   // validateSelectedMinPrice(minPrice: string): void {
