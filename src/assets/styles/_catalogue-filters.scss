@@ -48,13 +48,15 @@ input[type="checkbox"]:checked {
     background: white;
     min-height: 400px;
     width: calc(100% - 48px);
+    // box-sizing: border-box;
+    width: 100%;
     border-radius: 7px;
     position: absolute;
     z-index: 10;
     display: flex;
     // flex-direction: column;
     box-shadow: 7px 7px 15px rgb(134, 134, 134);
-    padding: 0 0 0 20px;
+    // padding: 0 0 0 20px;
     margin-top: 5px;
 }
 
@@ -70,7 +72,7 @@ input[type="checkbox"]:checked {
 
 .filter-container {
     flex-grow: 1;
-    margin: 20px 10px 20px 0;
+    // margin: 20px 10px 20px 0;
 }
 
 .filter-side-menu {
@@ -186,6 +188,11 @@ small {
     width: auto !important;
 }
 
+.tab {
+    height: 100%;
+    padding: 30px;
+}
+
 .tab-topic {
     // height: 400px;
     display: grid;
@@ -193,6 +200,36 @@ small {
     //grid-template-rows: 25px 25px;
     // grid-auto-flow: column;
     grid-gap: 5px;
+}
+
+.tab-more {
+    display: flex;
+    padding: 0;
+}
+
+.tab-more-side-menu {
+    background: #f2f2f2;
+    height: 100%;
+}
+
+.tab-more-side-menu span {
+    padding: 10px 20px 10px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.tab-more-side-menu span:hover {
+    background: #d4d4d4;
+    // color: #fff;
+}
+
+.tab-more-side-menu span.active {
+    background: $secondColor;
+    color: #fff;
+}
+
+.tab-more-main {
+    padding: 20px;
 }
 
 .tab-more input, .tab-more hr {
@@ -225,11 +262,11 @@ small {
     border-color: $secondColor;
 }
 
-/* css solution cause disabling in props throws error */
-.slider-tooltip-wrap, .slider-tooltip {
-    display: none !important;
-}
+// /* css solution cause disabling in props throws error */
+// .slider-tooltip-wrap, .slider-tooltip {
+//     display: none !important;
+// }
 
-.slider-process, .slider-dot {
-    background: $secondColor !important;
-}
+// .slider-process, .slider-dot {
+//     background: $secondColor !important;
+// }

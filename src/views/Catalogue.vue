@@ -23,7 +23,7 @@
         <div class="filter-container">
 
           <!-- TYPE -->
-          <div v-if="filterMenuItemSelected == 'type'">
+          <div class="tab tab-type" v-if="filterMenuItemSelected == 'type'">
             <div class="checkbox-group mt-md-10" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
               <input type="checkbox" class="mr-md-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
@@ -33,7 +33,7 @@
           </div>
 
           <!-- UPDATE -->
-          <div v-if="filterMenuItemSelected == 'update'">
+          <div class="tab tab-update" v-if="filterMenuItemSelected == 'update'">
             <div class="d-flex">
               <div class="d-flex flex-column">
                 <h5 class="date-labels">From date</h5>
@@ -55,7 +55,7 @@
           </div>
 
           <!-- TOPIC -->
-          <div class="tab-topic" v-if="filterMenuItemSelected == 'topic'">
+          <div class="tab tab-topic" v-if="filterMenuItemSelected == 'topic'">
             <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
               <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
@@ -63,7 +63,7 @@
           </div>
 
           <!-- FORMAT -->
-          <div v-if="filterMenuItemSelected == 'format'" class="d-flex">
+          <div class="tab tab-format d-flex" v-if="filterMenuItemSelected == 'format'">
 
             <div class="flex-grow-1" v-if="shownFormatCategories().includes('vector')">
               <h3 class="format-category-title">Vector</h3>
@@ -92,7 +92,7 @@
           </div>
 
           <!-- CRS -->
-          <div v-if="filterMenuItemSelected == 'crs'">
+          <div class="tab tab-crs" v-if="filterMenuItemSelected == 'crs'">
             <small>Popular CRS</small>
             <div class="checkbox-group mt-md-10 mb-md-5">
               <input type="checkbox" class="mr-md-10" id="EPSG:4326">
@@ -112,7 +112,7 @@
           </div>
 
           <!-- SCALE -->
-          <div v-if="filterMenuItemSelected == 'scale'">
+          <div class="tab tab-scale" v-if="filterMenuItemSelected == 'scale'">
             <div @click="onScaleSliderClick">
               <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" />
             </div>
@@ -141,7 +141,7 @@
           </div>
 
           <!-- COVERAGE -->
-          <div v-if="filterMenuItemSelected == 'coverage'">
+          <div class="tab tab-coverage" v-if="filterMenuItemSelected == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
                 <div class="d-flex align-items-center mb-md-20">
@@ -186,7 +186,7 @@
           </div>
 
           <!-- PRICE -->
-          <div v-if="filterMenuItemSelected == 'price'">
+          <div class="tab tab-price" v-if="filterMenuItemSelected == 'price'">
             <!-- <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider> -->
             <vue-slider :dotSize="16" v-model="priceValues" :min="priceMin" :max="priceMax" :tooltip="'none'" :height="2" />
 
@@ -208,8 +208,42 @@
           </div>
 
           <!-- MORE -->
-          <div class="tab-more" v-if="filterMenuItemSelected == 'more'">
-            <div class="form-group">
+          <div class="tab tab-more" v-if="filterMenuItemSelected == 'more'">
+
+            <div class="tab-more-side-menu d-flex flex-column">
+              <span @click="selectFilterMoreSubmenuItem('numberOfFeatures')" :class="{ active: filterMoreSubmenuItemSelected == 'numberOfFeatures' }"> Number of Features </span>
+              <span @click="selectFilterMoreSubmenuItem('vendor')" :class="{ active: filterMoreSubmenuItemSelected == 'vendor' }"> Vendor </span>
+              <span @click="selectFilterMoreSubmenuItem('language')" :class="{ active: filterMoreSubmenuItemSelected == 'language' }"> Language </span>
+              <span @click="selectFilterMoreSubmenuItem('license')" :class="{ active: filterMoreSubmenuItemSelected == 'license' }"> License </span>
+            </div>
+            <div class="tab-more-main">
+              <div v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
+                <div class="form-group">
+                  <label for="postal_code">Minimum number of Features</label>
+                  <input type="number" class="form-group__text" name="postal_code" id="postal_code" placeholder="e.g. 1500">
+                </div>
+              </div>
+              <div v-if="filterMoreSubmenuItemSelected == 'vendor'">
+                <div class="form-group">
+                  <label for="postal_code">Search by Vendor</label>
+                  <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+                </div>
+              </div>
+              <div v-if="filterMoreSubmenuItemSelected == 'language'">
+                <div class="form-group">
+                  <label for="postal_code">Search by Language</label>
+                  <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Language">
+                </div>
+              </div>
+              <div v-if="filterMoreSubmenuItemSelected == 'license'">
+                <div class="form-group">
+                  <label for="postal_code">Search by License</label>
+                  <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="License">
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="form-group">
               <label for="postal_code">Minimum number of Features</label>
               <input type="number" class="form-group__text" name="postal_code" id="postal_code" placeholder="e.g. 1500">
             </div>
@@ -229,7 +263,7 @@
             <div class="form-group">
               <label for="postal_code">Search by License</label>
               <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="License">
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -323,11 +357,6 @@ import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
-// we should maybe not include default CSS
-import 'vue-range-component/dist/vue-range-slider.css';
-// there is a known bug: https://github.com/xwpongithub/vue-range-slider/issues/18
-// fixed it by editing lib's js files as proposed
-import VueRangeSlider from 'vue-range-component';
 
 interface filterOption {
   name: string,
@@ -345,7 +374,6 @@ interface filterCategory {
     CatalogueCard,
     Datepicker,
     VueTimepicker,
-    VueRangeSlider,
     VueSlider,
   },
 })
@@ -364,6 +392,8 @@ export default class Catalogue extends Vue {
   filterMenuItems: {id: string, name: string}[];
 
   filterMenuItemSelected: string;
+
+  filterMoreSubmenuItemSelected: string;
 
   filters: filterCategory[];
 
@@ -410,6 +440,8 @@ export default class Catalogue extends Vue {
     this.catalogueApi = new CatalogueApi();
 
     this.filterMenuItemSelected = '';
+
+    this.filterMoreSubmenuItemSelected = 'numberOfFeatures';
 
     this.filters = [
       {
@@ -484,6 +516,10 @@ export default class Catalogue extends Vue {
 
   selectfilterMenuItem(filterItem: string): void {
     this.filterMenuItemSelected = filterItem;
+  }
+
+  selectFilterMoreSubmenuItem(filterItem: string): void {
+    this.filterMoreSubmenuItemSelected = filterItem;
   }
 
   removeFilter(category: string, filterName: string): void {
