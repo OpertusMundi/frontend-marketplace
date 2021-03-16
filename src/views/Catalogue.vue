@@ -113,7 +113,7 @@
 
           <!-- SCALE -->
           <div class="tab tab-scale" v-if="filterMenuItemSelected == 'scale'">
-            <div @click="onScaleSliderClick">
+            <div class="ml-md-20 mr-md-20" @click="onScaleSliderClick">
               <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" />
             </div>
 
@@ -188,13 +188,13 @@
           <!-- PRICE -->
           <div class="tab tab-price" v-if="filterMenuItemSelected == 'price'">
             <!-- <vue-range-slider ref="priceRangeSlider" v-model="priceValues" :min="priceMin" :max="priceMax" :step="priceStep" :enable-cross="false" :height="2"></vue-range-slider> -->
-            <vue-slider :dotSize="16" v-model="priceValues" :min="priceMin" :max="priceMax" :tooltip="'none'" :height="2" />
+            <!-- <vue-slider :dotSize="16" v-model="priceValues" :min="priceMin" :max="priceMax" :tooltip="'none'" :height="2" /> -->
 
-            <div class="values-line">
+            <!-- <div class="values-line">
               <span v-for="index in 5" :key="index"> {{(index-1)*priceMax/4}}€ </span>
-            </div>
+            </div> -->
 
-            <div class="mt-md-40 min-max-container">
+            <div class="min-max-container">
               <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price</label>
                 <input type="number" :min="priceMin" :value="priceValues[0]" @input="validateMinMaxInput('minPrice', $event.target.value)" class="form-group__text" id="priceSelectedMin">
@@ -211,11 +211,20 @@
           <div class="tab tab-more" v-if="filterMenuItemSelected == 'more'">
 
             <div class="tab-more-side-menu d-flex flex-column">
+              <span v-for="filter in filterMoreSubmenuItems"
+                :key="filter.id"
+                @click="selectFilterMoreSubmenuItem(filter.id)"
+                :class="{ active: filterMoreSubmenuItemSelected == filter.id }">
+                  {{ filter.name }}
+              </span>
+            </div>
+
+            <!-- <div class="tab-more-side-menu d-flex flex-column">
               <span @click="selectFilterMoreSubmenuItem('numberOfFeatures')" :class="{ active: filterMoreSubmenuItemSelected == 'numberOfFeatures' }"> Number of Features </span>
               <span @click="selectFilterMoreSubmenuItem('vendor')" :class="{ active: filterMoreSubmenuItemSelected == 'vendor' }"> Vendor </span>
               <span @click="selectFilterMoreSubmenuItem('language')" :class="{ active: filterMoreSubmenuItemSelected == 'language' }"> Language </span>
               <span @click="selectFilterMoreSubmenuItem('license')" :class="{ active: filterMoreSubmenuItemSelected == 'license' }"> License </span>
-            </div>
+            </div> -->
             <div class="tab-more-main">
               <div v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <div class="form-group">
@@ -357,6 +366,7 @@ import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
+import epsgList from '../service/lists/epsg';
 
 interface filterOption {
   name: string,
@@ -391,6 +401,8 @@ export default class Catalogue extends Vue {
   // filterMenuItems: string[];
   filterMenuItems: {id: string, name: string}[];
 
+  filterMoreSubmenuItems: {id: string, name: string}[];
+
   filterMenuItemSelected: string;
 
   filterMoreSubmenuItemSelected: string;
@@ -421,14 +433,15 @@ export default class Catalogue extends Vue {
 
   priceMax: number;
 
-  priceStep: number;
-
   constructor() {
     super();
 
     dom.watch();
 
-    this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'update', name: 'UPDATE' }, { id: 'topic', name: 'TOPIC' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'more', name: 'MORE' }];
+    console.log(epsgList[3]);
+
+    this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
+    this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'vendor', name: 'Vendor' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
 
     this.query = '';
     this.queryResults = [];
@@ -481,7 +494,7 @@ export default class Catalogue extends Vue {
     this.priceValues = [0, 5000];
     this.priceMin = 0;
     this.priceMax = 5000;
-    this.priceStep = 1;
+    // this.priceStep = 1;
   }
 
   @Watch('filterMenuItemSelected')
