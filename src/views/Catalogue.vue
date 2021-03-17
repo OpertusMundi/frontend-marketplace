@@ -96,7 +96,7 @@
             <small>Popular CRS</small>
             <div class="mt-md-10">
               <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-md-5">
-                <input type="checkbox" class="mr-md-10" :id="'EPSG_' + crs.code">
+                <input type="checkbox" class="mr-md-10" :id="'EPSG_' + crs.code" v-model="crs.isChecked">
                 <label :for="'EPSG_' + crs.code"> {{ crs.description }} </label>
               </div>
             </div>
@@ -116,7 +116,7 @@
           <!-- SCALE -->
           <div class="tab tab-scale" v-if="filterMenuItemSelected == 'scale'">
             <div class="ml-md-20 mr-md-20" @click="onScaleSliderClick">
-              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" />
+              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
             </div>
 
             <!-- <div class="values-line">
@@ -128,14 +128,14 @@
                 <label for="scaleSelectedMin">Minimum Scale</label>
                 <div>
                   <span>1 : </span>
-                  <input :min="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
+                  <input :min="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
                 </div>
               </div>
               <div class="min-max-input-item ml-md-20">
                 <label for="scaleSelectedMax">Maximum Scale</label>
                 <div>
                   <span>1 : </span>
-                  <input :max="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
+                  <input :max="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
                 </div>
               </div>
             </div>
@@ -187,7 +187,8 @@
                         <div class="control_indicator"></div>
                       </label>
                     </div>
-                    <button @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
+                    <!-- <button @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
+                    <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
                   </div>
                 </div>
               </div>
@@ -209,7 +210,7 @@
                 <label for="priceSelectedMax">Maximum Price</label>
                 <!-- <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax"> -->
                 <!-- <input type="number" :max="priceMax" :value="priceValues[1]" @input="validateMinMaxInput('maxPrice', $event.target.value)" class="form-group__text" id="priceSelectedMax"> -->
-                <input type="number" :min="0" v-model="priceMax" placeholder="no limit" class="form-group__text">
+                <input type="number" :min="0" v-model="priceMax" placeholder="No Limit" class="form-group__text">
               </div>
             </div>
           </div>
@@ -331,8 +332,14 @@
 
               <!-- SCALE -->
               <div class="pill" v-if="scaleValues[0] != scaleMin || scaleValues[1] != scaleMax">
-                1:{{scaleValues[1]}} - 1:{{scaleValues[0]}}€
+                1:{{scaleValues[1]}} - 1:{{scaleValues[0]}}
                 <div class="close-button" @click="removeFilter('scale')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- CRS -->
+              <div class="pill" v-for="filter in getFiltersChecked('crs')" :key="filter.code">
+                EPSG:{{filter.code}}
+                <div class="close-button" @click="removeFilter('crs', filter.code)"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- COVERAGE -->
@@ -421,7 +428,8 @@ interface filterCategory {
 
 interface crs {
   code: string,
-  description: string
+  description: string,
+  isChecked?: boolean
 }
 
 @Component({
@@ -460,6 +468,8 @@ export default class Catalogue extends Vue {
 
   mapCoverageSelectionRectangle: any;
 
+  mapCoverageSelectionIsDrawn: boolean;
+
   mapCoverageSelectionBBox: string;
 
   mapShades: any;
@@ -480,6 +490,8 @@ export default class Catalogue extends Vue {
 
   priceMax: number|null;
 
+  epsgAll: crs[];
+
   crsList: crs[];
 
   crsSearchString: string;
@@ -498,8 +510,6 @@ export default class Catalogue extends Vue {
     super();
 
     dom.watch();
-
-    console.log(epsgList[3]);
 
     this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
     this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'vendor', name: 'Vendor' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
@@ -538,6 +548,8 @@ export default class Catalogue extends Vue {
 
     this.mapCoverageSelectionBBox = '';
 
+    this.mapCoverageSelectionIsDrawn = false;
+
     this.scaleValues = [10, 10000000];
     this.scaleSliderOptions = [
       { id: 10, name: '1 : 10' },
@@ -557,7 +569,8 @@ export default class Catalogue extends Vue {
     this.priceMax = null;
     // this.priceStep = 1;
 
-    this.crsList = [{ code: '4326', description: 'EPSG:4326 | WGS84' }, { code: '3857', description: 'EPSG:3857 | Pseudo-Mercator WGS84' }];
+    this.epsgAll = epsgList;
+    this.crsList = [{ code: '4326', description: 'EPSG:4326, WGS84', isChecked: false }, { code: '3857', description: 'EPSG:3857, Pseudo-Mercator WGS84', isChecked: false }];
     this.crsSearchString = '';
     this.crsSearchList = [];
 
@@ -621,27 +634,11 @@ export default class Catalogue extends Vue {
         option!.isChecked = false;
         break;
       }
+      case 'crs': {
+        this.crsList.find((x) => x.code === filterName)!.isChecked = false;
+        break;
+      }
       case 'update': {
-        /*
-        switch (filterName) {
-          case 'From': {
-            // eslint-disable-next-line
-            this.filters.find((x) => x.name === category)!.options[0].value = '';
-            // eslint-disable-next-line
-            this.filters.find((x) => x.name === category)!.options[2].value = '00:00 AM';
-            break;
-          }
-          case 'To': {
-            // eslint-disable-next-line
-            this.filters.find((x) => x.name === category)!.options[1].value = '';
-            // eslint-disable-next-line
-            this.filters.find((x) => x.name === category)!.options[3].value = '23:59 PM';
-            break;
-          }
-          default:
-        }
-        */
-
         // eslint-disable-next-line
         this.filters.find((x) => x.name === category)!.options[0].value = '';
         // eslint-disable-next-line
@@ -667,6 +664,7 @@ export default class Catalogue extends Vue {
         this.areaSelected = '';
 
         this.mapCoverageSelectionBBox = '';
+        this.mapCoverageSelectionIsDrawn = false;
         this.mapShades.removeFrom(this.mapCoverage);
         this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
         this.mapCoverageSelectionRectangle = null;
@@ -708,6 +706,11 @@ export default class Catalogue extends Vue {
       case 'format':
         result = Object.values(this.formats)
           .flat()
+          .filter((x) => x.isChecked);
+        break;
+
+      case 'crs':
+        result = this.crsList
           .filter((x) => x.isChecked);
         break;
 
@@ -784,13 +787,12 @@ export default class Catalogue extends Vue {
 
     // this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
 
-    // this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
-    //   this.mapExtendToSelection();
-    // });
-
     L.easyButton('<i class="fas fa-vector-square"></i>', () => {
       // this.mapExtendToSelection();
       this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
+      this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+        this.mapCoverageSelectionIsDrawn = true;
+      });
     }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
@@ -818,13 +820,17 @@ export default class Catalogue extends Vue {
       this.crsSearchList = [];
       return;
     }
-    const filtered = epsgList.filter((x) => x.code.toLowerCase().includes(str.toLowerCase()) || x.description.toLowerCase().includes(str.toLowerCase()));
+    const filtered = this.epsgAll.filter((x) => x.code.toLowerCase().includes(str.toLowerCase()) || x.description.toLowerCase().includes(str.toLowerCase()));
     this.crsSearchList = filtered;
   }
 
   addCrsToList(crs: crs): void {
+    // eslint-disable-next-line
+    crs.isChecked = false;
     this.crsList.push(crs);
     this.crsSearchString = '';
+    this.crsList = JSON.parse(JSON.stringify(this.crsList));
+    this.epsgAll = this.epsgAll.filter((x) => x.code !== crs.code);
   }
 
   // validateSelectedMinPrice(minPrice: string): void {
