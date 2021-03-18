@@ -168,11 +168,11 @@
           <div class="tab tab-coverage" v-if="filterMenuItemSelected == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
-                <div class="d-flex align-items-center mb-md-20">
+                <!-- <div class="d-flex align-items-center mb-md-20">
                   <span><strong>1</strong></span> <input type="text" class="form-group__text" placeholder="Search City/Area">
-                </div>
+                </div> -->
                 <div class="d-flex align-items-center mb-md-20">
-                  <span><strong>2</strong></span>
+                  <span><strong>1</strong></span>
                   <div class="mr-md-10">
                     <select :disabled="mapCoverageSelectionBBox ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
@@ -185,7 +185,7 @@
                   </div>
                 </div>
                 <div class="d-flex">
-                  <span><strong>3</strong></span>
+                  <span><strong>2</strong></span>
                   <div class="select-area-text">
                     Or select an area of interest via a bounding box on the map.
                     <div class="form-group mt-md-10">
@@ -209,15 +209,19 @@
                         <div class="control_indicator"></div>
                       </label>
                     </div>
-                    <!-- <button @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
-                    <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button>
+                    <!-- <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
                     <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
                     <button v-if="mapCoverageSelectionIsDrawn && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
                 </div>
               </div>
 
-              <div id="mapCoverage"></div>
+              <div class="map-coverage-wrapper">
+                <div id="mapCoverage">
+                </div>
+                <input style="position: absolute; right: 0; top: 0; margin: 5px; width: 200px; z-index: 2000" type="text" class="form-group__text" placeholder="Search City/Area">
+                <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox && !mapCoverageDrawMode" @click="onDrawArea" style="bottom: 0; margin: 5px; position: absolute; z-index: 2000" class="btn--std btn--blue">Draw Area</button>
+              </div>
 
             </div>
           </div>
@@ -252,37 +256,68 @@
             </div>
 
             <div class="tab-more-main">
+              <!-- NUMBER OF FEATURES -->
               <div class="ml-md-20" v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <h4>Dataset size</h4>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_small">
-                  <label for="dataset_small"> Small </label>
+                  <label for="dataset_small"> Small <small class="grayed ml-md-20">&lt; 1000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_medium">
-                  <label for="dataset_medium"> Medium </label>
+                  <label for="dataset_medium"> Medium <small class="grayed ml-md-20">1000 - 100.000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_large">
-                  <label for="dataset_large"> Large </label>
+                  <label for="dataset_large"> Large <small class="grayed ml-md-20">&gt; 100.000 features</small></label>
                 </div>
               </div>
+
+              <!-- VENDOR -->
               <div v-if="filterMoreSubmenuItemSelected == 'vendor'">
                 <div class="form-group">
-                  <label for="postal_code">Search by Vendor</label>
-                  <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Vendor name">
+                  <label>Search by Vendor</label>
+                  <input v-for="(vendor, i) in vendors" :key="i" v-model="vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
                 </div>
+                <button @click="addVendor" class="fab-button">+</button>
               </div>
+
+              <!-- LANGUAGE -->
               <div v-if="filterMoreSubmenuItemSelected == 'language'">
-                <div class="form-group">
+                <h4>Language of asset fields / labels</h4>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_small">
+                  <label for="dataset_small"> English (UK/US)</label>
+                </div>
+                <hr>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_medium">
+                  <label for="dataset_medium"> German</label>
+                </div>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_large">
+                  <label for="dataset_large"> French</label>
+                </div>
+                <!-- <div class="form-group">
                   <label for="postal_code">Search by Language</label>
                   <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="Language">
-                </div>
+                </div> -->
               </div>
+
+              <!-- LICENSE -->
               <div v-if="filterMoreSubmenuItemSelected == 'license'">
-                <div class="form-group">
-                  <label for="postal_code">Search by License</label>
-                  <input type="text" class="form-group__text" name="postal_code" id="postal_code" placeholder="License">
+                <h4>Permitted use</h4>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="license_open">
+                  <label for="license_open"> Open license</label>
+                </div>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="license_organization">
+                  <label for="license_organization"> Within your organization</label>
+                </div>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="license_webgis">
+                  <label for="license_webgis"> Web-GIS applications</label>
                 </div>
               </div>
             </div>
@@ -446,8 +481,8 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 // import 'leaflet-editable';
 import 'leaflet-shades';
-import 'leaflet-easybutton';
-import 'leaflet-easybutton/src/easy-button.css';
+// import 'leaflet-easybutton';
+// import 'leaflet-easybutton/src/easy-button.css';
 import { dom } from '@fortawesome/fontawesome-svg-core';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
@@ -511,6 +546,8 @@ export default class Catalogue extends Vue {
 
   mapCoverageSelectionRectangle: any;
 
+  mapCoverageDrawMode: boolean;
+
   mapCoverageSelectionIsDrawn: boolean;
 
   mapCoverageSelectionBBox: string;
@@ -546,6 +583,8 @@ export default class Catalogue extends Vue {
   areas: { code: string, name: string }[];
 
   countrySelected: string;
+
+  vendors: string[];
 
   constructor() {
     super();
@@ -598,6 +637,8 @@ export default class Catalogue extends Vue {
 
     this.mapCoverageSelectionBBox = '';
 
+    this.mapCoverageDrawMode = false;
+
     this.mapCoverageSelectionIsDrawn = false;
 
     this.scaleValues = [10, 10000000];
@@ -627,6 +668,8 @@ export default class Catalogue extends Vue {
     this.countries = countries;
     this.areas = nuts;
     this.countrySelected = '';
+
+    this.vendors = [''];
   }
 
   @Watch('filterMenuItemSelected')
@@ -730,6 +773,7 @@ export default class Catalogue extends Vue {
         // this.areaSelected = '';
 
         this.mapCoverageSelectionBBox = '';
+        this.mapCoverageDrawMode = false;
         this.mapCoverageSelectionIsDrawn = false;
         this.mapShades.removeFrom(this.mapCoverage);
         this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
@@ -835,6 +879,7 @@ export default class Catalogue extends Vue {
 
   initMapCoverage(): void {
     this.mapCoverage = (L as any).map('mapCoverage', { editable: true });
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.mapCoverage);
@@ -853,18 +898,26 @@ export default class Catalogue extends Vue {
 
     // this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
 
-    L.easyButton('<i class="fas fa-vector-square"></i>', () => {
-      // this.mapExtendToSelection();
-      this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
-      this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
-        this.mapCoverageSelectionIsDrawn = true;
-      });
-    }, 'Zoom to Selection').addTo(this.mapCoverage);
+    // L.easyButton('<i class="fas fa-vector-square"></i>', () => {
+    //   // this.mapExtendToSelection();
+    //   this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
+    //   this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+    //     this.mapCoverageSelectionIsDrawn = true;
+    //   });
+    // }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
   // onCountrySelectChange() {
   //   this.areaSelected = '';
   // }
+
+  onDrawArea() {
+    this.mapCoverageDrawMode = true;
+    this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
+    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+      this.mapCoverageSelectionIsDrawn = true;
+    });
+  }
 
   onSetArea() {
     this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
@@ -911,6 +964,10 @@ export default class Catalogue extends Vue {
     this.crsSearchString = '';
     this.crsList = JSON.parse(JSON.stringify(this.crsList));
     this.epsgAll = this.epsgAll.filter((x) => x.code !== crs.code);
+  }
+
+  addVendor() {
+    this.vendors.push('');
   }
 
   // validateSelectedMinPrice(minPrice: string): void {

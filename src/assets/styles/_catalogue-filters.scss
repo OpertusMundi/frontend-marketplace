@@ -144,10 +144,16 @@ small {
     display: flex;
 }
 
-#mapCoverage {
+.map-coverage-wrapper {
     height: 400px;
     width: 100%;
+    position: relative;
     margin: 0 10px 0 10px;
+}
+
+#mapCoverage {
+    height: 100%;
+    width: 100%;
 }
 
 .coverage-side-menu {
@@ -220,6 +226,10 @@ small {
 .checkbox-group-disabled input,
 .checkbox-group-disabled label {
     cursor: not-allowed;
+}
+
+.grayed {
+    color: $labelColor;
 }
 
 .tab {
@@ -321,4 +331,17 @@ small {
   
   .leaflet-interactive.leaflet-path-draggable {
     fill: transparent !important;
+  }
+
+  .fab-button {
+      float: right;
+      height: 38px;
+      width: 38px;
+      font-size: 20px;
+      background: $secondColor;
+      color: #fff;
+      border-radius: 50%;
+      border: none;
+      outline: none;
+      box-shadow: 1px 1px 2px rgb(134, 134, 134);
   }
