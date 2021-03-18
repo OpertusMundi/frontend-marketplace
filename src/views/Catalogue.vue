@@ -32,23 +32,43 @@
             <!-- <div>{{filterTypeSelection}}</div> -->
           </div>
 
-          <!-- UPDATE -->
+          <!-- UPDATED -->
           <div class="tab tab-update" v-if="filterMenuItemSelected == 'update'">
             <div class="d-flex">
               <div class="d-flex flex-column">
-                <h5 class="date-labels">From date</h5>
-                <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[0].value" placeholder="select date"></datepicker>
-                <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[0].value">
-                  <h5 class="mt-md-30 date-labels">From time</h5>
-                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[2].value" placeholder="select time"></vue-timepicker>
+                <div class="d-flex space-between mb-md-5">
+                  <h5 class="date-labels">From date</h5>
+                  <div class="flex align-items-center">
+                    <button v-if="filterUpdated.dateFrom" @click="removeFilter('update', 'date_from')"><font-awesome-icon icon="times" /></button>
+                  </div>
+                </div>
+                <datepicker :inline="true" v-model="filterUpdated.dateFrom" placeholder="select date"></datepicker>
+                <div class="mt-md-30" v-if="filterUpdated.dateFrom">
+                  <div class="d-flex space-between mb-md-5">
+                    <h5 class="date-labels">From time</h5>
+                    <div class="flex align-items-center">
+                      <button v-if="filterUpdated.timeFrom != '00:00 AM'" @click="removeFilter('update', 'time_from')"><font-awesome-icon icon="times" /></button>
+                    </div>
+                  </div>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filterUpdated.timeFrom" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
               <div class="d-flex flex-column ml-md-15">
-                <h5 class="date-labels">To date</h5>
-                <datepicker :inline="true" v-model="filters.find((x) => x.name == 'update').options[1].value" placeholder="select date"></datepicker>
-                <div class="mt-md-30" v-if="filters.find((x) => x.name == 'update').options[1].value">
-                  <h5 class="date-labels">To time</h5>
-                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.find((x) => x.name == 'update').options[3].value" placeholder="select time"></vue-timepicker>
+                <div class="d-flex space-between mb-md-5">
+                  <h5 class="date-labels">To date</h5>
+                  <div class="flex align-items-center">
+                    <button v-if="filterUpdated.dateTo" @click="removeFilter('update', 'date_to')"><font-awesome-icon icon="times" /></button>
+                  </div>
+                </div>
+                <datepicker :inline="true" v-model="filterUpdated.dateTo" placeholder="select date"></datepicker>
+                <div class="mt-md-30" v-if="filterUpdated.dateTo">
+                  <div class="d-flex space-between mb-md-5">
+                    <h5 class="date-labels">To time</h5>
+                    <div class="flex align-items-center">
+                      <button v-if="filterUpdated.timeTo != '23:59 PM'" @click="removeFilter('update', 'time_to')"><font-awesome-icon icon="times" /></button>
+                    </div>
+                  </div>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filterUpdated.timeTo" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
             </div>
@@ -152,14 +172,14 @@
                 <div class="d-flex align-items-center mb-md-20">
                   <span><strong>2</strong></span>
                   <div class="mr-md-10">
-                    <select :disabled="mapCoverageSelectionBBox ? true : false" @change="onCountrySelectChange" v-model="countrySelected" class="form-group__select">
+                    <select :disabled="mapCoverageSelectionBBox ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
                     </select>
-                    <select :disabled="mapCoverageSelectionBBox ? true : false" v-if="countrySelected" v-model="areaSelected" class="form-group__select mt-md-5">
+                    <!-- <select :disabled="mapCoverageSelectionBBox ? true : false" v-if="countrySelected" v-model="areaSelected" class="form-group__select mt-md-5">
                       <option value="">(select area)</option>
                       <option v-for="area in getAreas()" :key="area.code"> {{area.name}} </option>
-                    </select>
+                    </select> -->
                   </div>
                 </div>
                 <div class="d-flex">
@@ -189,6 +209,7 @@
                     </div>
                     <!-- <button @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
                     <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
+                    <button v-if="mapCoverageSelectionIsDrawn && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
                 </div>
               </div>
@@ -228,10 +249,19 @@
             </div>
 
             <div class="tab-more-main">
-              <div v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
-                <div class="form-group">
-                  <label for="postal_code">Minimum number of Features</label>
-                  <input type="number" class="form-group__text" name="postal_code" id="postal_code" placeholder="e.g. 1500">
+              <div class="ml-md-20" v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
+                <h4>Dataset size</h4>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_small">
+                  <label for="dataset_small"> Small </label>
+                </div>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_medium">
+                  <label for="dataset_medium"> Medium </label>
+                </div>
+                <div class="checkbox-group mt-md-10">
+                  <input type="checkbox" class="mr-md-10" id="dataset_large">
+                  <label for="dataset_large"> Large </label>
                 </div>
               </div>
               <div v-if="filterMoreSubmenuItemSelected == 'vendor'">
@@ -303,20 +333,30 @@
                 <div class="close-button" @click="removeFilter('update', 'To')"><font-awesome-icon icon="times" /></div>
               </div> -->
 
-              <div v-if="filters.find((x) => x.name == 'update').options[0].value && !filters.find((x) => x.name == 'update').options[1].value" class="pill">
-                After {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }}
-                <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
+              <div v-if="filterUpdated.dateFrom && !filterUpdated.dateTo" class="pill">
+                After {{ dateFormatter(filterUpdated.dateFrom) }}{{ filterUpdated.timeFrom != '00:00 AM' ? ', ' + filterUpdated.timeFrom : '' }}
+                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
               </div>
 
-              <div v-if="!filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
+              <div v-if="!filterUpdated.dateFrom && filterUpdated.dateTo" class="pill">
+                Before {{ dateFormatter(filterUpdated.dateTo) }}{{ filterUpdated.timeTo != '23:59 PM' ? ', ' + filterUpdated.timeTo : '' }}
+                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <div v-if="filterUpdated.dateFrom && filterUpdated.dateTo" class="pill">
+                {{ dateFormatter(filterUpdated.dateFrom) }}{{ filterUpdated.timeFrom != '00:00 AM' ? ', ' + filterUpdated.timeFrom : '' }} - {{ dateFormatter(filterUpdated.dateTo) }}{{ filterUpdated.timeTo != '23:59 PM' ? ', ' + filterUpdated.timeTo : '' }}
+                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- <div v-if="!filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
                 Before {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
                 <div class="close-button" @click="removeFilter('update', 'From')"><font-awesome-icon icon="times" /></div>
-              </div>
+              </div> -->
 
-              <div v-if="filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
+              <!-- <div v-if="filters.find((x) => x.name == 'update').options[0].value && filters.find((x) => x.name == 'update').options[1].value" class="pill">
                 {{dateFormatter(filters.find((x) => x.name == 'update').options[0].value)}}{{filters.find((x) => x.name == 'update').options[2].value != '00:00 AM' ? ', ' + filters.find((x) => x.name == 'update').options[2].value : '' }} - {{dateFormatter(filters.find((x) => x.name == 'update').options[1].value)}}{{filters.find((x) => x.name == 'update').options[3].value != '23:59 PM' ? ', ' + filters.find((x) => x.name == 'update').options[3].value : '' }}
                 <div class="close-button" @click="removeFilter('update')"><font-awesome-icon icon="times" /></div>
-              </div>
+              </div> -->
 
               <!-- TOPIC -->
               <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
@@ -343,12 +383,8 @@
               </div>
 
               <!-- COVERAGE -->
-              <div v-if="countrySelected && !areaSelected && !mapCoverageSelectionBBox" class="pill">
+              <div v-if="countrySelected && !mapCoverageSelectionBBox" class="pill">
                 {{ countries.find((x) => x.code == countrySelected).name }}
-                <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
-              </div>
-              <div v-if="areaSelected && !mapCoverageSelectionBBox" class="pill">
-                {{ areaSelected }}
                 <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
               </div>
 
@@ -462,6 +498,8 @@ export default class Catalogue extends Vue {
 
   filters: filterCategory[];
 
+  filterUpdated: {dateFrom: string, dateTo: string, timeFrom: string, timeTo: string};
+
   formats: {api: { id: string, name: string, isChecked: boolean }[], vector: { id: string, name: string, isChecked: boolean }[], raster: { id: string, name: string, isChecked: boolean }[], };
 
   mapCoverage: any;
@@ -498,13 +536,11 @@ export default class Catalogue extends Vue {
 
   crsSearchList: crs[];
 
-  countries: { code: string, name: string }[];
+  countries: { code: string, name: string, bbox: number[] }[];
 
   areas: { code: string, name: string }[];
 
   countrySelected: string;
-
-  areaSelected: string;
 
   constructor() {
     super();
@@ -531,14 +567,23 @@ export default class Catalogue extends Vue {
       {
         name: 'type',
         options: [{ name: 'Vector dataset', pillLabel: 'Vector', isChecked: false }, { name: 'Raster dataset', pillLabel: 'Raster', isChecked: false }, { name: 'API', pillLabel: 'API', isChecked: false }],
-      }, {
-        name: 'update',
-        options: [{ name: 'From', value: '' }, { name: 'To', value: '' }, { name: 'timeFrom', value: '00:00 AM' }, { name: 'timeTo', value: '23:59 PM' }],
-      }, {
+      },
+      // {
+      //   name: 'update',
+      //   options: [{ name: 'From', value: '' }, { name: 'To', value: '' }, { name: 'timeFrom', value: '00:00 AM' }, { name: 'timeTo', value: '23:59 PM' }],
+      // },
+      {
         name: 'topic',
         options: [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }],
       },
     ];
+
+    this.filterUpdated = {
+      dateFrom: '',
+      dateTo: '',
+      timeFrom: '00:00 AM',
+      timeTo: '23:59 PM',
+    };
 
     this.formats = {
       vector: [{ id: 'shp', name: 'Shapefile', isChecked: false }, { id: 'geoPackage', name: 'GeoPackage', isChecked: false }, { id: 'geoJson', name: 'GeoJSON', isChecked: false }],
@@ -577,11 +622,10 @@ export default class Catalogue extends Vue {
     this.countries = countries;
     this.areas = nuts;
     this.countrySelected = '';
-    this.areaSelected = '';
   }
 
   @Watch('filterMenuItemSelected')
-  onPropertyChanged(menuItem: string): void {
+  onFilterItemChanged(menuItem: string): void {
     if (menuItem === 'coverage') {
       setTimeout(() => {
         this.initMapCoverage();
@@ -639,15 +683,32 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'update': {
-        // eslint-disable-next-line
-        this.filters.find((x) => x.name === category)!.options[0].value = '';
-        // eslint-disable-next-line
-        this.filters.find((x) => x.name === category)!.options[2].value = '00:00 AM';
-
-        // eslint-disable-next-line
-        this.filters.find((x) => x.name === category)!.options[1].value = '';
-        // eslint-disable-next-line
-        this.filters.find((x) => x.name === category)!.options[3].value = '23:59 PM';
+        switch (filterName) {
+          case 'date_from': {
+            this.filterUpdated.dateFrom = '';
+            this.filterUpdated.timeFrom = '00:00 AM';
+            break;
+          }
+          case 'date_to': {
+            this.filterUpdated.dateTo = '';
+            this.filterUpdated.timeTo = '23:59 PM';
+            break;
+          }
+          case 'time_from': {
+            this.filterUpdated.timeFrom = '00:00 AM';
+            break;
+          }
+          case 'time_to': {
+            this.filterUpdated.timeTo = '23:59 PM';
+            break;
+          }
+          default: {
+            this.filterUpdated.dateFrom = '';
+            this.filterUpdated.dateTo = '';
+            this.filterUpdated.timeFrom = '00:00 AM';
+            this.filterUpdated.timeTo = '23:59 PM';
+          }
+        }
         break;
       }
       case 'format': {
@@ -661,7 +722,7 @@ export default class Catalogue extends Vue {
       }
       case 'coverage': {
         this.countrySelected = '';
-        this.areaSelected = '';
+        // this.areaSelected = '';
 
         this.mapCoverageSelectionBBox = '';
         this.mapCoverageSelectionIsDrawn = false;
@@ -796,9 +857,9 @@ export default class Catalogue extends Vue {
     }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
-  onCountrySelectChange() {
-    this.areaSelected = '';
-  }
+  // onCountrySelectChange() {
+  //   this.areaSelected = '';
+  // }
 
   onSetArea() {
     this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
@@ -806,13 +867,27 @@ export default class Catalogue extends Vue {
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
 
+  onClearArea() {
+    this.removeFilter('coverage', '');
+  }
+
   mapExtendToSelection(): void {
     this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
   }
 
-  getAreas(): {code: string, name: string}[] {
-    return this.areas.filter((x) => x.code === this.countrySelected);
+  @Watch('countrySelected')
+  onCountrySelected(country: any): void {
+    console.log(country);
+    const coords = this.countries
+      .find((x) => x.code === country)!
+      .bbox;
+    console.log(coords);
+    this.mapCoverageSelectionRectangle = L.rectangle([[coords[1], coords[0]], [coords[3], coords[2]]])
+      .addTo(this.mapCoverage);
+    this.mapCoverageSelectionRectangle.enableEdit();
+    this.mapCoverageSelectionIsDrawn = true;
+    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
   }
 
   searchCrs(str: string): void {
@@ -826,7 +901,7 @@ export default class Catalogue extends Vue {
 
   addCrsToList(crs: crs): void {
     // eslint-disable-next-line
-    crs.isChecked = false;
+    crs.isChecked = true;
     this.crsList.push(crs);
     this.crsSearchString = '';
     this.crsList = JSON.parse(JSON.stringify(this.crsList));
