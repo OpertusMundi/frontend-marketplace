@@ -212,6 +212,16 @@ small {
     background: #f2f2f2;
 }
 
+.checkbox-group-disabled h3,
+.checkbox-group-disabled label {
+    color: #acacac;
+}
+
+.checkbox-group-disabled input,
+.checkbox-group-disabled label {
+    cursor: not-allowed;
+}
+
 .tab {
     height: 100%;
     padding: 30px;

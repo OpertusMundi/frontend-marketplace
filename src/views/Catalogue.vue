@@ -34,10 +34,11 @@
 
           <!-- UPDATED -->
           <div class="tab tab-update" v-if="filterMenuItemSelected == 'update'">
+            <h5 class="date-labels"><strong>Select last update date</strong></h5>
             <div class="d-flex">
               <div class="d-flex flex-column">
                 <div class="d-flex space-between mb-md-5">
-                  <h5 class="date-labels">From date</h5>
+                  <small class="date-labels">From date</small>
                   <div class="flex align-items-center">
                     <button v-if="filterUpdated.dateFrom" @click="removeFilter('update', 'date_from')"><font-awesome-icon icon="times" /></button>
                   </div>
@@ -45,7 +46,7 @@
                 <datepicker :inline="true" v-model="filterUpdated.dateFrom" placeholder="select date"></datepicker>
                 <div class="mt-md-30" v-if="filterUpdated.dateFrom">
                   <div class="d-flex space-between mb-md-5">
-                    <h5 class="date-labels">From time</h5>
+                    <small class="date-labels">From time</small>
                     <div class="flex align-items-center">
                       <button v-if="filterUpdated.timeFrom != '00:00 AM'" @click="removeFilter('update', 'time_from')"><font-awesome-icon icon="times" /></button>
                     </div>
@@ -55,7 +56,7 @@
               </div>
               <div class="d-flex flex-column ml-md-15">
                 <div class="d-flex space-between mb-md-5">
-                  <h5 class="date-labels">To date</h5>
+                  <small class="date-labels">To date</small>
                   <div class="flex align-items-center">
                     <button v-if="filterUpdated.dateTo" @click="removeFilter('update', 'date_to')"><font-awesome-icon icon="times" /></button>
                   </div>
@@ -63,7 +64,7 @@
                 <datepicker :inline="true" v-model="filterUpdated.dateTo" placeholder="select date"></datepicker>
                 <div class="mt-md-30" v-if="filterUpdated.dateTo">
                   <div class="d-flex space-between mb-md-5">
-                    <h5 class="date-labels">To time</h5>
+                    <small class="date-labels">To time</small>
                     <div class="flex align-items-center">
                       <button v-if="filterUpdated.timeTo != '23:59 PM'" @click="removeFilter('update', 'time_to')"><font-awesome-icon icon="times" /></button>
                     </div>
@@ -85,26 +86,27 @@
           <!-- FORMAT -->
           <div class="tab tab-format d-flex" v-if="filterMenuItemSelected == 'format'">
 
-            <div class="flex-grow-1" v-if="shownFormatCategories().includes('vector')">
+            <!-- <div class="flex-grow-1" v-if="shownFormatCategories().includes('vector')"> -->
+            <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('vector') }" class="flex-grow-1">
               <h3 class="format-category-title">Vector</h3>
               <div class="checkbox-group mb-md-5" v-for="format in formats.vector" :key="format.id">
-                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <input :disabled="!shownFormatCategories().includes('vector')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
 
-            <div class="flex-grow-1" v-if="shownFormatCategories().includes('raster')">
+            <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('raster') }" class="flex-grow-1">
               <h3 class="format-category-title">Raster</h3>
               <div class="checkbox-group mb-md-5" v-for="format in formats.raster" :key="format.id">
-                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <input :disabled="!shownFormatCategories().includes('raster')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
 
-            <div class="flex-grow-1" v-if="shownFormatCategories().includes('api')">
+            <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
               <div class="checkbox-group mb-md-5" v-for="format in formats.api" :key="format.id">
-                <input type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
@@ -208,6 +210,7 @@
                       </label>
                     </div>
                     <!-- <button @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
+                    <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button>
                     <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
                     <button v-if="mapCoverageSelectionIsDrawn && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
@@ -396,14 +399,16 @@
               <!-- PRICE -->
               <div v-if="priceMin && !priceMax" class="pill">
                 &gt;{{ priceMin }}€
+                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
               <div v-if="!priceMin && priceMax" class="pill">
                 &lt;{{ priceMax }}€
+                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
               <div v-if="priceMin && priceMax" class="pill">
                 {{ priceMin }}€ - {{ priceMax }}€
+                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
-
               <!-- <div class="pill" v-if="priceValues[0] != priceMin || priceValues[1] != priceMax">
                 {{priceValues[0]}}€ - {{priceValues[1]}}€
                 <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
