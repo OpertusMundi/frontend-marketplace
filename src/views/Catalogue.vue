@@ -242,15 +242,15 @@
               <div class="ml-md-20" v-show="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <h4>Dataset size</h4>
                 <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_small">
+                  <input v-model="numberOfFeatures.isSmallChecked" type="checkbox" class="mr-md-10" id="dataset_small">
                   <label for="dataset_small"> Small <small class="grayed ml-md-20">&lt; 1000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_medium">
+                  <input v-model="numberOfFeatures.isMediumChecked" type="checkbox" class="mr-md-10" id="dataset_medium">
                   <label for="dataset_medium"> Medium <small class="grayed ml-md-20">1000 - 100.000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_large">
+                  <input v-model="numberOfFeatures.isLargeChecked" type="checkbox" class="mr-md-10" id="dataset_large">
                   <label for="dataset_large"> Large <small class="grayed ml-md-20">&gt; 100.000 features</small></label>
                 </div>
               </div>
@@ -258,6 +258,7 @@
               <!-- AREA OF INTEREST -->
               <div v-show="filterMoreSubmenuItemSelected == 'areaOfInterest'">
                 <h4>Area of Interest</h4>
+                <span style="color: orange">more to be added</span>
               </div>
 
               <!-- ATTRIBUTES -->
@@ -289,6 +290,7 @@
               <!-- LANGUAGE -->
               <div v-show="filterMoreSubmenuItemSelected == 'language'">
                 <h4>Language of asset fields / labels</h4>
+                <span style="color: orange">more to be added</span>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_small">
                   <label for="dataset_small"> English (UK/US)</label>
@@ -307,6 +309,7 @@
               <!-- LICENSE -->
               <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
+                <span style="color: orange">more to be added</span>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="license_open">
                   <label for="license_open"> Open license</label>
@@ -395,6 +398,27 @@
                 {{ priceMin }}€ - {{ priceMax }}€
                 <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
               </div>
+
+              <!-- NUMBER OF FEATURES -->
+              <div class="pill" v-if="numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Small <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Medium <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Small & Medium <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Small & Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Medium & Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
+
+              <!-- ATTRIBUTES -->
+              <div v-if="attributes.some((x) => {return x !== ''})" class="pill">
+                Attributes: {{ getInputsAsOneLabel(attributes) }}
+                <div class="close-button" @click="removeFilter('attributes')"><font-awesome-icon icon="times" /></div>
+              </div>
+
+              <!-- VENDOR -->
+              <div v-if="vendors.some((x) => {return x !== ''})" class="pill">
+                Vendors: {{ getInputsAsOneLabel(vendors) }}
+                <div class="close-button" @click="removeFilter('vendor')"><font-awesome-icon icon="times" /></div>
+              </div>
+
             </div>
           </div>
           <div class="filter-side-menu-bottom">
@@ -527,6 +551,8 @@ export default class Catalogue extends Vue {
 
   countrySelected: string;
 
+  numberOfFeatures: { isSmallChecked: boolean, isMediumChecked: boolean, isLargeChecked: boolean };
+
   vendors: string[];
 
   attributes: string[];
@@ -607,6 +633,7 @@ export default class Catalogue extends Vue {
     this.areas = nuts;
     this.countrySelected = '';
 
+    this.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
     this.vendors = [''];
     this.attributes = [''];
   }
@@ -614,7 +641,6 @@ export default class Catalogue extends Vue {
   @Watch('filterMenuItemSelected')
   onFilterItemChanged(menuItem: string): void {
     if (menuItem === 'coverage' && !this.mapCoverage) {
-      console.log('init map');
       setTimeout(() => {
         this.initMapCoverage();
       }, 0);
@@ -653,13 +679,16 @@ export default class Catalogue extends Vue {
   removeFilter(category: string, filterName: string): void {
     switch (category) {
       case 'type':
+        // eslint-disable-next-line
         this.types.find((x) => x.name === filterName)!.isChecked = false;
         break;
       case 'topic': {
+        // eslint-disable-next-line
         this.topics.find((x) => x.name === filterName)!.isChecked = false;
         break;
       }
       case 'crs': {
+        // eslint-disable-next-line
         this.crsList.find((x) => x.code === filterName)!.isChecked = false;
         break;
       }
@@ -714,6 +743,18 @@ export default class Catalogue extends Vue {
         this.scaleValues = [this.scaleMin, this.scaleMax];
         break;
       }
+      case 'numberOfFeatures': {
+        this.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
+        break;
+      }
+      case 'attributes': {
+        this.attributes = this.attributes.map(() => '');
+        break;
+      }
+      case 'vendor': {
+        this.vendors = this.vendors.map(() => '');
+        break;
+      }
       default:
     }
   }
@@ -751,8 +792,11 @@ export default class Catalogue extends Vue {
   }
 
   shownFormatCategories(): string[] {
+    // eslint-disable-next-line
     const isVectorChecked = this.types.find((x) => x.name === 'Vector dataset')!.isChecked;
+    // eslint-disable-next-line
     const isRasterChecked = this.types.find((x) => x.name === 'Raster dataset')!.isChecked;
+    // eslint-disable-next-line
     const isApiChecked = this.types.find((x) => x.name === 'API')!.isChecked;
 
     let res: string[] = [];
@@ -807,7 +851,7 @@ export default class Catalogue extends Vue {
     this.initMapView();
   }
 
-  initMapView() {
+  initMapView(): void {
     const latMin = 28.647719;
     const latMax = 73.426841;
     const lonMin = -32.519531;
@@ -816,7 +860,7 @@ export default class Catalogue extends Vue {
     this.mapCoverage.fitBounds([[latMin, lonMin], [latMax, lonMax]]);
   }
 
-  onCountrySelected(country) {
+  onCountrySelected(country: string): void {
     if (!country) {
       if (this.mapCoverageSelectionRectangle) {
         this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
@@ -826,6 +870,7 @@ export default class Catalogue extends Vue {
       return;
     }
 
+    // eslint-disable-next-line
     const coords = this.countries
       .find((x) => x.code === country)!
       .bbox;
@@ -846,15 +891,14 @@ export default class Catalogue extends Vue {
     this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds(), { padding: [50, 50] });
   }
 
-  onSetArea() {
+  onSetArea(): void {
     this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
     this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
     this.mapShades.addTo(this.mapCoverage);
     this.mapCoverageSelectionRectangle.disableEdit();
   }
 
-  onClearArea() {
-    console.log(this.mapShades);
+  onClearArea(): void {
     if (this.mapShades) {
       this.mapShades.onRemove(this.mapCoverage);
     }
@@ -898,18 +942,17 @@ export default class Catalogue extends Vue {
     this.epsgAll = this.epsgAll.filter((x) => x.code !== crs.code);
   }
 
-  addVendor() {
+  addVendor(): void {
     this.vendors.push('');
   }
 
-  addAttribute() {
+  addAttribute(): void {
     this.attributes.push('');
   }
 
   validateMinMaxInput(input: string, value: number): void {
     switch (input) {
       case 'minScale': {
-        console.log('min scale');
         const minScale = Number(value);
         this.scaleValues = [minScale > this.scaleValues[1] ? this.scaleValues[1] : minScale, this.scaleValues[1]];
         break;
@@ -921,6 +964,18 @@ export default class Catalogue extends Vue {
       }
       default:
     }
+  }
+
+  getInputsAsOneLabel(arr: string[]): string {
+    let label = '';
+    arr.forEach((x) => {
+      if (x) {
+        label += ', ';
+        label += x;
+      }
+    });
+    label = label.substring(1);
+    return label;
   }
 }
 </script>
