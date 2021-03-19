@@ -174,7 +174,7 @@
                 <div class="d-flex align-items-center mb-md-20">
                   <span><strong>1</strong></span>
                   <div class="mr-md-10">
-                    <select :disabled="mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
+                    <select @change="onCountrySelected($event.target.value)" :disabled="mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
                     </select>
@@ -210,8 +210,9 @@
                       </label>
                     </div>
                     <!-- <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--outlineblue">Draw Area</button> -->
+                    <!-- <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button> -->
                     <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
-                    <button v-if="mapCoverageSelectionIsDrawn && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
+                    <button v-if="mapCoverageSelectionRectangle && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
                 </div>
               </div>
@@ -220,7 +221,7 @@
                 <div id="mapCoverage">
                 </div>
                 <input type="text" class="form-group__text" placeholder="Search City/Area">
-                <button v-if="!mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox && !mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn--blue"><font-awesome-icon class="mr-md-10" icon="vector-square" /> Draw Area</button>
+                <button v-if="!mapCoverageSelectionRectangle && !mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn--blue"><font-awesome-icon class="mr-md-10" icon="vector-square" /> Draw Area</button>
               </div>
 
             </div>
@@ -281,7 +282,7 @@
               <!-- ATTRIBUTES -->
               <div v-if="filterMoreSubmenuItemSelected == 'attributes'">
                 <div class="form-group">
-                  <label>The following fields must be contained in dataset</label>
+                  <label>Fields that must be contained in dataset</label>
                   <div class="d-flex">
                     <div>
                       <input v-for="(attribute, i) in attributes" :key="i" v-model="attributes[i]" type="text" class="form-group__text" :name="'search_attribute_' + i" :id="'search_attribute_' + i" placeholder="attribute name">
@@ -669,6 +670,8 @@ export default class Catalogue extends Vue {
 
     this.mapCoverageDrawMode = false;
 
+    this.mapCoverageSelectionRectangle = null;
+
     this.mapCoverageSelectionIsDrawn = false;
 
     this.scaleValues = [10, 10000000];
@@ -711,6 +714,7 @@ export default class Catalogue extends Vue {
       }, 0);
     } else {
       if (this.mapCoverage) {
+        this.onClearArea();
         this.mapCoverage.remove();
       }
       this.mapCoverage = null;
@@ -813,6 +817,7 @@ export default class Catalogue extends Vue {
         // this.mapCoverage.off();
         // this.mapCoverage.remove();
         // this.initMapCoverage();
+
         this.onClearArea();
         break;
       }
@@ -916,12 +921,7 @@ export default class Catalogue extends Vue {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.mapCoverage);
 
-    const latMin = 28.647719;
-    const latMax = 73.426841;
-    const lonMin = -32.519531;
-    const lonMax = 58.359375;
-
-    this.mapCoverage.fitBounds([[latMin, lonMin], [latMax, lonMax]]);
+    this.initMapView();
 
     // const selectionLayerOptions = { fillColor: 'transparent', color: '#190AFF', dashArray: '20 20' };
 
@@ -939,51 +939,22 @@ export default class Catalogue extends Vue {
     // }, 'Zoom to Selection').addTo(this.mapCoverage);
   }
 
-  // onCountrySelectChange() {
-  //   this.areaSelected = '';
-  // }
+  initMapView() {
+    const latMin = 28.647719;
+    const latMax = 73.426841;
+    const lonMin = -32.519531;
+    const lonMax = 58.359375;
 
-  onDrawArea() {
-    this.mapCoverageDrawMode = true;
-    this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
-    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
-      this.mapCoverageSelectionIsDrawn = true;
-      this.countrySelected = '';
-    });
+    this.mapCoverage.fitBounds([[latMin, lonMin], [latMax, lonMax]]);
   }
 
-  onSetArea() {
-    this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
-    this.mapShades.addTo(this.mapCoverage);
-    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
-  }
-
-  onClearArea() {
-    // this.removeFilter('coverage', '');
-    this.countrySelected = '';
-    // this.areaSelected = '';
-
-    this.mapCoverageSelectionBBox = '';
-    this.mapCoverageDrawMode = false;
-    this.mapCoverageSelectionIsDrawn = false;
-    // this.mapShades.removeFrom(this.mapCoverage);
-    // this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
-    this.mapCoverageSelectionRectangle = null;
-    this.mapShades = null;
-    this.mapCoverage.off();
-    this.mapCoverage.remove();
-    this.initMapCoverage();
-  }
-
-  mapExtendToSelection(): void {
-    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
-    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
-  }
-
-  @Watch('countrySelected')
-  onCountrySelected(country: string): void {
+  onCountrySelected(country) {
     if (!country) {
-      this.onClearArea();
+      if (this.mapCoverageSelectionRectangle) {
+        this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+        this.mapCoverageSelectionRectangle = null;
+      }
+      this.initMapView();
       return;
     }
 
@@ -993,17 +964,120 @@ export default class Catalogue extends Vue {
 
     if (this.mapCoverageSelectionRectangle) {
       this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+      this.mapCoverageSelectionRectangle = null;
     }
-    this.mapCoverageSelectionRectangle = L.rectangle([[coords[1], coords[0]], [coords[3], coords[2]]])
-      // .on('editable:vertex:dragend', () => {
-      //   this.mapCoverageSelectionIsDrawn = true;
-      //   this.countrySelected = '';
-      // })
+    this.mapCoverageSelectionRectangle = L.rectangle([[coords[1], coords[0]], [coords[3], coords[2]]], { color: '#190AFF', fillColor: 'transparent' })
       .addTo(this.mapCoverage);
     this.mapCoverageSelectionRectangle.enableEdit();
+    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+      this.countrySelected = '';
+      this.mapCoverageSelectionIsDrawn = true;
+      this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds(), { padding: [50, 50] });
+    });
     this.mapCoverageSelectionIsDrawn = true;
-    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
+    this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds(), { padding: [50, 50] });
   }
+
+  onSetArea() {
+    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
+    this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
+    this.mapShades.addTo(this.mapCoverage);
+    this.mapCoverageSelectionRectangle.disableEdit();
+  }
+
+  onClearArea() {
+    console.log(this.mapShades);
+    if (this.mapShades) {
+      this.mapShades.onRemove(this.mapCoverage);
+    }
+    if (this.mapCoverageSelectionRectangle) {
+      this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+    }
+    // this.mapShades.removeFrom(this.mapCoverage);
+    this.mapCoverageSelectionRectangle = null;
+    this.mapShades = null;
+    this.mapCoverageSelectionIsDrawn = false;
+    this.mapCoverageSelectionBBox = '';
+    this.countrySelected = '';
+  }
+
+  onDrawArea(): void {
+    this.mapCoverageDrawMode = true;
+    this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
+    this.mapCoverageSelectionRectangle.setStyle({ color: '#190AFF', fillColor: 'transparent' });
+    this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+      this.countrySelected = '';
+      this.mapCoverageSelectionIsDrawn = true;
+      this.mapCoverageDrawMode = false;
+      this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds(), { padding: [50, 50] });
+    });
+  }
+
+  // onCountrySelectChange() {
+  //   this.areaSelected = '';
+  // }
+
+  // onDrawArea() {
+  //   this.mapCoverageDrawMode = true;
+  //   this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
+  //   this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
+  //     this.mapCoverageSelectionIsDrawn = true;
+  //     this.countrySelected = '';
+  //   });
+  // }
+
+  // onSetArea() {
+  //   this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
+  //   this.mapShades.addTo(this.mapCoverage);
+  //   this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
+  // }
+
+  // onClearArea() {
+  //   // this.removeFilter('coverage', '');
+  //   this.countrySelected = '';
+  //   // this.areaSelected = '';
+
+  //   this.mapCoverageSelectionBBox = '';
+  //   this.mapCoverageDrawMode = false;
+  //   this.mapCoverageSelectionIsDrawn = false;
+  //   // this.mapShades.removeFrom(this.mapCoverage);
+  //   // this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+  //   this.mapCoverageSelectionRectangle = null;
+  //   this.mapShades = null;
+  //   this.mapCoverage.off();
+  //   this.mapCoverage.remove();
+  //   this.initMapCoverage();
+  // }
+
+  // mapExtendToSelection(): void {
+  //   this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
+  //   this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
+  // }
+
+  // @Watch('countrySelected')
+  // onCountrySelected(country: string): void {
+  //   if (!country) {
+  //     this.onClearArea();
+  //     return;
+  //   }
+
+  //   const coords = this.countries
+  //     .find((x) => x.code === country)!
+  //     .bbox;
+
+  //   if (this.mapCoverageSelectionRectangle) {
+  //     this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
+  //   }
+  //   this.mapCoverageSelectionRectangle = L.rectangle([[coords[1], coords[0]], [coords[3], coords[2]]])
+  //     // .on('editable:vertex:dragend', () => {
+  //     //   this.mapCoverageSelectionIsDrawn = true;
+  //     //   this.countrySelected = '';
+  //     // })
+  //     .addTo(this.mapCoverage);
+  //   this.mapCoverageSelectionRectangle.enableEdit();
+  //   this.mapCoverageSelectionIsDrawn = true;
+  //   this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds());
+  // }
 
   searchCrs(str: string): void {
     if (!str) {
