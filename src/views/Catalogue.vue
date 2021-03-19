@@ -19,11 +19,11 @@
         </span>
       </div>
 
-      <div v-if="filterMenuItemSelected" class="filter-dialog-wrapper">
+      <div v-show="filterMenuItemSelected" class="filter-dialog-wrapper">
         <div class="filter-container">
 
           <!-- TYPE -->
-          <div class="tab tab-type" v-if="filterMenuItemSelected == 'type'">
+          <div class="tab tab-type" v-show="filterMenuItemSelected == 'type'">
             <div class="checkbox-group mt-md-10" v-for="type in filters.find(x => x.name == 'type').options" :key="type.name">
               <input type="checkbox" class="mr-md-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
@@ -33,7 +33,7 @@
           </div>
 
           <!-- UPDATED -->
-          <div class="tab tab-update" v-if="filterMenuItemSelected == 'update'">
+          <div class="tab tab-update" v-show="filterMenuItemSelected == 'update'">
             <h5 class="date-labels"><strong>Select last update date</strong></h5>
             <div class="d-flex">
               <div class="d-flex flex-column">
@@ -76,7 +76,7 @@
           </div>
 
           <!-- TOPIC -->
-          <div class="tab tab-topic" v-if="filterMenuItemSelected == 'topic'">
+          <div class="tab tab-topic" v-show="filterMenuItemSelected == 'topic'">
             <div class="checkbox-group mb-md-2" v-for="topic in filters.find(x => x.name == 'topic').options" :key="topic.name">
               <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
@@ -84,7 +84,7 @@
           </div>
 
           <!-- FORMAT -->
-          <div class="tab tab-format d-flex" v-if="filterMenuItemSelected == 'format'">
+          <div class="tab tab-format d-flex" v-show="filterMenuItemSelected == 'format'">
 
             <!-- <div class="flex-grow-1" v-if="shownFormatCategories().includes('vector')"> -->
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('vector') }" class="flex-grow-1">
@@ -114,7 +114,7 @@
           </div>
 
           <!-- CRS -->
-          <div class="tab tab-crs" v-if="filterMenuItemSelected == 'crs'">
+          <div class="tab tab-crs" v-show="filterMenuItemSelected == 'crs'">
             <small>Popular CRS</small>
             <div class="mt-md-10">
               <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-md-5">
@@ -136,7 +136,7 @@
           </div>
 
           <!-- SCALE -->
-          <div class="tab tab-scale" v-if="filterMenuItemSelected == 'scale'">
+          <div class="tab tab-scale" v-show="filterMenuItemSelected == 'scale'">
             <div class="ml-md-20 mr-md-20" @click="onScaleSliderClick">
               <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
             </div>
@@ -165,7 +165,7 @@
           </div>
 
           <!-- COVERAGE -->
-          <div class="tab tab-coverage" v-if="filterMenuItemSelected == 'coverage'">
+          <div class="tab tab-coverage" v-show="filterMenuItemSelected == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
                 <!-- <div class="d-flex align-items-center mb-md-20">
@@ -228,7 +228,7 @@
           </div>
 
           <!-- PRICE -->
-          <div class="tab tab-price" v-if="filterMenuItemSelected == 'price'">
+          <div class="tab tab-price" v-show="filterMenuItemSelected == 'price'">
             <div class="min-max-container">
               <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price</label>
@@ -245,7 +245,7 @@
           </div>
 
           <!-- MORE -->
-          <div class="tab tab-more" v-if="filterMenuItemSelected == 'more'">
+          <div class="tab tab-more" v-show="filterMenuItemSelected == 'more'">
 
             <div class="tab-more-side-menu d-flex flex-column">
               <span v-for="filter in filterMoreSubmenuItems"
@@ -258,7 +258,7 @@
 
             <div class="tab-more-main p-md-20 pl-md-30">
               <!-- NUMBER OF FEATURES -->
-              <div class="ml-md-20" v-if="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
+              <div class="ml-md-20" v-show="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <h4>Dataset size</h4>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_small">
@@ -275,12 +275,12 @@
               </div>
 
               <!-- AREA OF INTEREST -->
-              <div v-if="filterMoreSubmenuItemSelected == 'areaOfInterest'">
+              <div v-show="filterMoreSubmenuItemSelected == 'areaOfInterest'">
                 <h4>Area of Interest</h4>
               </div>
 
               <!-- ATTRIBUTES -->
-              <div v-if="filterMoreSubmenuItemSelected == 'attributes'">
+              <div v-show="filterMoreSubmenuItemSelected == 'attributes'">
                 <div class="form-group">
                   <label>Fields that must be contained in dataset</label>
                   <div class="d-flex">
@@ -293,7 +293,7 @@
               </div>
 
               <!-- VENDOR -->
-              <div v-if="filterMoreSubmenuItemSelected == 'vendor'">
+              <div v-show="filterMoreSubmenuItemSelected == 'vendor'">
                 <!-- <div class="form-group">
                   <label>Search by Vendor</label>
                   <input v-for="(vendor, i) in vendors" :key="i" v-model="vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
@@ -312,7 +312,7 @@
               </div>
 
               <!-- LANGUAGE -->
-              <div v-if="filterMoreSubmenuItemSelected == 'language'">
+              <div v-show="filterMoreSubmenuItemSelected == 'language'">
                 <h4>Language of asset fields / labels</h4>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="dataset_small">
@@ -334,7 +334,7 @@
               </div>
 
               <!-- LICENSE -->
-              <div v-if="filterMoreSubmenuItemSelected == 'license'">
+              <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
                 <div class="checkbox-group mt-md-10">
                   <input type="checkbox" class="mr-md-10" id="license_open">
@@ -708,16 +708,19 @@ export default class Catalogue extends Vue {
 
   @Watch('filterMenuItemSelected')
   onFilterItemChanged(menuItem: string): void {
-    if (menuItem === 'coverage') {
+    if (menuItem === 'coverage' && !this.mapCoverage) {
+      console.log('init map');
       setTimeout(() => {
         this.initMapCoverage();
       }, 0);
     } else {
+      /*
       if (this.mapCoverage) {
         this.onClearArea();
         this.mapCoverage.remove();
       }
       this.mapCoverage = null;
+      */
     }
   }
 
