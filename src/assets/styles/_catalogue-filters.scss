@@ -151,6 +151,22 @@ small {
     margin: 0 10px 0 10px;
 }
 
+.map-coverage-wrapper input {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 5px;
+    width: 200px;
+    z-index: 2000;
+}
+
+.map-coverage-wrapper button {
+    bottom: 0;
+    margin: 5px;
+    position: absolute;
+    z-index: 2000;
+}
+
 #mapCoverage {
     height: 100%;
     width: 100%;
@@ -280,9 +296,9 @@ small {
     color: #fff;
 }
 
-.tab-more-main {
-    padding: 20px;
-}
+// .tab-more-main {
+//     padding: 20px;
+// }
 
 .tab-more input, .tab-more hr {
     max-width: 400px;
@@ -327,21 +343,21 @@ small {
     position: absolute;
     background: rgba(0,0,0,0.4);
     z-index: 400;
-  }
-  
-  .leaflet-interactive.leaflet-path-draggable {
-    fill: transparent !important;
-  }
+}
 
-  .fab-button {
-      float: right;
-      height: 38px;
-      width: 38px;
-      font-size: 20px;
-      background: $secondColor;
-      color: #fff;
-      border-radius: 50%;
-      border: none;
-      outline: none;
-      box-shadow: 1px 1px 2px rgb(134, 134, 134);
-  }
+.leaflet-interactive.leaflet-path-draggable {
+    fill: transparent !important;
+}
+
+.fab-button {
+    float: right;
+    height: 38px;
+    width: 38px;
+    font-size: 20px;
+    background: $secondColor;
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    box-shadow: 1px 1px 2px rgb(134, 134, 134);
+}
