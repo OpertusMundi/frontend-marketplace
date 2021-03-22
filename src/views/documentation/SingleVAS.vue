@@ -323,6 +323,20 @@
     </div>
   </div>
 </template>
+<script lang="ts">
+import Vue from 'vue';
+import axios from 'axios';
+
+export default Vue.extend({
+  mounted():void {
+    axios.get(`http://om-docs.bracketdev.com/wp-json/wp/v2/vas?slug=${this.$route.params.slug}`).then((response) => {
+      console.log(response.data);
+    }).catch((error) => {
+      console.log(error);
+    });
+  },
+});
+</script>
 <style lang="scss">
 @import "@/assets/styles/_page.scss";
 @import "@/assets/styles/_single-vas.scss";
