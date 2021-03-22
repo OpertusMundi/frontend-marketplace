@@ -1,0 +1,55 @@
+@import "./acarousel";
+@import "./mixins";
+.services-carts {
+    padding: 80px 0;
+    @media (max-width: 576px) {
+        padding: 60px 0;
+    }
+    .single-vas__title {
+        margin-bottom:40px;
+    }
+    &__holder {
+        display: flex;
+        margin: 0 -10px;
+        flex-wrap: wrap;
+    }
+    &__item {
+        @extend .a_carousel__item;
+        flex: initial;
+        width: 100%;
+        margin: 0 10px 20px 10px;
+        min-height:270px;
+
+        @media (min-width: 576px) {
+            width: calc(50% - 20px);
+        }
+        @media (min-width: 768px) {
+        min-height:250px;
+
+            width: calc(33.333% - 20px);
+        }
+
+        @media (min-width:1200px) {
+            width: calc(25% - 20px);
+        }
+
+        &__view {
+            @extend .a_carousel__item__view;
+        }
+        &__inner {
+            @extend .a_carousel__item__inner;
+            justify-content: space-between;
+        }
+        &__top {
+            @extend .a_carousel__item__top;
+            span {
+                @extend .a_carousel__item__main__title;
+            }
+        }
+        &__main {
+            @extend .a_carousel__item__main;
+            &__text {
+            }
+        }
+    }
+}

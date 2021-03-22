@@ -1,0 +1,111 @@
+.documentation-tabs {
+    &__holder {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    margin-top: -30px;
+
+    &__title {
+        font-family: $mainFont;
+        font-weight: 500;
+        font-size: em(20);
+        letter-spacing: 0.05em;
+        line-height: 1.5em;
+        position: relative;
+        padding: 0 5px;
+        margin-right: 10px;
+        &:before {
+            content: "";
+            bottom: 0;
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: none;
+        }
+        &.active {
+            color: $secondColor;
+            &:before {
+                background: $secondColor;
+            }
+        }
+    }
+
+    &__items {
+        padding: 60px 0;
+        @media (max-width: 576px) {
+            padding: 50px 0;
+        }
+    }
+    &__item {
+        width: 100%;
+        position: relative;
+        margin-bottom: 20px;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-weight: 600;
+            line-height: 1.3em;
+            margin-bottom: 20px;
+            font-family: $mainFont;
+            letter-spacing: 0.03em;
+        }
+        h1 {
+            font-size: em(25);
+        }
+        h2,
+        h3 {
+            font-size: em(23);
+        }
+        p {
+            font-size: em(16);
+
+            font-weight: normal;
+            letter-spacing: 0.02em;
+            line-height: 1.2em;
+            margin-bottom:20px;
+
+            text-align: left;
+        }
+        ul {
+            margin-bottom:20px;
+        }
+        li {
+            font-weight: 500;
+            &:before {
+                content: "•";
+                margin-right: 5px;
+            }
+        }
+        a {
+            color: $secondColor;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &__help {
+        &__title {
+            font-size: em(25);
+
+            font-weight: 700;
+            margin-bottom: 20px;
+            @media (max-width: 576px) {
+                font-size: em(22);
+            }
+        }
+        &__text {
+            margin-bottom: 20px;
+        }
+        &__btn {
+            a {
+                display: inline-block;
+            }
+        }
+    }
+}
