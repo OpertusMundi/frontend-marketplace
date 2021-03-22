@@ -17,12 +17,11 @@
             <div class="services-carts__item__inner">
               <div class="services-carts__item__top">
                 <img src="@/assets/images/t-icon.svg" alt="" />
-                <span>Drive</span>
+                <span>{{service.title.rendered}}</span>
               </div>
               <div class="services-carts__item__main">
-                <div class="services-carts__item__main__text">
-                  Secure cloud storage for managing, sharing, trading and using your files across
-                  Topio’s services.
+                <div class="services-carts__item__main__text"  v-if="service.acf.overview_text">
+                  {{service.acf.overview_text}}
                 </div>
               </div>
             </div>

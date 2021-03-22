@@ -6,7 +6,7 @@
       <div class="single-vas__hero__content">
         <h1 class="single-vas__hero__content__title">
           <img src="@/assets/images/t-icon-white.svg" alt="" />
-          <span>Drive</span>
+          <span></span>
         </h1>
         <div class="single-vas__hero__content__text">
           <p>
@@ -324,18 +324,27 @@
   </div>
 </template>
 <script lang="ts">
-import Vue from 'vue';
+import { Vue } from 'vue-property-decorator';
 import axios from 'axios';
 
-export default Vue.extend({
-  mounted():void {
-    axios.get(`http://om-docs.bracketdev.com/wp-json/wp/v2/vas?slug=${this.$route.params.slug}`).then((response) => {
-      console.log(response.data);
-    }).catch((error) => {
-      console.log(error);
-    });
-  },
-});
+export default class VAS extends Vue {
+  page: any;
+
+  constructor() {
+    super();
+    this.page = [];
+  }
+
+  mounted(): void {
+    axios
+      .get(`http://om-docs.bracketdev.com/wp-json/wp/v2/vas?slug=${this.$route.params.slug}`).then((response) => {
+        this.page = response.data;
+        console.log(this.page);
+      }).catch((error) => {
+        console.log(error);
+      });
+  }
+}
 </script>
 <style lang="scss">
 @import "@/assets/styles/_page.scss";
