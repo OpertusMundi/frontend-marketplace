@@ -260,7 +260,7 @@
                       </div>
                       <!-- HEATMAP -->
                       <span class="map-type">Heatmap</span>
-                      <p>(dummy - heatmap of another asset) Colormap with varying intensity according to the density of features</p>
+                      <p>Colormap with varying intensity according to the density of features</p>
                       <div class="tab_maps-map">
                         <l-map
                           ref="mapHeatmap"
@@ -835,7 +835,7 @@ export default class CatalogueSingle extends Vue {
     this.map.center = polygon.getBounds().getCenter();
   }
 
-  heatmapStyle(feature) {
+  heatmapStyle(feature: any): any {
     return {
       fillColor: feature.properties.fill,
       color: feature.properties.fill,
@@ -846,11 +846,11 @@ export default class CatalogueSingle extends Vue {
     };
   }
 
-  wktToGeoJson(wkt) {
+  wktToGeoJson(wkt: string): any {
     return wktToGeojsonParser(wkt);
   }
 
-  mbrToLeafletBounds(wkt) {
+  mbrToLeafletBounds(wkt: string): number[][] {
     const geoJson = wktToGeojsonParser(wkt);
     const bounds = geoJson.coordinates[0]
       .map((x) => [x[1], x[0]]);
