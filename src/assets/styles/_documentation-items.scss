@@ -29,7 +29,7 @@
     }
     &__item {
         width: 100%;
-        min-height: 310px;
+        min-height: 290px;
         border-radius: 10px;
         position: relative;
         background: #fff;
@@ -37,6 +37,10 @@
         color:$darkColor;
         @media (min-width: 768px) {
             width: calc(50% - 10px);
+        }
+        @media (min-width: 1200px) {
+            min-height: 270px;
+
         }
         &__counter {
             background-color: $secondColor;
@@ -50,6 +54,7 @@
             width: 48px;
             line-height: 48px;
             margin-bottom: 20px;
+            transition: 0.4s ease all;
 
             @media (min-width: 768px) {
                 width: 72px;
@@ -73,6 +78,8 @@
             line-height: 1.2;
             font-size: em(18);
             letter-spacing: 0.02em;
+            transition: 0.4s ease all;
+
         }
         &:hover {
             color: $mainFontColor !important;
@@ -84,6 +91,12 @@
             }
             .documentation-items__item__view {
                 border-color: $secondColor;
+            }
+            .documentation-items__item__counter {
+                margin-bottom:5px;
+            }
+            .documentation-items__item__text {
+                margin:0;
             }
         }
 

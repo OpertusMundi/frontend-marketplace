@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page" v-if="page.length > 0">
     <section class="single-vas__hero">
       <img
         class="single-vas__hero__image"
@@ -8,12 +8,12 @@
         alt=""
       />
       <div class="single-vas__hero__content">
-        <h1 class="single-vas__hero__content__title" v-if="page[0].acf.hero_title">
+        <h1 class="single-vas__hero__content__title">
           <img src="@/assets/images/t-icon-white.svg" alt="" />
-          <span>{{ page[0].acf.hero_title }}</span>
+          <span>{{ page[0].title.rendered }}</span>
         </h1>
-        <div class="single-vas__hero__content__text" v-html="page[0].acf.hero_description"  v-if="page[0].acf.hero_description">
-          </div>
+        <div class="single-vas__hero__content__text" v-if="page[0].excerpt.rendered" v-html="page[0].excerpt.rendered">
+        </div>
         <div class="single-vars__hero__btn">
         <a href="" class="btn btn--std btn--white">
           Start using
@@ -164,8 +164,8 @@
                 <span v-if="related.post_title">{{related.post_title}}</span>
               </div>
               <div class="services-carts__item__main">
-                <div class="services-carts__item__main__text" v-if="related.overview_text">
-                  {{related.overview_text}}
+                <div class="services-carts__item__main__text" v-if="related.post_excerpt">
+                  {{related.post_excerpt}}
                 </div>
               </div>
             </div>

@@ -3,8 +3,7 @@
     <section class="page__hero page__hero--white">
       <div class="page__hero__inner">
         <h1>{{ page[0].title.rendered }}</h1>
-        <div class="page__hero__text" v-if="page[0].acf.hero_subitle">
-          {{ page[0].acf.hero_subitle }}
+        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html=" page[0].excerpt.rendered">
         </div>
       </div>
     </section>
@@ -20,8 +19,7 @@
                 <span>{{service.title.rendered}}</span>
               </div>
               <div class="services-carts__item__main">
-                <div class="services-carts__item__main__text"  v-if="service.acf.overview_text">
-                  {{service.acf.overview_text}}
+                <div class="services-carts__item__main__text" v-html="service.excerpt.rendered">
                 </div>
               </div>
             </div>
@@ -29,17 +27,17 @@
         </div>
       </div>
     </div>
-    <documentation-section :title="page[0].acf.documentation_title" :subtitle="page[0].acf.documentation_text" :items="page[0].acf.documentation"></documentation-section>
+    <documentation-cards :title="page[0].acf.documentation_title" :subtitle="page[0].acf.documentation_text" :items="page[0].acf.documentation"></documentation-cards>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import DocumentationSection from '@/components/Documentation/SectionCards.vue';
+import DocumentationCards from '@/components/Documentation/DocumentationCards.vue';
 import axios from 'axios';
 
 @Component({
   components: {
-    DocumentationSection,
+    DocumentationCards,
   },
 })
 export default class VAS extends Vue {

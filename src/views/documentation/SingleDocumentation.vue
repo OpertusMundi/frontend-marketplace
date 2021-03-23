@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page" v-if="page.length > 0">
     <section class="page__hero page__hero--white page__hero__documentation">
       <div class="page__hero__inner">
         <div class="s_container">
@@ -40,21 +40,6 @@
         </transition>
       </div>
     </section>
-    <div class="documentation-items__help">
-      <div class="s_container">
-        <div class="documentation-items__help__title">
-          Need any help?
-        </div>
-        <div class="documentation-items__help__text">
-          In case you have any questions please visit our Hepldesk
-        </div>
-        <div class="documentation-items__help__btn">
-          <a href="" class="btn btn--std btn--blue">
-            Go to helpdesk
-          </a>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script lang="ts">
