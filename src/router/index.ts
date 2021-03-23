@@ -54,7 +54,7 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "documentation" */ '../views/documentation/Documentation.vue'),
   },
   {
-    path: '/documentation/single',
+    path: '/documentation/:slug',
     name: 'single-documentation',
     component: () => import(/* webpackChunkName: "documentationsingle" */ '../views/documentation/SingleDocumentation.vue'),
   },

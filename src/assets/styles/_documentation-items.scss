@@ -29,11 +29,12 @@
     }
     &__item {
         width: 100%;
-        min-height: 290px;
+        min-height: 310px;
         border-radius: 10px;
         position: relative;
         background: #fff;
         margin-bottom: 20px;
+        color:$darkColor;
         @media (min-width: 768px) {
             width: calc(50% - 10px);
         }

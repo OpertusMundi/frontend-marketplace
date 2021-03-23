@@ -4,73 +4,32 @@
       <div class="documentation-items__title">{{ title }}</div>
       <div class="documentation-items__subtitle">{{ subtitle }}</div>
       <div class="documentation-items__holder">
-        <div class="documentation-items__item">
+        <router-link :to="`/documentation/${item.post_name}`"  class="documentation-items__item"  v-for="(item,index) in items"  v-bind:key="`${index}_tab_content`">
           <div class="documentation-items__item__inner">
-            <div class="documentation-items__item__counter"><span>1</span></div>
-            <div class="documentation-items__item__title">
-              Documentation #1
+            <div class="documentation-items__item__counter"><span>{{index+1}}</span></div>
+            <div class="documentation-items__item__title" v-if="item.acf.hero_title">
+              {{item.acf.hero_title}}
             </div>
-            <div class="documentation-items__item__text">
-              Secure cloud storage for managing, sharing, trading and using your files across
-              Topio’s services.
+            <div class="documentation-items__item__text" v-if="item.acf.overview_text">
+                  {{item.acf.overview_text}}
             </div>
           </div>
-
           <div class="documentation-items__item__view"><span>VIEW SERVICE</span></div>
-        </div>
-          <div class="documentation-items__item">
-          <div class="documentation-items__item__inner">
-            <div class="documentation-items__item__counter"><span>1</span></div>
-            <div class="documentation-items__item__title">
-              Documentation #1
-            </div>
-            <div class="documentation-items__item__text">
-              Secure cloud storage for managing, sharing, trading and using your files across
-              Topio’s services.
-            </div>
-          </div>
-
-          <div class="documentation-items__item__view"><span>VIEW SERVICE</span></div>
-        </div>
-          <div class="documentation-items__item">
-          <div class="documentation-items__item__inner">
-            <div class="documentation-items__item__counter"><span>1</span></div>
-            <div class="documentation-items__item__title">
-              Documentation #1
-            </div>
-            <div class="documentation-items__item__text">
-              Secure cloud storage for managing, sharing, trading and using your files across
-              Topio’s services.
-            </div>
-          </div>
-
-          <div class="documentation-items__item__view"><span>VIEW SERVICE</span></div>
-        </div>
-          <div class="documentation-items__item">
-          <div class="documentation-items__item__inner">
-            <div class="documentation-items__item__counter"><span>1</span></div>
-            <div class="documentation-items__item__title">
-              Documentation #1
-            </div>
-            <div class="documentation-items__item__text">
-              Secure cloud storage for managing, sharing, trading and using your files across
-              Topio’s services.
-            </div>
-          </div>
-
-          <div class="documentation-items__item__view"><span>VIEW DOCUMENTATION</span></div>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Prop, Vue } from 'vue-property-decorator';
+import { Prop, Component, Vue } from 'vue-property-decorator';
 
+@Component
 export default class DocumentationSection extends Vue {
     @Prop({ required: true }) readonly title!: string;
 
     @Prop({ required: true }) readonly subtitle!: string;
+
+    @Prop({ required: true }) readonly items!: string;
 }
 </script>
 <style lang="scss">
