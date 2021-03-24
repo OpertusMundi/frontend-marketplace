@@ -2,14 +2,41 @@
     display: flex;
 }
 
-.d-column {
+.d-inline-flex {
+    display: inline-flex;
+}
+
+.flex-column {
     flex-direction: column;
+}
+.flex-row {
+    flex-direction: row;
 }
 
 .align-items-center {
     align-items: center;
 }
 
+.align-self-start {
+    align-self: flex-start;
+}
+
+.align-self-end {
+    align-self: flex-end;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
 .justify-content-center {
     justify-content: center;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
 }
