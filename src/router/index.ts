@@ -39,6 +39,26 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "faq" */ '../views/Faq.vue'),
   },
   {
+    path: '/vas',
+    name: 'vas',
+    component: () => import(/* webpackChunkName: "vas" */ '../views/documentation/VAS.vue'),
+  },
+  {
+    path: '/vas/:slug',
+    name: 'single-vas',
+    component: () => import(/* webpackChunkName: "vassingke" */ '../views/documentation/SingleVAS.vue'),
+  },
+  {
+    path: '/documentation',
+    name: 'documentation',
+    component: () => import(/* webpackChunkName: "documentation" */ '../views/documentation/Documentation.vue'),
+  },
+  {
+    path: '/documentation/:slug',
+    name: 'single-documentation',
+    component: () => import(/* webpackChunkName: "documentationsingle" */ '../views/documentation/SingleDocumentation.vue'),
+  },
+  {
     path: '/dashboard',
     component: () => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
     meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },

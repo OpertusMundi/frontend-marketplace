@@ -1,0 +1,76 @@
+<template>
+  <div class="page" v-if="page.length > 0">
+    <section class="page__hero page__hero--white">
+      <div class="page__hero__inner">
+        <h1>{{ page[0].title.rendered }}</h1>
+        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html=" page[0].excerpt.rendered">
+        </div>
+      </div>
+    </section>
+
+    <div class="services-carts" v-if="services.length > 0">
+      <div class="s_container">
+        <div class="services-carts__holder">
+          <router-link :to="`/vas/${service.slug}`" class="services-carts__item" v-for="service in services" v-bind:key="service.id">
+            <div class="services-carts__item__view"><span>VIEW SERVICE</span></div>
+            <div class="services-carts__item__inner">
+              <div class="services-carts__item__top">
+                <img src="@/assets/images/t-icon.svg" alt="" />
+                <span>{{service.title.rendered}}</span>
+              </div>
+              <div class="services-carts__item__main">
+                <div class="services-carts__item__main__text" v-html="service.excerpt.rendered">
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+      </div>
+    </div>
+    <documentation-cards :title="page[0].acf.documentation_title" :subtitle="page[0].acf.documentation_text" :items="page[0].acf.documentation"></documentation-cards>
+  </div>
+</template>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import DocumentationCards from '@/components/Documentation/DocumentationCards.vue';
+import axios from 'axios';
+
+@Component({
+  components: {
+    DocumentationCards,
+  },
+})
+export default class VAS extends Vue {
+  page: any;
+
+  services: any;
+
+  constructor() {
+    super();
+
+    this.page = [];
+    this.services = [];
+  }
+
+  mounted():void {
+    axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/pages?slug=vas').then((response) => {
+      this.page = response.data;
+      console.log(this.page);
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/vas').then((response) => {
+      this.services = response.data;
+      console.log(this.services);
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+}
+</script>
+<style lang="scss">
+@import "@/assets/styles/_page.scss";
+@import "@/assets/styles/_services-carts.scss";
+@import "@/assets/styles/_documentation-items.scss";
+</style>
