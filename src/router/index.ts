@@ -112,6 +112,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
       },
       {
+        path: 'users',
+        name: 'Users',
+        component: () => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Users.vue'),
+        meta: { requiresRole: 'ROLE_USER', layout: 'dashboard' },
+      },
+      {
         path: 'messages/create',
         name: 'MessageNew',
         component: () => import(/* webpackChunkName: "dashboardmesssagenew" */ '../views/dashboard/MessageNew.vue'),
