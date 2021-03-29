@@ -36,7 +36,17 @@ const routes: RouteConfig[] = [
   {
     path: '/faq',
     name: 'Faq',
-    component: () => import(/* webpackChunkName: "faq" */ '../views/Faq.vue'),
+    component: () => import(/* webpackChunkName: "faq" */ '../views/faq/Faq.vue'),
+  },
+  {
+    path: '/faq/:category',
+    name: 'faq-category',
+    component: () => import(/* webpackChunkName: "faqcategory" */ '../views/faq/FaqCategory.vue'),
+  },
+  {
+    path: '/faq/:category/:slug',
+    name: 'single-faq',
+    component: () => import(/* webpackChunkName: "singlefaq" */ '../views/faq/SingleFaq.vue'),
   },
   {
     path: '/vas',
