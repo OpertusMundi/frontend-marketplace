@@ -29,6 +29,27 @@
             color: #fff;
         }
     }
+    &--outlinedark {
+        font-size: em(15);
+        padding: 7px 25px 6px;
+        text-transform: uppercase;
+        border-radius: 25px;
+        letter-spacing: 0.08em;
+        font-weight: 500;
+        border: 2px solid $darkColor;
+        min-width: 100px;
+        display: inline-block;
+        text-align: center;
+        transition: all 0.2s ease;
+        color: $darkColor;
+        span {
+            font-weight: 500;
+        }
+        &:hover {
+            background: $darkColor;
+            color: #fff;
+        }
+    }
     &--std {
         font-size: em(15);
         padding: 10px 25px 10px;
