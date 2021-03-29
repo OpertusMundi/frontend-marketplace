@@ -8,12 +8,12 @@
         cursor: not-allowed;
     }
 
-    &--outlineblue {     
+    &--outlineblue {
         font-size: em(15);
         padding: 7px 25px 6px;
         text-transform: uppercase;
         border-radius: 25px;
-        letter-spacing: 0.08em;   
+        letter-spacing: 0.08em;
         font-weight: 500;
         border: 2px solid $secondColor;
         min-width: 100px;
@@ -21,7 +21,7 @@
         text-align: center;
         transition: all 0.2s ease;
         color: $secondColor;
-        span{
+        span {
             font-weight: 500;
         }
         &:hover {
@@ -29,18 +29,18 @@
             color: #fff;
         }
     }
-    &--std {        
+    &--std {
         font-size: em(15);
         padding: 10px 25px 10px;
         text-transform: uppercase;
         border-radius: 25px;
-        letter-spacing: 0.08em;   
+        letter-spacing: 0.08em;
         font-weight: 500;
         outline: none;
         box-shadow: none;
         border: none;
         transition: all 0.4s ease;
-        span{
+        span {
             font-weight: 500;
         }
     }
@@ -62,6 +62,23 @@
         background: $mainColor;
         &:hover {
             background: #fff;
+        }
+    }
+    &--white {
+        background: #fff;
+        color: $darkColor;
+        &:hover {
+            background: $darkColor;
+            color: #fff;
+        }
+    }
+    &--trans {
+        color:$secondColor;
+        border-color:$secondColor;
+        border:2px solid $secondColor;
+        &:hover {
+            background-color:$secondColor;
+            color:#fff;
         }
     }
 }

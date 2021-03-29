@@ -14,18 +14,18 @@
           :center="map.center"
           :options="map.mapOptions"
         >
-        <l-tile-layer
-          :url="map.url"
-          :attribution="map.attribution"/>
-        <l-geo-json
-          ref="geoJsonLayer"
-          v-if="catalogueItemType == 'api' && geoJson"
-          :geojson="geoJson">
-        </l-geo-json>
-        <l-polygon v-if="map.coordinates_type === 'Polygon'"
-          :latLngs="this.catalogueItem.geometry.coordinates[0]"
-          color="#190AFF"
-        />
+          <l-tile-layer
+            :url="map.url"
+            :attribution="map.attribution"/>
+          <l-geo-json
+            ref="geoJsonLayer"
+            v-if="catalogueItemType == 'api' && geoJson"
+            :geojson="geoJson">
+          </l-geo-json>
+          <l-polygon v-if="map.coordinates_type === 'Polygon'"
+            :latLngs="this.catalogueItem.geometry.coordinates[0]"
+            color="#FF0045"
+          />
         </l-map>
       </div>
     </div>
@@ -34,7 +34,7 @@
         <div class="asset__content">
           <div class="asset__head">
             <a href="#" class="asset__head__breadcrumps"><img src="@/assets/images/icons/back_icon.svg" alt="">BACK</a>
-            <topic-category-icon :category="catalogueItem.topicCategory"/>
+            <topic-category-icon v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat_icon`" :category="category"/>
             <div class="asset__head__title">
               <h1>{{ catalogueItem.title }}</h1>
               <a href="#" class="asset__head__favorites">
@@ -47,18 +47,19 @@
             </div>
             <div class="asset__head__version">
               <div class="custom-select">
-                <select name="version">
-                  <option value="" default selected>VERSION 1.3</option>
-                  <option value="">VERSION 1.2</option>
-                  <option value="">VERSION 1.1</option>
+                <select name="version" v-model="selectedVersion">
+                  <option :value="version" v-for="version in catalogueItem.versions" v-bind:key="`${version}_version`">VERSION {{ version }}</option>
                 </select>
               </div>
-              <div class="asset__head__rating rating"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
+              <!-- <div class="asset__head__rating rating">
+                <span v-for="index in 5" v-bind:key="`${index}_rating`" :class="{ 'active' : index <= catalogueItem.statistics.rating }">★</span>
+                <i>{{catalogueItem.statistics.rating ? catalogueItem.statistics.rating : '- '}}/5</i>
+              </div> -->
             </div>
             <div class="asset__head__data" v-if="catalogueItemType == 'api'">
               <ul>
-                <li><strong>Last updated:</strong>{{ formatDate(catalogueItem.revisionDate) }}</li>
-                <li><strong>Created:</strong>{{ formatDate(catalogueItem.publicationDate) }}</li>
+                <li><strong>Last updated:</strong>{{ catalogueItem.revisionDate | format_date }}</li>
+                <li><strong>Created:</strong>{{ catalogueItem.publicationDate | format_date }}</li>
                 <!-- <li><strong>Topic:</strong>{{ catalogueItem.topicCategory }}</li>
                 <li><strong>Format:</strong>{{ catalogueItem.format }}</li> -->
                 <li><strong>CRS:</strong>{{ catalogueItemDummyMetadata.crs }}</li>
@@ -69,13 +70,13 @@
             </div>
             <div class="asset__head__data" v-else>
               <ul>
-                <li><strong>Last updated:</strong>{{ formatDate(catalogueItem.revisionDate) }}</li>
-                <li><strong>Created:</strong>{{ formatDate(catalogueItem.publicationDate) }}</li>
-                <li><strong>Topic:</strong>{{ catalogueItem.topicCategory }}</li>
+                <li><strong>Last updated:</strong>{{ catalogueItem.revisionDate | format_date }}</li>
+                <li><strong>Created:</strong>{{ catalogueItem.publicationDate | format_date }}</li>
+                <li><strong>Topic:</strong><span v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}</span></li>
                 <li><strong>Format:</strong>{{ catalogueItem.format }}</li>
                 <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem }}</li>
-                <li><strong>Scale:</strong> 1:5,000 urban areas, 1:10,000 provincial areas</li>
-                <li><strong>Coverage:</strong>97% of Greece</li>
+                <li><strong>Scale:</strong><span v-for="scale in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.theme }}</span></li>
+                <li><strong>Coverage:</strong>97% of Greece (DUMMY)</li>
               </ul>
             </div>
           </div>
@@ -89,29 +90,30 @@
                 <div class="asset__section__content__inner">
                   <div class="asset__section__overview__left">
                     <h5>Description</h5>
-                    <p>Study and analyze the geospatial data value chain in <a href="#">EU to suitably</a> align and position the platform with current and emerging needs of owners and consumers from a technical, organizational, legal, and business perspective.</p>
-                    <h5>Suitable for:</h5>
+                    <p>{{ catalogueItem.abstract }}</p>
+                    <h5 v-if="catalogueItem.suitableFor">Suitable for:</h5>
                     <ul>
-                      <li>Thematic mapping</li>
-                      <li>Land management and property development</li>
-                      <li>Environmental monitoring</li>
+                      <li v-for="suitableFor in catalogueItem.suitableFor" v-bind:key="`${suitableFor}_suitable`">{{ suitableFor }}</li>
                     </ul>
-                    <h5>Additional resources</h5>
-                    <a href="#">additional-1.pdf</a> <br>
+                    <h5 v-if="catalogueItem.additionalResources">Additional resources:</h5>
+                    <a v-for="(additionalResources, index) in catalogueItem.additionalResources" v-bind:key="`${index}_aditional_r`" :href="additionalResources.uri" target="_blank" style="display:block">{{ additionalResources.text }}</a>
                   </div>
                   <div class="asset__section__overview__right">
                     <h5>Asset Info</h5>
-                    <p><strong>Language:</strong> English <br>
-                      <strong>Temporal extent:</strong>  Nov. 2019 - Oct. 2020 <br>
-                      <strong>Compatibility:</strong> example</p>
+                    <p><strong>Language:</strong> {{ catalogueItem.language }} <br>
+                      <strong>Temporal extent:</strong>  Nov. 2019 - Oct. 2020 (DUMMY)<br>
                     <h5>Tags</h5>
-                    <p v-if="catalogueItemType == 'api'">
+                    <div v-if="catalogueItemType == 'api'">
+                    <p>
                       <span v-for="(tag, index) in catalogueItemDummyMetadata.distinct.feat_desc" :key="index">
                         {{tag}}<span v-if="index < catalogueItemDummyMetadata.distinct.feat_desc.length - 1">,</span>
                       </span>
                     </p>
-                    <p v-else>vector, greece, agriculture,
-                      commercial, map, analytics</p>
+                    </div>
+                    <div v-else></div>
+                    <!-- <p v-if="catalogueItem.keywords.length > 0">
+                      <span v-for="keyword in catalogueItem.keywords" v-bind:key="keyword.keyword">{{ keyword.keyword }}, </span>
+                    </p> -->
                   </div>
                 </div>
               </div>
@@ -155,28 +157,160 @@
                 <h4>Terms & Restrictions</h4>
                 <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
                 <ul class="asset__section__head__tabs">
-                  <li><a href="#" class="active">Type of licence</a></li>
-                  <li><a href="#">Countries</a></li>
-                  <li><a href="#">Duration</a></li>
-                  <li><a href="#">Vocabulary</a></li>
+                  <li><a href="#" @click.prevent="activeTermsTab = 1" :class="{ 'active' : activeTermsTab == 1 }">Type of licence</a></li>
+                  <li><a href="#" @click.prevent="activeTermsTab = 2" :class="{ 'active' : activeTermsTab == 2 }">Countries</a></li>
+                  <li><a href="#" @click.prevent="activeTermsTab = 3" :class="{ 'active' : activeTermsTab == 3 }">Duration</a></li>
+                  <li><a href="#" @click.prevent="activeTermsTab = 4" :class="{ 'active' : activeTermsTab == 4 }">Vocabulary</a></li>
                 </ul>
               </div>
               <div class="asset__section__content">
                 <div class="asset__section__content__inner">
                   <ul class="asset__section__tabs">
-                    <li>
-                      <p>Study and analyze the geospatial data value chain in EU to suitably align and position the platform with current and emerging needs of owners and consumers from a technical, organizational, legal, and business perspective.
-                        Study and analyze the geospatial data value chain in EU to suitably align and position the platform with current and emerging needs of owners and consumers from a technical, organizational, legal, and business perspective.
-                        Study and analyze the geospatial data value chain in EU to suitably align and position the platform.</p>
+                    <li v-if="activeTermsTab == 1">
+                      <p>{{ catalogueItem.license }}</p>
                     </li>
-                    <li>
-                      <p>Countries content</p>
+                    <li v-if="activeTermsTab == 2">
+                      <p>Countries content (DUMMY)</p>
                     </li>
-                    <li>
-                      <p>Duration content</p>
+                    <li v-if="activeTermsTab == 3">
+                      <p>Duration content (DUMMY)</p>
                     </li>
-                    <li>
-                      <p>Vocabulary content</p>
+                    <li v-if="activeTermsTab == 4">
+                      <p>Vocabulary content (DUMMY)</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+            </section>
+
+            <section class="asset__section">
+              <div class="asset__section__head">
+                <h4>Data Profiling and Samples</h4>
+                <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+                <ul class="asset__section__head__tabs">
+                  <li><a href="#" @click.prevent="activeProfilingTab = 1" :class="{ 'active' : activeProfilingTab == 1 }">Attributes</a></li>
+                  <li><a href="#" @click.prevent="activeProfilingTab = 2" :class="{ 'active' : activeProfilingTab == 2 }">Maps</a></li>
+                  <li><a href="#" @click.prevent="activeProfilingTab = 3" :class="{ 'active' : activeProfilingTab == 3 }">Sample 1</a></li>
+                  <li><a href="#" @click.prevent="activeProfilingTab = 4" :class="{ 'active' : activeProfilingTab == 4 }">Sample 2</a></li>
+                </ul>
+              </div>
+              <div class="asset__section__content">
+                <div class="asset__section__content__inner">
+                  <ul class="asset__section__tabs">
+                    <li v-if="activeProfilingTab == 1">
+                      <p>Attributes content (DUMMY)</p>
+                    </li>
+                    <li v-if="activeProfilingTab == 2">
+                      <p>Contains map images with the geometry of the dataset</p>
+                      <hr>
+                      <!-- MBR -->
+                      <span class="map-type">MBR</span>
+                      <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
+                      <div class="tab_maps-map">
+                        <l-map
+                          ref="mapMbr"
+                          v-if="map.show"
+                          :bounds="mbrToLeafletBounds(metadata.mbr)"
+                          :options="map.mapOptions"
+                        >
+                          <l-tile-layer
+                          :url="map.url"
+                          :attribution="map.attribution"/>
+                          <l-geo-json
+                            ref="geoJsonMbrLayer"
+                            v-if="metadata"
+                            :geojson="wktToGeoJson(metadata.mbr)"
+                            :optionsStyle="{color: 'orange'}"
+                          >
+                          </l-geo-json>
+                        </l-map>
+                      </div>
+                      <!-- CONVEX HULL -->
+                      <span class="map-type">Convex Hull</span>
+                      <p>Convex polygon enclosing all features</p>
+                      <div class="tab_maps-map">
+                        <l-map
+                          ref="mapConvexHull"
+                          v-if="map.show"
+                          :bounds="mbrToLeafletBounds(metadata.mbr)"
+                          :options="map.mapOptions"
+                        >
+                          <l-tile-layer
+                          :url="map.url"
+                          :attribution="map.attribution"/>
+                          <l-geo-json
+                            ref="geoJsonConvexHullLayer"
+                            v-if="metadata"
+                            :geojson="wktToGeoJson(metadata.convexHull)"
+                            :optionsStyle="{color: 'orange'}"
+                          >
+                          </l-geo-json>
+                        </l-map>
+                      </div>
+                      <!-- THUMBNAIL -->
+                      <span class="map-type">Thumbnail</span>
+                      <p>Thumbnail image depicting the spatial coverage of the dataset</p>
+                      <div class="tab_maps-map tab_maps-map-thumbnail">
+                        <img
+                          v-if="metadata"
+                          :src="'data:image/png;base64, ' + metadata.thumbnail"
+                          alt="thumbnail"
+                        >
+                      </div>
+                      <!-- HEATMAP -->
+                      <span class="map-type">Heatmap</span>
+                      <p>Colormap with varying intensity according to the density of features</p>
+                      <div class="tab_maps-map">
+                        <l-map
+                          ref="mapHeatmap"
+                          v-if="map.show"
+                          :bounds="mbrToLeafletBounds(metadata.mbr)"
+                          :options="map.mapOptions"
+                        >
+                          <l-tile-layer
+                          :url="map.url"
+                          :attribution="map.attribution"/>
+                          <l-geo-json
+                            ref="geoJsonHeatmapLayer"
+                            v-if="metadata"
+                            :geojson="metadata.heatmap"
+                            :optionsStyle="heatmapStyle"
+                            :smoothFactor="0.2"
+                            :opacity="0.1"
+                            :options="{smoothFactor: 0.2}"
+                          >
+                          </l-geo-json>
+                        </l-map>
+                      </div>
+                      <!-- CLUSTERS -->
+                      <span class="map-type">Clusters</span>
+                      <p>Density-based spatial clusters of features</p>
+                      <div class="tab_maps-map">
+                        <l-map
+                          ref="mapClusters"
+                          v-if="map.show"
+                          :bounds="mbrToLeafletBounds(metadata.mbr)"
+                          :options="map.mapOptions"
+                        >
+                          <l-tile-layer
+                          :url="map.url"
+                          :attribution="map.attribution"/>
+                          <l-geo-json
+                            ref="geoJsonClustersLayer"
+                            v-if="metadata"
+                            :geojson="metadata.clusters"
+                            :optionsStyle="{color: 'orange'}"
+                          >
+                          </l-geo-json>
+                        </l-map>
+                      </div>
+                    </li>
+                    <li v-if="activeProfilingTab == 3">
+                      <p>Sample 1 content (DUMMY)</p>
+                    </li>
+                    <li v-if="activeProfilingTab == 4">
+                      <p>Sample 2 content (DUMMY)</p>
                     </li>
                   </ul>
                 </div>
@@ -194,23 +328,29 @@
               </div>
             </div>
             <ul class="asset__shopcard__priceoptions">
-              <li>+ 24% VAT</li>
-              <li>+ 5,99€ delivery to Poland</li>
+              <li>+ 24% VAT (DUMMY)</li>
+              <li>+ 5,99€ delivery to Poland (DUMMY)</li>
+            </ul>
+            <ul class="asset__shopcard__buyinfo pt-sm-10">
+              <li><strong>Asset application restrictions</strong></li>
+              <li><strong>Domain: </strong> Geomarketing (DUMMY)</li>
+              <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
             </ul>
             <div class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
             <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
             <ul class="asset__shopcard__buyinfo">
-              <li><strong>Expected delivery:</strong>Available immediately</li>
-              <li><strong>Payment:</strong> Secure, escrow account</li>
-              <li><strong>Payment methods:</strong> </li>
+              <li><strong>Delivery type: </strong> From topio / vendor (DUMMY)</li>
+              <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li>
+              <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li>
             </ul>
-            <div class="asset__shopcard__pid">PID: 300.994.567 </div>
             <div class="asset-owner">
               <div class="asset-owner__inner">
-                <div class="asset-owner__inner__logo"><img src="@/assets/images/about/partners/athina_logo.svg" alt=""></div>
+                <div class="asset-owner__inner__logo">
+                  <!-- <img :src="catalogueItem.logoImage" :alt="catalogueItem.publisher.name"> -->
+                </div>
                 <div class="asset-owner__inner__info">
                   <div class="asset-owner__inner__info__name">
-                    <a href="#">AthenaRC</a>
+                    <!-- <a href="#">{{ catalogueItem.publisher.name }}</a> -->
                     <a href="#">
                       <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 33 31" style="enable-background:new 0 0 33 31;" xml:space="preserve">
                         <path style="fill:#FFFFFF;"
@@ -219,9 +359,12 @@
                       </svg>
                     </a>
                   </div>
-                  <div class="rating rating--dark"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
-                  <div class="asset-owner__inner__info__country">Athens, Greece</div>
-                  <div class="asset-owner__inner__info__date">Joined February 2020</div>
+                  <!-- <div class="rating rating--dark">
+                    <span v-for="index in 5" v-bind:key="`${index}_rating`" :class="{ 'active' : index <= catalogueItem.publisher.rating }">★</span>
+                    <i>{{catalogueItem.publisher.rating ? catalogueItem.publisher.rating : '- '}}/5</i>
+                  </div> -->
+                  <!-- <div class="asset-owner__inner__info__country">{{ catalogueItem.publisher.city }}, {{ catalogueItem.publisher.country }}</div> -->
+                  <!-- <div class="asset-owner__inner__info__date">Joined {{ catalogueItem.publisher.joinedAt | format_date }}</div> -->
                 </div>
               </div>
             </div>
@@ -479,6 +622,9 @@ import JsonViewer from 'vue-json-viewer';
 import { reproject } from 'reproject';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
+import { parse as wktToGeojsonParser } from 'wellknown';
+
+import mockMetadata from '../service/mock-data/vector-metadata';
 /* */
 
 @Component({
@@ -489,6 +635,11 @@ import { GeoJsonObject } from 'geojson';
     LPolygon,
     LGeoJson,
     JsonViewer,
+  },
+  filters: {
+    format_date(value) {
+      return moment(value).format('DD MMM. YYYY');
+    },
   },
 })
 export default class CatalogueSingle extends Vue {
@@ -509,7 +660,7 @@ export default class CatalogueSingle extends Vue {
   catalogueItemType: string;
 
   // a dummy API response example
-  apiSampleResponse = {
+  apiSampleResponse: any = {
     status: 'ok',
     geometries: {
       foo: 'foo',
@@ -529,10 +680,20 @@ export default class CatalogueSingle extends Vue {
 
   cartApi: CartApi;
 
+  selectedVersion: string;
+
+  activeTermsTab: number;
+
+  activeProfilingTab: number;
+
+  metadata: any;
 
   constructor() {
     super();
 
+    this.selectedVersion = '';
+    this.activeTermsTab = 1;
+    this.activeProfilingTab = 1;
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueItemType = '';
     this.catalogueApi = new CatalogueApi();
@@ -554,6 +715,8 @@ export default class CatalogueSingle extends Vue {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
+
+    this.metadata = null;
   }
 
   mounted():void {
@@ -562,6 +725,11 @@ export default class CatalogueSingle extends Vue {
       this.calcAssetHeaderTitle();
     });
     this.loadAsset();
+
+    // imitate REST-API latency
+    setTimeout(() => {
+      this.metadata = mockMetadata;
+    }, 3000);
   }
 
   @Watch('selectedPricingModel')
@@ -573,10 +741,6 @@ export default class CatalogueSingle extends Vue {
 
   beforeDestroy():void {
     window.removeEventListener('resize', this.calcAssetHeaderTitle);
-  }
-
-  formatDate(date:string): string {
-    return moment(date).format('DD MMM. YYYY');
   }
 
   prModelCurrencyFormat(currency:string): string {
@@ -601,6 +765,7 @@ export default class CatalogueSingle extends Vue {
       this.geoJson = this.reprojectGeoJson(this.catalogueItemDummyMetadata.clusters, this.catalogueItemDummyMetadata.crs, 'EPSG:4326');
 
       this.itemLoaded = true;
+      console.log('item loaded');
       setTimeout(() => {
         this.initMap();
       }, 200);
@@ -639,6 +804,8 @@ export default class CatalogueSingle extends Vue {
         }
         this.itemLoaded = true;
         this.catalogueItem = queryResponse.result;
+        console.log('catalogue item', this.catalogueItem);
+        this.selectedVersion = this.catalogueItem.version;
         setTimeout(() => {
           this.calcAssetHeaderTitle();
           this.initMap();
@@ -654,10 +821,11 @@ export default class CatalogueSingle extends Vue {
       this.polygonCenter();
     }
 
-    // my addition
-    this.$nextTick(() => {
-      (this as any).$refs.map.mapObject.fitBounds((this as any).$refs.geoJsonLayer.getBounds());
-    });
+    if (this.catalogueItemType === 'api') {
+      this.$nextTick(() => {
+        (this as any).$refs.map.mapObject.fitBounds((this as any).$refs.geoJsonLayer.getBounds());
+      });
+    }
   }
 
   polygonCenter():void {
@@ -665,6 +833,28 @@ export default class CatalogueSingle extends Vue {
     const coordinates:any = this.catalogueItem.geometry.coordinates[0];
     const polygon = L.polygon(coordinates);
     this.map.center = polygon.getBounds().getCenter();
+  }
+
+  heatmapStyle(feature: any): any {
+    return {
+      fillColor: feature.properties.fill,
+      color: feature.properties.fill,
+      fillOpacity: 0.7,
+      opacity: 0.4,
+      weight: 1,
+      stroke: true,
+    };
+  }
+
+  wktToGeoJson(wkt: string): any {
+    return wktToGeojsonParser(wkt);
+  }
+
+  mbrToLeafletBounds(wkt: string): number[][] {
+    const geoJson = wktToGeojsonParser(wkt);
+    const bounds = geoJson.coordinates[0]
+      .map((x) => [x[1], x[0]]);
+    return bounds;
   }
 
   addToCart():void {
@@ -701,4 +891,5 @@ export default class CatalogueSingle extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
 </style>

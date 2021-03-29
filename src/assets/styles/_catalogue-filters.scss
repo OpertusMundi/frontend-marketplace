@@ -1,0 +1,363 @@
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input[type="checkbox"] {
+    -ms-transform: scale(1.3); /* IE */
+    -moz-transform: scale(1.3); /* FF */
+    -webkit-transform: scale(1.3); /* Safari and Chrome */
+    -o-transform: scale(1.3); /* Opera */
+    transform: scale(1.3);
+    padding: 10px;
+}
+
+input[type="checkbox"]:checked {
+    background: $secondColor;
+}
+
+#search_assets {
+    width: 50%;
+}
+
+.menu-select-style__wrapper {
+    width: 100%;
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    grid-gap: 3px;
+}
+
+.menu-select-style__wrapper span {
+    border-radius: 3px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .85rem;
+    padding: 10px 10px 10px 10px;
+    cursor: pointer;
+}
+
+.menu-select-style__wrapper span.active {
+    background: $secondColor;
+    color: #fff;
+}
+
+.filter-dialog-wrapper {
+    background: white;
+    min-height: 400px;
+    width: calc(100% - 48px);
+    // box-sizing: border-box;
+    border-radius: 7px;
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    // flex-direction: column;
+    box-shadow: 7px 7px 15px rgb(134, 134, 134);
+    // padding: 0 0 0 20px;
+    margin-top: 5px;
+}
+
+.filter-side-menu-bottom {
+    display: inline-block;
+    width: 100%;
+}
+
+.filter-side-menu-bottom button {
+    margin: 20px 20px 20px 0px;
+    float: right;
+}
+
+.filter-container {
+    flex-grow: 1;
+    // margin: 20px 10px 20px 0;
+}
+
+.filter-side-menu {
+    width: 360px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.filter-side-menu-main {
+    flex-grow: 1;
+    display: flex;
+}
+
+.time-picker li.active {
+    background: $secondColor !important;
+}
+
+.date-labels {
+    color: #5e5e5e;
+    margin: 5px;
+}
+
+.pill {
+    width: auto;
+    // background: #190AFF;
+    background: $secondColor;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px 5px 10px;
+    margin: 5px;
+    border-radius: 7px;
+}
+
+.close-button {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.filter-buttons-container button {
+    float: right;
+}
+
+small {
+    color: $labelColor;
+}
+
+.format-category-title {
+    color: $labelColor;
+    margin-bottom: 10px;
+}
+
+.container-map-menu {
+    display: flex;
+}
+
+.map-coverage-wrapper {
+    height: 400px;
+    width: 100%;
+    position: relative;
+    margin: 0 10px 0 10px;
+}
+
+.map-coverage-wrapper input {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 5px;
+    width: 200px;
+    z-index: 2000;
+}
+
+.map-coverage-wrapper button {
+    bottom: 0;
+    margin: 5px;
+    position: absolute;
+    z-index: 2000;
+}
+
+#mapCoverage {
+    height: 100%;
+    width: 100%;
+}
+
+.coverage-side-menu {
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+.coverage-side-menu input,
+.coverage-side-menu select,
+.coverage-side-menu .select-area-text {
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.coverage-map-menu-container {
+    display: flex;
+}
+
+.values-line, .values-line {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.values-line span {
+    width: 60px;
+    text-align: center;
+    color: $labelColor;
+}
+
+.min-max-container {
+    display: flex;
+}
+
+.min-max-input-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.min-max-input-item label {
+    color: $labelColor;
+}
+
+.min-max-scale-input {
+    display: inline-flex !important;
+    width: auto !important;
+}
+
+// .crs-search-autocomplete {
+// }
+
+.crs-search-autocomplete ul li {
+    border-bottom: solid 1px #f2f2f2;
+    padding: 10px 10px 10px 20px;
+    cursor: pointer;
+}
+
+.crs-search-autocomplete ul li:hover {
+    background: #f2f2f2;
+}
+
+.checkbox-group-disabled h3,
+.checkbox-group-disabled label {
+    color: #acacac;
+}
+
+.checkbox-group-disabled input,
+.checkbox-group-disabled label {
+    cursor: not-allowed;
+}
+
+.grayed {
+    color: $labelColor;
+}
+
+.tab {
+    height: 100%;
+    padding: 30px;
+}
+
+.tab-update button {
+    background: #fff;
+    border: solid 1px $darkColor;
+    border-radius: 3px;
+    height: 25px !important;
+    width: 25px !important;
+}
+
+.tab-topic {
+    // height: 400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    //grid-template-rows: 25px 25px;
+    // grid-auto-flow: column;
+    grid-gap: 5px;
+}
+
+.tab-more {
+    display: flex;
+    padding: 0;
+}
+
+.tab-more-side-menu {
+    background: #f2f2f2;
+    height: 100%;
+}
+
+.tab-more-side-menu span {
+    padding: 10px 20px 10px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.tab-more-side-menu span:hover {
+    background: #d4d4d4;
+    // color: #fff;
+}
+
+.tab-more-side-menu span.active {
+    background: $secondColor;
+    color: #fff;
+}
+
+// .tab-more-main {
+//     padding: 20px;
+// }
+
+.tab-more input, .tab-more hr {
+    max-width: 400px;
+}
+
+.vue-slider-dot-handle {
+    background: $secondColor !important;
+    border: none !important;
+    box-shadow: none;
+}
+
+.vue-slider-process, .vue-slider:hover .vue-slider-process {
+    background: $secondColor;
+}
+
+.vue-slider-mark-step {
+    // display: none;
+    margin-left: -3px;
+    margin-top: -3px;
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    border: solid 1px rgba(0, 0, 0, 0.32); 
+    background: #fff;
+    box-shadow: none !important;
+}
+
+.vue-slider-mark-step-active {
+    border-color: $secondColor;
+}
+
+// /* css solution cause disabling in props throws error */
+// .slider-tooltip-wrap, .slider-tooltip {
+//     display: none !important;
+// }
+
+// .slider-process, .slider-dot {
+//     background: $secondColor !important;
+// }
+
+.leaflet-areaselect-shade {
+    position: absolute;
+    background: rgba(0,0,0,0.4);
+    z-index: 400;
+}
+
+.leaflet-interactive.leaflet-path-draggable {
+    fill: transparent !important;
+}
+
+.fab-button {
+    float: right;
+    height: 38px;
+    width: 38px;
+    font-size: 20px;
+    background: $secondColor;
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    box-shadow: 1px 1px 2px rgb(134, 134, 134);
+}

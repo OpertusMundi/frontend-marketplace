@@ -17,19 +17,30 @@
     &__map {
         position: absolute;
         z-index: 1;
-        // height: 550px;
+        height: 550px;
         // height: var(--asset-head-height);
-        height: 100%;
+        // height: 100%;
         width: 100%;
         top: 0;
         left: 0;
-        // background: $gradient_main;
+        background: $gradient_main;
 
         &__inner {
             width: 100%;
             height: 100%;
             position: relative;
             // opacity: 0.4;
+            &:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: $gradient_main;
+                z-index: 999;
+                opacity: 0.6;
+            }
         }
     }
     .s_container {
@@ -234,6 +245,10 @@
             }
         }
 
+        &__restrictions {
+            margin-top: 20px;
+        }
+
         &__addtocart {
             margin: 20px 0 30px;
             a {
@@ -244,8 +259,16 @@
         }
         &__buyinfo {
             font-size: em(13);
+            margin-bottom: 15px;
             li {
                 margin-bottom: 5px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                img {
+                    display: block;
+                    margin-left: 5px;
+                }
             }
         }
 
@@ -839,4 +862,20 @@
             white-space: normal;
         }
     }
+}
+
+.asset__section__tabs .map-type {
+    font-size: 25px;
+}
+
+.asset__section__tabs .tab_maps-map {
+    width: 100%;
+    height: 400px;
+    background: #ddd;
+    margin-bottom: 40px;
+}
+
+.tab_maps-map-thumbnail img {
+    height: 100%;
+    width: 100%;
 }
