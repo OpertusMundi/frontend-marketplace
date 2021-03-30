@@ -21,91 +21,100 @@
         </div>
 
         <!-- GENERAL -->
-        <div class="tab tab-general" v-if="selectedTab == 'general'">
+        <div class="tab tab-general" v-if="userData && selectedTab == 'general'">
           <div class="grid-container">
-            <div class="grid-item">Image</div>
-            <div class="grid-item">AthImg</div>
+            <div class="grid-item"><strong>Image</strong></div>
+            <div class="grid-item"><img :src="'data:image/png;base64, ' + userData.profile.consumer.current.logoImage" :height="80" :width="80" alt="user image"></div>
             <div class="grid-item">CHANGE</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Username</div>
-            <div class="grid-item">AthImg</div>
+            <div class="grid-item"><strong>Username</strong></div>
+            <div class="grid-item">{{ userData.username }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Full name</div>
-            <div class="grid-item">AthImg</div>
+            <div class="grid-item"><strong>Full name</strong></div>
+            <div class="grid-item">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Company email</div>
-            <div class="grid-item">AthImg</div>
+            <div class="grid-item"><strong>Company email</strong></div>
+            <div class="grid-item">{{ userData.profile.provider.current.email }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
           </div>
         </div>
 
         <!-- LOGIN & SECURITY -->
-        <div class="tab tab-login_security" v-if="selectedTab == 'loginAndSecurity'">
+        <div class="tab tab-login_security" v-if="userData && selectedTab == 'loginAndSecurity'">
           <div class="grid-container">
-            <div class="grid-item">Password</div>
+            <div class="grid-item"><strong>Password</strong></div>
             <div class="grid-item"></div>
             <div class="grid-item">CHANGE</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Two-step verification</div>
+            <div class="grid-item"><strong>Two-step verification</strong></div>
             <div class="grid-item"></div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Mobile number</div>
-            <div class="grid-item">+30 000 00000000</div>
+            <div class="grid-item"><strong>Mobile number</strong></div>
+            <div class="grid-item">{{ userData.profile.mobile }}</div>
             <div class="grid-item">CHANGE</div>
             <div class="grid-line"></div>
           </div>
         </div>
 
         <!-- COMPANY INFORMATION -->
-        <div class="tab tab-company_information" v-if="selectedTab == 'companyInformation'">
+        <div class="tab tab-company_information" v-if="userData && selectedTab == 'companyInformation'">
           <div class="grid-container">
-            <div class="grid-item">Company name</div>
-            <div class="grid-item">Athena Research Centre</div>
+            <div class="grid-item"><strong>Company name</strong></div>
+            <div class="grid-item">{{ userData.profile.provider.current.name }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Vat number</div>
-            <div class="grid-item">123456789</div>
+            <div class="grid-item"><strong>VAT number</strong></div>
+            <div class="grid-item">123456789 (dummy)</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Domain</div>
-            <div class="grid-item">Data research</div>
+            <div class="grid-item"><strong>Domain</strong></div>
+            <div class="grid-item">{{ userData.profile.provider.current.companyType }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
 
-            <div class="grid-item">Country</div>
-            <div class="grid-item">Greece</div>
+            <div class="grid-item"><strong>Country</strong></div>
+            <div class="grid-item">{{ userData.profile.provider.current.headquartersAddress.country }}</div>
             <div class="grid-item">EDIT</div>
             <div class="grid-line"></div>
           </div>
         </div>
 
         <!-- PAYOUT OPTIONS -->
-        <div class="tab tab-payout_options" v-if="selectedTab == 'payoutOptions'">
+        <div class="tab tab-payout_options" v-if="userData && selectedTab == 'payoutOptions'">
           <div class="grid-container">
-            <div class="grid-item">IBAN</div>
-            <div class="grid-item">GR 01 2345 6789 0123 4567 8901 234</div>
+            <div class="grid-item"><strong>IBAN</strong></div>
+            <div class="grid-item">{{ userData.profile.provider.current.bankAccount.iban }}</div>
             <div class="grid-item">CHANGE</div>
             <div class="grid-line"></div>
           </div>
         </div>
 
         <!-- ADDRESSES -->
-        <div class="tab tab-addresses" v-if="selectedTab == 'addresses'">
-          <div v-for="(address, i) in addresses" :key="i" class="grid-items-wrapper">
-            <div class="grid-container">
-              <div class="grid-item">ADDRESS {{ i + 1 }}</div>
-              <div class="grid-item">{{ address.number + ', ' + address.street + ', ' + address.city + ', ' + address.country + ', ' + address.zipCode }}</div>
+        <div class="tab tab-addresses" v-if="userData && selectedTab == 'addresses'">
+          <div class="grid-container">
+            <div class="grid-item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
+            <div class="grid-item">
+              {{ userData.profile.provider.current.headquartersAddress.line1 + ', ' + userData.profile.provider.current.headquartersAddress.city + ', ' + userData.profile.provider.current.headquartersAddress.country + userData.profile.provider.current.headquartersAddress.postalCode }}
+            </div>
+            <div class="grid-item">EDIT</div>
+            <div class="grid-line"></div>
+
+            <div v-if="userData.profile.provider.current.representative.address.line1" class="grid-items-wrapper">
+              <div class="grid-item"><strong>ADDRESS 2</strong> (json: representative)</div>
+              <div class="grid-item">
+                {{ userData.profile.provider.current.representative.address.line1 + ', ' + userData.profile.provider.current.representative.address.city + ', ' + userData.profile.provider.current.representative.address.country + userData.profile.provider.current.representative.address.postalCode }}
+              </div>
               <div class="grid-item">EDIT</div>
               <div class="grid-line"></div>
             </div>
@@ -116,8 +125,8 @@
         <div class="tab tab-payment_methods" v-if="selectedTab == 'paymentMethods'">
           <div v-for="(card, i) in cards" :key="i" class="grid-items-wrapper">
             <div class="grid-container">
-              <div class="grid-item">CARD {{ i + 1 }}</div>
-              <div class="grid-item">{{ card }}</div>
+              <div class="grid-item"><strong>CARD {{ i + 1 }}</strong></div>
+              <div class="grid-item">{{ card }} (dummy)</div>
               <div class="grid-item">REMOVE</div>
               <div class="grid-line"></div>
             </div>
@@ -157,13 +166,13 @@
           </div>
 
           <div class="grid-container-kyc mt-md-40">
-            <div class="grid-item grid-item-kyc-header">TYPE</div>
-            <div class="grid-item grid-item-kyc-header">STATUS</div>
-            <div class="grid-item grid-item-kyc-header">REFUSAL REASON</div>
-            <div class="grid-item grid-item-kyc-header">ID</div>
-            <div class="grid-item grid-item-kyc-header">CREATION DATE</div>
-            <div class="grid-item grid-item-kyc-header">PROCESSED DATE</div>
-            <div class="grid-item grid-item-kyc-header"></div>
+            <div class="grid-item-kyc-header">TYPE</div>
+            <div class="grid-item-kyc-header">STATUS</div>
+            <div class="grid-item-kyc-header">REFUSAL REASON</div>
+            <div class="grid-item-kyc-header">ID</div>
+            <div class="grid-item-kyc-header">CREATION DATE</div>
+            <div class="grid-item-kyc-header">PROCESSED DATE</div>
+            <div class="grid-item-kyc-header"></div>
             <div class="grid-line grid-item-kyc-header"></div>
 
             <div class="grid-item"><strong>Identity proof*</strong></div>
@@ -491,6 +500,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import AccountApi from '@/service/account';
+import {
+  Account, ServerResponse,
+} from '@/model';
 import {
   required,
   email,
@@ -524,7 +537,9 @@ localize({
 export default class DashboardHome extends Vue {
   selectedTab: string;
 
-  addresses: any = [];
+  accountApi: AccountApi;
+
+  userData: null | Account;
 
   cards: string [];
 
@@ -545,6 +560,10 @@ export default class DashboardHome extends Vue {
   constructor() {
     super();
 
+    this.accountApi = new AccountApi();
+
+    this.userData = null;
+
     this.selectedTab = 'general';
 
     this.isKycValidated = false;
@@ -557,14 +576,18 @@ export default class DashboardHome extends Vue {
 
     this.showUboForm = false;
 
-    this.addresses = [
-      // eslint-disable-next-line
-      { street: 'Leocharous', number: 17, city: 'Athens', country: 'Greece', zipCode: '10560' },
-      // eslint-disable-next-line
-      { street: 'Leocharous', number: 23, city: 'Athens', country: 'Greece', zipCode: '10560' },
-    ];
-
     this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
+  }
+
+  mounted(): void {
+    this.loadUserData();
+  }
+
+  loadUserData() {
+    this.accountApi.getUserData().then((response: ServerResponse<Account>) => {
+      console.log(response);
+      this.userData = response.result;
+    });
   }
 
   selectTab(tab: string): void {
@@ -617,98 +640,8 @@ export default class DashboardHome extends Vue {
 }
 </script>
 <style lang="scss">
-  // style override
-  .settings .collection__menu {
-    margin-bottom: 0;
-  }
-
-  .settings .tab .grid-container {
-    display: grid;
-    grid-template-columns: 60% 30% 10%;
-  }
-
-  .settings .grid-items-wrapper {
-    display: contents;
-  }
-
-  .settings .grid-line {
-    grid-column: 1/6;
-    height: 1px !important;
-    width: 100%;
-    background: $labelColor;
-  }
-
-  .settings .grid-item {
-    padding: 20px;
-  }
-
-  .settings .grid-container-kyc {
-    display: grid;
-    grid-template-columns: 20% 8% 8% 8% 8% 8% 30%;
-    font-size: 1rem;
-  }
-
-  .settings .grid-container-kyc .grid-line {
-    grid-column: 1/8;
-  }
-
-  .settings .grid-item-kyc-header {
-    padding: 0 0 0 20px;
-    margin: 0 0 3px 0;
-    color: $labelColor;
-  }
-
-  .text-gray {
-    color: $labelColor;
-  }
-
-  .text-black {
-    color: #121212;
-  }
-
-  .kyc-validation-status {
-    background: #fff;
-    padding: 3px 30px 3px 30px;
-    border-radius: 3px;
-  }
-
-  .kyc-validation-status-true {
-    border: solid 1px $secondColor;
-    color: $secondColor;
-  }
-
-  .kyc-validation-status-false {
-    border: solid 1px red;
-    color: red;
-  }
-
-  .font-weight-500 {
-    font-weight: 500;
-  }
-
-  .btn-ubo {
-    padding: 30px;
-    background: #fff;
-    letter-spacing: 0.06em;
-    border: dashed 1px;
-    border-radius: 7px;
-  }
-
-  .card-ubo {
-    padding: 30px;
-    background: #fff;
-    letter-spacing: 0.06em;
-    border: solid 2px $darkColor;
-    border-radius: 7px;
-    margin-bottom: 15px;
-    cursor: pointer;
-  }
-
-  .card-ubo-selected {
-    border: solid 2px $secondColor;
-  }
-
-  @import "@/assets/styles/_settings.scss";
+  @import "@/assets/styles/dashboard/_settings.scss";
+  // @import "@/assets/styles/_settings.scss";
   @import "@/assets/styles/_collection.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
   @import "@/assets/styles/abstracts/_spacings.scss";
