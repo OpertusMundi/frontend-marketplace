@@ -1,0 +1,15 @@
+export enum EnumContinent {
+  AFRICA = 'AFRICA',
+  NORTH_AMERICA = 'NORTH_AMERICA',
+  OCEANIA = 'OCEANIA',
+  ANTARCTICA = 'ANTARCTICA',
+  ASIA = 'ASIA',
+  EUROPE = 'EUROPE',
+  SOUTH_AMERICA = 'SOUTH_AMERICA',
+}
+
+export enum EnumAssetType {
+  RASTER = 'RASTER',
+  SERVICE = 'SERVICE',
+  VECTOR = 'VECTOR',
+}

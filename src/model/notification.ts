@@ -16,7 +16,7 @@ interface Notification {
    */
   text: string;
   /**
-   * Date created in ISO format e.g. 2020-06-10T16:01:04.991+03:00 
+   * Date created in ISO format e.g. 2020-06-10T16:01:04.991+03:00
    */
   createdAt: string;
   /**

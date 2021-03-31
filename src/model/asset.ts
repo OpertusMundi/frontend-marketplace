@@ -1,3 +1,19 @@
+export enum EnumResourceType {
+  FILE = 'FILE',
+  SERVICE = 'SERVICE',
+}
+
+export enum EnumAssetSourceType {
+  NETCDF = 'NETCDF',
+  RASTER = 'RASTER',
+  VECTOR = 'VECTOR',
+}
+
+export enum EnumServiceResourceType {
+  WFS = 'WFS',
+  WMS = 'WMS',
+}
+
 export interface AssetFileAdditionalResource {
   /**
    * The description of the file
@@ -43,28 +59,62 @@ export interface AssetUriAdditionalResource {
   text: string;
 }
 
-export interface AssetResource {
+export interface Resource {
+  /**
+   * Resource unique identifier
+   */
+  id: string;
+  /**
+   * Parent resource unique identifier
+   */
+  parentId: string;
+}
+
+export interface FileResource extends Resource {
+  /**
+   * Discriminator field used for deserializing the model to the appropriate data type
+   */
+  type: EnumResourceType.FILE;
+  /**
+   * File size in bytes
+   */
+  size: number;
+  /**
+   * Asset category computed from the file format
+   */
+  category: EnumAssetSourceType;
   /**
    * File name
    */
   fileName: string;
   /**
-   * File unique identifier
-   */
-  id: string;
-  /**
-   * Date of last update in in ISO format
+   * Date of last update in ISO format
    */
   modifiedOn: string;
   /**
-   * File size in bytes
+   * File format
    */
-  size: number;
+  format: string;
 }
 
-export interface AssetResourceCommand {
+export interface ServiceResource extends Resource {
   /**
-   * File name. If not set, the name of uploaded file is used.
+   * Discriminator field used for deserializing the model to the appropriate data type
+   */
+  type: EnumResourceType.SERVICE;
+  /**
+   * Service type
+   */
+  serviceType: EnumServiceResourceType;
+  /**
+   * Service endpoint
+   */
+  endpoint: string;
+}
+
+export interface FileResourceCommand {
+  /**
+   * File name. If not set, the name of uploaded file is used
    */
   fileName: string;
   /**
