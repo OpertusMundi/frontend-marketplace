@@ -5,7 +5,8 @@ import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
 } from '@/model';
 import { AxiosResponse } from 'axios';
-import { CatalogueHarvestCommand, Publisher } from '@/model/catalogue';
+import { CatalogueHarvestCommand, CatalogueHarvestImportCommand, EnumCatalogueType, Publisher } from '@/model/catalogue';
+import { HarvestImportResponse } from '@/model/draft';
 
 // Custom response types
 interface CatalogueQueryResponseInternal extends ServerResponse<QueryResultPage<CatalogueItem>> {
@@ -54,7 +55,9 @@ export default class CatalogueApi extends Api {
 
   public async harvest(command: CatalogueHarvestCommand): Promise<SimpleResponse> {
     const url = '/action/catalogue/harvest';
-
+    if (!command.type) {
+      command.type = EnumCatalogueType.CSW;
+    }
     return this.post<CatalogueHarvestCommand, SimpleResponse>(url, command)
       .then((response: AxiosResponse<SimpleResponse>) => {
         const { data } = response;
@@ -63,8 +66,8 @@ export default class CatalogueApi extends Api {
       });
   }
 
-  public async findHarvested(catalogueUrl: string, page = 0, size = 10): Promise<CatalogueQueryResponse> {
-    const url = `/action/catalogue/harvest?url=${catalogueUrl}&page=${page}&size=${size}`;
+  public async findHarvested(catalogueUrl: string, page = 0, size = 10, query: string = ''): Promise<CatalogueQueryResponse> {
+    const url = `/action/catalogue/harvest?url=${catalogueUrl}&page=${page}&size=${size}&query=${query}`;
 
     return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>): CatalogueQueryResponse => {
@@ -72,6 +75,17 @@ export default class CatalogueApi extends Api {
 
         // Ignore publishers
         return data as CatalogueQueryResponse;
+      });
+  }
+
+  public async importHarvested(command: CatalogueHarvestImportCommand): Promise<HarvestImportResponse> {
+    const url = '/action/catalogue/harvest/import';
+
+    return this.post<CatalogueHarvestImportCommand, HarvestImportResponse>(url, command)
+      .then((response: AxiosResponse<HarvestImportResponse>) => {
+        const { data } = response;
+
+        return data;
       });
   }
 

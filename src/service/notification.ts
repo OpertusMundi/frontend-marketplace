@@ -10,19 +10,19 @@ export default class NotificationApi extends Api {
   }
 
   public async find(
-    page: number = 0, size: number = 10, dateFrom: string | null = null, dateTo: string | null = null, read: boolean | null = null
+    page = 0, size = 10, dateFrom: string | null = null, dateTo: string | null = null, read: boolean | null = null,
   ): Promise<NotificationQueryResponse> {
     const params = {
-      'page': page,
-      'size': size,
+      page,
+      size,
       'date-from': dateFrom,
       'date-to': dateTo,
-      'read': read,
+      read,
     };
 
-    const keyValues = Object.keys(params).filter(k => !!params[k]).map(k => `${k}=${params[k]}`);
+    const keyValues = Object.keys(params).filter((k) => !!params[k]).map((k) => `${k}=${params[k]}`);
 
-    const url = '/action/notifications?' + keyValues.join('&');
+    const url = `/action/notifications?${keyValues.join('&')}`;
 
     return this.get<NotificationQueryResponse>(url)
       .then((response: AxiosResponse<NotificationQueryResponse>) => {
@@ -42,5 +42,4 @@ export default class NotificationApi extends Api {
         return data;
       });
   }
-
 }

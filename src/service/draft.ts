@@ -5,13 +5,13 @@ import {
   AxiosServerResponse, AxiosPageResponse, ServerResponse, PageResult,
 } from '@/model/response';
 import {
-  CatalogueItemCommand, DraftApiCommand,
+  CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
 } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
 } from '@/model/draft';
 import {
-  AssetFileAdditionalResourceCommand, AssetResourceCommand,
+  AssetFileAdditionalResourceCommand, FileResourceCommand,
 } from '@/model/asset';
 import { AxiosRequestConfig } from 'axios';
 
@@ -81,10 +81,12 @@ export default class DraftAssetApi extends Api {
    *
    * @param command
    */
-  public async createApi(command: DraftApiCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
+  public async createApi(
+    command: DraftApiFromAssetCommand | DraftApiFromFileCommand, config?: AxiosRequestConfig
+  ): Promise<ServerResponse<AssetDraft>> {
     const url = '/action/drafts/api';
 
-    return this.post<DraftApiCommand, ServerResponse<AssetDraft>>(url, command, config)
+    return this.post<DraftApiFromAssetCommand | DraftApiFromFileCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
@@ -185,7 +187,7 @@ export default class DraftAssetApi extends Api {
    * @param resource File to upload
    * @param command Command object with resource metadata
    */
-  public async uploadResource(key: string, resource: File, command: AssetResourceCommand): Promise<ServerResponse<AssetDraft>> {
+  public async uploadResource(key: string, resource: File, command: FileResourceCommand): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}/resources`;
 
     const form = new FormData();
