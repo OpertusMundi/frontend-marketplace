@@ -25,11 +25,11 @@
         </div>
       </div>
 
-      <button v-if="!isAddUserFormOpen" @click="isAddUserFormOpen = true" class="btn--std btn-add-user mt-md-20">Add New User</button>
+      <button v-if="!isAddUserFormOpen" @click="isAddUserFormOpen = true" class="btn--std btn-add-user mt-xs-20">Add New User</button>
 
-      <div v-if="isAddUserFormOpen" class="add-user-form mt-md-40 ml-md-20">
+      <div v-if="isAddUserFormOpen" class="add-user-form mt-xs-40 ml-xs-20">
         <h4>Add new user</h4>
-        <p class="mb-md-20">Create a new user role for your organisation. All people need to already have a topio account.</p>
+        <p class="mb-xs-20">Create a new user role for your organisation. All people need to already have a topio account.</p>
         <div class="form-group">
           <label for="username">Username *</label>
           <input type="text" class="form-group__text" name="username" id="username">
@@ -54,13 +54,13 @@
           </select>
         </div>
 
-        <div class="checkbox-group mt-md-20">
-          <input type="checkbox" class="mr-md-10" id="checkbox_notify_user">
+        <div class="checkbox-group mt-xs-20">
+          <input type="checkbox" class="mr-xs-10" id="checkbox_notify_user">
           <label for="checkbox_notify_user"> Notify user about their account role </label>
         </div>
 
-        <button @click="isAddUserFormOpen = false" class="btn--std btn--outlineblue mt-md-30">Cancel</button>
-        <button class="btn--std btn--blue mt-md-30 ml-md-30">Add User</button>
+        <button @click="isAddUserFormOpen = false" class="btn--std btn--outlineblue mt-xs-30">Cancel</button>
+        <button class="btn--std btn--blue mt-xs-30 ml-xs-30">Add User</button>
       </div>
 
     </div>

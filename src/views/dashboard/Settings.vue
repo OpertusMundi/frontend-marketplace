@@ -135,37 +135,37 @@
 
         <!-- KYC -->
         <div class="tab tab-kyc" v-if="selectedTab == 'kyc'">
-          <div class="row mt-md-20">
+          <div class="row mt-xs-20">
             <div class="col-md-5 text-gray">
               <p> We need you to upload the following documents in order to validate the information you provided. </p>
 
-              <p class="mt-md-20"><strong>Identity proof</strong></p>
+              <p class="mt-xs-20"><strong>Identity proof</strong></p>
               <p>This document should refer to the individual duly empowered to act on behalf of the legal entity. ID card: Front AND Back (Valid) OR Passport (Valid).</p>
 
-              <p class="mt-md-20"><strong>Articles of association</strong></p>
+              <p class="mt-xs-20"><strong>Articles of association</strong></p>
               <p>Certified articles of association (Statute) - formal memorandum stated by the entrepreneurs, in which the following information is mentioned: business name, activity, registered address, shareholding, etc.</p>
 
-              <p class="mt-md-20"><strong>Registration proof</strong></p>
+              <p class="mt-xs-20"><strong>Registration proof</strong></p>
               <p>Extract from the Company Register issued within the last three months in the case of an organization or soletrader, this can be a proof of registration from the official authority.</p>
 
-              <p class="mt-md-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
+              <p class="mt-xs-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
 
             </div>
             <div class="col-md-7 d-flex flex-column">
               <span class="text-black"><strong>Vendor validation status</strong></span>
-              <div class="mt-md-20"><span class="kyc-validation-status" :class="isKycValidated? 'kyc-validation-status-true' : 'kyc-validation-status-false'">NOT KYC VALIDATED</span></div>
-              <div class="mt-md-30 d-flex">
+              <div class="mt-xs-20"><span class="kyc-validation-status" :class="isKycValidated? 'kyc-validation-status-true' : 'kyc-validation-status-false'">NOT KYC VALIDATED</span></div>
+              <div class="mt-xs-30 d-flex">
                 <div class="font-weight-500">Issues:</div>
-                <div class="ml-md-20">
-                  <p class="mb-md-5">Missing Identity proof document</p>
-                  <p class="mb-md-5">Missing Articles of association document</p>
-                  <p class="mb-md-5">Missing Registration proof document</p>
+                <div class="ml-xs-20">
+                  <p class="mb-xs-5">Missing Identity proof document</p>
+                  <p class="mb-xs-5">Missing Articles of association document</p>
+                  <p class="mb-xs-5">Missing Registration proof document</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="grid-container-kyc mt-md-40">
+          <div class="grid-container-kyc mt-xs-40">
             <div class="grid-item-kyc-header">TYPE</div>
             <div class="grid-item-kyc-header">STATUS</div>
             <div class="grid-item-kyc-header">REFUSAL REASON</div>
@@ -210,7 +210,7 @@
             UBO declaration is replacing the manual shareholder declaration. <br>
             For each declaration you need to create <strong>1 - 4 UBOs</strong>.
           </div>
-          <div class="row mt-md-30">
+          <div class="row mt-xs-30">
             <div class="col-md-4 d-flex flex-column">
               <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedDeclaration}">
                 STATUS: {{ declaration.status }} <br>
@@ -354,7 +354,7 @@
                 </div>
 
                 <button class="btn--std btn--outlinedark">CANCEL</button>
-                <button class="btn--std btn--dark ml-md-20">ADD UBO</button>
+                <button class="btn--std btn--dark ml-xs-20">ADD UBO</button>
 
               </div>
             </div>

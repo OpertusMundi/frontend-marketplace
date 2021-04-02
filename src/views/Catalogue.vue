@@ -24,8 +24,8 @@
 
           <!-- TYPE -->
           <div class="tab tab-type" v-show="filterMenuItemSelected == 'type'">
-            <div class="checkbox-group mt-md-10" v-for="type in types" :key="type.name">
-              <input type="checkbox" class="mr-md-10" :id="`type_${type.name}`" v-model="type.isChecked">
+            <div class="checkbox-group mt-xs-10" v-for="type in types" :key="type.name">
+              <input type="checkbox" class="mr-xs-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
             </div>
           </div>
@@ -35,15 +35,15 @@
             <h5 class="date-labels"><strong>Select last update date</strong></h5>
             <div class="d-flex">
               <div class="d-flex flex-column">
-                <div class="d-flex space-between mb-md-5">
+                <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">From date</small>
                   <div class="flex align-items-center">
                     <button v-if="updated.dateFrom" @click="removeFilter('update', 'date_from')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
                 <datepicker :inline="true" v-model="updated.dateFrom" placeholder="select date"></datepicker>
-                <div class="mt-md-30" v-if="updated.dateFrom">
-                  <div class="d-flex space-between mb-md-5">
+                <div class="mt-xs-30" v-if="updated.dateFrom">
+                  <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">From time</small>
                     <div class="flex align-items-center">
                       <button v-if="updated.timeFrom != '00:00 AM'" @click="removeFilter('update', 'time_from')"><font-awesome-icon icon="times" /></button>
@@ -52,16 +52,16 @@
                   <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="updated.timeFrom" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
-              <div class="d-flex flex-column ml-md-15">
-                <div class="d-flex space-between mb-md-5">
+              <div class="d-flex flex-column ml-xs-15">
+                <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">To date</small>
                   <div class="flex align-items-center">
                     <button v-if="updated.dateTo" @click="removeFilter('update', 'date_to')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
                 <datepicker :inline="true" v-model="updated.dateTo" placeholder="select date"></datepicker>
-                <div class="mt-md-30" v-if="updated.dateTo">
-                  <div class="d-flex space-between mb-md-5">
+                <div class="mt-xs-30" v-if="updated.dateTo">
+                  <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">To time</small>
                     <div class="flex align-items-center">
                       <button v-if="updated.timeTo != '23:59 PM'" @click="removeFilter('update', 'time_to')"><font-awesome-icon icon="times" /></button>
@@ -75,8 +75,8 @@
 
           <!-- TOPIC -->
           <div class="tab tab-topic" v-show="filterMenuItemSelected == 'topic'">
-            <div class="checkbox-group mb-md-2" v-for="topic in topics" :key="topic.name">
-              <input type="checkbox" class="mr-md-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
+            <div class="checkbox-group mb-xs-2" v-for="topic in topics" :key="topic.name">
+              <input type="checkbox" class="mr-xs-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
             </div>
           </div>
@@ -86,24 +86,24 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('vector') }" class="flex-grow-1">
               <h3 class="format-category-title">Vector</h3>
-              <div class="checkbox-group mb-md-5" v-for="format in formats.vector" :key="format.id">
-                <input :disabled="!shownFormatCategories().includes('vector')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+              <div class="checkbox-group mb-xs-5" v-for="format in formats.vector" :key="format.id">
+                <input :disabled="!shownFormatCategories().includes('vector')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('raster') }" class="flex-grow-1">
               <h3 class="format-category-title">Raster</h3>
-              <div class="checkbox-group mb-md-5" v-for="format in formats.raster" :key="format.id">
-                <input :disabled="!shownFormatCategories().includes('raster')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+              <div class="checkbox-group mb-xs-5" v-for="format in formats.raster" :key="format.id">
+                <input :disabled="!shownFormatCategories().includes('raster')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <div class="checkbox-group mb-md-5" v-for="format in formats.api" :key="format.id">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-md-10" :id="`format_${format.id}`" v-model="format.isChecked">
+              <div class="checkbox-group mb-xs-5" v-for="format in formats.api" :key="format.id">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
             </div>
@@ -113,16 +113,16 @@
           <!-- CRS -->
           <div class="tab tab-crs" v-show="filterMenuItemSelected == 'crs'">
             <small>Popular CRS</small>
-            <div class="mt-md-10">
-              <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-md-5">
-                <input type="checkbox" class="mr-md-10" :id="'EPSG_' + crs.code" v-model="crs.isChecked">
+            <div class="mt-xs-10">
+              <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-xs-5">
+                <input type="checkbox" class="mr-xs-10" :id="'EPSG_' + crs.code" v-model="crs.isChecked">
                 <label :for="'EPSG_' + crs.code"> {{ crs.description }} </label>
               </div>
             </div>
 
-            <div class="mt-md-30">
+            <div class="mt-xs-30">
               <small>Search for CRS</small>
-              <input v-model="crsSearchString" @input="searchCrs($event.target.value)" type="text" class="form-group__text mt-md-10" placeholder="CRS name or Code">
+              <input v-model="crsSearchString" @input="searchCrs($event.target.value)" type="text" class="form-group__text mt-xs-10" placeholder="CRS name or Code">
               <div v-if="crsSearchString" class="crs-search-autocomplete">
                 <ul>
                   <li @click="addCrsToList(crs)" v-for="crs in crsSearchList" :key="crs.code">{{crs.description}}</li>
@@ -134,11 +134,11 @@
 
           <!-- SCALE -->
           <div class="tab tab-scale" v-show="filterMenuItemSelected == 'scale'">
-            <div class="ml-md-20 mr-md-20" @click="onScaleSliderClick">
+            <div class="ml-xs-20 mr-xs-20" @click="onScaleSliderClick">
               <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
             </div>
 
-            <div class="mt-md-40 min-max-container">
+            <div class="mt-xs-40 min-max-container">
               <div class="min-max-input-item">
                 <label for="scaleSelectedMin">Minimum Scale</label>
                 <div>
@@ -146,7 +146,7 @@
                   <input :min="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
                 </div>
               </div>
-              <div class="min-max-input-item ml-md-20">
+              <div class="min-max-input-item ml-xs-20">
                 <label for="scaleSelectedMax">Maximum Scale</label>
                 <div>
                   <span>1 : </span>
@@ -161,9 +161,9 @@
           <div class="tab tab-coverage" v-show="filterMenuItemSelected == 'coverage'">
             <div class="coverage-map-menu-container">
               <div class="coverage-side-menu">
-                <div class="d-flex align-items-center mb-md-20">
+                <div class="d-flex align-items-center mb-xs-20">
                   <span><strong>1</strong></span>
-                  <div class="mr-md-10">
+                  <div class="mr-xs-10">
                     <select @change="onCountrySelected($event.target.value)" :disabled="mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
@@ -174,7 +174,7 @@
                   <span><strong>2</strong></span>
                   <div class="select-area-text">
                     Or select an area of interest via a bounding box on the map.
-                    <div class="form-group mt-md-10">
+                    <div class="form-group mt-xs-10">
                       <label class="control control-radio">
                         Box overlaps with asset geometry
                         <input type="radio" name="asset_type" checked />
@@ -205,7 +205,7 @@
                 <div id="mapCoverage">
                 </div>
                 <input type="text" class="form-group__text" placeholder="Search City/Area">
-                <button v-if="!mapCoverageSelectionRectangle && !mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn--blue"><font-awesome-icon class="mr-md-10" icon="vector-square" /> Draw Area</button>
+                <button v-if="!mapCoverageSelectionRectangle && !mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn--blue"><font-awesome-icon class="mr-xs-10" icon="vector-square" /> Draw Area</button>
               </div>
 
             </div>
@@ -218,7 +218,7 @@
                 <label for="priceSelectedMin">Minimum Price</label>
                 <input type="number" :min="0" v-model="priceMin" placeholder="Free" class="form-group__text">
               </div>
-              <div class="min-max-input-item ml-md-20">
+              <div class="min-max-input-item ml-xs-20">
                 <label for="priceSelectedMax">Maximum Price</label>
                 <input type="number" :min="0" v-model="priceMax" placeholder="No Limit" class="form-group__text">
               </div>
@@ -237,21 +237,21 @@
               </span>
             </div>
 
-            <div class="tab-more-main p-md-20 pl-md-30">
+            <div class="tab-more-main p-xs-20 pl-xs-30">
               <!-- NUMBER OF FEATURES -->
-              <div class="ml-md-20" v-show="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
+              <div class="ml-xs-20" v-show="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <h4>Dataset size</h4>
-                <div class="checkbox-group mt-md-10">
-                  <input v-model="numberOfFeatures.isSmallChecked" type="checkbox" class="mr-md-10" id="dataset_small">
-                  <label for="dataset_small"> Small <small class="grayed ml-md-20">&lt; 1000 features</small></label>
+                <div class="checkbox-group mt-xs-10">
+                  <input v-model="numberOfFeatures.isSmallChecked" type="checkbox" class="mr-xs-10" id="dataset_small">
+                  <label for="dataset_small"> Small <small class="grayed ml-xs-20">&lt; 1000 features</small></label>
                 </div>
-                <div class="checkbox-group mt-md-10">
-                  <input v-model="numberOfFeatures.isMediumChecked" type="checkbox" class="mr-md-10" id="dataset_medium">
-                  <label for="dataset_medium"> Medium <small class="grayed ml-md-20">1000 - 100.000 features</small></label>
+                <div class="checkbox-group mt-xs-10">
+                  <input v-model="numberOfFeatures.isMediumChecked" type="checkbox" class="mr-xs-10" id="dataset_medium">
+                  <label for="dataset_medium"> Medium <small class="grayed ml-xs-20">1000 - 100.000 features</small></label>
                 </div>
-                <div class="checkbox-group mt-md-10">
-                  <input v-model="numberOfFeatures.isLargeChecked" type="checkbox" class="mr-md-10" id="dataset_large">
-                  <label for="dataset_large"> Large <small class="grayed ml-md-20">&gt; 100.000 features</small></label>
+                <div class="checkbox-group mt-xs-10">
+                  <input v-model="numberOfFeatures.isLargeChecked" type="checkbox" class="mr-xs-10" id="dataset_large">
+                  <label for="dataset_large"> Large <small class="grayed ml-xs-20">&gt; 100.000 features</small></label>
                 </div>
               </div>
 
@@ -269,7 +269,7 @@
                     <div>
                       <input v-for="(attribute, i) in attributes" :key="i" v-model="attributes[i]" type="text" class="form-group__text" :name="'search_attribute_' + i" :id="'search_attribute_' + i" placeholder="attribute name">
                     </div>
-                    <button @click="addAttribute" class="fab-button align-self-end ml-md-15 mb-md-10">+</button>
+                    <button @click="addAttribute" class="fab-button align-self-end ml-xs-15 mb-xs-10">+</button>
                   </div>
                 </div>
               </div>
@@ -282,7 +282,7 @@
                     <div>
                       <input v-for="(vendor, i) in vendors" :key="i" v-model="vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
                     </div>
-                    <button @click="addVendor" class="fab-button align-self-end ml-md-15 mb-md-10">+</button>
+                    <button @click="addVendor" class="fab-button align-self-end ml-xs-15 mb-xs-10">+</button>
                   </div>
                 </div>
               </div>
@@ -291,17 +291,17 @@
               <div v-show="filterMoreSubmenuItemSelected == 'language'">
                 <h4>Language of asset fields / labels</h4>
                 <span style="color: orange">more to be added</span>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_small">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="dataset_small">
                   <label for="dataset_small"> English (UK/US)</label>
                 </div>
                 <hr>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_medium">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="dataset_medium">
                   <label for="dataset_medium"> German</label>
                 </div>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="dataset_large">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="dataset_large">
                   <label for="dataset_large"> French</label>
                 </div>
               </div>
@@ -310,16 +310,16 @@
               <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
                 <span style="color: orange">more to be added</span>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="license_open">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="license_open">
                   <label for="license_open"> Open license</label>
                 </div>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="license_organization">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="license_organization">
                   <label for="license_organization"> Within your organization</label>
                 </div>
-                <div class="checkbox-group mt-md-10">
-                  <input type="checkbox" class="mr-md-10" id="license_webgis">
+                <div class="checkbox-group mt-xs-10">
+                  <input type="checkbox" class="mr-xs-10" id="license_webgis">
                   <label for="license_webgis"> Web-GIS applications</label>
                 </div>
               </div>
@@ -329,9 +329,9 @@
 
         <div class="filter-side-menu">
           <!-- DISPLAY OF FILTERS CHECKED -->
-          <div class="filter-side-menu-main p-md-10">
+          <div class="filter-side-menu-main p-xs-10">
             <div>
-              <h3 class="m-md-10">Selections</h3>
+              <h3 class="m-xs-10">Selections</h3>
 
               <!-- TYPE -->
               <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
@@ -428,7 +428,7 @@
         </div>
       </div>
 
-      <h6 class="mt-md-50">9999 ASSETS</h6>
+      <h6 class="mt-xs-50">9999 ASSETS</h6>
 
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
