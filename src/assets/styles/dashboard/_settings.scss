@@ -1,14 +1,19 @@
 .settings {
-  position: relative;
+  height: 100%;
 }
 
 .settings .collection__menu {
   margin-bottom: 0;
 }
 
-.settings .tab-wrapper {
-  position: absolute;
-  width: 100%;
+.settings .tabs-content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.settings .tabs-content-wrapper .tab-wrapper {
+  grid-row-start: 1;
+  grid-column-start: 1;
 }
 
 .settings .tab .grid-container {
