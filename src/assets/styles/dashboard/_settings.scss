@@ -1,92 +1,101 @@
+.settings {
+  position: relative;
+}
+
 .settings .collection__menu {
-    margin-bottom: 0;
-  }
+  margin-bottom: 0;
+}
 
-  .settings .tab .grid-container {
-    display: grid;
-    grid-template-columns: 60% 30% 10%;
-  }
+.settings .tab-wrapper {
+  position: absolute;
+  width: 100%;
+}
 
-  .settings .grid-items-wrapper {
-    display: contents;
-  }
+.settings .tab .grid-container {
+  display: grid;
+  grid-template-columns: 60% 30% 10%;
+}
 
-  .settings .grid-line {
-    grid-column: 1/6;
-    height: 1px !important;
-    width: 100%;
-    background: $labelColor;
-  }
+.settings .grid-items-wrapper {
+  display: contents;
+}
 
-  .settings .grid-item {
-    // padding: 20px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-  }
+.settings .grid-line {
+  grid-column: 1/6;
+  height: 1px !important;
+  width: 100%;
+  background: $labelColor;
+}
 
-  .settings .grid-container-kyc {
-    display: grid;
-    grid-template-columns: 20% 8% 8% 8% 8% 8% 30%;
-    font-size: 1rem;
-  }
+.settings .grid-item {
+  // padding: 20px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
 
-  .settings .grid-container-kyc .grid-line {
-    grid-column: 1/8;
-  }
+.settings .grid-container-kyc {
+  display: grid;
+  grid-template-columns: 20% 8% 8% 8% 8% 8% 30%;
+  font-size: 1rem;
+}
 
-  .settings .grid-item-kyc-header {
-    padding: 0 0 0 0;
-    margin: 0 0 3px 0;
-    color: $labelColor;
-  }
+.settings .grid-container-kyc .grid-line {
+  grid-column: 1/8;
+}
 
-  .text-gray {
-    color: $labelColor;
-  }
+.settings .grid-item-kyc-header {
+  padding: 0 0 0 0;
+  margin: 0 0 3px 0;
+  color: $labelColor;
+}
 
-  .text-black {
-    color: #121212;
-  }
+.text-gray {
+  color: $labelColor;
+}
 
-  .kyc-validation-status {
-    background: #fff;
-    padding: 3px 30px 3px 30px;
-    border-radius: 3px;
-  }
+.text-black {
+  color: #121212;
+}
 
-  .kyc-validation-status-true {
-    border: solid 1px $secondColor;
-    color: $secondColor;
-  }
+.kyc-validation-status {
+  background: #fff;
+  padding: 3px 30px 3px 30px;
+  border-radius: 3px;
+}
 
-  .kyc-validation-status-false {
-    border: solid 1px red;
-    color: red;
-  }
+.kyc-validation-status-true {
+  border: solid 1px $secondColor;
+  color: $secondColor;
+}
 
-  .font-weight-500 {
-    font-weight: 500;
-  }
+.kyc-validation-status-false {
+  border: solid 1px red;
+  color: red;
+}
 
-  .btn-ubo {
-    padding: 30px;
-    background: #fff;
-    letter-spacing: 0.06em;
-    border: dashed 1px;
-    border-radius: 7px;
-  }
+.font-weight-500 {
+  font-weight: 500;
+}
 
-  .card-ubo {
-    padding: 30px;
-    background: #fff;
-    letter-spacing: 0.06em;
-    border: solid 2px $darkColor;
-    border-radius: 7px;
-    margin-bottom: 15px;
-    cursor: pointer;
-  }
+.btn-ubo {
+  padding: 30px;
+  background: #fff;
+  letter-spacing: 0.06em;
+  border: dashed 1px;
+  border-radius: 7px;
+}
 
-  .card-ubo-selected {
-    border: solid 2px $secondColor;
-  }
+.card-ubo {
+  padding: 30px;
+  background: #fff;
+  letter-spacing: 0.06em;
+  border: solid 2px $darkColor;
+  border-radius: 7px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.card-ubo-selected {
+  border: solid 2px $secondColor;
+}

@@ -101,265 +101,275 @@
         </div>
 
         <!-- ADDRESSES -->
-        <div class="tab tab-addresses" v-if="userData && selectedTab == 'addresses'">
-          <div class="grid-container">
-            <div class="grid-item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
-            <div class="grid-item">
-              {{ userData.profile.provider.current.headquartersAddress.line1 + ', ' + userData.profile.provider.current.headquartersAddress.city + ', ' + userData.profile.provider.current.headquartersAddress.country + userData.profile.provider.current.headquartersAddress.postalCode }}
-            </div>
-            <div class="grid-item">EDIT</div>
-            <div class="grid-line"></div>
-
-            <div v-if="userData.profile.provider.current.representative.address.line1" class="grid-items-wrapper">
-              <div class="grid-item"><strong>ADDRESS 2</strong> (json: representative)</div>
+        <transition name="fade" mode="out-in">
+          <div class="tab tab-addresses" v-if="userData && selectedTab == 'addresses'">
+            <div class="grid-container">
+              <div class="grid-item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
               <div class="grid-item">
-                {{ userData.profile.provider.current.representative.address.line1 + ', ' + userData.profile.provider.current.representative.address.city + ', ' + userData.profile.provider.current.representative.address.country + userData.profile.provider.current.representative.address.postalCode }}
+                {{ userData.profile.provider.current.headquartersAddress.line1 + ', ' + userData.profile.provider.current.headquartersAddress.city + ', ' + userData.profile.provider.current.headquartersAddress.country + userData.profile.provider.current.headquartersAddress.postalCode }}
               </div>
               <div class="grid-item">EDIT</div>
               <div class="grid-line"></div>
+
+              <div v-if="userData.profile.provider.current.representative.address.line1" class="grid-items-wrapper">
+                <div class="grid-item"><strong>ADDRESS 2</strong> (json: representative)</div>
+                <div class="grid-item">
+                  {{ userData.profile.provider.current.representative.address.line1 + ', ' + userData.profile.provider.current.representative.address.city + ', ' + userData.profile.provider.current.representative.address.country + userData.profile.provider.current.representative.address.postalCode }}
+                </div>
+                <div class="grid-item">EDIT</div>
+                <div class="grid-line"></div>
+              </div>
             </div>
           </div>
-        </div>
+        </transition>
 
         <!-- PAYMENT METHODS -->
-        <div class="tab tab-payment_methods" v-if="selectedTab == 'paymentMethods'">
-          <div v-for="(card, i) in cards" :key="i" class="grid-items-wrapper">
-            <div class="grid-container">
-              <div class="grid-item"><strong>CARD {{ i + 1 }}</strong></div>
-              <div class="grid-item">{{ card }} (dummy)</div>
-              <div class="grid-item">REMOVE</div>
+        <transition name="fade" mode="out-in">
+          <div class="tab-wrapper">
+            <div class="tab tab-payment_methods" v-if="selectedTab == 'paymentMethods'">
+              <div v-for="(card, i) in cards" :key="i" class="grid-items-wrapper">
+                <div class="grid-container">
+                  <div class="grid-item"><strong>CARD {{ i + 1 }}</strong></div>
+                  <div class="grid-item">{{ card }} (dummy)</div>
+                  <div class="grid-item">REMOVE</div>
+                  <div class="grid-line"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+
+        <!-- KYC -->
+        <transition name="fade" mode="out-in">
+          <div class="tab tab-kyc" v-if="selectedTab == 'kyc'">
+            <div class="row mt-xs-20">
+              <div class="col-md-5 text-gray">
+                <p> We need you to upload the following documents in order to validate the information you provided. </p>
+
+                <p class="mt-xs-20"><strong>Identity proof</strong></p>
+                <p>This document should refer to the individual duly empowered to act on behalf of the legal entity. ID card: Front AND Back (Valid) OR Passport (Valid).</p>
+
+                <p class="mt-xs-20"><strong>Articles of association</strong></p>
+                <p>Certified articles of association (Statute) - formal memorandum stated by the entrepreneurs, in which the following information is mentioned: business name, activity, registered address, shareholding, etc.</p>
+
+                <p class="mt-xs-20"><strong>Registration proof</strong></p>
+                <p>Extract from the Company Register issued within the last three months in the case of an organization or soletrader, this can be a proof of registration from the official authority.</p>
+
+                <p class="mt-xs-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
+
+              </div>
+              <div class="col-md-7 d-flex flex-column">
+                <span class="text-black"><strong>Vendor validation status</strong></span>
+                <div class="mt-xs-20"><span class="kyc-validation-status" :class="isKycValidated? 'kyc-validation-status-true' : 'kyc-validation-status-false'">NOT KYC VALIDATED</span></div>
+                <div class="mt-xs-30 d-flex">
+                  <div class="font-weight-500">Issues:</div>
+                  <div class="ml-xs-20">
+                    <p class="mb-xs-5">Missing Identity proof document</p>
+                    <p class="mb-xs-5">Missing Articles of association document</p>
+                    <p class="mb-xs-5">Missing Registration proof document</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-container-kyc mt-xs-40">
+              <div class="grid-item-kyc-header">TYPE</div>
+              <div class="grid-item-kyc-header">STATUS</div>
+              <div class="grid-item-kyc-header">REFUSAL REASON</div>
+              <div class="grid-item-kyc-header">ID</div>
+              <div class="grid-item-kyc-header">CREATION DATE</div>
+              <div class="grid-item-kyc-header">PROCESSED DATE</div>
+              <div class="grid-item-kyc-header"></div>
+              <div class="grid-line grid-item-kyc-header"></div>
+
+              <div class="grid-item"><strong>Identity proof*</strong></div>
+              <div class="grid-item">UPLOAD</div>
+              <div class="grid-item"></div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">ADD NEW IDENTITY PROOF DOCUMENT</div>
+              <div class="grid-line"></div>
+
+              <div class="grid-item"><strong>Articles of association*</strong></div>
+              <div class="grid-item">UPLOAD</div>
+              <div class="grid-item"></div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">ADD NEW ARTICLES OF ASSOCIATION DOCUMENT</div>
+              <div class="grid-line"></div>
+
+              <div class="grid-item"><strong>Registration proof*</strong></div>
+              <div class="grid-item">UPLOAD</div>
+              <div class="grid-item"></div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">-</div>
+              <div class="grid-item">ADD NEW REGISTRATION PROOF DOCUMENT</div>
               <div class="grid-line"></div>
             </div>
           </div>
-        </div>
-
-        <!-- KYC -->
-        <div class="tab tab-kyc" v-if="selectedTab == 'kyc'">
-          <div class="row mt-xs-20">
-            <div class="col-md-5 text-gray">
-              <p> We need you to upload the following documents in order to validate the information you provided. </p>
-
-              <p class="mt-xs-20"><strong>Identity proof</strong></p>
-              <p>This document should refer to the individual duly empowered to act on behalf of the legal entity. ID card: Front AND Back (Valid) OR Passport (Valid).</p>
-
-              <p class="mt-xs-20"><strong>Articles of association</strong></p>
-              <p>Certified articles of association (Statute) - formal memorandum stated by the entrepreneurs, in which the following information is mentioned: business name, activity, registered address, shareholding, etc.</p>
-
-              <p class="mt-xs-20"><strong>Registration proof</strong></p>
-              <p>Extract from the Company Register issued within the last three months in the case of an organization or soletrader, this can be a proof of registration from the official authority.</p>
-
-              <p class="mt-xs-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
-
-            </div>
-            <div class="col-md-7 d-flex flex-column">
-              <span class="text-black"><strong>Vendor validation status</strong></span>
-              <div class="mt-xs-20"><span class="kyc-validation-status" :class="isKycValidated? 'kyc-validation-status-true' : 'kyc-validation-status-false'">NOT KYC VALIDATED</span></div>
-              <div class="mt-xs-30 d-flex">
-                <div class="font-weight-500">Issues:</div>
-                <div class="ml-xs-20">
-                  <p class="mb-xs-5">Missing Identity proof document</p>
-                  <p class="mb-xs-5">Missing Articles of association document</p>
-                  <p class="mb-xs-5">Missing Registration proof document</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid-container-kyc mt-xs-40">
-            <div class="grid-item-kyc-header">TYPE</div>
-            <div class="grid-item-kyc-header">STATUS</div>
-            <div class="grid-item-kyc-header">REFUSAL REASON</div>
-            <div class="grid-item-kyc-header">ID</div>
-            <div class="grid-item-kyc-header">CREATION DATE</div>
-            <div class="grid-item-kyc-header">PROCESSED DATE</div>
-            <div class="grid-item-kyc-header"></div>
-            <div class="grid-line grid-item-kyc-header"></div>
-
-            <div class="grid-item"><strong>Identity proof*</strong></div>
-            <div class="grid-item">UPLOAD</div>
-            <div class="grid-item"></div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">ADD NEW IDENTITY PROOF DOCUMENT</div>
-            <div class="grid-line"></div>
-
-            <div class="grid-item"><strong>Articles of association*</strong></div>
-            <div class="grid-item">UPLOAD</div>
-            <div class="grid-item"></div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">ADD NEW ARTICLES OF ASSOCIATION DOCUMENT</div>
-            <div class="grid-line"></div>
-
-            <div class="grid-item"><strong>Registration proof*</strong></div>
-            <div class="grid-item">UPLOAD</div>
-            <div class="grid-item"></div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">-</div>
-            <div class="grid-item">ADD NEW REGISTRATION PROOF DOCUMENT</div>
-            <div class="grid-line"></div>
-          </div>
-        </div>
+        </transition>
 
         <!-- UBO -->
-        <div class="tab tab-ubo" v-if="selectedTab == 'ubo'">
-          <div>
-            UBO declaration is replacing the manual shareholder declaration. <br>
-            For each declaration you need to create <strong>1 - 4 UBOs</strong>.
+        <transition name="fade" mode="out-in">
+          <div class="tab tab-ubo" v-if="selectedTab == 'ubo'">
+            <div>
+              UBO declaration is replacing the manual shareholder declaration. <br>
+              For each declaration you need to create <strong>1 - 4 UBOs</strong>.
+            </div>
+            <div class="row mt-xs-30">
+              <div class="col-md-4 d-flex flex-column">
+                <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedDeclaration}">
+                  STATUS: {{ declaration.status }} <br>
+                  ID: {{ declaration.id }} <br>
+                  CREATION DATE: {{ declaration.creationDate }}
+                </div>
+                <button @click="addDeclaration()" class="btn-ubo">ADD DECLARATION</button>
+              </div>
+              <div class="col-md-2">
+                <div v-if="selectedDeclaration !== null">
+                  <div v-for="(ubo, i) in declarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedUbo}">UBO {{ i + 1 }}</div>
+                  <button @click="addUboToDeclaration()" class="btn-ubo">ADD UBO</button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div v-if="selectedDeclaration !== null && declarations[selectedDeclaration].ubos[selectedUbo]">
+                  <validation-provider v-slot="{ errors }" name="Last name" rules="required">
+                    <div class="form-group">
+                      <label for="last_name">Last name*</label>
+                      <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].lastName" type="text" class="form-group__text" name="last_name" id="last_name">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="First Name" rules="required">
+                    <div class="form-group">
+                      <label for="firstName">First name*</label>
+                      <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].firstName" type="text" class="form-group__text" name="firstName" id="firstName">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                    <div class="form-group">
+                      <label for="address_line_1">Address Line 1*</label>
+                      <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine1" type="text" class="form-group__text" name="address_line_1" id="address_line_1">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Address Line 2">
+                    <div class="form-group">
+                      <label for="address_line_2">Address Line 2</label>
+                      <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine2" type="text" class="form-group__text" name="address_line_2" id="address_line_2">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                        <div class="form-group">
+                          <label for="country">Country *</label>
+                          <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].country" class="form-group__select" name="country" id="country">
+                            <option v-for="country in countries" :key="country"> {{country}} </option>
+                          </select>
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                        <div class="form-group">
+                          <label for="region">Region *</label>
+                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].region" type="text" class="form-group__text" name="region" id="region">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="City" rules="required">
+                        <div class="form-group">
+                          <label for="city">City *</label>
+                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].city" type="text" class="form-group__text" name="city" id="city">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Zip code" rules="required">
+                        <div class="form-group">
+                          <label for="zipCode">Zip code *</label>
+                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].zipCode" type="text" class="form-group__text" name="zipCode" id="zipCode">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
+                        <div class="form-group">
+                          <label for="birthdate">Birthdate *</label>
+                          <input type="date" v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthdate" class="form-group__text" name="birthdate" id="birthdate">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
+                        <div class="form-group">
+                          <label for="nationality">Nationality *</label>
+                          <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].nationality" class="form-group__select" name="nationality" id="nationality">
+                            <option v-for="country in countries" :key="country"> {{country}} </option>
+                          </select>
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Birthplace City" rules="required">
+                        <div class="form-group">
+                          <label for="birthplaceCity">Birthplace city *</label>
+                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCity" type="text" class="form-group__text" name="birthplaceCity" id="birthplaceCity">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+
+                    <div class="col-md-6">
+                      <validation-provider v-slot="{ errors }" name="Birthplace Country" rules="required">
+                        <div class="form-group">
+                          <label for="birthplaceCountry">Birthplace country *</label>
+                          <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCountry" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
+                            <option v-for="country in countries" :key="country"> {{country}} </option>
+                          </select>
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+                    </div>
+                  </div>
+
+                  <button class="btn--std btn--outlinedark">CANCEL</button>
+                  <button class="btn--std btn--dark ml-xs-20">ADD UBO</button>
+
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="row mt-xs-30">
-            <div class="col-md-4 d-flex flex-column">
-              <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedDeclaration}">
-                STATUS: {{ declaration.status }} <br>
-                ID: {{ declaration.id }} <br>
-                CREATION DATE: {{ declaration.creationDate }}
-              </div>
-              <button @click="addDeclaration()" class="btn-ubo">ADD DECLARATION</button>
-            </div>
-            <div class="col-md-2">
-              <div v-if="selectedDeclaration !== null">
-                <div v-for="(ubo, i) in declarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedUbo}">UBO {{ i + 1 }}</div>
-                <button @click="addUboToDeclaration()" class="btn-ubo">ADD UBO</button>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div v-if="selectedDeclaration !== null && declarations[selectedDeclaration].ubos[selectedUbo]">
-                <validation-provider v-slot="{ errors }" name="Last name" rules="required">
-                  <div class="form-group">
-                    <label for="last_name">Last name*</label>
-                    <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].lastName" type="text" class="form-group__text" name="last_name" id="last_name">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-
-                <validation-provider v-slot="{ errors }" name="First Name" rules="required">
-                  <div class="form-group">
-                    <label for="firstName">First name*</label>
-                    <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].firstName" type="text" class="form-group__text" name="firstName" id="firstName">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-
-                <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
-                  <div class="form-group">
-                    <label for="address_line_1">Address Line 1*</label>
-                    <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine1" type="text" class="form-group__text" name="address_line_1" id="address_line_1">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-
-                <validation-provider v-slot="{ errors }" name="Address Line 2">
-                  <div class="form-group">
-                    <label for="address_line_2">Address Line 2</label>
-                    <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine2" type="text" class="form-group__text" name="address_line_2" id="address_line_2">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                      <div class="form-group">
-                        <label for="country">Country *</label>
-                        <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].country" class="form-group__select" name="country" id="country">
-                          <option v-for="country in countries" :key="country"> {{country}} </option>
-                        </select>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Region" rules="required">
-                      <div class="form-group">
-                        <label for="region">Region *</label>
-                        <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].region" type="text" class="form-group__text" name="region" id="region">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="City" rules="required">
-                      <div class="form-group">
-                        <label for="city">City *</label>
-                        <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].city" type="text" class="form-group__text" name="city" id="city">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Zip code" rules="required">
-                      <div class="form-group">
-                        <label for="zipCode">Zip code *</label>
-                        <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].zipCode" type="text" class="form-group__text" name="zipCode" id="zipCode">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
-                      <div class="form-group">
-                        <label for="birthdate">Birthdate *</label>
-                        <input type="date" v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthdate" class="form-group__text" name="birthdate" id="birthdate">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
-                      <div class="form-group">
-                        <label for="nationality">Nationality *</label>
-                        <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].nationality" class="form-group__select" name="nationality" id="nationality">
-                          <option v-for="country in countries" :key="country"> {{country}} </option>
-                        </select>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Birthplace City" rules="required">
-                      <div class="form-group">
-                        <label for="birthplaceCity">Birthplace city *</label>
-                        <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCity" type="text" class="form-group__text" name="birthplaceCity" id="birthplaceCity">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-
-                  <div class="col-md-6">
-                    <validation-provider v-slot="{ errors }" name="Birthplace Country" rules="required">
-                      <div class="form-group">
-                        <label for="birthplaceCountry">Birthplace country *</label>
-                        <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCountry" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
-                          <option v-for="country in countries" :key="country"> {{country}} </option>
-                        </select>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                  </div>
-                </div>
-
-                <button class="btn--std btn--outlinedark">CANCEL</button>
-                <button class="btn--std btn--dark ml-xs-20">ADD UBO</button>
-
-              </div>
-            </div>
-          </div>
-        </div>
+        </transition>
 
         <!-- <div class="settings__grid">
           <a href="setting.html" class="settings__item">
