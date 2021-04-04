@@ -27,7 +27,7 @@
     <button v-if="!isAddUserFormOpen" @click="isAddUserFormOpen = true" class="btn--std btn-add-user mt-xs-20">Add New User</button>
 
     <transition name="fade" mode="out-in">
-      <div v-if="isAddUserFormOpen" class="mt-xs-40 ml-xs-20">
+      <div v-if="isAddUserFormOpen" class="users-form mt-xs-40 ml-xs-20">
         <h4>Add new user</h4>
         <p class="mb-xs-20">Create a new user role for your organisation. All people need to already have a topio account.</p>
         <div class="form-group">
@@ -90,7 +90,7 @@ export default class DashboardUsers extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import "@/assets/styles/dashboard/_users.scss";
 @import "@/assets/styles/abstracts/_spacings.scss";
 @import "@/assets/styles/_btns.scss";
