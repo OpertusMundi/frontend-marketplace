@@ -1,49 +1,44 @@
-.users .grid-container {
-    display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
+.users {
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+
+  &__header {
+    &__item {
+      font-weight: 700;
+      padding: 10px 20px 10px 20px;
+    }
+  }
+
+  &__item {
+    padding: 20px;    
+  }
+
+  &__line {
+    grid-column: 1/6;
+    height: 1px !important;
+    width: 100%;
+    background: $labelColor;
+  }
 }
 
-.users .grid-items-wrapper {
-    display: contents;
+.form-group {
+  &__text {
+    max-width: 600px;
+  }
+  &__select {
+    max-width: 300px;
+  }
 }
 
-// .grid-header-item, .grid-item {
-//     padding: 20px;
-// }
-
-.users .grid-header-item {
-  font-weight: 700;
-  padding: 10px 20px 10px 20px;
+.grid-ignore-wrapper {
+  display: contents;
 }
 
-.users .grid-item {
-  padding: 20px;
-}
-
-.users .grid-line {
-  grid-column: 1/6;
-  height: 1px !important;
-  width: 100%;
-  background: $labelColor;
-}
-
-.users .btn-add-user {
+.btn-add-user {
   background: transparent;
 }
 
-// .add-user-form {
-//   max-width: 600px;
-// }
-
-.add-user-form input {
-  max-width: 600px;
-}
-
-.add-user-form select {
-  max-width: 300px;
-}
-
-.add-user-form > .checkbox-group > label {
+.text-second-color {
   color: $secondColor;
 }
 
