@@ -86,42 +86,46 @@ export enum EnumPricingModel {
 
 export interface BasePricingModelCommand {
   /*
+   *
+   */
+  key?: string,
+  /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
   type: EnumPricingModel;
   /**
    * The domains in which users can apply the asset. Can be empty if no restrictions exist
    */
-  domainRestrictions: string[];
+  domainRestrictions: string[] | null;
   /**
    * Continents that the users are allowed to apply the asset
    */
-  coverageRestrictionContinents: EnumContinent[];
+  coverageRestrictionContinents: EnumContinent[] | null;
   /**
    * Restrict consumers to specific continents
    */
-  consumerRestrictionContinents: EnumContinent[];
+  consumerRestrictionContinents: EnumContinent[] | null;
   /**
    * Countries that the users are allowed to apply the asset. Countries are specified
    * using the 2 letter code as defined in ISO 3166.
    *
    * {@see https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}
    */
-  coverageRestrictionCountries: string[];
+  coverageRestrictionCountries: string[] | null;
   /**
    * Restrict consumers to specific countries. Countries are specified
    * using the 2 letter code as defined in ISO 3166.
    *
    * {@see https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}
    */
-  consumerRestrictionCountries: string[];
+  consumerRestrictionCountries: string[] | null;
 }
 
 export interface FreePricingModelCommand extends BasePricingModelCommand {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type: EnumPricingModel;
+  type: EnumPricingModel.FREE;
 }
 
 export interface FixedPricingModelCommand extends BasePricingModelCommand {
@@ -177,7 +181,7 @@ export interface FixedPopulationPricingModelCommand extends BasePricingModelComm
    * Each element (except for the first one) must have a `count` property with a value
    * greater than the previous one
    */
-  discountRates: DiscountRate;
+  discountRates: DiscountRate[];
 }
 
 export interface CallPrePaidPricingModelCommand extends BasePricingModelCommand {
@@ -349,7 +353,7 @@ export interface EffectivePricingModel {
   /**
    * The pricing model
    */
-  model: BasePricingModelCommand;
+  model: FreePricingModelCommand | FixedPricingModelCommand | FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | CallPrePaidPricingModelCommand | CallBlockRatePricingModelCommand | RowPrePaidPricingModelCommand | RowBlockRatePricingModelCommand;
   /**
    * Parameters applied to the pricing model for computing the effective pricing model
    */

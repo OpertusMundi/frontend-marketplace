@@ -692,7 +692,8 @@ export default class CreateAsset extends Vue {
     };
 
     this.priceModelType = '';
-    const priceModel = { type: '' } as BasePricingModelCommand;
+    // const priceModel = { type: '' } as BasePricingModelCommand;
+    const priceModel = { type: 'UNDEFINED' } as BasePricingModelCommand;
     this.asset.pricingModels = [];
     this.asset.pricingModels.push(priceModel);
 
