@@ -9,42 +9,42 @@
       <div class="settings">
         <div class="collection__menu">
           <ul>
-            <li @click="selectTab('general')" :class="{ active: selectedTab=='general' }"><a href="#" @click.prevent="">General</a></li>
-            <li @click="selectTab('loginAndSecurity')" :class="{ active: selectedTab=='loginAndSecurity' }"><a href="#" @click.prevent="">Login & Security</a></li>
-            <li @click="selectTab('companyInformation')" :class="{ active: selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
-            <li @click="selectTab('payoutOptions')" :class="{ active: selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
-            <li @click="selectTab('addresses')" :class="{ active: selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
-            <li @click="selectTab('paymentMethods')" :class="{ active: selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
-            <li @click="selectTab('kyc')" :class="{ active: selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
-            <li @click="selectTab('ubo')" :class="{ active: selectedTab=='ubo' }"><a href="#" @click.prevent="">UBO</a></li>
+            <li @click="selectTab('general')" :class="{ 'active': selectedTab=='general' }"><a href="#" @click.prevent="">General</a></li>
+            <li @click="selectTab('loginAndSecurity')" :class="{ 'active': selectedTab=='loginAndSecurity' }"><a href="#" @click.prevent="">Login & Security</a></li>
+            <li @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
+            <li @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
+            <li @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
+            <li @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
+            <li @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
+            <li @click="selectTab('ubo')" :class="{ 'active': selectedTab=='ubo' }"><a href="#" @click.prevent="">UBO</a></li>
           </ul>
         </div>
 
-        <div class="tabs-content-wrapper">
+        <div class="tabs__outter-wrapper">
           <!-- GENERAL -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="userData && selectedTab == 'general'">
-              <div class="tab tab-general">
-                <div class="grid-container">
-                  <div class="grid-item"><strong>Image</strong></div>
-                  <div class="grid-item"><img :src="'data:image/png;base64, ' + userData.profile.consumer.current.logoImage" :height="80" :width="80" alt="user image"></div>
-                  <div class="grid-item">CHANGE</div>
-                  <div class="grid-line"></div>
+            <div class="tabs__single-tab-wrapper" v-if="userData && selectedTab == 'general'">
+              <div class="tabs__tab tabs__tab__tab-general">
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>Image</strong></div>
+                  <div class="tabs__tab__list__item"><img :src="'data:image/png;base64, ' + userData.profile.consumer.current.logoImage" :height="80" :width="80" alt="user image"></div>
+                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Username</strong></div>
-                  <div class="grid-item">{{ userData.username }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Username</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.username }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Full name</strong></div>
-                  <div class="grid-item">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Full name</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Company email</strong></div>
-                  <div class="grid-item">{{ userData.profile.provider.current.email }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Company email</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.email }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
             </div>
@@ -52,23 +52,23 @@
 
           <!-- LOGIN & SECURITY -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="userData && selectedTab == 'loginAndSecurity'">
-              <div class="tab tab-login_security">
-                <div class="grid-container">
-                  <div class="grid-item"><strong>Password</strong></div>
-                  <div class="grid-item"></div>
-                  <div class="grid-item">CHANGE</div>
-                  <div class="grid-line"></div>
+            <div class="tabs__single-tab-wrapper" v-if="userData && selectedTab == 'loginAndSecurity'">
+              <div class="tabs__tab tabs__tab__login_security">
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>Password</strong></div>
+                  <div class="tabs__tab__list__item"></div>
+                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Two-step verification</strong></div>
-                  <div class="grid-item"></div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Two-step verification</strong></div>
+                  <div class="tabs__tab__list__item"></div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Mobile number</strong></div>
-                  <div class="grid-item">{{ userData.profile.mobile }}</div>
-                  <div class="grid-item">CHANGE</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Mobile number</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.mobile }}</div>
+                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
             </div>
@@ -76,28 +76,28 @@
 
           <!-- COMPANY INFORMATION -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="userData && selectedTab == 'companyInformation'">
-              <div class="tab tab-company_information">
-                <div class="grid-container">
-                  <div class="grid-item"><strong>Company name</strong></div>
-                  <div class="grid-item">{{ userData.profile.provider.current.name }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+            <div class="tabs__single-tab-wrapper" v-if="userData && selectedTab == 'companyInformation'">
+              <div class="tabs__tab tabs__tab__company_information">
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>Company name</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.name }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>VAT number</strong></div>
-                  <div class="grid-item">123456789 (dummy)</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>VAT number</strong></div>
+                  <div class="tabs__tab__list__item">123456789 (dummy)</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Domain</strong></div>
-                  <div class="grid-item">{{ userData.profile.provider.current.companyType }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Domain</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.companyType }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div class="grid-item"><strong>Country</strong></div>
-                  <div class="grid-item">{{ userData.profile.provider.current.headquartersAddress.country }}</div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Country</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.headquartersAddress.country }}</div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
             </div>
@@ -105,13 +105,13 @@
 
           <!-- PAYOUT OPTIONS -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="userData && selectedTab == 'payoutOptions'">
-              <div class="tab tab-payout_options">
-                <div class="grid-container">
-                  <div class="grid-item"><strong>IBAN</strong></div>
-                  <div class="grid-item">{{ userData.profile.provider.current.bankAccount.iban }}</div>
-                  <div class="grid-item">CHANGE</div>
-                  <div class="grid-line"></div>
+            <div class="tabs__single-tab-wrapper" v-if="userData && selectedTab == 'payoutOptions'">
+              <div class="tabs__tab tabs__tab__payout_options">
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>IBAN</strong></div>
+                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.bankAccount.iban }}</div>
+                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
             </div>
@@ -119,23 +119,23 @@
 
           <!-- ADDRESSES -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="userData && selectedTab == 'addresses'">
-              <div class="tab tab-addresses">
-                <div class="grid-container">
-                  <div class="grid-item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
-                  <div class="grid-item">
+            <div class="tabs__single-tab-wrapper" v-if="userData && selectedTab == 'addresses'">
+              <div class="tabs__tab tabs__tab__addresses">
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
+                  <div class="tabs__tab__list__item">
                     {{ userData.profile.provider.current.headquartersAddress.line1 + ', ' + userData.profile.provider.current.headquartersAddress.city + ', ' + userData.profile.provider.current.headquartersAddress.country + userData.profile.provider.current.headquartersAddress.postalCode }}
                   </div>
-                  <div class="grid-item">EDIT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__line"></div>
 
-                  <div v-if="userData.profile.provider.current.representative.address.line1" class="grid-items-wrapper">
-                    <div class="grid-item"><strong>ADDRESS 2</strong> (json: representative)</div>
-                    <div class="grid-item">
+                  <div v-if="userData.profile.provider.current.representative.address.line1" class="tabs__tab__ignore-grid-wrapper">
+                    <div class="tabs__tab__list__item"><strong>ADDRESS 2</strong> (json: representative)</div>
+                    <div class="tabs__tab__list__item">
                       {{ userData.profile.provider.current.representative.address.line1 + ', ' + userData.profile.provider.current.representative.address.city + ', ' + userData.profile.provider.current.representative.address.country + userData.profile.provider.current.representative.address.postalCode }}
                     </div>
-                    <div class="grid-item">EDIT</div>
-                    <div class="grid-line"></div>
+                    <div class="tabs__tab__list__item">EDIT</div>
+                    <div class="tabs__tab__list__line"></div>
                   </div>
                 </div>
               </div>
@@ -144,14 +144,14 @@
 
           <!-- PAYMENT METHODS -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="selectedTab == 'paymentMethods'">
-              <div class="tab tab-payment_methods">
-                <div v-for="(card, i) in cards" :key="i" class="grid-items-wrapper">
-                  <div class="grid-container">
-                    <div class="grid-item"><strong>CARD {{ i + 1 }}</strong></div>
-                    <div class="grid-item">{{ card }} (dummy)</div>
-                    <div class="grid-item">REMOVE</div>
-                    <div class="grid-line"></div>
+            <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'paymentMethods'">
+              <div class="tabs__tab tabs__tab__payment_methods">
+                <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                  <div class="tabs__tab__list">
+                    <div class="tabs__tab__list__item"><strong>CARD {{ i + 1 }}</strong></div>
+                    <div class="tabs__tab__list__item">{{ card }} (dummy)</div>
+                    <div class="tabs__tab__list__item">REMOVE</div>
+                    <div class="tabs__tab__list__line"></div>
                   </div>
                 </div>
               </div>
@@ -160,8 +160,8 @@
 
           <!-- KYC -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="selectedTab == 'kyc'">
-              <div class="tab tab-kyc">
+            <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'kyc'">
+              <div class="tabs__tab tabs__tab__kyc">
                 <div class="row mt-xs-20">
                   <div class="col-md-5 text-gray">
                     <p> We need you to upload the following documents in order to validate the information you provided. </p>
@@ -180,7 +180,7 @@
                   </div>
                   <div class="col-md-7 d-flex flex-column">
                     <span class="text-black"><strong>Vendor validation status</strong></span>
-                    <div class="mt-xs-20"><span class="kyc-validation-status" :class="isKycValidated? 'kyc-validation-status-true' : 'kyc-validation-status-false'">NOT KYC VALIDATED</span></div>
+                    <div class="mt-xs-20"><span class="tabs__tab__kyc__status-label" :class="isKycValidated? 'tabs__tab__kyc__status-label--validated' : 'tabs__tab__kyc__status-label--not-validated'">NOT KYC VALIDATED</span></div>
                     <div class="mt-xs-30 d-flex">
                       <div class="font-weight-500">Issues:</div>
                       <div class="ml-xs-20">
@@ -192,42 +192,42 @@
                   </div>
                 </div>
 
-                <div class="grid-container-kyc mt-xs-40">
-                  <div class="grid-item-kyc-header">TYPE</div>
-                  <div class="grid-item-kyc-header">STATUS</div>
-                  <div class="grid-item-kyc-header">REFUSAL REASON</div>
-                  <div class="grid-item-kyc-header">ID</div>
-                  <div class="grid-item-kyc-header">CREATION DATE</div>
-                  <div class="grid-item-kyc-header">PROCESSED DATE</div>
-                  <div class="grid-item-kyc-header"></div>
-                  <div class="grid-line grid-item-kyc-header"></div>
+                <div class="tabs__tab__kyc__list mt-xs-40">
+                  <div class="tabs__tab__kyc__list__header-item">TYPE</div>
+                  <div class="tabs__tab__kyc__list__header-item">STATUS</div>
+                  <div class="tabs__tab__kyc__list__header-item">REFUSAL REASON</div>
+                  <div class="tabs__tab__kyc__list__header-item">ID</div>
+                  <div class="tabs__tab__kyc__list__header-item">CREATION DATE</div>
+                  <div class="tabs__tab__kyc__list__header-item">PROCESSED DATE</div>
+                  <div class="tabs__tab__kyc__list__header-item"></div>
+                  <div class="tabs__tab__kyc__list__line"></div>
 
-                  <div class="grid-item"><strong>Identity proof*</strong></div>
-                  <div class="grid-item">UPLOAD</div>
-                  <div class="grid-item"></div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">ADD NEW IDENTITY PROOF DOCUMENT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Identity proof*</strong></div>
+                  <div class="tabs__tab__list__item">UPLOAD</div>
+                  <div class="tabs__tab__list__item"></div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">ADD NEW IDENTITY PROOF DOCUMENT</div>
+                  <div class="tabs__tab__kyc__list__line"></div>
 
-                  <div class="grid-item"><strong>Articles of association*</strong></div>
-                  <div class="grid-item">UPLOAD</div>
-                  <div class="grid-item"></div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">ADD NEW ARTICLES OF ASSOCIATION DOCUMENT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Articles of association*</strong></div>
+                  <div class="tabs__tab__list__item">UPLOAD</div>
+                  <div class="tabs__tab__list__item"></div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">ADD NEW ARTICLES OF ASSOCIATION DOCUMENT</div>
+                  <div class="tabs__tab__kyc__list__line"></div>
 
-                  <div class="grid-item"><strong>Registration proof*</strong></div>
-                  <div class="grid-item">UPLOAD</div>
-                  <div class="grid-item"></div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">-</div>
-                  <div class="grid-item">ADD NEW REGISTRATION PROOF DOCUMENT</div>
-                  <div class="grid-line"></div>
+                  <div class="tabs__tab__list__item"><strong>Registration proof*</strong></div>
+                  <div class="tabs__tab__list__item">UPLOAD</div>
+                  <div class="tabs__tab__list__item"></div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">-</div>
+                  <div class="tabs__tab__list__item">ADD NEW REGISTRATION PROOF DOCUMENT</div>
+                  <div class="tabs__tab__kyc__list__line"></div>
                 </div>
               </div>
             </div>
@@ -235,25 +235,25 @@
 
           <!-- UBO -->
           <transition name="fade" mode="out-in">
-            <div class="tab-wrapper" v-if="selectedTab == 'ubo'">
-              <div class="tab tab-ubo">
+            <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'ubo'">
+              <div class="tabs__tab tabs__tab__ubo">
                 <div>
                   UBO declaration is replacing the manual shareholder declaration. <br>
                   For each declaration you need to create <strong>1 - 4 UBOs</strong>.
                 </div>
                 <div class="row mt-xs-30">
                   <div class="col-md-4 d-flex flex-column">
-                    <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedDeclaration}">
+                    <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="tabs__tab__ubo__card" :class="{'tabs__tab__ubo__card--selected': i == selectedDeclaration}">
                       STATUS: {{ declaration.status }} <br>
                       ID: {{ declaration.id }} <br>
                       CREATION DATE: {{ declaration.creationDate }}
                     </div>
-                    <button @click="addDeclaration()" class="btn-ubo">ADD DECLARATION</button>
+                    <button @click="addDeclaration()" class="tabs__tab__ubo__btn">ADD DECLARATION</button>
                   </div>
                   <div class="col-md-2">
                     <div v-if="selectedDeclaration !== null">
-                      <div v-for="(ubo, i) in declarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="card-ubo" :class="{'card-ubo-selected': i == selectedUbo}">UBO {{ i + 1 }}</div>
-                      <button @click="addUboToDeclaration()" class="btn-ubo">ADD UBO</button>
+                      <div v-for="(ubo, i) in declarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="tabs__tab__ubo__card" :class="{'tabs__tab__ubo__card--selected': i == selectedUbo}">UBO {{ i + 1 }}</div>
+                      <button @click="addUboToDeclaration()" class="tabs__tab__ubo__btn">ADD UBO</button>
                     </div>
                   </div>
                   <div class="col-md-6">
