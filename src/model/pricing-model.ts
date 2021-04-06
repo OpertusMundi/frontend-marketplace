@@ -96,29 +96,29 @@ export interface BasePricingModelCommand {
   /**
    * The domains in which users can apply the asset. Can be empty if no restrictions exist
    */
-  domainRestrictions: string[] | null;
+  domainRestrictions: string[];
   /**
    * Continents that the users are allowed to apply the asset
    */
-  coverageRestrictionContinents: EnumContinent[] | null;
+  coverageRestrictionContinents: EnumContinent[];
   /**
    * Restrict consumers to specific continents
    */
-  consumerRestrictionContinents: EnumContinent[] | null;
+  consumerRestrictionContinents: EnumContinent[];
   /**
    * Countries that the users are allowed to apply the asset. Countries are specified
    * using the 2 letter code as defined in ISO 3166.
    *
    * {@see https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}
    */
-  coverageRestrictionCountries: string[] | null;
+  coverageRestrictionCountries: string[];
   /**
    * Restrict consumers to specific countries. Countries are specified
    * using the 2 letter code as defined in ISO 3166.
    *
    * {@see https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}
    */
-  consumerRestrictionCountries: string[] | null;
+  consumerRestrictionCountries: string[];
 }
 
 export interface FreePricingModelCommand extends BasePricingModelCommand {
