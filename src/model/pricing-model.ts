@@ -86,6 +86,10 @@ export enum EnumPricingModel {
 
 export interface BasePricingModelCommand {
   /*
+   *
+   */
+  key?: string,
+  /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
   type: EnumPricingModel;
@@ -121,7 +125,7 @@ export interface FreePricingModelCommand extends BasePricingModelCommand {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type: EnumPricingModel;
+  type: EnumPricingModel.FREE;
 }
 
 export interface FixedPricingModelCommand extends BasePricingModelCommand {
@@ -177,7 +181,7 @@ export interface FixedPopulationPricingModelCommand extends BasePricingModelComm
    * Each element (except for the first one) must have a `count` property with a value
    * greater than the previous one
    */
-  discountRates: DiscountRate;
+  discountRates: DiscountRate[];
 }
 
 export interface CallPrePaidPricingModelCommand extends BasePricingModelCommand {
@@ -349,7 +353,7 @@ export interface EffectivePricingModel {
   /**
    * The pricing model
    */
-  model: BasePricingModelCommand;
+  model: FreePricingModelCommand | FixedPricingModelCommand | FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | CallPrePaidPricingModelCommand | CallBlockRatePricingModelCommand | RowPrePaidPricingModelCommand | RowBlockRatePricingModelCommand;
   /**
    * Parameters applied to the pricing model for computing the effective pricing model
    */
