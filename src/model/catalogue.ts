@@ -329,6 +329,10 @@ export interface CatalogueItemStatistics {
 }
 
 export interface Metadata {
+  /**
+   * resource unique identifier
+   */
+  key: string;
   assetType: 'NetCDF' | 'vector' | 'raster';
 }
 
@@ -644,6 +648,25 @@ export interface NetCdfMetadata extends Metadata {
 
 }
 
+export interface ResourceIngestionData {
+  /**
+   * The resource unique identifier
+   */
+  key: string;
+  /**
+   * The number of features stored in the table
+   */
+  features: number;
+  /**
+   * The database schema of the created table
+   */
+  schema: string;
+  /**
+   * The name of the created table. The table name is equal to the resource unique identifier
+   */
+  tableName: string;
+}
+
 export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Catalogue item identifier (UUID)
@@ -669,9 +692,17 @@ export interface CatalogueItemDetails extends CatalogueItem {
    */
   additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
   /**
-   * Automated metadata. The property is present only for authenticated users
+   * Automated metadata. The property is present only for authenticated users.
+   * The array contains an element for each resource. The resource can be found
+   * using the key property.
    */
-  automatedMetadata?: Metadata;
+  automatedMetadata?: Metadata[];
+  /**
+   * Ingestion information. Only visible to the owners (publishers) of the asset.
+   * The array contains an element for each ingested resource. The resource can
+   * be found using the key property.
+   */
+  ingestionInfo?: ResourceIngestionData[];
   /**
    * A list of resources of the dataset
    */
@@ -694,12 +725,17 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
    * Automated metadata. This value will be overwritten by the publish asset workflow
    */
-  automatedMetadata?: Metadata;
+  automatedMetadata?: Metadata[];
   /**
    * True if the resource files should be imported into PostGIS database and published using WMS/WFS
    * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
   ingested: boolean;
+  /**
+   * Ingestion information. Only visible to the owners (publishers) of the asset.
+   * This value will be overwritten by the publish asset workflow
+   */
+  ingestionInfo?: ResourceIngestionData[];
   /*
    * Pricing model available for the asset
    */
