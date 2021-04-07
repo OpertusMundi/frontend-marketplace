@@ -381,7 +381,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import {
   ProviderProfessionalCommand,
   BankAccountCommand,
-  EnumCustomerType,
+  EnumMangopayUserType,
   AddressCommand,
   EnumLegalPersonType,
   CustomerRepresentativeCommand,
@@ -469,7 +469,7 @@ export default class BecomeVendor extends Vue {
       name: '',
       phone: '',
       email: '',
-      type: EnumCustomerType.PROFESSIONAL,
+      type: EnumMangopayUserType.PROFESSIONAL,
       additionalInfo: '',
       companyNumber: '',
       companyType: '',

@@ -1,5 +1,5 @@
 import { CatalogueItem } from '@/model/catalogue';
-import { BasePricingModel } from '@/model/pricing-model';
+import { QuotationParameters, EffectivePricingModel } from '@/model/pricing-model';
 
 export interface CartItem {
   /*
@@ -7,9 +7,11 @@ export interface CartItem {
    */
   id: string;
   /*
-   * Catalogue item
+   * Catalogue item. In contrast to catalogue responses, a cart item
+   * contains no pricing models. The effective pricing model is stored
+   * in property pricingModel
    */
-  product: CatalogueItem;
+  asset: CatalogueItem;
   /*
    * Date added to the cart
    */
@@ -17,7 +19,7 @@ export interface CartItem {
   /*
    * Selected pricing model
    */
-  pricingModel: BasePricingModel;
+  pricingModel: EffectivePricingModel;
 }
 
 export interface Cart {
@@ -61,13 +63,19 @@ export interface Cart {
 
 export interface CartAddItemCommand {
   /*
-   * Catalogue asset unique id
+   * Required catalogue asset PID
    */
-  productId: string;
+  assetId: string;
   /*
-   * Pricing model unique id (the id must be one from the supported pricing models
-   * returned by the catalogue, for the specific asset selected by the productId
+   * Required pricing model unique key (the key must be one of the supported pricing models
+   * returned by the catalogue, for the specific asset selected by the assetId
    * property)
    */
-  pricingModelId: string;
+  pricingModelKey: string;
+  /**
+   * System and user-defined quotation parameters. User-defined parameters are set by the user.
+   * System parameters are computed by the quotation service e.g. the population for a selected
+   * area
+   */
+  parameters: QuotationParameters;
 }

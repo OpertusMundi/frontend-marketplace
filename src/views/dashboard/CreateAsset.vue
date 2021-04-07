@@ -662,10 +662,14 @@ export default class CreateAsset extends Vue {
       publisherName: '',
       referenceSystem: '',
       resourceLocator: '',
+      responsibleParty: [],
       revisionDate: '2020-06-02',
       resources: [],
       scales: [],
+      spatialDataServiceOperations: [],
+      spatialDataServiceQueryables: [],
       spatialDataServiceType: null,
+      spatialDataServiceVersion: null,
       spatialResolution: null,
       suitableFor: [],
       title: '',
@@ -688,7 +692,8 @@ export default class CreateAsset extends Vue {
     };
 
     this.priceModelType = '';
-    const priceModel = { type: '' } as BasePricingModelCommand;
+    // const priceModel = { type: '' } as BasePricingModelCommand;
+    const priceModel = { type: 'UNDEFINED' } as BasePricingModelCommand;
     this.asset.pricingModels = [];
     this.asset.pricingModels.push(priceModel);
 

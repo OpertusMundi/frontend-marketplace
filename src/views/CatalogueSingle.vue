@@ -865,8 +865,9 @@ export default class CatalogueSingle extends Vue {
     this.cartErrors = '';
     // TODO: add to cart functions
     const cartItem:CartAddItemCommand = {
-      productId: this.catalogueItem.id,
-      pricingModelId: this.selectedPricingModel,
+      assetId: this.catalogueItem.id,
+      pricingModelKey: this.selectedPricingModel,
+      parameters: {},
     };
     this.cartApi.addItem(cartItem)
       .then((cartResponse: ServerResponse<Cart>) => {

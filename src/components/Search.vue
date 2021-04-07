@@ -95,11 +95,11 @@ export default class Search extends Vue {
     let lowestPrice:number|string = 999999;
     let highestPrice = 0;
     item.pricingModels.forEach((pricingModel) => {
-      if (lowestPrice > pricingModel.totalPrice) {
-        lowestPrice = pricingModel.totalPrice;
+      if (lowestPrice > pricingModel.quotation?.totalPrice) {
+        lowestPrice = pricingModel.quotation?.totalPrice;
       }
-      if (highestPrice < pricingModel.totalPrice) {
-        highestPrice = pricingModel.totalPrice;
+      if (highestPrice < pricingModel.quotation?.totalPrice) {
+        highestPrice = pricingModel.quotation?.totalPrice;
       }
     });
     if (lowestPrice === 0) lowestPrice = 'FREE';

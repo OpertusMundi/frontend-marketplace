@@ -1,7 +1,8 @@
 import { PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
-import { BasePricingModel, BasePricingModelCommand } from '@/model/pricing-model';
-import { AssetResource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
+import { EnumAssetType } from '@/model/enum';
+import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
+import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
 
 export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
@@ -41,10 +42,11 @@ export enum EnumTopicCategory {
   UTILITIES_COMMUNICATION = 'UTILITIES_COMMUNICATION',
 }
 
-export enum EnumType {
-  RASTER = 'RASTER',
-  SERVICE = 'SERVICE',
-  VECTOR = 'VECTOR',
+export enum EnumDeliveryMethod {
+  NONE = 'NONE',
+  DIGITAL_PLATFORM = 'DIGITAL_PLATFORM',
+  DIGITAL_PROVIDER = 'DIGITAL_PROVIDER',
+  PHYSICAL_PROVIDER = 'PHYSICAL_PROVIDER',
 }
 
 export interface CatalogueQuery extends PageRequest {
@@ -74,6 +76,49 @@ interface Scale {
    * A short description
    */
   theme: string;
+}
+
+enum EnumResponsiblePartyRole {
+  PUBLISHER = 'PUBLISHER',
+  OWNER = 'OWNER',
+  CUSTODIAN = 'CUSTODIAN',
+  USER = 'USER',
+  DISTRIBUTOR = 'DISTRIBUTOR',
+  ORIGINATOR = 'ORIGINATOR',
+  POINT_OF_CONTACT = 'POINT_OF_CONTACT',
+  PROCESSOR = 'PROCESSOR',
+  AUTHOR = 'AUTHOR',
+}
+
+interface ResponsibleParty {
+  /**
+   * Address of entity responsible for making the resource available
+   */
+  address: string;
+  /**
+   * Email of entity responsible for making the resource available
+   */
+  email: string;
+  /**
+   * Name of person responsible for making the resource available
+   */
+  name: string;
+  /**
+   * Name of entity responsible for making the resource available
+   */
+  organizationName: string;
+  /**
+   * Phone of entity responsible for making the resource available
+   */
+  phone: string;
+  /**
+   * Role of entity responsible for making the resource available
+   */
+  role: EnumResponsiblePartyRole
+  /**
+   * Contact hours of entity responsible for making the resource available
+   */
+  serviceHours: string;
 }
 
 interface BaseCatalogueItem {
@@ -172,6 +217,10 @@ interface BaseCatalogueItem {
    * may be provided
    */
   resourceLocator: string;
+  /**
+   * The responsible party (including contact information) of the resource
+   */
+  responsibleParty: ResponsibleParty[] | null;
   /*
    * A point or period of time associated with the revision event in the lifecycle of the resource",
    */
@@ -180,10 +229,22 @@ interface BaseCatalogueItem {
    * Denominator of the scale of the data set
    */
   scales: Scale[];
+  /**
+   * The operations supported by the service
+   */
+  spatialDataServiceOperations: string[] | null;
+  /**
+   * The queryables supported by the service
+   */
+  spatialDataServiceQueryables: string[] | null;
   /*
    * The nature or genre of the service
    */
   spatialDataServiceType: EnumSpatialDataServiceType | null;
+  /**
+   * The version of the implemented service specification
+   */
+  spatialDataServiceVersion: string | null;
   /*
    * Spatial resolution refers to the level of detail of the data set
    */
@@ -204,7 +265,7 @@ interface BaseCatalogueItem {
   /*
    * The nature or genre of the resource
    */
-  type: EnumType | null;
+  type: EnumAssetType | null;
   /*
    * Version of the resource
    */
@@ -268,6 +329,10 @@ export interface CatalogueItemStatistics {
 }
 
 export interface Metadata {
+  /**
+   * resource unique identifier
+   */
+  key: string;
   assetType: 'NetCDF' | 'vector' | 'raster';
 }
 
@@ -583,6 +648,25 @@ export interface NetCdfMetadata extends Metadata {
 
 }
 
+export interface ResourceIngestionData {
+  /**
+   * The resource unique identifier
+   */
+  key: string;
+  /**
+   * The number of features stored in the table
+   */
+  features: number;
+  /**
+   * The database schema of the created table
+   */
+  schema: string;
+  /**
+   * The name of the created table. The table name is equal to the resource unique identifier
+   */
+  tableName: string;
+}
+
 export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Catalogue item identifier (UUID)
@@ -591,7 +675,7 @@ export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Pricing model available for the asset
    */
-  pricingModels: BasePricingModel[];
+  pricingModels: EffectivePricingModel[];
   /*
    * Publisher details
    */
@@ -608,13 +692,21 @@ export interface CatalogueItemDetails extends CatalogueItem {
    */
   additionalResources: (AssetFileAdditionalResource | AssetUriAdditionalResource)[];
   /**
-   * Automated metadata. The property is present only for authenticated users
+   * Automated metadata. The property is present only for authenticated users.
+   * The array contains an element for each resource. The resource can be found
+   * using the key property.
    */
-  automatedMetadata?: Metadata;
+  automatedMetadata?: Metadata[];
+  /**
+   * Ingestion information. Only visible to the owners (publishers) of the asset.
+   * The array contains an element for each ingested resource. The resource can
+   * be found using the key property.
+   */
+  ingestionInfo?: ResourceIngestionData[];
   /**
    * A list of resources of the dataset
    */
-  resources: AssetResource[];
+  resources: Resource[];
   /*
    * Asset statistics
    */
@@ -633,12 +725,17 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
    * Automated metadata. This value will be overwritten by the publish asset workflow
    */
-  automatedMetadata?: Metadata;
+  automatedMetadata?: Metadata[];
   /**
    * True if the resource files should be imported into PostGIS database and published using WMS/WFS
    * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
   ingested: boolean;
+  /**
+   * Ingestion information. Only visible to the owners (publishers) of the asset.
+   * This value will be overwritten by the publish asset workflow
+   */
+  ingestionInfo?: ResourceIngestionData[];
   /*
    * Pricing model available for the asset
    */
@@ -646,7 +743,75 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
    * A list of resources of the dataset
    */
-  resources: AssetResource[];
+  resources: Resource[];
+}
+
+export enum EnumDraftCommandType {
+  ASSET = 'ASSET',
+  FILE = 'FILE',
+}
+
+export interface DraftApiCommand {
+  /**
+   * Service type
+   */
+  serviceType: 'WMS' | 'WFS' | 'DATA_API';
+  /**
+   * A name given to the resource
+   */
+  title: string;
+  /**
+   * Version of the resource
+   */
+  version: string;
+}
+
+export interface DraftApiFromAssetCommand extends DraftApiCommand {
+  /**
+   * Command type
+   */
+  type: EnumDraftCommandType.ASSET;
+  /**
+   * Published asset unique PID
+   */
+  pid: string;
+}
+
+export interface DraftApiFromFileCommand extends DraftApiCommand {
+  /**
+ * Command type
+ */
+  type: EnumDraftCommandType.FILE
+  /**
+   * Path to user's file system
+   */
+  path: string;
+  /**
+   * File format
+   */
+  format: string;
+}
+
+export enum EnumCatalogueType {
+  OPERTUSMUNDI = 'OPERTUSMUNDI',
+  CKAN = 'CKAN',
+  CSW = 'CSW',
+}
+
+export interface CatalogueHarvestCommand {
+  type: EnumCatalogueType | null;
+  url: string;
+}
+
+export interface CatalogueHarvestImportCommand {
+  /**
+   * Catalogue URL
+   */
+  url: string;
+  /**
+   * Unique identifiers of harvested catalogue items to import
+   */
+  ids: string[];
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
