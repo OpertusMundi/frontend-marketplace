@@ -10,7 +10,7 @@
       <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
       <Modal v-if="modalToShow == 'image'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :inputs="[{id: 'image', name: 'Image', value: '', type: 'file'}]" />
       <Modal v-if="modalToShow == 'username'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
-      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.lastName, type: 'text'}]" />
+      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
       <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
 
       <div class="settings">
