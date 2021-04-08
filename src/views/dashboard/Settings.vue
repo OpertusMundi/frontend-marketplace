@@ -6,6 +6,13 @@
         </div>
       </div>
 
+      <!-- MODALS -->
+      <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
+      <Modal v-if="modalToShow == 'image'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :inputs="[{id: 'image', name: 'Image', value: '', type: 'file'}]" />
+      <Modal v-if="modalToShow == 'username'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
+      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.lastName, type: 'text'}]" />
+      <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
+
       <div class="settings">
         <div class="collection__menu">
           <ul>
@@ -28,22 +35,22 @@
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Image</strong></div>
                   <div class="tabs__tab__list__item"><img :src="'data:image/png;base64, ' + userData.profile.consumer.current.logoImage" :height="80" :width="80" alt="user image"></div>
-                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'image'">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Username</strong></div>
                   <div class="tabs__tab__list__item">{{ userData.username }}</div>
-                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'username'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Full name</strong></div>
                   <div class="tabs__tab__list__item">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
-                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'fullName'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Company email</strong></div>
                   <div class="tabs__tab__list__item">{{ userData.profile.provider.current.email }}</div>
-                  <div class="tabs__tab__list__item">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'companyEmail'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -552,6 +559,8 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
+import Modal from '../../components/Modal.vue';
+import ProfileApi from '../../service/profile';
 
 extend('required', required);
 extend('email', email);
@@ -566,6 +575,7 @@ localize({
   components: {
     ValidationProvider,
     ValidationObserver,
+    Modal,
   },
 })
 export default class DashboardHome extends Vue {
@@ -586,6 +596,10 @@ export default class DashboardHome extends Vue {
   selectedUbo: number;
 
   showUboForm: boolean;
+
+  modalToShow: string;
+
+  profileApi: ProfileApi;
 
   // temporarily? using the following array of countries to populate options of country-select inputs
   // eslint-disable-next-line
@@ -611,6 +625,10 @@ export default class DashboardHome extends Vue {
     this.showUboForm = false;
 
     this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
+
+    this.modalToShow = '';
+
+    this.profileApi = new ProfileApi();
   }
 
   mounted(): void {
@@ -670,6 +688,23 @@ export default class DashboardHome extends Vue {
 
     this.declarations[this.selectedDeclaration!].ubos.push(uboData);
     this.showUboForm = true;
+  }
+
+  onModalSubmit(modalInputs) {
+    // create the data object for POST request
+    // by iterating through modal's inputs IDs & values
+    const data = {};
+    modalInputs.forEach((input) => {
+      data[input.id] = input.value;
+    });
+
+    this.profileApi.updateProfile(data as any).then((resp) => {
+      console.log(resp);
+    }).catch((err) => {
+      console.log(err);
+    });
+
+    this.modalToShow = '';
   }
 }
 </script>
