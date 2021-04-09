@@ -1,3 +1,4 @@
+import { ServerResponse } from '@/model/response';
 import { CatalogueItemCommand, Publisher } from '@/model/catalogue';
 
 export enum EnumDraftStatus {
@@ -111,3 +112,5 @@ export interface AssetDraftReviewCommand {
   reason?: string;
   rejected: boolean;
 }
+
+export type HarvestImportResponse = ServerResponse<{ [id: string]: AssetDraft }>;

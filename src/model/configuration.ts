@@ -1,14 +1,11 @@
+import { EnumAssetSourceType } from '@/model/asset';
+import { PricingModelSettings } from '@/model/pricing-model';
+
 export enum EnumAuthProvider {
   Forms = 'Forms',
   Google = 'Google',
   GitHub = 'GitHub',
   OpertusMundi = 'OpertusMundi',
-}
-
-enum EnumDataProfilerSourceType {
-  NETCDF = 'NETCDF',
-  RASTER = 'RASTER',
-  VECTOR = 'VECTOR',
 }
 
 interface AssetFileType {
@@ -23,7 +20,7 @@ interface AssetFileType {
   /**
    * File type category
    */
-  category: EnumDataProfilerSourceType,
+  category: EnumAssetSourceType,
   /**
    * Allowed file extensions
    */
@@ -40,6 +37,7 @@ interface AssetFileType {
 
 interface AssetConfiguration {
   fileTypes: AssetFileType[];
+  pricingModels: PricingModelSettings[];
 }
 
 export interface Configuration {
