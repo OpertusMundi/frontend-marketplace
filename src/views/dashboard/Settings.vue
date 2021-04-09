@@ -8,10 +8,12 @@
 
       <!-- MODALS -->
       <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
-      <Modal v-if="modalToShow == 'image'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :inputs="[{id: 'image', name: 'Image', value: '', type: 'file'}]" />
-      <Modal v-if="modalToShow == 'username'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
-      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
-      <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
+      <Modal v-if="modalToShow == 'image'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]" />
+      <Modal v-if="modalToShow == 'username'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
+      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
+      <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
+
+      <Modal v-if="modalToShow == 'kycIdentity'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentity'" :inputs="[{id: 'kycIdentityFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityComments', name: 'Comments', type: 'text'}]" />
 
       <div class="settings">
         <div class="collection__menu">
@@ -34,7 +36,7 @@
               <div class="tabs__tab tabs__tab__tab-general">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Image</strong></div>
-                  <div class="tabs__tab__list__item"><img :src="'data:image/png;base64, ' + userData.profile.consumer.current.logoImage" :height="80" :width="80" alt="user image"></div>
+                  <div class="tabs__tab__list__item"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image" style="border-radius: 50%"></div>
                   <div class="tabs__tab__list__item" @click="modalToShow = 'image'">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
 
@@ -210,7 +212,7 @@
                   <div class="tabs__tab__kyc__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Identity proof*</strong></div>
-                  <div class="tabs__tab__list__item">UPLOAD</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'kycIdentity'">UPLOAD</div>
                   <div class="tabs__tab__list__item"></div>
                   <div class="tabs__tab__list__item">-</div>
                   <div class="tabs__tab__list__item">-</div>
@@ -690,19 +692,39 @@ export default class DashboardHome extends Vue {
     this.showUboForm = true;
   }
 
-  onModalSubmit(modalInputs) {
-    // create the data object for POST request
-    // by iterating through modal's inputs IDs & values
-    const data = {};
-    modalInputs.forEach((input) => {
-      data[input.id] = input.value;
-    });
+  onModalSubmit(modalData) {
+    switch (modalData.modalId) {
+      // UPDATE IMAGE, USERNAME, FULLNAME, COMPANY EMAIL
+      case 'image':
+      case 'username':
+      case 'fullname':
+      case 'companyEmail': {
+        // create the data object for POST request
+        // by iterating through modal's inputs IDs & values
+        const data = {};
+        modalData.inputValues.forEach((input) => {
+          data[input.id] = input.value;
+        });
+        console.log('data', data);
 
-    this.profileApi.updateProfile(data as any).then((resp) => {
-      console.log(resp);
-    }).catch((err) => {
-      console.log(err);
-    });
+        this.profileApi.updateProfile(data as any).then((resp) => {
+          console.log(resp);
+          // API gateway should change: response from 'Update Profile' should have the content of the response of 'Get User Data'
+          if (resp.success) {
+            (this.userData as any).profile = resp.result;
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+        break;
+      }
+
+      // KYC
+      case 'kycIdentity': {
+        break;
+      }
+      default:
+    }
 
     this.modalToShow = '';
   }
