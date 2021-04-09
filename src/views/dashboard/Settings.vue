@@ -13,7 +13,7 @@
       <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
       <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
 
-      <Modal v-if="modalToShow == 'kycIdentity'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentity'" :inputs="[{id: 'kycIdentityFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityComments', name: 'Comments', type: 'text'}]" />
+      <Modal v-if="modalToShow == 'kycIdentityProof'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentityProof'" :inputs="[{id: 'kycIdentityProofFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityProofComments', name: 'Comments', type: 'text'}]" />
 
       <div class="settings">
         <div class="collection__menu">
@@ -211,32 +211,47 @@
                   <div class="tabs__tab__kyc__list__header-item"></div>
                   <div class="tabs__tab__kyc__list__line"></div>
 
-                  <div class="tabs__tab__list__item"><strong>Identity proof*</strong></div>
-                  <div class="tabs__tab__list__item" @click="modalToShow = 'kycIdentity'">UPLOAD</div>
-                  <div class="tabs__tab__list__item"></div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">ADD NEW IDENTITY PROOF DOCUMENT</div>
-                  <div class="tabs__tab__kyc__list__line"></div>
+                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'IDENTITY_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                    <div class="tabs__tab__list__item"><strong>Identity proof*</strong></div>
+                    <div class="tabs__tab__list__item">
+                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycIdentityProof'">UPLOAD</button>
+                      <span v-else>{{ document.status }}</span>
+                    </div>
+                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
+                    <div class="tabs__tab__list__item">-</div>
+                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW IDENTITY PROOF DOCUMENT' }}</div>
+                    <div class="tabs__tab__kyc__list__line"></div>
+                  </div>
 
-                  <div class="tabs__tab__list__item"><strong>Articles of association*</strong></div>
-                  <div class="tabs__tab__list__item">UPLOAD</div>
-                  <div class="tabs__tab__list__item"></div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">ADD NEW ARTICLES OF ASSOCIATION DOCUMENT</div>
-                  <div class="tabs__tab__kyc__list__line"></div>
+                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                    <div class="tabs__tab__list__item"><strong>Articles of association*</strong></div>
+                    <div class="tabs__tab__list__item">
+                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycArticlesOfAssociation'">UPLOAD</button>
+                      <span v-else>{{ document.status }}</span>
+                    </div>
+                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
+                    <div class="tabs__tab__list__item">-</div>
+                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW ARTICLES OF ASSOCIATION DOCUMENT' }}</div>
+                    <div class="tabs__tab__kyc__list__line"></div>
+                  </div>
 
-                  <div class="tabs__tab__list__item"><strong>Registration proof*</strong></div>
-                  <div class="tabs__tab__list__item">UPLOAD</div>
-                  <div class="tabs__tab__list__item"></div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">-</div>
-                  <div class="tabs__tab__list__item">ADD NEW REGISTRATION PROOF DOCUMENT</div>
-                  <div class="tabs__tab__kyc__list__line"></div>
+                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                    <div class="tabs__tab__list__item"><strong>Registration proof*</strong></div>
+                    <div class="tabs__tab__list__item">
+                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycRegistrationProof'">UPLOAD</button>
+                      <span v-else>{{ document.status }}</span>
+                    </div>
+                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
+                    <div class="tabs__tab__list__item">-</div>
+                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
+                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW REGISTRATION PROOF DOCUMENT' }}</div>
+                    <div class="tabs__tab__kyc__list__line"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -543,7 +558,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import AccountApi from '@/service/account';
 import {
   Account, ServerResponse,
 } from '@/model';
@@ -561,8 +575,18 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
-import Modal from '../../components/Modal.vue';
+import AccountApi from '@/service/account';
+import { EnumCustomerType } from '@/model/account';
+import {
+  EnumKycDocumentStatus,
+  EnumKycDocumentType,
+  KycDocument,
+  KycDocumentCommand,
+  KycDocumentPageCommand,
+} from '@/model/kyc-document';
 import ProfileApi from '../../service/profile';
+import KycDocumentApi from '../../service/kyc-document';
+import Modal from '../../components/Modal.vue';
 
 extend('required', required);
 extend('email', email);
@@ -603,6 +627,10 @@ export default class DashboardHome extends Vue {
 
   profileApi: ProfileApi;
 
+  kycDocumentApi: KycDocumentApi;
+
+  kycDocuments: KycDocument[] | null;
+
   // temporarily? using the following array of countries to populate options of country-select inputs
   // eslint-disable-next-line
   countries: string[] = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova", "Monaco", "Montenegro", "The Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City",];
@@ -631,16 +659,27 @@ export default class DashboardHome extends Vue {
     this.modalToShow = '';
 
     this.profileApi = new ProfileApi();
+
+    this.kycDocumentApi = new KycDocumentApi();
+
+    this.kycDocuments = null;
   }
 
   mounted(): void {
     this.loadUserData();
+    this.loadKycDocuments();
   }
 
   loadUserData() {
     this.accountApi.getUserData().then((response: ServerResponse<Account>) => {
       console.log(response);
       this.userData = response.result;
+    });
+  }
+
+  loadKycDocuments() {
+    this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((documentsResponse) => {
+      this.kycDocuments = documentsResponse.result.items;
     });
   }
 
@@ -693,11 +732,12 @@ export default class DashboardHome extends Vue {
   }
 
   onModalSubmit(modalData) {
+    console.log('submit');
     switch (modalData.modalId) {
       // UPDATE IMAGE, USERNAME, FULLNAME, COMPANY EMAIL
       case 'image':
       case 'username':
-      case 'fullname':
+      case 'fullName':
       case 'companyEmail': {
         // create the data object for POST request
         // by iterating through modal's inputs IDs & values
@@ -720,7 +760,53 @@ export default class DashboardHome extends Vue {
       }
 
       // KYC
-      case 'kycIdentity': {
+      case 'kycIdentityProof': {
+        console.log('kkkkyyccc');
+        const file = modalData.inputValues[0].value;
+        const comments = modalData.inputValues[1].value;
+        const documentPage: KycDocumentPageCommand = {
+          customerType: EnumCustomerType.PROVIDER,
+          comment: comments,
+        };
+        console.log(file, comments);
+
+        this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((resp) => {
+          // CREATED documents of IDENTITY_PROOF
+          const documentsIdentityCreated = resp.result.items
+            .filter((x) => x.type === EnumKycDocumentType.IDENTITY_PROOF && x.status === EnumKycDocumentStatus.CREATED);
+
+          // if document exists
+          if (documentsIdentityCreated.length) {
+            console.log('document exists');
+            const documentId = documentsIdentityCreated[0].id;
+            this.kycDocumentApi.addPage(documentId, documentPage, file).then((addPageResponse) => {
+              console.log(addPageResponse);
+              if (addPageResponse.success) {
+                console.log('page was successfully added to document!');
+              }
+            });
+          } else {
+          // if document does not exist
+            console.log('document does not exist');
+            const document: KycDocumentCommand = {
+              customerType: EnumCustomerType.PROVIDER,
+              type: EnumKycDocumentType.IDENTITY_PROOF,
+            };
+            this.kycDocumentApi.createDocument(document).then((createDocumentResponse) => {
+              if (createDocumentResponse.success) {
+                console.log('document created successfully!');
+                const documentId = createDocumentResponse.result.id;
+                this.kycDocumentApi.addPage(documentId, documentPage, file).then((addPageResponse) => {
+                  console.log(addPageResponse);
+                  if (addPageResponse.success) {
+                    console.log('page was successfully added to document!');
+                  }
+                });
+              }
+            });
+          }
+        });
+
         break;
       }
       default:

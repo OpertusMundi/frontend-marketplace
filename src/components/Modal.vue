@@ -110,7 +110,7 @@ export default class Modal extends Vue {
     font-size: 2em;
   }
   &__wrapper {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
