@@ -36,22 +36,22 @@
               <div class="tabs__tab tabs__tab__tab-general">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Image</strong></div>
-                  <div class="tabs__tab__list__item"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image" style="border-radius: 50%"></div>
+                  <div class="tabs__tab__list__item right"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image" style="border-radius: 50%"></div>
                   <div class="tabs__tab__list__item" @click="modalToShow = 'image'">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Username</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.username }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.username }}</div>
                   <div class="tabs__tab__list__item" @click="modalToShow = 'username'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Full name</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
                   <div class="tabs__tab__list__item" @click="modalToShow = 'fullName'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Company email</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.email }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.email }}</div>
                   <div class="tabs__tab__list__item" @click="modalToShow = 'companyEmail'">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -75,7 +75,7 @@
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Mobile number</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.mobile }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.mobile }}</div>
                   <div class="tabs__tab__list__item">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -89,22 +89,22 @@
               <div class="tabs__tab tabs__tab__company_information">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Company name</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.name }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.name }}</div>
                   <div class="tabs__tab__list__item">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>VAT number</strong></div>
-                  <div class="tabs__tab__list__item">123456789 (dummy)</div>
+                  <div class="tabs__tab__list__item right">123456789 (dummy)</div>
                   <div class="tabs__tab__list__item">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Domain</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.companyType }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.companyType }}</div>
                   <div class="tabs__tab__list__item">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Country</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.headquartersAddress.country }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.headquartersAddress.country }}</div>
                   <div class="tabs__tab__list__item">EDIT</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -118,7 +118,7 @@
               <div class="tabs__tab tabs__tab__payout_options">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>IBAN</strong></div>
-                  <div class="tabs__tab__list__item">{{ userData.profile.provider.current.bankAccount.iban }}</div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.iban }}</div>
                   <div class="tabs__tab__list__item">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -132,7 +132,7 @@
               <div class="tabs__tab tabs__tab__addresses">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>ADDRESS 1</strong> (json: headquartersAddress)</div>
-                  <div class="tabs__tab__list__item">
+                  <div class="tabs__tab__list__item right">
                     {{ userData.profile.provider.current.headquartersAddress.line1 + ', ' + userData.profile.provider.current.headquartersAddress.city + ', ' + userData.profile.provider.current.headquartersAddress.country + userData.profile.provider.current.headquartersAddress.postalCode }}
                   </div>
                   <div class="tabs__tab__list__item">EDIT</div>
@@ -140,7 +140,7 @@
 
                   <div v-if="userData.profile.provider.current.representative.address.line1" class="tabs__tab__ignore-grid-wrapper">
                     <div class="tabs__tab__list__item"><strong>ADDRESS 2</strong> (json: representative)</div>
-                    <div class="tabs__tab__list__item">
+                    <div class="tabs__tab__list__item right">
                       {{ userData.profile.provider.current.representative.address.line1 + ', ' + userData.profile.provider.current.representative.address.city + ', ' + userData.profile.provider.current.representative.address.country + userData.profile.provider.current.representative.address.postalCode }}
                     </div>
                     <div class="tabs__tab__list__item">EDIT</div>
@@ -158,7 +158,7 @@
                 <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
                   <div class="tabs__tab__list">
                     <div class="tabs__tab__list__item"><strong>CARD {{ i + 1 }}</strong></div>
-                    <div class="tabs__tab__list__item">{{ card }} (dummy)</div>
+                    <div class="tabs__tab__list__item right">{{ card }} (dummy)</div>
                     <div class="tabs__tab__list__item">REMOVE</div>
                     <div class="tabs__tab__list__line"></div>
                   </div>
