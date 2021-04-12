@@ -267,25 +267,39 @@
                 </div>
                 <div class="row mt-xs-30">
                   <div class="col-md-4 d-flex flex-column">
-                    <div v-for="(declaration, i) in declarations" :key="i" @click="selectDeclaration(i)" class="tabs__tab__ubo__card" :class="{'tabs__tab__ubo__card--selected': i == selectedDeclaration}">
-                      STATUS: {{ declaration.status }} <br>
-                      ID: {{ declaration.id }} <br>
-                      CREATION DATE: {{ declaration.creationDate }}
+                    <div v-for="(declaration, i) in uboDeclarations" :key="i" @click="selectDeclaration(i)" class="tabs__tab__ubo__card tabs__tab__ubo__card--clickable" :class="{'tabs__tab__ubo__card--selected': i == selectedDeclaration}">
+                      <span><span class="bold">STATUS:</span> {{ declaration.status }}</span>
+                      <span><span class="bold">ID:</span> {{ declaration.id }}</span>
+                      <span><span class="bold">CREATION DATE:</span> {{ declaration.createdOn }}</span>
                     </div>
-                    <button @click="addDeclaration()" class="tabs__tab__ubo__btn">ADD DECLARATION</button>
+                    <button v-if="uboDeclarations && canAddDeclaration()" @click="addDeclaration()" class="tabs__tab__ubo__btn">ADD DECLARATION</button>
                   </div>
                   <div class="col-md-2">
-                    <div v-if="selectedDeclaration !== null">
-                      <div v-for="(ubo, i) in declarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="tabs__tab__ubo__card" :class="{'tabs__tab__ubo__card--selected': i == selectedUbo}">UBO {{ i + 1 }}</div>
-                      <button @click="addUboToDeclaration()" class="tabs__tab__ubo__btn">ADD UBO</button>
+                    <div v-if="areUbosOfDeclarationLoaded">
+                      <div v-for="(ubo, i) in uboDeclarations[selectedDeclaration].ubos" :key="i" class="tabs__tab__ubo__card">
+                        <span class="title">UBO {{ i + 1 }}</span>
+                        <span><span class="bold">ID:</span> {{ ubo.id }} </span>
+                        <span><span class="bold">FIRST NAME:</span> {{ ubo.firstName }}</span>
+                        <span><span class="bold">LAST NAME:</span> {{ ubo.lastName }} </span>
+                        <span><span class="bold">ADDRESS:</span> {{ ubo.address.line1 + ', ' + (ubo.address.line2? ubo.address.line2 + ', ' : '') + ubo.address.postalCode + ', ' + ubo.address.city + ', ' + ubo.address.region + ', ' + ubo.address.country }} </span>
+                        <span><span class="bold">NATIONALITY:</span> {{ ubo.nationality }} </span>
+                        <span><span class="bold">BIRTHDATE:</span> {{ ubo.birthdate }} </span>
+                        <span><span class="bold">BIRTHPLACE:</span> {{ ubo.birthplace.city + ', ' + ubo.birthplace.country }} </span>
+                      </div>
+                      <div v-if="showUboForm" class="tabs__tab__ubo__card tabs__tab__ubo__card--selected">
+                        <span class="ubo-title">
+                          UBO {{ uboDeclarations[selectedDeclaration].ubos? uboDeclarations[selectedDeclaration].ubos.length + 1 : 1 }}
+                        </span>
+                      </div>
+                      <button @click="addUboToDeclaration()" v-if="canAddUbo()" :disabled="showUboForm" class="tabs__tab__ubo__btn">ADD UBO</button>
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div v-if="selectedDeclaration !== null && declarations[selectedDeclaration].ubos[selectedUbo]">
+                    <div v-if="showUboForm">
                       <validation-provider v-slot="{ errors }" name="Last name" rules="required">
                         <div class="form-group">
                           <label for="last_name">Last name*</label>
-                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].lastName" type="text" class="form-group__text" name="last_name" id="last_name">
+                          <input v-model="uboToAdd.lastName" type="text" class="form-group__text" name="last_name" id="last_name">
                           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                         </div>
                       </validation-provider>
@@ -293,7 +307,7 @@
                       <validation-provider v-slot="{ errors }" name="First Name" rules="required">
                         <div class="form-group">
                           <label for="firstName">First name*</label>
-                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].firstName" type="text" class="form-group__text" name="firstName" id="firstName">
+                          <input v-model="uboToAdd.firstName" type="text" class="form-group__text" name="firstName" id="firstName">
                           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                         </div>
                       </validation-provider>
@@ -301,7 +315,7 @@
                       <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
                         <div class="form-group">
                           <label for="address_line_1">Address Line 1*</label>
-                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine1" type="text" class="form-group__text" name="address_line_1" id="address_line_1">
+                          <input v-model="uboToAdd.address.line1" type="text" class="form-group__text" name="address_line_1" id="address_line_1">
                           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                         </div>
                       </validation-provider>
@@ -309,7 +323,7 @@
                       <validation-provider v-slot="{ errors }" name="Address Line 2">
                         <div class="form-group">
                           <label for="address_line_2">Address Line 2</label>
-                          <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].addressLine2" type="text" class="form-group__text" name="address_line_2" id="address_line_2">
+                          <input v-model="uboToAdd.address.line2" type="text" class="form-group__text" name="address_line_2" id="address_line_2">
                           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                         </div>
                       </validation-provider>
@@ -319,7 +333,7 @@
                           <validation-provider v-slot="{ errors }" name="Country" rules="required">
                             <div class="form-group">
                               <label for="country">Country *</label>
-                              <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].country" class="form-group__select" name="country" id="country">
+                              <select v-model="uboToAdd.address.country" class="form-group__select" name="country" id="country">
                                 <option v-for="country in countries" :key="country"> {{country}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -331,7 +345,7 @@
                           <validation-provider v-slot="{ errors }" name="Region" rules="required">
                             <div class="form-group">
                               <label for="region">Region *</label>
-                              <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].region" type="text" class="form-group__text" name="region" id="region">
+                              <input v-model="uboToAdd.address.region" type="text" class="form-group__text" name="region" id="region">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
                           </validation-provider>
@@ -343,7 +357,7 @@
                           <validation-provider v-slot="{ errors }" name="City" rules="required">
                             <div class="form-group">
                               <label for="city">City *</label>
-                              <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].city" type="text" class="form-group__text" name="city" id="city">
+                              <input v-model="uboToAdd.address.city" type="text" class="form-group__text" name="city" id="city">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
                           </validation-provider>
@@ -353,7 +367,7 @@
                           <validation-provider v-slot="{ errors }" name="Zip code" rules="required">
                             <div class="form-group">
                               <label for="zipCode">Zip code *</label>
-                              <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].zipCode" type="text" class="form-group__text" name="zipCode" id="zipCode">
+                              <input v-model="uboToAdd.address.postalCode" type="text" class="form-group__text" name="zipCode" id="zipCode">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
                           </validation-provider>
@@ -365,7 +379,7 @@
                           <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                             <div class="form-group">
                               <label for="birthdate">Birthdate *</label>
-                              <input type="date" v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthdate" class="form-group__text" name="birthdate" id="birthdate">
+                              <input type="date" v-model="uboToAdd.birthdate" class="form-group__text" name="birthdate" id="birthdate">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
                           </validation-provider>
@@ -375,7 +389,7 @@
                           <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
                             <div class="form-group">
                               <label for="nationality">Nationality *</label>
-                              <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].nationality" class="form-group__select" name="nationality" id="nationality">
+                              <select v-model="uboToAdd.nationality" class="form-group__select" name="nationality" id="nationality">
                                 <option v-for="country in countries" :key="country"> {{country}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -389,7 +403,7 @@
                           <validation-provider v-slot="{ errors }" name="Birthplace City" rules="required">
                             <div class="form-group">
                               <label for="birthplaceCity">Birthplace city *</label>
-                              <input v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCity" type="text" class="form-group__text" name="birthplaceCity" id="birthplaceCity">
+                              <input v-model="uboToAdd.birthplace.city" type="text" class="form-group__text" name="birthplaceCity" id="birthplaceCity">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
                           </validation-provider>
@@ -399,7 +413,7 @@
                           <validation-provider v-slot="{ errors }" name="Birthplace Country" rules="required">
                             <div class="form-group">
                               <label for="birthplaceCountry">Birthplace country *</label>
-                              <select v-model="declarations[selectedDeclaration].ubos[selectedUbo].birthplaceCountry" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
+                              <select v-model="uboToAdd.birthplace.country" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
                                 <option v-for="country in countries" :key="country"> {{country}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -408,15 +422,188 @@
                         </div>
                       </div>
 
-                      <button class="btn--std btn--outlinedark">CANCEL</button>
-                      <button class="btn--std btn--dark ml-xs-20">ADD UBO</button>
-
+                      <button class="btn--std btn--outlinedark" @click="showUboForm = false">CANCEL</button>
+                      <button class="btn--std btn--dark ml-xs-20" @click="submitUbo">ADD UBO</button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </transition>
+
+          <!-- <transition name="fade" mode="out-in">
+            <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'ubo'">
+              <div class="tabs__tab tabs__tab__ubo">
+                <div>
+                  UBO declaration is replacing the manual shareholder declaration. <br>
+                  For each declaration you need to create <strong>1 - 4 UBOs</strong>.
+                </div>
+                <div class="row mt-xs-30">
+                  <div class="col-md-4 d-flex flex-column">
+                    <div v-for="(declaration, i) in uboDeclarations" :key="i" @click="selectDeclaration(i)" class="tabs__tab__ubo__card" :class="{'tabs__tab__ubo__card--selected': i == selectedDeclaration}">
+                      STATUS: {{ declaration.status }} <br>
+                      ID: {{ declaration.id }} <br>
+                      CREATION DATE: {{ declaration.createdOn }}
+                    </div>
+                    <button v-if="uboDeclarations" @click="addDeclaration()" class="tabs__tab__ubo__btn">ADD DECLARATION</button>
+                  </div>
+                  <div class="col-md-2">
+                    <div v-if="selectedDeclaration !== null">
+                      <div v-for="(ubo, i) in uboDeclarations[selectedDeclaration].ubos" :key="i" @click="selectUbo(i)" class="tabs__tab__ubo__card">
+                        <span class="ubo-title">UBO {{ i + 1 }}</span>
+                        <span><span class="ubo-bold">ID:</span> {{ ubo.id }} </span>
+                        <span><span class="ubo-bold">FIRST NAME:</span> {{ ubo.firstName }}</span>
+                        <span><span class="ubo-bold">LAST NAME:</span> {{ ubo.lastName }} </span>
+                        <span><span class="ubo-bold">ADDRESS:</span> {{ ubo.address.line1 + ', ' + (ubo.address.line2? ubo.address.line2 + ', ' : '') + ubo.address.postalCode + ', ' + ubo.address.city + ', ' + ubo.address.region + ', ' + ubo.address.country }} </span>
+                        <span><span class="ubo-bold">NATIONALITY:</span> {{ ubo.nationality }} </span>
+                        <span><span class="ubo-bold">BIRTHDATE:</span> {{ ubo.birthdate }} </span>
+                        <span><span class="ubo-bold">BIRTHPLACE:</span> {{ ubo.birthplace.city + ', ' + ubo.birthplace.country }} </span>
+                      </div>
+                      <div v-if="showUboForm" class="tabs__tab__ubo__card tabs__tab__ubo__card--selected">
+                        <span class="ubo-title">
+                          UBO {{ uboDeclarations[selectedDeclaration].ubos.length + 1 }}
+                        </span>
+                      </div>
+                      <button @click="addUboToDeclaration()" :disabled="showUboForm" class="tabs__tab__ubo__btn">ADD UBO</button>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div v-if="showUboForm">
+                      <validation-provider v-slot="{ errors }" name="Last name" rules="required">
+                        <div class="form-group">
+                          <label for="last_name">Last name*</label>
+                          <input v-model="uboToAdd.lastName" type="text" class="form-group__text" name="last_name" id="last_name">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+
+                      <validation-provider v-slot="{ errors }" name="First Name" rules="required">
+                        <div class="form-group">
+                          <label for="firstName">First name*</label>
+                          <input v-model="uboToAdd.firstName" type="text" class="form-group__text" name="firstName" id="firstName">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+
+                      <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                        <div class="form-group">
+                          <label for="address_line_1">Address Line 1*</label>
+                          <input v-model="uboToAdd.address.line1" type="text" class="form-group__text" name="address_line_1" id="address_line_1">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+
+                      <validation-provider v-slot="{ errors }" name="Address Line 2">
+                        <div class="form-group">
+                          <label for="address_line_2">Address Line 2</label>
+                          <input v-model="uboToAdd.address.line2" type="text" class="form-group__text" name="address_line_2" id="address_line_2">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        </div>
+                      </validation-provider>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                            <div class="form-group">
+                              <label for="country">Country *</label>
+                              <select v-model="uboToAdd.address.country" class="form-group__select" name="country" id="country">
+                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                              </select>
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                            <div class="form-group">
+                              <label for="region">Region *</label>
+                              <input v-model="uboToAdd.address.region" type="text" class="form-group__text" name="region" id="region">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="City" rules="required">
+                            <div class="form-group">
+                              <label for="city">City *</label>
+                              <input v-model="uboToAdd.address.city" type="text" class="form-group__text" name="city" id="city">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Zip code" rules="required">
+                            <div class="form-group">
+                              <label for="zipCode">Zip code *</label>
+                              <input v-model="uboToAdd.address.postalCode" type="text" class="form-group__text" name="zipCode" id="zipCode">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
+                            <div class="form-group">
+                              <label for="birthdate">Birthdate *</label>
+                              <input type="date" v-model="uboToAdd.birthdate" class="form-group__text" name="birthdate" id="birthdate">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
+                            <div class="form-group">
+                              <label for="nationality">Nationality *</label>
+                              <select v-model="uboToAdd.nationality" class="form-group__select" name="nationality" id="nationality">
+                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                              </select>
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Birthplace City" rules="required">
+                            <div class="form-group">
+                              <label for="birthplaceCity">Birthplace city *</label>
+                              <input v-model="uboToAdd.birthplace.city" type="text" class="form-group__text" name="birthplaceCity" id="birthplaceCity">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+
+                        <div class="col-md-6">
+                          <validation-provider v-slot="{ errors }" name="Birthplace Country" rules="required">
+                            <div class="form-group">
+                              <label for="birthplaceCountry">Birthplace country *</label>
+                              <select v-model="uboToAdd.birthplace.country" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
+                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                              </select>
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+
+                      <button class="btn--std btn--outlinedark" @click="showUboForm = false">CANCEL</button>
+                      <button class="btn--std btn--dark ml-xs-20" @click="submitUbo">ADD UBO</button>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition> -->
         </div>
 
         <!-- <div class="settings__grid">
@@ -584,8 +771,12 @@ import {
   KycDocumentCommand,
   KycDocumentPageCommand,
 } from '@/model/kyc-document';
+import {
+  UboDeclaration, UboCommand,
+} from '@/model/ubo-declaration';
 import ProfileApi from '../../service/profile';
 import KycDocumentApi from '../../service/kyc-document';
+import UboDeclarationApi from '../../service/ubo-declaration';
 import Modal from '../../components/Modal.vue';
 
 extend('required', required);
@@ -615,14 +806,6 @@ export default class DashboardHome extends Vue {
 
   isKycValidated: boolean;
 
-  declarations: any;
-
-  selectedDeclaration: null | number;
-
-  selectedUbo: number;
-
-  showUboForm: boolean;
-
   modalToShow: string;
 
   profileApi: ProfileApi;
@@ -630,6 +813,20 @@ export default class DashboardHome extends Vue {
   kycDocumentApi: KycDocumentApi;
 
   kycDocuments: KycDocument[] | null;
+
+  uboDeclarationApi: UboDeclarationApi;
+
+  uboDeclarations: UboDeclaration[] | null;
+
+  selectedDeclaration: null | number;
+
+  // selectedUbo: number | null;
+
+  areUbosOfDeclarationLoaded: boolean;
+
+  showUboForm: boolean;
+
+  uboToAdd: UboCommand;
 
   // temporarily? using the following array of countries to populate options of country-select inputs
   // eslint-disable-next-line
@@ -646,14 +843,6 @@ export default class DashboardHome extends Vue {
 
     this.isKycValidated = false;
 
-    this.declarations = [];
-
-    this.selectedDeclaration = null;
-
-    this.selectedUbo = 0;
-
-    this.showUboForm = false;
-
     this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
 
     this.modalToShow = '';
@@ -663,11 +852,27 @@ export default class DashboardHome extends Vue {
     this.kycDocumentApi = new KycDocumentApi();
 
     this.kycDocuments = null;
+
+    this.uboDeclarationApi = new UboDeclarationApi();
+
+    // this.uboDeclarations = [];
+    this.uboDeclarations = null;
+
+    this.selectedDeclaration = null;
+
+    this.areUbosOfDeclarationLoaded = false;
+
+    // this.selectedUbo = null;
+
+    this.showUboForm = false;
+
+    this.uboToAdd = this.initUboToAdd();
   }
 
   mounted(): void {
     this.loadUserData();
     this.loadKycDocuments();
+    this.loadUboDeclarations();
   }
 
   loadUserData() {
@@ -683,52 +888,129 @@ export default class DashboardHome extends Vue {
     });
   }
 
+  loadUboDeclarations() {
+    this.uboDeclarationApi.findAll().then((delcarationResponse) => {
+      this.uboDeclarations = delcarationResponse.result.items;
+    });
+  }
+
   selectTab(tab: string): void {
     this.selectedTab = tab;
   }
 
-  addDeclaration(): void {
-    this.selectedUbo = 0;
+  canAddDeclaration(): boolean {
+    const distinctOnlyStatuses = ['CREATED', 'INCOMPLETE', 'VALIDATION_ASKED'];
+    if (!this.uboDeclarations || this.uboDeclarations?.some((x) => distinctOnlyStatuses.includes(x.status))) {
+      return false;
+    }
+    return true;
+  }
 
-    this.declarations.push({
-      status: 'CREATED',
-      id: Math.floor(Math.random() * 10000000000),
-      creationDate: Date.now(),
-      ubos: [],
+  canAddUbo(): boolean {
+    const permittedStatuses = ['CREATED', 'INCOMPLETE'];
+    if (!this.uboDeclarations || this.selectedDeclaration === null || !permittedStatuses.includes(this.uboDeclarations[this.selectedDeclaration].status)) {
+      return false;
+    }
+    return true;
+  }
+
+  addDeclaration(): void {
+    // this.selectedUbo = null;
+
+    this.uboDeclarationApi.createDeclaration().then((declarationResponse) => {
+      const declaration = declarationResponse.result;
+      this.uboDeclarations!.push(declaration);
     });
+
+    // this.uboDeclarations.push({
+    //   status: 'CREATED',
+    //   id: Math.floor(Math.random() * 10000000000),
+    //   creationDate: Date.now(),
+    //   ubos: [],
+    // });
   }
 
   selectDeclaration(i) {
-    if (i !== this.selectedDeclaration) {
-      this.selectedUbo = 0;
-    }
+    this.areUbosOfDeclarationLoaded = false;
+    this.showUboForm = false;
     this.selectedDeclaration = i;
+    const declarationId = this.uboDeclarations![i].id;
+
+    this.uboDeclarationApi.findOne(declarationId).then((declarationResponse) => {
+      if (declarationResponse.success) {
+        if (declarationResponse.result.ubos) {
+          Vue.set(this.uboDeclarations![i], 'ubos', declarationResponse.result.ubos);
+        }
+        this.areUbosOfDeclarationLoaded = true;
+      }
+    });
+
     // this.showUboForm = false;
   }
 
-  selectUbo(i) {
-    this.selectedUbo = i;
-    // this.showUboForm = true;
+  // selectUbo(i) {
+  //   this.selectedUbo = i;
+  //   // this.showUboForm = true;
+  // }
+
+  initUboToAdd(): UboCommand {
+    return {
+      firstName: '',
+      lastName: '',
+      address: {
+        city: '',
+        country: '',
+        line1: '',
+        line2: '',
+        postalCode: '',
+        region: '',
+      },
+      nationality: '',
+      birthdate: '',
+      birthplace: {
+        city: '',
+        country: '',
+      },
+    };
   }
 
   addUboToDeclaration(): void {
-    const uboData = {
-      lastName: '',
-      firstName: '',
-      addressLine1: '',
-      addressLine2: '',
-      country: '',
-      region: '',
-      city: '',
-      zipCode: '',
-      birthdate: '',
-      nationality: '',
-      birthplaceCity: '',
-      birthplaceCountry: '',
-    };
+    // const uboData = {
+    //   lastName: '',
+    //   firstName: '',
+    //   addressLine1: '',
+    //   addressLine2: '',
+    //   country: '',
+    //   region: '',
+    //   city: '',
+    //   zipCode: '',
+    //   birthdate: '',
+    //   nationality: '',
+    //   birthplaceCity: '',
+    //   birthplaceCountry: '',
+    // };
 
-    this.declarations[this.selectedDeclaration!].ubos.push(uboData);
+    // this.uboDeclarations[this.selectedDeclaration!].ubos.push(uboData);
     this.showUboForm = true;
+  }
+
+  submitUbo() {
+    // OVERWRITE FOR DEVELOPMENT PURPOSE
+    this.uboToAdd.birthdate = '2021-04-12T07:13:09Z';
+
+    const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
+    console.log(declarationId);
+    this.uboDeclarationApi.addUbo(declarationId, this.uboToAdd).then((uboResponse) => {
+      console.log(uboResponse);
+      if (uboResponse.success) {
+        if (this.uboDeclarations![this.selectedDeclaration!].ubos) {
+          this.uboDeclarations![this.selectedDeclaration!].ubos.push(uboResponse.result);
+        } else {
+          this.uboDeclarations![this.selectedDeclaration!].ubos = [uboResponse.result];
+        }
+      }
+    });
+    // this.uboDeclarationApi.
   }
 
   onModalSubmit(modalData) {

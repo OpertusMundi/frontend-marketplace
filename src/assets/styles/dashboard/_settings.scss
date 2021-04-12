@@ -95,14 +95,30 @@
         padding: 30px;
         background: #fff;
         letter-spacing: 0.06em;
+        font-size: .8em;
         border: solid 2px $darkColor;
         border-radius: 7px;
         margin-bottom: 15px;
-        cursor: pointer;
+        display: flex;
+        flex-direction: column;
 
         &--selected {
           border: solid 2px $secondColor;
         }
+
+        &--clickable {
+          cursor: pointer;
+        }
+      }
+
+      .title {
+        font-size: 1.2em;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+
+      .bold {
+        font-weight: 800;
       }
     }
 
