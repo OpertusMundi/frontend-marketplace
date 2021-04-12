@@ -8,12 +8,12 @@
 
       <!-- MODALS -->
       <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
-      <Modal v-if="modalToShow == 'image'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]" />
-      <Modal v-if="modalToShow == 'username'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
-      <Modal v-if="modalToShow == 'fullName'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
-      <Modal v-if="modalToShow == 'companyEmail'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
+      <Modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]" />
+      <Modal :show="modalToShow == 'username'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
+      <Modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
+      <Modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
 
-      <Modal v-if="modalToShow == 'kycIdentityProof'" @close="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentityProof'" :inputs="[{id: 'kycIdentityProofFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityProofComments', name: 'Comments', type: 'text'}]" />
+      <Modal :show="modalToShow == 'kycIdentityProof'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentityProof'" :inputs="[{id: 'kycIdentityProofFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityProofComments', name: 'Comments', type: 'text'}]" />
 
       <div class="settings">
         <div class="collection__menu">
