@@ -8,12 +8,31 @@
 
       <!-- MODALS -->
       <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
-      <Modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]" />
-      <Modal :show="modalToShow == 'username'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]" />
-      <Modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]" />
-      <Modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]" />
+      <div v-if="userData">
+        <modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
+        <modal :show="modalToShow == 'username'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]"></modal>
 
-      <Modal :show="modalToShow == 'kycIdentityProof'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Upload identity proof document'" :modalId="'kycIdentityProof'" :inputs="[{id: 'kycIdentityProofFile', name: 'Identity Proof Document', type: 'file', returnType: 'blob'}, {id: 'kycIdentityProofComments', name: 'Comments', type: 'text'}]" />
+        <modal :withSlots="true" :show="modalToShow == 'kycIdentityProof' || modalToShow == 'kycArticlesOfAssociation' || modalToShow == 'kycRegistrationProof'" @dismiss="modalToShow = ''" :modalId="'kycIdentityProof'">
+          <template v-slot:body>
+            <h1>Upload pages</h1>
+
+            <div v-for="kycInput in kycNumberOfInputs" :key="kycInput" class="form-group mt-sm-20">
+              <div><input class="form-group__text input-kyc-file" type="file"></div>
+              <div><input class="form-group__text input-kyc-comments" type="text" placeholder="add comments"></div>
+            </div>
+
+            <button class="btn--std btn--outlineblue" @click="addKycInput">+ add page</button>
+          </template>
+
+          <template v-slot:btn-submit>
+            <button v-if="modalToShow == 'kycIdentityProof'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('identityProof')">submit pages</button>
+            <button v-if="modalToShow == 'kycArticlesOfAssociation'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('articlesOfAssociation')">submit pages</button>
+            <button v-if="modalToShow == 'kycRegistrationProof'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('registrationProof')">submit pages</button>
+          </template>
+        </modal>
+      </div>
 
       <div class="settings">
         <div class="collection__menu">
@@ -37,22 +56,22 @@
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Image</strong></div>
                   <div class="tabs__tab__list__item right"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image" style="border-radius: 50%"></div>
-                  <div class="tabs__tab__list__item" @click="modalToShow = 'image'">CHANGE</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'image'"><span class="clickable">CHANGE</span></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Username</strong></div>
                   <div class="tabs__tab__list__item right">{{ userData.username }}</div>
-                  <div class="tabs__tab__list__item" @click="modalToShow = 'username'">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'username'"><span class="clickable">EDIT</span></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Full name</strong></div>
                   <div class="tabs__tab__list__item right">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
-                  <div class="tabs__tab__list__item" @click="modalToShow = 'fullName'">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'fullName'"><span class="clickable">EDIT</span></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Company email</strong></div>
                   <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.email }}</div>
-                  <div class="tabs__tab__list__item" @click="modalToShow = 'companyEmail'">EDIT</div>
+                  <div class="tabs__tab__list__item" @click="modalToShow = 'companyEmail'"><span class="clickable">EDIT</span></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -187,72 +206,76 @@
                     <p class="mt-xs-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
 
                   </div>
-                  <div class="col-md-7 d-flex flex-column">
+                  <div class="col-md-7 d-flex flex-column" v-if="kycDocuments">
                     <span class="text-black"><strong>Vendor validation status</strong></span>
-                    <div class="mt-xs-20"><span class="tabs__tab__kyc__status-label" :class="isKycValidated? 'tabs__tab__kyc__status-label--validated' : 'tabs__tab__kyc__status-label--not-validated'">NOT KYC VALIDATED</span></div>
-                    <div class="mt-xs-30 d-flex">
+                    <div class="mt-xs-20"><span class="tabs__tab__kyc__status-label" :class="isVendorKycValidated()? 'tabs__tab__kyc__status-label--validated' : 'tabs__tab__kyc__status-label--not-validated'">NOT KYC VALIDATED</span></div>
+                    <div class="mt-xs-30 d-flex" v-if="!isVendorKycValidated()">
                       <div class="font-weight-500">Issues:</div>
                       <div class="ml-xs-20">
-                        <p class="mb-xs-5">Missing Identity proof document</p>
-                        <p class="mb-xs-5">Missing Articles of association document</p>
-                        <p class="mb-xs-5">Missing Registration proof document</p>
+                        <p v-if="!kycDocuments.filter(x => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Identity proof document</p>
+                        <p v-if="!kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Articles of association document</p>
+                        <p v-if="!kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Registration proof document</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="tabs__tab__kyc__list mt-xs-40">
-                  <div class="tabs__tab__kyc__list__header-item">TYPE</div>
-                  <div class="tabs__tab__kyc__list__header-item">STATUS</div>
-                  <div class="tabs__tab__kyc__list__header-item">REFUSAL REASON</div>
-                  <div class="tabs__tab__kyc__list__header-item">ID</div>
-                  <div class="tabs__tab__kyc__list__header-item">CREATION DATE</div>
-                  <div class="tabs__tab__kyc__list__header-item">PROCESSED DATE</div>
-                  <div class="tabs__tab__kyc__list__header-item"></div>
-                  <div class="tabs__tab__kyc__list__line"></div>
-
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'IDENTITY_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div class="tabs__tab__list__item"><strong>Identity proof*</strong></div>
-                    <div class="tabs__tab__list__item">
-                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycIdentityProof'">UPLOAD</button>
-                      <span v-else>{{ document.status }}</span>
+                <div class="tabs__tab__kyc__list mt-xs-30">
+                  <!-- identity proof -->
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycIdentityProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Identity proof *</h3>
+                  </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'IDENTITY_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div class="mr-xs-40">{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
                     </div>
-                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
-                    <div class="tabs__tab__list__item">-</div>
-                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW IDENTITY PROOF DOCUMENT' }}</div>
-                    <div class="tabs__tab__kyc__list__line"></div>
+                  </div>
+                  <hr>
+
+                  <!-- articles of association -->
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycArticlesOfAssociation'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Articles of Association *</h3>
+                  </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div>{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
+                    </div>
+                  </div>
+                  <hr>
+
+                  <!-- registration proof -->
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycRegistrationProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Registration proof *</h3>
+                  </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div>{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
+                    </div>
                   </div>
 
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div class="tabs__tab__list__item"><strong>Articles of association*</strong></div>
-                    <div class="tabs__tab__list__item">
-                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycArticlesOfAssociation'">UPLOAD</button>
-                      <span v-else>{{ document.status }}</span>
-                    </div>
-                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
-                    <div class="tabs__tab__list__item">-</div>
-                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW ARTICLES OF ASSOCIATION DOCUMENT' }}</div>
-                    <div class="tabs__tab__kyc__list__line"></div>
-                  </div>
-
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div class="tabs__tab__list__item"><strong>Registration proof*</strong></div>
-                    <div class="tabs__tab__list__item">
-                      <button v-if="document.status == 'CREATED'" @click="modalToShow = 'kycRegistrationProof'">UPLOAD</button>
-                      <span v-else>{{ document.status }}</span>
-                    </div>
-                    <div class="tabs__tab__list__item">{{ document.refusedReasonType }}</div>
-                    <div class="tabs__tab__list__item">-</div>
-                    <div class="tabs__tab__list__item">{{ document.createdOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.processedOn }}</div>
-                    <div class="tabs__tab__list__item">{{ document.status == 'CREATED'? '' : 'ADD NEW REGISTRATION PROOF DOCUMENT' }}</div>
-                    <div class="tabs__tab__kyc__list__line"></div>
-                  </div>
                 </div>
+
               </div>
             </div>
           </transition>
@@ -765,7 +788,6 @@ import en from 'vee-validate/dist/locale/en.json';
 import AccountApi from '@/service/account';
 import { EnumCustomerType } from '@/model/account';
 import {
-  EnumKycDocumentStatus,
   EnumKycDocumentType,
   KycDocument,
   KycDocumentCommand,
@@ -804,8 +826,6 @@ export default class DashboardHome extends Vue {
 
   cards: string [];
 
-  isKycValidated: boolean;
-
   modalToShow: string;
 
   profileApi: ProfileApi;
@@ -813,6 +833,9 @@ export default class DashboardHome extends Vue {
   kycDocumentApi: KycDocumentApi;
 
   kycDocuments: KycDocument[] | null;
+
+  kycNumberOfInputs: number;
+  // kycPageInputs: {file: File, comments: string}[];
 
   uboDeclarationApi: UboDeclarationApi;
 
@@ -841,8 +864,6 @@ export default class DashboardHome extends Vue {
 
     this.selectedTab = 'general';
 
-    this.isKycValidated = false;
-
     this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
 
     this.modalToShow = '';
@@ -852,6 +873,8 @@ export default class DashboardHome extends Vue {
     this.kycDocumentApi = new KycDocumentApi();
 
     this.kycDocuments = null;
+
+    this.kycNumberOfInputs = 1;
 
     this.uboDeclarationApi = new UboDeclarationApi();
 
@@ -875,20 +898,112 @@ export default class DashboardHome extends Vue {
     this.loadUboDeclarations();
   }
 
-  loadUserData() {
+  loadUserData(): void {
     this.accountApi.getUserData().then((response: ServerResponse<Account>) => {
-      console.log(response);
       this.userData = response.result;
     });
   }
 
-  loadKycDocuments() {
+  loadKycDocuments(): void {
     this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
     });
   }
 
-  loadUboDeclarations() {
+  isVendorKycValidated():boolean {
+    // eslint-disable-next-line
+    if (!this.kycDocuments!.filter((x) => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')) {
+      return false;
+    }
+    return true;
+  }
+
+  addKycInput(): void {
+    this.kycNumberOfInputs += 1;
+  }
+
+  /*
+    TO DO:
+    should handle cases in which document is created but pages where NOT uploaded (e.g. due to file size or no file selection)
+    either
+    1) delete document on upload failure OR
+    2) on next pages upload, first check if document is already created before creating new
+  */
+  onSubmitKycPages(documentTypeString: string): void {
+    const files = [...this.$el.querySelectorAll('.input-kyc-file')].map((x) => (x as any).files[0]);
+    const comments = [...this.$el.querySelectorAll('.input-kyc-comments')].map((x) => (x as any).value);
+
+    const data: {file: File, comments: string}[] = [];
+    files.forEach((x, i) => {
+      data.push({ file: x, comments: comments[i] });
+    });
+    console.log(data);
+
+    let documentType;
+    switch (documentTypeString) {
+      case 'identityProof': {
+        documentType = EnumKycDocumentType.IDENTITY_PROOF;
+        break;
+      }
+      case 'articlesOfAssociation': {
+        documentType = EnumKycDocumentType.ARTICLES_OF_ASSOCIATION;
+        break;
+      }
+      case 'registrationProof': {
+        documentType = EnumKycDocumentType.REGISTRATION_PROOF;
+        break;
+      }
+      default:
+    }
+
+    // ATTENTION: it currently creates only PROVIDER document
+    const document: KycDocumentCommand = {
+      customerType: EnumCustomerType.PROVIDER,
+      type: documentType,
+    };
+
+    // CREATE DOCUMENT
+    this.kycDocumentApi.createDocument(document).then((createDocumentResponse) => {
+      if (createDocumentResponse.success) { // document created successfully
+        console.log('document created successfully!');
+        const documentId = createDocumentResponse.result.id;
+
+        const addPagePromises: any = [];
+        data.forEach((x) => {
+          const documentPage: KycDocumentPageCommand = {
+            customerType: EnumCustomerType.PROVIDER,
+            comment: x.comments,
+          };
+          addPagePromises.push(this.kycDocumentApi.addPage(documentId, documentPage, x.file));
+        });
+
+        // ADD PAGES IN DOCUMENT
+        Promise.all(addPagePromises).then((addPagesResponse) => {
+          console.log(addPagesResponse);
+          if (addPagesResponse.some((x) => (x as any).success !== true)) {
+            console.log('at least one page was not uploaded in document', addPagesResponse);
+          } else {
+            console.log('pages added successfully');
+
+            // SUBMIT DOCUMENT FOR VALIDATION
+            this.kycDocumentApi.submitDocument(documentId, document).then((submitDocumentResponse) => {
+              if (submitDocumentResponse.success) {
+                console.log('document submitted successfully!');
+                // eslint-disable-next-line
+                this.kycDocuments!.push(submitDocumentResponse.result);
+              } else {
+                console.log('error submitting document', submitDocumentResponse);
+              }
+            });
+          }
+        });
+      } else { // error creating document
+        console.log('error creating document', createDocumentResponse);
+      }
+    });
+  }
+
+  loadUboDeclarations(): void {
     this.uboDeclarationApi.findAll().then((delcarationResponse) => {
       this.uboDeclarations = delcarationResponse.result.items;
     });
@@ -919,6 +1034,7 @@ export default class DashboardHome extends Vue {
 
     this.uboDeclarationApi.createDeclaration().then((declarationResponse) => {
       const declaration = declarationResponse.result;
+      // eslint-disable-next-line
       this.uboDeclarations!.push(declaration);
     });
 
@@ -930,15 +1046,17 @@ export default class DashboardHome extends Vue {
     // });
   }
 
-  selectDeclaration(i) {
+  selectDeclaration(i: number): void {
     this.areUbosOfDeclarationLoaded = false;
     this.showUboForm = false;
     this.selectedDeclaration = i;
+    // eslint-disable-next-line
     const declarationId = this.uboDeclarations![i].id;
 
     this.uboDeclarationApi.findOne(declarationId).then((declarationResponse) => {
       if (declarationResponse.success) {
         if (declarationResponse.result.ubos) {
+          // eslint-disable-next-line
           Vue.set(this.uboDeclarations![i], 'ubos', declarationResponse.result.ubos);
         }
         this.areUbosOfDeclarationLoaded = true;
@@ -994,18 +1112,22 @@ export default class DashboardHome extends Vue {
     this.showUboForm = true;
   }
 
-  submitUbo() {
+  submitUbo(): void {
     // OVERWRITE FOR DEVELOPMENT PURPOSE
     this.uboToAdd.birthdate = '2021-04-12T07:13:09Z';
 
+    // eslint-disable-next-line
     const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
     console.log(declarationId);
     this.uboDeclarationApi.addUbo(declarationId, this.uboToAdd).then((uboResponse) => {
       console.log(uboResponse);
       if (uboResponse.success) {
+        // eslint-disable-next-line
         if (this.uboDeclarations![this.selectedDeclaration!].ubos) {
+          // eslint-disable-next-line
           this.uboDeclarations![this.selectedDeclaration!].ubos.push(uboResponse.result);
         } else {
+          // eslint-disable-next-line
           this.uboDeclarations![this.selectedDeclaration!].ubos = [uboResponse.result];
         }
       }
@@ -1013,7 +1135,8 @@ export default class DashboardHome extends Vue {
     // this.uboDeclarationApi.
   }
 
-  onModalSubmit(modalData) {
+  // eslint-disable-next-line
+  onModalSubmit(modalData: any): void {
     console.log('submit');
     switch (modalData.modalId) {
       // UPDATE IMAGE, USERNAME, FULLNAME, COMPANY EMAIL
@@ -1038,57 +1161,6 @@ export default class DashboardHome extends Vue {
         }).catch((err) => {
           console.log(err);
         });
-        break;
-      }
-
-      // KYC
-      case 'kycIdentityProof': {
-        console.log('kkkkyyccc');
-        const file = modalData.inputValues[0].value;
-        const comments = modalData.inputValues[1].value;
-        const documentPage: KycDocumentPageCommand = {
-          customerType: EnumCustomerType.PROVIDER,
-          comment: comments,
-        };
-        console.log(file, comments);
-
-        this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((resp) => {
-          // CREATED documents of IDENTITY_PROOF
-          const documentsIdentityCreated = resp.result.items
-            .filter((x) => x.type === EnumKycDocumentType.IDENTITY_PROOF && x.status === EnumKycDocumentStatus.CREATED);
-
-          // if document exists
-          if (documentsIdentityCreated.length) {
-            console.log('document exists');
-            const documentId = documentsIdentityCreated[0].id;
-            this.kycDocumentApi.addPage(documentId, documentPage, file).then((addPageResponse) => {
-              console.log(addPageResponse);
-              if (addPageResponse.success) {
-                console.log('page was successfully added to document!');
-              }
-            });
-          } else {
-          // if document does not exist
-            console.log('document does not exist');
-            const document: KycDocumentCommand = {
-              customerType: EnumCustomerType.PROVIDER,
-              type: EnumKycDocumentType.IDENTITY_PROOF,
-            };
-            this.kycDocumentApi.createDocument(document).then((createDocumentResponse) => {
-              if (createDocumentResponse.success) {
-                console.log('document created successfully!');
-                const documentId = createDocumentResponse.result.id;
-                this.kycDocumentApi.addPage(documentId, documentPage, file).then((addPageResponse) => {
-                  console.log(addPageResponse);
-                  if (addPageResponse.success) {
-                    console.log('page was successfully added to document!');
-                  }
-                });
-              }
-            });
-          }
-        });
-
         break;
       }
       default:
