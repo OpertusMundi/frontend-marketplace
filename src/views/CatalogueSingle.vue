@@ -321,6 +321,7 @@
         </div>
         <div class="asset__sidebar">
           <div class="asset__shopcard">
+            <button @click="toggleSelectAreaModal" class="mb-xs-20">show 'select areas' dummy button</button>
             <div class="asset__shopcard__variations">
               <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
                 <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
@@ -595,6 +596,9 @@
         </div>
       </div>
     </div>
+
+    <!-- MODALS -->
+    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal"></select-areas>
   </div>
 </template>
 
@@ -626,6 +630,7 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 
 import mockMetadata from '../service/mock-data/vector-metadata';
 /* */
+import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 
 @Component({
   components: {
@@ -635,6 +640,7 @@ import mockMetadata from '../service/mock-data/vector-metadata';
     LPolygon,
     LGeoJson,
     JsonViewer,
+    SelectAreas,
   },
   filters: {
     format_date(value) {
@@ -688,6 +694,8 @@ export default class CatalogueSingle extends Vue {
 
   metadata: any;
 
+  isSelectAreasModalOn: boolean;
+
   constructor() {
     super();
 
@@ -717,6 +725,7 @@ export default class CatalogueSingle extends Vue {
     };
 
     this.metadata = null;
+    this.isSelectAreasModalOn = false;
   }
 
   mounted():void {
@@ -813,6 +822,10 @@ export default class CatalogueSingle extends Vue {
       });
   }
 
+  toggleSelectAreaModal(): void {
+    this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
+  }
+
   initMap(): void {
     this.map.show = true;
     // this.map.coordinates_type = this.catalogueItem.geometry.type;
@@ -835,6 +848,7 @@ export default class CatalogueSingle extends Vue {
     this.map.center = polygon.getBounds().getCenter();
   }
 
+  // eslint-disable-next-line
   heatmapStyle(feature: any): any {
     return {
       fillColor: feature.properties.fill,
