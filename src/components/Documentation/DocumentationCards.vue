@@ -5,8 +5,6 @@
       <div class="documentation-items__subtitle">{{ subtitle }}</div>
       <div class="documentation-items__holder">
         <documentation-card :item=item :index=index  v-for="(item, index) in items" v-bind:key="`${index}_doc_item`"></documentation-card>
-
-
       </div>
     </div>
   </div>

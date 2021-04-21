@@ -76,9 +76,8 @@ export default class Faq extends Vue {
     this.initAOS();
     window.addEventListener('scroll', this.changeActiveSideItem);
     axios
-      .get(`http://om-docs.bracketdev.com/wp-json/wp/v2/faq?slug=${this.$route.params.slug}`).then((response) => {
+      .get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/faq?slug=${this.$route.params.slug}`).then((response) => {
         this.page = response.data;
-        console.log(this.page);
       }).catch((error) => {
         console.log(error);
       });
@@ -86,7 +85,6 @@ export default class Faq extends Vue {
 
   changeActiveSideItem():void {
     const titles:any = document.getElementsByClassName('terms__main__title');
-    // const titlesArray = Array.prototype.slice.call(titles);
     for (let i = 0; i <= titles.length; i += 1) {
       if (titles[i]) {
         if (document.documentElement.scrollTop + 245 >= titles[i].offsetTop) {

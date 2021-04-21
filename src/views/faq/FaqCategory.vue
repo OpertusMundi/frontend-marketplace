@@ -53,13 +53,13 @@ constructor() {
 }
 
 mounted():void {
-  axios.get(`http://om-docs.bracketdev.com/wp-json/wp/v2/faq_categories?slug=${this.$route.params.category}`).then((response) => {
+  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/faq_categories?slug=${this.$route.params.category}`).then((response) => {
     this.page = response.data;
   }).catch((error) => {
     console.log(error);
   });
 
-  axios.get(`http://om-docs.bracketdev.com/wp-json/om/v1/faq-categories?category=${this.$route.params.category}`).then((response) => {
+  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/om/v1/faq-categories?category=${this.$route.params.category}`).then((response) => {
     this.category = response.data;
     console.log(this.category);
   }).catch((error) => {

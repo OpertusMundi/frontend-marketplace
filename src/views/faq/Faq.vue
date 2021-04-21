@@ -46,7 +46,6 @@ page: any;
 
 searchResultsActive = false;
 
-
 constructor() {
   super();
 
@@ -55,15 +54,13 @@ constructor() {
 }
 
 mounted():void {
-  axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/faq_categories?parent=0').then((response) => {
+  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/faq_categories?parent=0`).then((response) => {
     this.categories = response.data;
-    console.log(this.categories);
   }).catch((error) => {
     console.log(error);
   });
-  axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/pages?slug=faq').then((response) => {
+  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=faq`).then((response) => {
     this.page = response.data;
-    console.log(this.page);
   }).catch((error) => {
     console.log(error);
   });
