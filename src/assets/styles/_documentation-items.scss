@@ -23,9 +23,9 @@
 
     &__items {
         padding: 80px 0;
-    @media (max-width: 576px) {
-        padding: 60px 0;
-    }
+        @media (max-width: 576px) {
+            padding: 60px 0;
+        }
     }
     &__item {
         width: 100%;
@@ -34,13 +34,12 @@
         position: relative;
         background: #fff;
         margin-bottom: 20px;
-        color:$darkColor;
+        color: $darkColor;
         @media (min-width: 768px) {
             width: calc(50% - 10px);
         }
         @media (min-width: 1200px) {
             min-height: 270px;
-
         }
         &__counter {
             background-color: $secondColor;
@@ -79,7 +78,6 @@
             font-size: em(18);
             letter-spacing: 0.02em;
             transition: 0.4s ease all;
-
         }
         &:hover {
             color: $mainFontColor !important;
@@ -93,10 +91,10 @@
                 border-color: $secondColor;
             }
             .documentation-items__item__counter {
-                margin-bottom:5px;
+                margin-bottom: 5px;
             }
             .documentation-items__item__text {
-                margin:0;
+                margin: 0;
             }
         }
 
@@ -169,5 +167,4 @@
             }
         }
     }
-
 }
