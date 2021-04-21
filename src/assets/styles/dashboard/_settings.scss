@@ -1,0 +1,167 @@
+.settings .collection__menu {
+  margin-bottom: 0;
+}
+
+.tabs {
+  &__outter-wrapper {
+    // using grid to overlay each tab above each other (without using absolute positioning) for smooth transitions
+    // used in combination with .single-tab-wrapper
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  &__single-tab-wrapper {
+    grid-row-start: 1;
+    grid-column-start: 1;
+  }
+
+  &__tab {
+    &__list {
+      display: grid;
+      // grid-template-columns: 60% 30% 10%;
+      grid-template-columns: 1fr 1fr min-content;
+
+      &__item {
+        padding: 20px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+      }
+
+      &__line {
+        grid-column: 1/6;
+        height: 1px;
+        width: 100%;
+        background: $labelColor;
+      }
+
+      .right {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .clickable {
+        cursor: pointer;
+      }
+    }
+
+    &__kyc {
+      &__list {
+        display: grid;
+        // grid-template-columns: repeat(6, auto);
+        grid-template-columns: min-content auto auto auto auto auto;
+  
+        &__header-item {
+          padding: 0 0 0 20px;
+          margin: 0 0 3px 0;
+          color: $labelColor;
+        }
+
+        > span {
+          color: $labelColor;
+          font-size: .8em;
+        }
+
+        > hr {
+          grid-column: 1/7;
+        }
+
+        .validated {
+          color: $secondColor;
+        }
+
+        .refused {
+          color: red;
+        }
+
+        &__title {
+          grid-column: 1/7;
+          display: flex;
+        }
+
+        &__item {
+          // .
+        }
+  
+        &__line {
+          grid-column: 1/6;
+          height: 1px;
+          width: 100%;
+          background: $labelColor;
+        }
+      }
+
+      &__status-label {
+        background: #fff;
+        padding: 3px 30px 3px 30px;
+        border-radius: 3px;
+        
+        &--validated {
+          border: solid 1px $secondColor;
+          color: $secondColor;
+        }
+        &--not-validated {
+          border: solid 1px red;
+          color: red;
+        }
+      }
+    }
+
+    &__ubo {
+      &__btn {
+        padding: 30px;
+        background: #fff;
+        letter-spacing: 0.06em;
+        border: dashed 1px;
+        border-radius: 7px;
+      }
+
+      &__card {
+        padding: 30px;
+        background: #fff;
+        letter-spacing: 0.06em;
+        font-size: .8em;
+        border: solid 2px $darkColor;
+        border-radius: 7px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+
+        &--selected {
+          border: solid 2px $secondColor;
+        }
+
+        &--clickable {
+          cursor: pointer;
+        }
+      }
+
+      .title {
+        font-size: 1.2em;
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+
+      .bold {
+        font-weight: 800;
+      }
+    }
+
+    &__ignore-grid-wrapper {
+      display: contents;
+    }
+  }
+}
+
+// utilities
+.text-gray {
+  color: $labelColor;
+}
+
+.text-black {
+  color: #121212;
+}
+
+.font-weight-500 {
+  font-weight: 500;
+}

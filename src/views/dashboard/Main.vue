@@ -51,6 +51,12 @@
                 <span>Settings</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu">
+              <router-link to="/dashboard/users" data-name="Users">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20.454" height="24"><g data-name="Group 3347" fill="#333"><path data-name="Path 8974" d="M10.227 11.113A5.557 5.557 0 1 0 4.67 5.557a5.563 5.563 0 0 0 5.557 5.556zm0-9.125a3.568 3.568 0 1 1-3.568 3.569 3.572 3.572 0 0 1 3.568-3.568z"/><path data-name="Path 8975" d="M10.227 12.12C6.69 12.12 0 14.394 0 23.006V24h20.454v-.994c0-8.612-6.689-10.886-10.227-10.886zm-8.2 9.891c.572-7.809 7.879-7.9 8.2-7.9s7.63.093 8.2 7.9z"/></g></svg>
+                <span>Users</span>
+              </router-link>
+            </li>
           </ul>
         </nav>
         <a href="#" class="dashboard__sidebar__toggle" v-bind:class="{active: sidebarClosed}" @click.prevent="sidebarClosed = !sidebarClosed"><svg xmlns="http://www.w3.org/2000/svg" width="17.404" height="25.65" viewBox="0 0 17.404 25.65"><path id="Path_2292" data-name="Path 2292" d="M-1105.012-7721.223l11.469 14.086 11.871-14.086" transform="translate(-7704.786 1106.175) rotate(90)" fill="none" stroke="#333" stroke-width="3"/></svg></a>

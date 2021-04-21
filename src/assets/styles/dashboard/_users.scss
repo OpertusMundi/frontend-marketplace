@@ -1,0 +1,57 @@
+.users {
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+
+  &__header {
+    &__item {
+      font-weight: 700;
+      padding: 10px 20px 10px 20px;
+    }
+  }
+
+  &__item {
+    padding: 20px;    
+  }
+
+  &__line {
+    grid-column: 1/6;
+    height: 1px !important;
+    width: 100%;
+    background: $labelColor;
+  }
+}
+
+.users-form .form-group {
+  &__text {
+    max-width: 600px;
+  }
+  &__select {
+    max-width: 300px;
+  }
+}
+
+.grid-ignore-wrapper {
+  display: contents;
+}
+
+.btn-add-user {
+  background: transparent;
+}
+
+.text-second-color {
+  color: $secondColor;
+}
+
+input[type="checkbox"] {
+    -ms-transform: scale(1.3); /* IE */
+    -moz-transform: scale(1.3); /* FF */
+    -webkit-transform: scale(1.3); /* Safari and Chrome */
+    -o-transform: scale(1.3); /* Opera */
+    transform: scale(1.3);
+    padding: 10px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
