@@ -598,7 +598,7 @@
     </div>
 
     <!-- MODALS -->
-    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal"></select-areas>
+    <select-areas :show="isSelectAreasModalOn" @close="toggleSelectAreaModal"></select-areas>
   </div>
 </template>
 
