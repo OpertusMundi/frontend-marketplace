@@ -82,7 +82,7 @@ export default class DraftAssetApi extends Api {
    * @param command
    */
   public async createApi(
-    command: DraftApiFromAssetCommand | DraftApiFromFileCommand, config?: AxiosRequestConfig
+    command: DraftApiFromAssetCommand | DraftApiFromFileCommand, config?: AxiosRequestConfig,
   ): Promise<ServerResponse<AssetDraft>> {
     const url = '/action/drafts/api';
 
