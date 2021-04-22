@@ -2,7 +2,7 @@ import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import {
-  Account, AccountProfileCommand, Profile,
+  Account, AccountProfileCommand,
 } from '@/model/account';
 
 export default class ProfileApi extends Api {
@@ -13,11 +13,11 @@ export default class ProfileApi extends Api {
   /**
    * Get profile data
    */
-  public async getProfile(): Promise<ServerResponse<Profile>> {
+  public async getProfile(): Promise<ServerResponse<Account>> {
     const url = '/action/profile';
 
-    return this.get<ServerResponse<Profile>>(url)
-      .then((response: AxiosServerResponse<Profile>) => {
+    return this.get<ServerResponse<Account>>(url)
+      .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
 
         return data;
