@@ -318,6 +318,9 @@
                     </div>
                   </div>
                   <div class="col-md-6">
+                    <div v-if="!showUboForm && areUbosOfDeclarationLoaded && (uboDeclarations[selectedDeclaration].status == 'CREATED' || uboDeclarations[selectedDeclaration].status == 'INCOMPLETE')">
+                      <button class="btn--std btn--blue" @click="submitDeclaration">Submit Declaration</button>
+                    </div>
                     <div v-if="showUboForm">
                       <validation-provider v-slot="{ errors }" name="Last name" rules="required">
                         <div class="form-group">
@@ -357,7 +360,7 @@
                             <div class="form-group">
                               <label for="country">Country *</label>
                               <select v-model="uboToAdd.address.country" class="form-group__select" name="country" id="country">
-                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                                <option v-for="country in countries" :key="country.name" :value="country.code"> {{country.name}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
@@ -413,7 +416,7 @@
                             <div class="form-group">
                               <label for="nationality">Nationality *</label>
                               <select v-model="uboToAdd.nationality" class="form-group__select" name="nationality" id="nationality">
-                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                                <option v-for="country in countries" :key="country.name" :value="country.code"> {{country.name}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
@@ -437,7 +440,7 @@
                             <div class="form-group">
                               <label for="birthplaceCountry">Birthplace country *</label>
                               <select v-model="uboToAdd.birthplace.country" class="form-group__select" name="birthplaceCountry" id="birthplaceCountry">
-                                <option v-for="country in countries" :key="country"> {{country}} </option>
+                                <option v-for="country in countries" :key="country.name" :value="country.code"> {{country.name}} </option>
                               </select>
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
@@ -545,7 +548,7 @@ export default class DashboardHome extends Vue {
 
   // temporarily? using the following array of countries to populate options of country-select inputs
   // eslint-disable-next-line
-  countries: string[] = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova", "Monaco", "Montenegro", "The Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City",];
+  countries: {name: string, code: string}[] = [{ name: 'FRANCE', code: 'FR' }, { name: 'GREECE', code: 'GR' }];
 
   constructor() {
     super();
@@ -654,43 +657,69 @@ export default class DashboardHome extends Vue {
       type: documentType,
     };
 
-    // CREATE DOCUMENT
-    this.kycDocumentApi.createDocument(document).then((createDocumentResponse) => {
-      if (createDocumentResponse.success) { // document created successfully
-        console.log('document created successfully!');
-        const documentId = createDocumentResponse.result.id;
+    // FIRSTLY, CHECK IF DOCUMENT OF THIS TYPE IS CREATED
+    this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((getDocumentsResponse) => {
+      if (getDocumentsResponse.success) {
+        console.log('count: ', getDocumentsResponse.result.count, 'documentType: ', documentType, getDocumentsResponse);
+        if (getDocumentsResponse.result.count && getDocumentsResponse.result.items.some((x) => x.type === documentType && x.status === 'CREATED')) {
+          // eslint-disable-next-line
+          const documentId = getDocumentsResponse.result.items.find((x) => x.type === documentType && x.status === 'CREATED')!.id;
+          console.log(`document has been created before! will add pages to: ${documentId}`);
+          this.addPagesInKycDocument(data, document, documentId);
+        } else {
+          console.log('document is not created, will be created now!');
+          this.kycDocumentApi.createDocument(document).then((createDocumentResponse) => {
+            if (createDocumentResponse.success) { // document created successfully
+              console.log('document created successfully!');
+              const documentId = createDocumentResponse.result.id;
+              this.addPagesInKycDocument(data, document, documentId);
+            } else { // error creating document
+              console.log('error creating document', createDocumentResponse);
+            }
+          });
+        }
+      } else {
+        console.log('error searching documents');
+      }
+    });
+  }
 
-        const addPagePromises: any = [];
-        data.forEach((x) => {
-          const documentPage: KycDocumentPageCommand = {
-            customerType: EnumCustomerType.PROVIDER,
-            comment: x.comments,
-          };
-          addPagePromises.push(this.kycDocumentApi.addPage(documentId, documentPage, x.file));
-        });
+  addPagesInKycDocument(data: {file: File, comments: string}[], document: KycDocumentCommand, documentId: string): void {
+    const addPagePromises: any = [];
+    data.forEach((x) => {
+      const documentPage: KycDocumentPageCommand = {
+        customerType: EnumCustomerType.PROVIDER,
+        comment: x.comments,
+      };
+      addPagePromises.push(this.kycDocumentApi.addPage(documentId, documentPage, x.file));
+    });
 
-        // ADD PAGES IN DOCUMENT
-        Promise.all(addPagePromises).then((addPagesResponse) => {
-          console.log(addPagesResponse);
-          if (addPagesResponse.some((x) => (x as any).success !== true)) {
-            console.log('at least one page was not uploaded in document', addPagesResponse);
+    // ADD PAGES IN DOCUMENT
+    Promise.all(addPagePromises).then((addPagesResponse) => {
+      console.log(addPagesResponse);
+      if (addPagesResponse.some((x) => (x as any).success !== true)) {
+        console.log('at least one page was not uploaded in document', addPagesResponse);
+      } else {
+        console.log('pages added successfully');
+
+        // SUBMIT DOCUMENT FOR VALIDATION
+        this.kycDocumentApi.submitDocument(documentId, document).then((submitDocumentResponse) => {
+          if (submitDocumentResponse.success) {
+            console.log('document submitted successfully!');
+            // IF DOCUMENT ALREADY EXISTED, REPLACE IT WITH THE NEW FROM RESPONSE
+            // eslint-disable-next-line
+            if (this.kycDocuments?.some((x) => x.id === submitDocumentResponse.result.id)) {
+              const i = this.kycDocuments?.findIndex((x) => x.id === submitDocumentResponse.result.id);
+              this.kycDocuments[i] = submitDocumentResponse.result;
+            // IF NOT, PUSH IT ON THE LIST
+            } else {
+            // eslint-disable-next-line
+              this.kycDocuments!.push(submitDocumentResponse.result);
+            }
           } else {
-            console.log('pages added successfully');
-
-            // SUBMIT DOCUMENT FOR VALIDATION
-            this.kycDocumentApi.submitDocument(documentId, document).then((submitDocumentResponse) => {
-              if (submitDocumentResponse.success) {
-                console.log('document submitted successfully!');
-                // eslint-disable-next-line
-                this.kycDocuments!.push(submitDocumentResponse.result);
-              } else {
-                console.log('error submitting document', submitDocumentResponse);
-              }
-            });
+            console.log('error submitting document', submitDocumentResponse);
           }
         });
-      } else { // error creating document
-        console.log('error creating document', createDocumentResponse);
       }
     });
   }
@@ -806,11 +835,12 @@ export default class DashboardHome extends Vue {
 
   submitUbo(): void {
     // OVERWRITE FOR DEVELOPMENT PURPOSE
-    this.uboToAdd.birthdate = '2021-04-12T07:13:09Z';
+    this.uboToAdd.birthdate = '1980-01-01T00:00:00.000Z';
 
     // eslint-disable-next-line
     const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
     console.log(declarationId);
+    console.log('ubo to add: ', this.uboToAdd);
     this.uboDeclarationApi.addUbo(declarationId, this.uboToAdd).then((uboResponse) => {
       console.log(uboResponse);
       if (uboResponse.success) {
@@ -822,9 +852,23 @@ export default class DashboardHome extends Vue {
           // eslint-disable-next-line
           this.uboDeclarations![this.selectedDeclaration!].ubos = [uboResponse.result];
         }
+        this.showUboForm = false;
       }
     });
-    // this.uboDeclarationApi.
+  }
+
+  submitDeclaration(): void {
+    const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
+    this.uboDeclarationApi.submitDeclaration(declarationId).then((submitDeclarationResponse) => {
+      if (submitDeclarationResponse.success) {
+        const index = this.uboDeclarations?.findIndex((x) => x.id === submitDeclarationResponse.result.id);
+        // this.uboDeclarations![index!] = submitDeclarationResponse.result;
+        // eslint-disable-next-line
+        Vue.set(this.uboDeclarations!, index!, submitDeclarationResponse.result);
+      } else {
+        console.log('error in submitting declaration');
+      }
+    });
   }
 
   // eslint-disable-next-line
