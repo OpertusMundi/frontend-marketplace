@@ -40,7 +40,12 @@ interface AssetConfiguration {
   pricingModels: PricingModelSettings[];
 }
 
+interface WordPressConfiguration {
+  endpoint: string;
+}
+
 export interface Configuration {
   asset: AssetConfiguration;
   authProviders: EnumAuthProvider[];
+  wordPress: WordPressConfiguration;
 }
