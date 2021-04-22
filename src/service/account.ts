@@ -39,17 +39,6 @@ export default class AccountApi extends Api {
       });
   }
 
-  public async getUserData(): Promise<ServerResponse<Account>> {
-    const url = '/action/account/user-data';
-
-    return this.get<ServerResponse<Account>>(url)
-      .then((response: AxiosServerResponse<Account>) => {
-        const { data } = response;
-
-        return data;
-      });
-  }
-
   /**
    * Creates a new account and sends an email for verifying the user email address
    *

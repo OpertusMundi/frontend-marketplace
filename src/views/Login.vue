@@ -34,6 +34,7 @@ import { required, email } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import store from '@/store';
 import AccountApi from '@/service/account';
+import ProfileApi from '@/service/profile';
 import { ServerResponse, LoginResult } from '@/model';
 import { Account } from '@/model/account';
 import { AxiosError } from 'axios';
@@ -58,6 +59,8 @@ export default class Login extends Vue {
 
   accountApi: AccountApi;
 
+  profileApi: ProfileApi;
+
   formErrors: string;
 
   constructor() {
@@ -68,6 +71,7 @@ export default class Login extends Vue {
     this.formErrors = '';
 
     this.accountApi = new AccountApi();
+    this.profileApi = new ProfileApi();
   }
 
   mounted(): void {
@@ -87,8 +91,8 @@ export default class Login extends Vue {
             const { csrfToken: token, csrfHeader: header } = loginResponse.result;
             store.commit('setCsrfToken', { token, header });
             // Load user data
-            this.accountApi
-              .getUserData()
+            this.profileApi
+              .getProfile()
               .then((accountResponse: ServerResponse<Account>) => {
                 if (accountResponse.success) {
                   store.commit('setUserData', accountResponse.result);

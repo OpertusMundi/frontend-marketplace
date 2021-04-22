@@ -23,6 +23,7 @@ import store from '@/store';
 import AccountApi from '@/service/account';
 import ConfigurationApi from '@/service/config';
 import CartApi from '@/service/cart';
+import ProfileApi from '@/service/profile';
 
 import {
   Configuration, Account, ServerResponse, LogoutResult, Cart,
@@ -41,6 +42,8 @@ export default class App extends Vue {
   accountApi: AccountApi;
 
   configApi: ConfigurationApi;
+
+  profileApi: ProfileApi;
 
   cartApi: CartApi;
 
@@ -66,6 +69,7 @@ export default class App extends Vue {
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
+    this.profileApi = new ProfileApi();
 
     this.noHeader = [
       'Login',
@@ -127,8 +131,8 @@ export default class App extends Vue {
           configuration: configResponse.result,
         });
         // Check if user is authenticated
-        this.accountApi
-          .getUserData()
+        this.profileApi
+          .getProfile()
           .then((profileResponse: ServerResponse<Account>) => {
             if (profileResponse.success) {
               store.commit('setUserData', profileResponse.result);
