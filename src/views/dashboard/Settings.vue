@@ -685,16 +685,16 @@ export default class DashboardHome extends Vue {
     this.selectedTab = tab;
   }
 
+  /*
+    MODAL SUBMISSION & CHANGING FIELDS
+  */
+
   canEditMangoPayRelatedField(): boolean {
     if (!this.isUserDraft || (this.isUserDraft && this.draftStatus === 'DRAFT')) {
       return true;
     }
     return false;
   }
-
-  /*
-    MODAL SUBMISSION & CHANGING FIELDS
-  */
 
   // eslint-disable-next-line
   onModalSubmit(modalData: any): void {
@@ -731,33 +731,37 @@ export default class DashboardHome extends Vue {
   }
 
   changeMangoPayRelatedField(field: string, value: string): void {
-    if (this.isUserDraft && this.draftStatus === 'DRAFT') {
-      // eslint-disable-next-line
-      let draft = this.userData!.profile.provider.draft;
-
-      switch (field) {
-        case 'company_name': {
-          draft!.name = value;
-          break;
-        }
-        case 'vat_number': {
-          draft!.companyNumber = value;
-          break;
-        }
-        case 'domain': {
-          draft!.companyType = value;
-          break;
-        }
-        case 'iban': {
-          draft!.bankAccount.iban = value;
-          break;
-        }
-        default:
-      }
+    let draft;
+    if (this.isUserDraft) { // if draft exists, update existing draft
+      draft = this.userData!.profile.provider.draft;
+    } else { // if draft is null, copy current profile as draft
+      draft = this.userData!.profile.provider.current;
     }
+
+    switch (field) {
+      case 'company_name': {
+        draft!.name = value;
+        break;
+      }
+      case 'vat_number': {
+        draft!.companyNumber = value;
+        break;
+      }
+      case 'domain': {
+        draft!.companyType = value;
+        break;
+      }
+      case 'iban': {
+        draft!.bankAccount.iban = value;
+        break;
+      }
+      default:
+    }
+
+    // HERE, SUBMIT DRAFT
   }
 
-  submitDraft(): void {
+  submitRegistrationFromDraft(): void {
     const draft = this.userData?.profile.provider.draft;
     console.log('submit draft');
   }
