@@ -9,10 +9,87 @@
       <!-- MODALS -->
       <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
       <div v-if="!isLoading()">
-        <modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
-        <modal :show="modalToShow == 'username'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your username'" :modalId="'username'" :inputs="[{id: 'username', name: 'Username', value: userData.username, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onModalSubmit" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
+        <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'mobileNumber'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your mobile number'" :modalId="'mobile'" :inputs="[{id: 'mobile', name: 'Mobile number', type: 'text'}]"></modal>
+
+        <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: userData.profile.provider.draft? userData.profile.provider.draft.companyNumber : userData.profile.provider.current.companyNumber, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: userData.profile.provider.draft? userData.profile.provider.draft.companyType : userData.profile.provider.current.companyType, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', value: userData.profile.provider.draft? userData.profile.provider.draft.email : userData.profile.provider.current.email, type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'website'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your website'" :modalId="'siteUrl'" :inputs="[{id: 'siteUrl', name: 'Site URL', value: userData.profile.provider.draft? userData.profile.provider.draft.siteUrl : userData.profile.provider.current.siteUrl, type: 'text'}]"></modal>
+
+        <!-- <modal :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change Address'" :modalId="'bankAccountOwnerAddress'"
+          :inputs="[
+            { id: 'line1', name: 'Line 1', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line1 : userData.profile.provider.current.bankAccount.ownerAddress.line1, type: 'text' },
+            { id: 'line2', name: 'Line 2', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line2 : userData.profile.provider.current.bankAccount.ownerAddress.line2, type: 'text' },
+            { id: 'city', name: 'City', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.city : userData.profile.provider.current.bankAccount.ownerAddress.city, type: 'text' },
+            { id: 'region', name: 'Region', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.region : userData.profile.provider.current.bankAccount.ownerAddress.region, type: 'text' },
+            { id: 'postalCode', name: 'ZIP Code', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.postalCode : userData.profile.provider.current.bankAccount.ownerAddress.postalCode, type: 'text' },
+            { id: 'country', name: 'Country', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.country : userData.profile.provider.current.bankAccount.ownerAddress.country, type: 'text' },
+          ]"></modal> -->
+
+        <modal :withSlots="true" :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" :modalId="'bankAccountOwnerAddress'">
+          <template v-slot:body>
+            <h1 class="mb-xs-20">Change Owner Address</h1>
+
+            <div class="form-group">
+              <label for="bankAccountOwnerAddressLine1">Line 1</label>
+              <input ref="bankAccountOwnerAddressLine1" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line1 : userData.profile.provider.current.bankAccount.ownerAddress.line1" class="form-group__text" type="text" id="bankAccountOwnerAddressLine1">
+            </div>
+            <div class="form-group">
+              <label for="bankAccountOwnerAddressLine2">Line 2</label>
+              <input ref="bankAccountOwnerAddressLine2" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line2 : userData.profile.provider.current.bankAccount.ownerAddress.line2" class="form-group__text" type="text" id="bankAccountOwnerAddressLine2">
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="bankAccountOwnerAddressCity">City</label>
+                  <input ref="bankAccountOwnerAddressCity" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.city : userData.profile.provider.current.bankAccount.ownerAddress.city" class="form-group__text" type="text" id="bankAccountOwnerAddressCity">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="bankAccountOwnerAddressRegion">Region</label>
+                  <input ref="bankAccountOwnerAddressRegion" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.region : userData.profile.provider.current.bankAccount.ownerAddress.region" class="form-group__text" type="text" id="bankAccountOwnerAddressRegion">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="bankAccountOwnerAddressPostalCode">Postal Code</label>
+                  <input ref="bankAccountOwnerAddressPostalCode" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.postalCode : userData.profile.provider.current.bankAccount.ownerAddress.postalCode" class="form-group__text" type="text" id="bankAccountOwnerAddressPostalCode">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="bankAccountOwnerAddressCountry">Country</label>
+                  <input ref="bankAccountOwnerAddressCountry" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.country : userData.profile.provider.current.bankAccount.ownerAddress.country" class="form-group__text" type="text" id="bankAccountOwnerAddressCountry">
+                </div>
+              </div>
+            </div>
+          </template>
+          <template v-slot:btn-submit>
+            <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'bankAccountOwnerAddress'})">CONFIRM</button>
+          </template>
+        </modal>
+
+        <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="modalToShow = ''" :modalId="'password'">
+          <template v-slot:body>
+            <h1>Change password</h1>
+
+            <div class="form-group">
+              <label for="modal_input_password" class="mt-xs-20"> Password </label>
+              <input v-model="password" class="form-group__text" type="password" id="modal_input_password">
+
+              <label for="modal_input_passwordVerification" class="mt-xs-20"> Verify password </label>
+              <input v-model="passwordVerify" class="form-group__text" type="password" id="modal_input_passwordVerification">
+            </div>
+          </template>
+
+          <template v-slot:btn-submit><button class="btn btn--std btn--blue ml-xs-20" @click="onSubmitTopioAccountField({modalId: 'password'})" :disabled="password !== passwordVerify || password === ''">CONFIRM</button></template>
+        </modal>
 
         <modal :withSlots="true" :show="modalToShow == 'kycIdentityProof' || modalToShow == 'kycArticlesOfAssociation' || modalToShow == 'kycRegistrationProof'" @dismiss="modalToShow = ''" :modalId="'kycIdentityProof'">
           <template v-slot:body>
@@ -33,6 +110,8 @@
           </template>
         </modal>
       </div>
+
+      <!-- END OF MODALS -->
 
       <div class="settings">
         <div class="collection__menu">
@@ -59,20 +138,19 @@
                   <div class="tabs__tab__list__item"><button @click="modalToShow = 'image'" class="btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
 
-                  <div class="tabs__tab__list__item"><strong>Username</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.username }}</div>
-                  <div class="tabs__tab__list__item"><button @click="modalToShow = 'username'" class="btn--std btn--outlinedark">EDIT</button></div>
-                  <div class="tabs__tab__list__line"></div>
-
                   <div class="tabs__tab__list__item"><strong>Full name</strong></div>
                   <div class="tabs__tab__list__item right">{{ userData.profile.firstName + ' ' + userData.profile.lastName }}</div>
-                  <!-- <div class="tabs__tab__list__item" @click="modalToShow = 'fullName'"><span class="clickable">EDIT</span></div> -->
                   <div class="tabs__tab__list__item"><button @click="modalToShow = 'fullName'" class="btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
-                  <div class="tabs__tab__list__item"><strong>Company email</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.email }}</div>
-                  <div class="tabs__tab__list__item"><button @click="modalToShow = 'companyEmail'" class="btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__item"><strong>Mobile number</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.mobile }}</div>
+                  <div class="tabs__tab__list__item"><button @click="modalToShow = 'mobileNumber'" class="btn--std btn--outlinedark">CHANGE</button></div>
+                  <div class="tabs__tab__list__line"></div>
+
+                  <div class="tabs__tab__list__item"><strong>Locale</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.locale }}</div>
+                  <div class="tabs__tab__list__item"><button @click="modalToShow = 'locale'" class="btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -86,17 +164,12 @@
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Password</strong></div>
                   <div class="tabs__tab__list__item"></div>
-                  <div class="tabs__tab__list__item">CHANGE</div>
+                  <div class="tabs__tab__list__item"><button @click="modalToShow = 'password'" class="btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Two-step verification</strong></div>
                   <div class="tabs__tab__list__item"></div>
                   <div class="tabs__tab__list__item">EDIT</div>
-                  <div class="tabs__tab__list__line"></div>
-
-                  <div class="tabs__tab__list__item"><strong>Mobile number</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.mobile }}</div>
-                  <div class="tabs__tab__list__item">CHANGE</div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -117,18 +190,28 @@
 
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Company name</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.name }}</div>
-                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'companyName'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>VAT number</strong></div>
-                  <div class="tabs__tab__list__item right">123456789 (dummy)</div>
-                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__item right"> {{ userData.profile.provider.draft? userData.profile.provider.draft.companyNumber : userData.profile.provider.current.companyNumber }} </div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'vatNumber'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Domain</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.companyType }}</div>
-                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.companyType : userData.profile.provider.current.companyType }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'domain'" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__line"></div>
+
+                  <div class="tabs__tab__list__item"><strong>Company email</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.email : userData.profile.provider.current.email }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'companyEmail'" class="btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__line"></div>
+
+                  <div class="tabs__tab__list__item"><strong>Website</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.siteUrl : userData.profile.provider.current.siteUrl }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'website'" class="btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -148,9 +231,31 @@
                 </div>
 
                 <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>Bank Account Owner Name</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.ownerName }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">CHANGE</button></div>
+                  <div class="tabs__tab__list__line"></div>
+                </div>
+
+                <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>IBAN</strong></div>
                   <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.iban }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">CHANGE</button></div>
+                  <div class="tabs__tab__list__line"></div>
+                </div>
+
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>BIC</strong></div>
+                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.bic }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">CHANGE</button></div>
+                  <div class="tabs__tab__list__line"></div>
+                </div>
+
+                <div class="tabs__tab__list">
+                  <div class="tabs__tab__list__item"><strong>Address</strong></div>
+                  <div v-if="!userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.ownerAddress.line1 }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.line2? userData.profile.provider.current.bankAccount.ownerAddress.line2 + ', ': '' }} {{ userData.profile.provider.current.bankAccount.ownerAddress.postalCode }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.city }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.region }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.country }}</div>
+                  <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.bankAccount.ownerAddress.line1 }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.line2? userData.profile.provider.draft.bankAccount.ownerAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.bankAccount.ownerAddress.postalCode }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.city }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.region }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.country }}</div>
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'bankAccountOwnerAddress'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -511,7 +616,7 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
-import { EnumCustomerType } from '@/model/account';
+import { EnumCustomerRegistrationStatus, EnumCustomerType, Address } from '@/model/account';
 import {
   EnumKycDocumentType,
   KycDocument,
@@ -522,6 +627,7 @@ import {
   UboDeclaration, UboCommand,
 } from '@/model/ubo-declaration';
 import ProfileApi from '../../service/profile';
+import ProviderApi from '../../service/provider';
 import KycDocumentApi from '../../service/kyc-document';
 import UboDeclarationApi from '../../service/ubo-declaration';
 import Modal from '../../components/Modal.vue';
@@ -545,6 +651,8 @@ localize({
 export default class DashboardHome extends Vue {
   // APIs
   profileApi: ProfileApi;
+
+  providerApi: ProviderApi;
 
   kycDocumentApi: KycDocumentApi;
 
@@ -572,6 +680,10 @@ export default class DashboardHome extends Vue {
 
   userData: null | Account;
 
+  password: string;
+
+  passwordVerify: string;
+
   cards: string [];
 
   kycDocuments: KycDocument[] | null;
@@ -595,6 +707,8 @@ export default class DashboardHome extends Vue {
 
     this.profileApi = new ProfileApi();
 
+    this.providerApi = new ProviderApi();
+
     this.kycDocumentApi = new KycDocumentApi();
 
     this.uboDeclarationApi = new UboDeclarationApi();
@@ -614,6 +728,18 @@ export default class DashboardHome extends Vue {
     this.userData = null;
 
     this.selectedTab = 'general';
+
+    this.password = '';
+    this.passwordVerify = '';
+
+    // this.bankAccountOwnerAddress = {
+    //   city: '',
+    //   country: '',
+    //   line1: '',
+    //   line2: '',
+    //   postalCode: '',
+    //   region: '',
+    // };
 
     this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
 
@@ -646,17 +772,28 @@ export default class DashboardHome extends Vue {
   */
 
   loadUserData(): void {
+    this.isUserDataLoaded = false;
+
     this.profileApi.getProfile().then((response: ServerResponse<Account>) => {
       this.userData = response.result;
       this.isUserDraft = !!this.userData.profile.provider.draft;
+
+      // NEXT BLOCK ( OVERWRITE ) TO BE DELETED - DEVELOPMENT PURPOSE ONLY
+      // if (this.userData.profile.provider.draft) {
+      //   this.userData.profile.provider.draft.status = EnumCustomerRegistrationStatus.DRAFT;
+      // }
+
       if (this.isUserDraft && this.userData.profile.provider.draft?.status) {
         this.draftStatus = this.userData.profile.provider.draft?.status;
       }
+
       this.isUserDataLoaded = true;
     });
   }
 
   loadKycDocuments(): void {
+    this.isKycDocumentsLoaded = false;
+
     this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
       this.isKycDocumentsLoaded = true;
@@ -664,6 +801,8 @@ export default class DashboardHome extends Vue {
   }
 
   loadUboDeclarations(): void {
+    this.isUboDeclarationsLoaded = false;
+
     this.uboDeclarationApi.findAll().then((delcarationResponse) => {
       this.uboDeclarations = delcarationResponse.result.items;
       this.isUboDeclarationsLoaded = true;
@@ -697,68 +836,133 @@ export default class DashboardHome extends Vue {
   }
 
   // eslint-disable-next-line
-  onModalSubmit(modalData: any): void {
-    console.log('submit');
+  onSubmitTopioAccountField(modalData: any): void {
+    const data = {
+      firstName: this.userData!.profile.firstName,
+      image: this.userData!.profile.image,
+      imageMimeType: this.userData!.profile.imageMimeType,
+      lastName: this.userData!.profile.lastName,
+      locale: this.userData!.profile.locale,
+      mobile: this.userData!.profile.mobile,
+      phone: this.userData!.profile.phone,
+    };
+
     switch (modalData.modalId) {
-      // UPDATE IMAGE, USERNAME, FULLNAME, COMPANY EMAIL
-      case 'image':
-      case 'username':
+      case 'image': {
+        console.log(modalData.inputValues[0]);
+        const imgString = modalData.inputValues[0].value.split(',')[1];
+        const imgType = modalData.inputValues[0].value.split(';')[0].split('data:')[1];
+        data.image = imgString;
+        data.imageMimeType = imgType;
+        break;
+      }
       case 'fullName':
-      case 'companyEmail': {
+      case 'mobile': {
         // create the data object for POST request
         // by iterating through modal's inputs IDs & values
-        const data = {};
         modalData.inputValues.forEach((input) => {
           data[input.id] = input.value;
         });
-        console.log('data', data);
-
-        this.profileApi.updateProfile(data as any).then((resp) => {
-          console.log(resp);
-          // API gateway should change: response from 'Update Profile' should have the content of the response of 'Get User Data'
-          if (resp.success) {
-            (this.userData as any).profile = resp.result;
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
+        break;
+      }
+      case 'password': {
+        // eslint-disable-next-line
+        console.log(this.password);
         break;
       }
       default:
     }
 
+    console.log('data', data);
+    this.isUserDataLoaded = false;
+    this.profileApi.updateProfile(data as any).then((resp) => {
+      console.log(resp);
+      if (resp.success) {
+        this.loadUserData();
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+
     this.modalToShow = '';
   }
 
-  changeMangoPayRelatedField(field: string, value: string): void {
+  onSubmitMangoPayField(modalData): void {
     let draft;
     if (this.isUserDraft) { // if draft exists, update existing draft
       draft = this.userData!.profile.provider.draft;
+
+      // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
+      // eslint-disable-next-line
+      delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
+
     } else { // if draft is null, copy current profile as draft
-      draft = this.userData!.profile.provider.current;
+      draft = {};
+      const propertiesToKeep = ['additionalInfo', 'bankAccount', 'companyNumber', 'companyType', 'email', 'headquartersAddress', 'legalPersonType', 'representative', 'logoImage', 'logoImageMimeType', 'name', 'phone', 'siteUrl', 'type'];
+      Object.keys(this.userData!.profile.provider.current!).forEach((x) => {
+        if (propertiesToKeep.includes(x)) {
+          // eslint-disable-next-line
+          draft[x] = this.userData!.profile.provider.current![x];
+        }
+      });
+      // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
+      // eslint-disable-next-line
+      delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
     }
 
-    switch (field) {
-      case 'company_name': {
-        draft!.name = value;
+    switch (modalData.modalId) {
+      case 'companyName': {
+        draft!.name = modalData.inputValues[0].value;
         break;
       }
-      case 'vat_number': {
-        draft!.companyNumber = value;
+      case 'vatNumber': {
+        draft!.companyNumber = modalData.inputValues[0].value;
         break;
       }
-      case 'domain': {
-        draft!.companyType = value;
+      case 'companyType': {
+        draft!.companyType = modalData.inputValues[0].value;
+        break;
+      }
+      case 'companyEmail': {
+        draft!.email = modalData.inputValues[0].value;
+        break;
+      }
+      case 'siteUrl': {
+        draft!.siteUrl = modalData.inputValues[0].value;
+        break;
+      }
+      case 'bankAccountOwnerAddress': {
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.line1 = (this.$refs['bankAccountOwnerAddressLine1'] as HTMLInputElement).value;
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.line2 = (this.$refs['bankAccountOwnerAddressLine2'] as HTMLInputElement).value;
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.city = (this.$refs['bankAccountOwnerAddressCity'] as HTMLInputElement).value;
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.region = (this.$refs['bankAccountOwnerAddressRegion'] as HTMLInputElement).value;
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.postalCode = (this.$refs['bankAccountOwnerAddressPostalCode'] as HTMLInputElement).value;
+        // eslint-disable-next-line
+        draft!.bankAccount.ownerAddress.country = (this.$refs['bankAccountOwnerAddressCountry'] as HTMLInputElement).value;
         break;
       }
       case 'iban': {
-        draft!.bankAccount.iban = value;
+        draft!.bankAccount.iban = modalData.inputValues[0].value;
         break;
       }
       default:
     }
 
     // HERE, SUBMIT DRAFT
+    console.log(draft);
+
+    this.isUserDataLoaded = false;
+    this.providerApi.updateRegistration(draft).then((resp) => {
+      console.log(resp);
+      this.loadUserData();
+    });
+
+    this.modalToShow = '';
   }
 
   submitRegistrationFromDraft(): void {
