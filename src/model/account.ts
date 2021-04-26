@@ -198,7 +198,7 @@ export interface ConsumerProfessionalCommand extends CustomerCommand {
   companyType: string;
   headquartersAddress: AddressCommand;
   legalPersonType: EnumLegalPersonType;
-  legalRepresentative: CustomerRepresentativeCommand;
+  representative: CustomerRepresentativeCommand;
   /**
    * Base64 encoded company logo image
    */
