@@ -1,3 +1,4 @@
+import { EnumPaymentMethod } from '@/model/enum';
 import { BankAccount } from '@/model/account';
 import { Order } from '@/model/order';
 
@@ -18,17 +19,6 @@ export enum EnumCardValidity {
   * INVALID validity.
   */
   INVALID
-}
-
-export enum EnumPaymentMethod {
-  /**
-   * Payment with registered card
-   */
-  CARD_DIRECT = 'CARD_DIRECT',
-  /**
-   * Payment using bankwire transfer
-   */
-  BANKWIRE = 'BANKWIRE',
 }
 
 export enum EnumPaymentItemType {

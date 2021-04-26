@@ -19,7 +19,7 @@ export default class UboDeclarationApi extends Api {
 
     const keyValues = Object.keys(params).filter((k) => !!params[k]).map((k) => `${k}=${params[k]}`);
 
-    const url = '/action/ubo-declarations';
+    const url = `/action/ubo-declarations?${keyValues.join('&')}`;
 
     return this.get<UboDeclarationQueryResponse>(url)
       .then((response: AxiosResponse<UboDeclarationQueryResponse>) => {
