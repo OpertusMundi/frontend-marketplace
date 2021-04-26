@@ -522,3 +522,18 @@ export interface Account {
    */
   username: string;
 }
+
+export interface PasswordChangeCommand {
+  /**
+   * Current password of the authenticated user
+   */
+  currentPassword: string;
+  /**
+   * New password
+   */
+  newPassword: string;
+  /**
+   * New password verification. Must match property `newPassword`
+   */
+  verifyNewPassword: string;
+}
