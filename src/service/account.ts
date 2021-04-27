@@ -3,7 +3,7 @@ import Api from '@/service/api';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { LoginResult, LogoutResult } from '@/model/auth';
 import {
-  Account, AccountCommandDto, ActivationTokenCommand,
+  Account, AccountCommandDto, ActivationTokenCommand, PasswordChangeCommand,
 } from '@/model/account';
 
 export default class AccountApi extends Api {
@@ -81,6 +81,29 @@ export default class AccountApi extends Api {
     const url = `/action/account/token/verify/${token}`;
 
     return this.post<ActivationTokenCommand, ServerResponse<void>>(url, null)
+      .then((response: AxiosServerResponse<void>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  /**
+   * Change password for authenticated user
+   *
+   * @param currentPassword
+   * @param newPassword
+   * @param verifyNewPassword
+   * @returns
+   */
+  public async changePassword(currentPassword: string, newPassword: string, verifyNewPassword: string): Promise<ServerResponse<void>> {
+    const url = '/action/account/password/change';
+
+    return this.post<PasswordChangeCommand, ServerResponse<void>>(url, {
+      currentPassword,
+      newPassword,
+      verifyNewPassword,
+    })
       .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
 
