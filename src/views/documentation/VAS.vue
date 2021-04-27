@@ -53,14 +53,14 @@ export default class VAS extends Vue {
   }
 
   mounted():void {
-    axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/pages?slug=vas').then((response) => {
+    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=vas`).then((response) => {
       this.page = response.data;
       console.log(this.page);
     }).catch((error) => {
       console.log(error);
     });
 
-    axios.get('http://om-docs.bracketdev.com/wp-json/wp/v2/vas').then((response) => {
+    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/vas`).then((response) => {
       this.services = response.data;
       console.log(this.services);
     }).catch((error) => {

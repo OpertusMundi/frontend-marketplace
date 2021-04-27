@@ -1,6 +1,6 @@
+import { EnumPaymentMethod } from '@/model/enum';
 import { EnumDeliveryMethod } from '@/model/catalogue';
 import { EffectivePricingModel } from '@/model/pricing-model';
-import { EnumPaymentMethod } from '@/model/payment';
 
 export enum EnumOrderItemType {
   ASSET = 'ASSET',

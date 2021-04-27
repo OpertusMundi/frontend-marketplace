@@ -190,7 +190,7 @@ export default class VAS extends Vue {
 
   mounted(): void {
     axios
-      .get(`http://om-docs.bracketdev.com/wp-json/wp/v2/vas?slug=${this.$route.params.slug}`).then((response) => {
+      .get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/vas?slug=${this.$route.params.slug}`).then((response) => {
         this.page = response.data;
         console.log(this.page);
       }).catch((error) => {

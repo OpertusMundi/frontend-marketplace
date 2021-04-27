@@ -5,7 +5,9 @@ import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
 } from '@/model';
 import { AxiosResponse } from 'axios';
-import { CatalogueHarvestCommand, CatalogueHarvestImportCommand, EnumCatalogueType, Publisher } from '@/model/catalogue';
+import {
+  CatalogueHarvestCommand, CatalogueHarvestImportCommand, EnumCatalogueType, Publisher,
+} from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 
 // Custom response types
@@ -55,18 +57,18 @@ export default class CatalogueApi extends Api {
 
   public async harvest(command: CatalogueHarvestCommand): Promise<SimpleResponse> {
     const url = '/action/catalogue/harvest';
-    if (!command.type) {
-      command.type = EnumCatalogueType.CSW;
-    }
-    return this.post<CatalogueHarvestCommand, SimpleResponse>(url, command)
-      .then((response: AxiosResponse<SimpleResponse>) => {
-        const { data } = response;
 
-        return data;
-      });
+    return this.post<CatalogueHarvestCommand, SimpleResponse>(url, {
+      ...command,
+      type: command.type || EnumCatalogueType.CSW,
+    }).then((response: AxiosResponse<SimpleResponse>) => {
+      const { data } = response;
+
+      return data;
+    });
   }
 
-  public async findHarvested(catalogueUrl: string, page = 0, size = 10, query: string = ''): Promise<CatalogueQueryResponse> {
+  public async findHarvested(catalogueUrl: string, page = 0, size = 10, query = ''): Promise<CatalogueQueryResponse> {
     const url = `/action/catalogue/harvest?url=${catalogueUrl}&page=${page}&size=${size}&query=${query}`;
 
     return this.get<CatalogueQueryResponseInternal>(url)
@@ -88,5 +90,4 @@ export default class CatalogueApi extends Api {
         return data;
       });
   }
-
 }
