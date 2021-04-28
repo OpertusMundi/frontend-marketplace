@@ -22,20 +22,29 @@
                   <span> {{ country.properties.NAME_ENGL }} </span>
                   <span> + </span>
                 </div>
-                <div v-if="selectedNutsCountry == country.properties.id">sub-areas</div>
+                <div v-if="selectedNutsCountry == country.properties.id">
+                  <div v-if="!subAreasGeoJson">loading</div>
+                  <div v-if="subAreasGeoJson" class="select-area-modal__col-areas__sub-areas">
+                    <span @click="selectSubArea(area.properties.code)" :class="{'nuts-1': area.properties.code.length == 3, 'nuts-2': area.properties.code.length == 4, 'nuts-3': area.properties.code.length == 5, 'selected': areasSelectedForPurchase.includes(area.properties.code)}" class="select-area-modal__col-areas__sub-areas__area" v-for="area in subAreasGeoJson.features" :key="area.properties.code">{{ area.properties.code }}: {{ area.properties.name }}</span>
+                  </div>
+                  <div></div>
+                </div>
                 <hr>
               </div>
             </div>
           </div>
           <div class="select-area-modal__col-map">
-            <l-map ref="mapSelectAreas" :bounds="mapOptions.bounds" v-if="mapOptions">
+            <l-map ref="mapSelectAreas" :maxZoom="maxZoom" :minZoom="minZoom" :bounds="mapOptions.bounds" @zoomend="onZoomEnd" v-if="mapOptions">
+              <div class="loader" v-if="isAreasLoading"><h2>LOADING</h2></div>
               <div class="select-area-modal__col-map__add-area" v-if="selectedNutsCountry">
                 <h3>{{ europeGeoJson.features.find((x) => x.properties.id === selectedNutsCountry).properties.NAME_ENGL }}</h3>
                 <span>130,000 rows</span>
-                <button class="btn--std btn--blue">ADD AREA</button>
+                <button @click="addCountry()" class="btn--std btn--blue">ADD COUNTRY</button>
               </div>
               <l-tile-layer :url="mapOptions.tileUrl"></l-tile-layer>
-              <l-geo-json :geojson="europeGeoJson" :options="mapOptions.geoJsonOptions"></l-geo-json>
+              <l-geo-json ref="europeGeoJsonLayer" v-if="!subAreasGeoJson" :geojson="europeGeoJson" :optionsStyle="mapOptions.europeGeoJsonStyle" :options="mapOptions.europeGeoJsonOptions"></l-geo-json>
+              <!-- in order to have 'ref' of the layer, v-show instead of v-if is required. therefore, a dummy linestring is used as geojson, when subAreasGeoJson is null -->
+              <l-geo-json ref="subAreasGeoJsonLayer" v-show="subAreasGeoJson" :geojson="subAreasGeoJson? subAreasGeoJson : {type: 'Feature', geometry: {type: 'LineString', coordinates: [[0,0], [1,1]]}}" :optionsStyle="subAreasGeoJson? mapOptions.subAreasGeoJsonStyle : {}" :options="subAreasGeoJson? mapOptions.subAreasGeoJsonOptions : {}"></l-geo-json>
             </l-map>
           </div>
           <div class="select-area-modal__col-submit">
@@ -44,7 +53,13 @@
               <p>Minimum: 10,000</p>
               <hr>
             </div> -->
-
+            <div class="select-area-modal__col-submit__area-label__wrapper">
+              <div v-for="area in areasSelectedForPurchase" :key="area" class="select-area-modal__col-submit__area-label">
+                {{ area }}
+                <button @click="onRemoveAreaFromList(area)">X</button>
+              </div>
+            </div>
+            <button @click="addToCart" class="btn btn--std btn--blue">ADD TO CART</button>
             <div class="asset__shopcard">
               <ul class="asset__shopcard__priceoptions">
                 <li>+ 24% VAT (DUMMY)</li>
@@ -94,12 +109,21 @@
   </transition>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Prop,
+  Watch,
+} from 'vue-property-decorator';
+import store from '@/store';
 import L, { latLng } from 'leaflet';
 import {
   LMap, LTileLayer, LPolygon, LGeoJson,
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { CartAddItemCommand } from '../../model/cart';
+import CartApi from '../../service/cart';
+import SpatialApi from '../../service/spatial';
 import europeGeoJSON from '../../service/lists/europe-geojson';
 
 @Component({
@@ -110,26 +134,66 @@ import europeGeoJSON from '../../service/lists/europe-geojson';
   },
 })
 export default class SelectAreas extends Vue {
-  @Prop() private show!: boolean;
+  @Prop() private assetId!: string;
+
+  @Prop() private pricingModelKey!: string;
+
+  show: boolean;
+
+  cartApi: CartApi;
+
+  spatialApi: SpatialApi;
+
+  isAreasLoading: boolean;
+
+  minZoom: number;
+
+  maxZoom: number;
 
   europeGeoJson: any;
+
+  subAreasGeoJson: any;
+
+  areasSelectedForPurchase: string[];
+
+  fitBoundsCountryZoom: number;
 
   selectedNutsCountry: string;
 
   mapOptions: any = {
     tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     bounds: [[28.647719, -32.519531], [73.426841, 58.359375]],
-    geoJsonOptions: {
+    europeGeoJsonStyle: {
+      fillColor: 'transparent',
+      color: 'blue',
+    },
+    // subAreasGeoJsonStyle: {
+    //   fillColor: 'transparent',
+    //   color: 'blue',
+    // },
+    subAreasGeoJsonStyle: (feature) => {
+      if (this.areasSelectedForPurchase.includes(feature.properties.code)) {
+        return { color: 'blue', fillOpacity: 0.7, fillColor: 'blue' };
+      }
+      return { color: 'blue', fillOpacity: 0.7, fillColor: 'transparent' };
+    },
+    europeGeoJsonOptions: {
       onEachFeature: (feature, layer) => {
-        // layer.bindPopup(`country: ${feature.properties.NAME_ENGL}`);
-
-        // layer.on('mouseover', () => {
-        //   layer.openPopup();
-        // });
-
         layer.on('click', () => {
-          (this as any).$refs.mapSelectAreas.fitBounds(layer.getBounds());
-          this.changeSelectedNutsCountry(feature.properties.id);
+          // (this as any).$refs.mapSelectAreas.fitBounds(layer.getBounds());
+          // this.changeSelectedNutsCountry(feature.properties.id);
+          this.selectArea(feature);
+        });
+      },
+    },
+    subAreasGeoJsonOptions: {
+      onEachFeature: (feature, layer) => {
+        layer.on('click', () => {
+          // (this as any).$refs.mapSelectAreas.fitBounds(layer.getBounds());
+          console.log(feature.properties.code);
+          console.log(feature.properties.name);
+          // layer.setStyle({ fillColor: 'red' });
+          this.selectSubArea(feature.properties.code);
         });
       },
     },
@@ -138,24 +202,156 @@ export default class SelectAreas extends Vue {
   constructor() {
     super();
 
+    this.show = false;
+
+    this.cartApi = new CartApi();
+
+    this.spatialApi = new SpatialApi();
+
+    this.isAreasLoading = false;
+
+    this.minZoom = 0;
+
+    this.maxZoom = 4;
+
     this.europeGeoJson = europeGeoJSON;
+
+    this.subAreasGeoJson = null;
+
+    this.areasSelectedForPurchase = [];
+
+    this.fitBoundsCountryZoom = -1;
 
     this.selectedNutsCountry = '';
   }
 
+  mounted() {
+    console.log('i am mounted!');
+    this.show = true;
+  }
+
+  beforeDestroy() {
+    this.show = false;
+    console.log('i am destroyed');
+  }
+
   onCloseModal(): void {
+    this.subAreasGeoJson = null;
+    this.areasSelectedForPurchase = [];
+    this.selectedNutsCountry = '';
     this.$emit('close');
   }
 
   changeSelectedNutsCountry(id) {
     this.selectedNutsCountry = id;
+    console.log(id);
+
+    this.isAreasLoading = true;
+    this.spatialApi.findAllByPrefix(id).then((resp) => {
+      if (resp.success) {
+        console.log(resp.result.features.length);
+        // the following SORT should be avoided by fixing the API
+        (resp as any).result.features.sort((a, b) => (a.properties.code > b.properties.code ? 1 : -1));
+        // the following REMOVE DUPLICATES should be avoided by fixing the API
+        // eslint-disable-next-line
+        (resp as any).result.features = (resp as any).result.features.filter((val,ind,arr)=>arr.findIndex(t=>(t.properties.code === val.properties.code))===ind)
+        console.log(resp.result.features.length);
+
+        this.subAreasGeoJson = resp.result;
+        this.updateMapSelectionsStyle();
+        console.log(this.subAreasGeoJson);
+      } else {
+        console.log('error fetching sub-areas');
+      }
+      this.isAreasLoading = false;
+    });
+
     const countryIndex = this.europeGeoJson.features.findIndex((x) => x.properties.id === id);
     this.$refs.country[countryIndex].scrollIntoView();
   }
 
-  selectArea(country) {
-    (this as any).$refs.mapSelectAreas.fitBounds(L.geoJSON(country).getBounds());
-    this.changeSelectedNutsCountry(country.properties.id);
+  addCountry() {
+    this.areasSelectedForPurchase.push(this.selectedNutsCountry);
+  }
+
+  selectArea(countryGeoJson) {
+    this.maxZoom = 13;
+    this.subAreasGeoJson = null;
+    const bounds = L.geoJSON(countryGeoJson).getBounds();
+
+    setTimeout(() => {
+      this.fitBoundsCountryZoom = (this as any).$refs.mapSelectAreas.mapObject.getBoundsZoom(bounds);
+      (this as any).$refs.mapSelectAreas.fitBounds(bounds);
+    }, 0);
+
+    this.changeSelectedNutsCountry(countryGeoJson.properties.id);
+  }
+
+  selectSubArea(code: string): void {
+    (this as any).$refs.mapSelectAreas.mapObject.invalidateSize();
+    this.areasSelectedForPurchase.push(code);
+    // (this as any).$refs.subAreasGeoJsonLayer.mapObject.resetStyle();
+    this.updateMapSelectionsStyle();
+  }
+
+  onRemoveAreaFromList(area: string): void {
+    this.areasSelectedForPurchase = this.areasSelectedForPurchase.filter((x) => x !== area);
+    // (this as any).$refs.subAreasGeoJsonLayer.mapObject.resetStyle();
+    this.updateMapSelectionsStyle();
+  }
+
+  onSubAreasGeoJsonLayerReady() {
+    console.log('sub areas ready');
+  }
+
+  updateMapSelectionsStyle() {
+    setTimeout(() => {
+      (this as any).$refs.subAreasGeoJsonLayer.mapObject.setStyle((feature) => {
+        if (this.areasSelectedForPurchase.includes(feature.properties.code)) {
+          return { color: 'blue', fillOpacity: 0.7, fillColor: 'blue' };
+        }
+        return { color: 'blue', fillOpacity: 0.7, fillColor: 'transparent' };
+      });
+    }, 0);
+  }
+
+  onZoomEnd() {
+    const currentZoom = (this as any).$refs.mapSelectAreas.mapObject.getZoom();
+    console.log(currentZoom);
+
+    // if zoomed-out from country fit-bounds, then show Europe, not country
+    if (currentZoom < this.fitBoundsCountryZoom && this.subAreasGeoJson) {
+      this.subAreasGeoJson = null;
+      // this.maxZoom = 4;
+      this.maxZoom = currentZoom;
+    }
+  }
+
+  addToCart() {
+    console.log(this.areasSelectedForPurchase);
+
+    const item: CartAddItemCommand = {
+      assetId: this.assetId,
+      parameters: {
+        nuts: this.areasSelectedForPurchase,
+        prePaidTier: 0,
+        systemParams: {
+          population: 0,
+          populationPercent: 0,
+          rows: 0,
+        },
+      },
+      pricingModelKey: this.pricingModelKey,
+    };
+
+    this.cartApi.addItem(item).then((addItemResp) => {
+      if (addItemResp.success) {
+        console.log('item added successfully');
+        store.commit('setCartItems', addItemResp.result);
+      } else {
+        console.log('error adding item');
+      }
+    });
   }
 }
 </script>
@@ -172,6 +368,19 @@ export default class SelectAreas extends Vue {
   padding: 20px;
   display: flex;
   flex-direction: column;
+
+  .loader {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 9999;
+  }
 
   &__wrapper {
     position: fixed;
@@ -209,7 +418,8 @@ export default class SelectAreas extends Vue {
   }
 
   &__col-areas {
-    min-width: 290px;
+    // min-width: 290px;
+    width: 290px;
     padding: 0 20px 0 0;
     display: flex;
     flex-direction: column;
@@ -230,6 +440,34 @@ export default class SelectAreas extends Vue {
       cursor: pointer;
       padding: 0 10px 0 0;
     }
+
+    &__sub-areas {
+      display: flex;
+      flex-direction: column;
+
+      .nuts-1 {
+        font-size: 1.1em;
+      }
+      .nuts-2 {
+        font-size: 1em;
+        margin-left: 15px;
+      }
+      .nuts-3 {
+        font-size: .9em;
+        margin-left: 30px;
+      }
+
+      .selected {
+        background: $secondColor;
+        color: #fff;
+        padding: 5px;
+      }
+
+      &__area {
+        margin: 5px 0 0 0;
+        border-radius: 5px;
+      }
+    }
   }
 
   &__col-map {
@@ -249,7 +487,38 @@ export default class SelectAreas extends Vue {
   }
 
   &__col-submit {
+    width: 290px;
     padding: 0 0 0 20px;
+
+    &__area-label {
+      // background: $secondColor;
+      // color: #fff;
+      background: #fff;
+      color: $secondColor;
+      border: solid 2px $secondColor;
+      border-radius: 5px;
+      margin: 0 5px 5px 5px;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      button {
+        background: transparent;
+        // color: #fff;
+        color: $secondColor;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &__wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+    }
 
     // .card {
     //   background: #fff;

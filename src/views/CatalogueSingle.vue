@@ -321,11 +321,16 @@
         </div>
         <div class="asset__sidebar">
           <div class="asset__shopcard">
-            <button @click="toggleSelectAreaModal" class="mb-xs-20">show 'select areas' dummy button</button>
+            <!-- <button @click="toggleSelectAreaModal" class="mb-xs-20">show 'select areas' dummy button</button> -->
             <div class="asset__shopcard__variations">
-              <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
+              <!-- <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
                 <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
                 <label :for="`p_variation_${pr_model.id}`">{{ pr_model.totalPrice === 0 ? 'FREE' : pr_model.totalPrice + prModelCurrencyFormat(pr_model.currency) }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
+              </div> -->
+
+              <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
+                <input type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
+                <label :for="`p_variation_${pr_model.model.key}`">{{ pr_model.model.type }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
               </div>
             </div>
             <ul class="asset__shopcard__priceoptions">
@@ -337,7 +342,10 @@
               <li><strong>Domain: </strong> Geomarketing (DUMMY)</li>
               <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
             </ul>
-            <div class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
+
+            <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="toggleSelectAreaModal" class="btn btn--std btn--blue">SELECT AREAS</a></div>
+            <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
+
             <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
             <ul class="asset__shopcard__buyinfo">
               <li><strong>Delivery type: </strong> From topio / vendor (DUMMY)</li>
@@ -598,7 +606,7 @@
     </div>
 
     <!-- MODALS -->
-    <select-areas :show="isSelectAreasModalOn" @close="toggleSelectAreaModal"></select-areas>
+    <select-areas v-if="isSelectAreasModalOn" :show="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
   </div>
 </template>
 
@@ -607,6 +615,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   CatalogueItem, ServerResponse, CartAddItemCommand, Cart,
 } from '@/model';
+import { EnumPricingModel, BasePricingModelCommand } from '@/model/pricing-model';
 import store from '@/store';
 import moment from 'moment';
 import CatalogueApi from '@/service/catalogue';
@@ -678,7 +687,8 @@ export default class CatalogueSingle extends Vue {
 
   itemLoaded = false;
 
-  selectedPricingModel: string;
+  // selectedPricingModel: string;
+  selectedPricingModel: BasePricingModelCommand | null;
 
   map:any;
 
@@ -705,7 +715,7 @@ export default class CatalogueSingle extends Vue {
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueItemType = '';
     this.catalogueApi = new CatalogueApi();
-    this.selectedPricingModel = '';
+    this.selectedPricingModel = null;
     this.cartErrors = '';
     this.cartApi = new CartApi();
     this.map = {
@@ -872,26 +882,28 @@ export default class CatalogueSingle extends Vue {
   }
 
   addToCart():void {
-    if (this.selectedPricingModel === '') {
+    if (!this.selectedPricingModel) {
       this.cartErrors = 'Please select a pricing model!';
       return;
     }
     this.cartErrors = '';
+    console.log('TODO: add to cart');
     // TODO: add to cart functions
-    const cartItem:CartAddItemCommand = {
-      assetId: this.catalogueItem.id,
-      pricingModelKey: this.selectedPricingModel,
-      parameters: {},
-    };
-    this.cartApi.addItem(cartItem)
-      .then((cartResponse: ServerResponse<Cart>) => {
-        if (cartResponse.success) {
-          store.commit('setCartItems', cartResponse.result);
-        } else {
-          // TODO: Handle error
-          console.error('cannot add item to cart!');
-        }
-      });
+
+    // const cartItem:CartAddItemCommand = {
+    //   assetId: this.catalogueItem.id,
+    //   pricingModelKey: this.selectedPricingModel.key,
+    //   parameters: {},
+    // };
+    // this.cartApi.addItem(cartItem)
+    //   .then((cartResponse: ServerResponse<Cart>) => {
+    //     if (cartResponse.success) {
+    //       store.commit('setCartItems', cartResponse.result);
+    //     } else {
+    //       // TODO: Handle error
+    //       console.error('cannot add item to cart!');
+    //     }
+    //   });
   }
 
   calcAssetHeaderTitle():void {
