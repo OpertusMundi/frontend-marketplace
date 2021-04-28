@@ -1,5 +1,6 @@
 export {
   Account,
+  PasswordChangeCommand,
   Profile,
 } from '@/model/account';
 

@@ -13,3 +13,14 @@ export enum EnumAssetType {
   SERVICE = 'SERVICE',
   VECTOR = 'VECTOR',
 }
+
+export enum EnumPaymentMethod {
+  /**
+   * Payment with registered card
+   */
+  CARD_DIRECT = 'CARD_DIRECT',
+  /**
+   * Payment using bankwire transfer
+   */
+  BANKWIRE = 'BANKWIRE',
+}

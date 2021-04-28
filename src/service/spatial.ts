@@ -77,7 +77,7 @@ export default class SpatialApi extends Api {
    *
    * @param level NUTS level
    * @param bbox bounding box [minX, minY, maxX, maxY] in EPSG:4326 e.g. [-180, -90, 180, 90]
-   * @returns 
+   * @returns
    */
   public async wfs(level: number, bbox: [number, number, number, number]): Promise<NutsRegionFeatureCollection> {
     const url = `/action/spatial/nuts/${level}/wfs?bbox=${bbox.join(',')}`;
