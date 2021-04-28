@@ -242,12 +242,54 @@ export default class SelectAreas extends Vue {
     this.$emit('close');
   }
 
-  changeSelectedNutsCountry(id) {
-    this.selectedNutsCountry = id;
-    console.log(id);
+  // changeSelectedNutsCountry(id) {
+  //   this.selectedNutsCountry = id;
+  //   console.log(id);
+
+  //   this.isAreasLoading = true;
+  //   this.spatialApi.findAllByPrefix(id).then((resp) => {
+  //     if (resp.success) {
+  //       console.log(resp.result.features.length);
+  //       // the following SORT should be avoided by fixing the API
+  //       (resp as any).result.features.sort((a, b) => (a.properties.code > b.properties.code ? 1 : -1));
+  //       // the following REMOVE DUPLICATES should be avoided by fixing the API
+  //       // eslint-disable-next-line
+  //       (resp as any).result.features = (resp as any).result.features.filter((val,ind,arr)=>arr.findIndex(t=>(t.properties.code === val.properties.code))===ind)
+  //       console.log(resp.result.features.length);
+
+  //       this.subAreasGeoJson = resp.result;
+  //       this.updateMapSelectionsStyle();
+  //       console.log(this.subAreasGeoJson);
+  //     } else {
+  //       console.log('error fetching sub-areas');
+  //     }
+  //     this.isAreasLoading = false;
+  //   });
+
+  //   const countryIndex = this.europeGeoJson.features.findIndex((x) => x.properties.id === id);
+  //   this.$refs.country[countryIndex].scrollIntoView();
+  // }
+
+  addCountry() {
+    this.areasSelectedForPurchase.push(this.selectedNutsCountry);
+  }
+
+  selectArea(countryGeoJson) {
+    this.maxZoom = 13;
+    this.subAreasGeoJson = null;
+    const bounds = L.geoJSON(countryGeoJson).getBounds();
+
+    setTimeout(() => {
+      this.fitBoundsCountryZoom = (this as any).$refs.mapSelectAreas.mapObject.getBoundsZoom(bounds);
+      (this as any).$refs.mapSelectAreas.fitBounds(bounds);
+    }, 0);
+
+    const countryId = countryGeoJson.properties.id;
+    this.selectedNutsCountry = countryId;
+    console.log(countryId);
 
     this.isAreasLoading = true;
-    this.spatialApi.findAllByPrefix(id).then((resp) => {
+    this.spatialApi.findAllByPrefix(countryId).then((resp) => {
       if (resp.success) {
         console.log(resp.result.features.length);
         // the following SORT should be avoided by fixing the API
@@ -266,25 +308,8 @@ export default class SelectAreas extends Vue {
       this.isAreasLoading = false;
     });
 
-    const countryIndex = this.europeGeoJson.features.findIndex((x) => x.properties.id === id);
+    const countryIndex = this.europeGeoJson.features.findIndex((x) => x.properties.id === countryId);
     this.$refs.country[countryIndex].scrollIntoView();
-  }
-
-  addCountry() {
-    this.areasSelectedForPurchase.push(this.selectedNutsCountry);
-  }
-
-  selectArea(countryGeoJson) {
-    this.maxZoom = 13;
-    this.subAreasGeoJson = null;
-    const bounds = L.geoJSON(countryGeoJson).getBounds();
-
-    setTimeout(() => {
-      this.fitBoundsCountryZoom = (this as any).$refs.mapSelectAreas.mapObject.getBoundsZoom(bounds);
-      (this as any).$refs.mapSelectAreas.fitBounds(bounds);
-    }, 0);
-
-    this.changeSelectedNutsCountry(countryGeoJson.properties.id);
   }
 
   selectSubArea(code: string): void {
