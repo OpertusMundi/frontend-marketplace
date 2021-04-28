@@ -28,15 +28,18 @@
             <h1>Change password</h1>
 
             <div class="form-group">
-              <label for="modal_input_password" class="mt-xs-20"> Password </label>
-              <input v-model="password" class="form-group__text" type="password" id="modal_input_password">
+              <label for="modal_input_passwordCurrent" class="mt-xs-20"> Current password </label>
+              <input v-model="passwordCurrent" class="form-group__text" type="password" id="modal_input_passwordCurrent">
 
-              <label for="modal_input_passwordVerification" class="mt-xs-20"> Verify password </label>
-              <input v-model="passwordVerify" class="form-group__text" type="password" id="modal_input_passwordVerification">
+              <label for="modal_input_passwordNew" class="mt-xs-20"> New password </label>
+              <input v-model="passwordNew" class="form-group__text" type="password" id="modal_input_passwordNew">
+
+              <label for="modal_input_passwordNewVerify" class="mt-xs-20"> Verify new password </label>
+              <input v-model="passwordNewVerify" class="form-group__text" type="password" id="modal_input_passwordNewVerify">
             </div>
           </template>
 
-          <template v-slot:btn-submit><button class="btn btn--std btn--blue ml-xs-20" @click="onSubmitTopioAccountField({modalId: 'password'})" :disabled="password !== passwordVerify || password === ''">CONFIRM</button></template>
+          <template v-slot:btn-submit><button class="btn btn--std btn--blue ml-xs-20" @click="onChangePassword" :disabled="passwordNew !== passwordNewVerify || passwordNew === '' || passwordCurrent === ''">CONFIRM</button></template>
         </modal>
 
         <modal :withSlots="true" :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" :modalId="'bankAccountOwnerAddress'">
@@ -374,9 +377,9 @@
           <transition name="fade" mode="out-in">
             <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'paymentMethods'">
 
-              <div v-if="isUserDraft && draftStatus=='SUBMITTED'" class="mt-xs-20 mb-xs-20">
+              <!-- <div v-if="isUserDraft && draftStatus=='SUBMITTED'" class="mt-xs-20 mb-xs-20">
                 <h3 class="settings__alert--blue">You have submitted changes and are pending approval.</h3>
-              </div>
+              </div> -->
 
               <div class="tabs__tab tabs__tab__payment_methods">
                 <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
@@ -387,6 +390,12 @@
                     <div class="tabs__tab__list__line"></div>
                   </div>
                 </div>
+
+                <div v-if="cards.length" class="d-flex justify-content-end">
+                  <button @click="addCard" class="btn btn--std btn--outlineblue">ADD CARD</button>
+                </div>
+                <h4 v-else class="mt-xs-30">There are no cards submitted. <button @click="addCard" class="btn btn--std btn--blue ml-xs-20">ADD CARD</button></h4>
+
               </div>
             </div>
           </transition>
@@ -689,6 +698,7 @@ import {
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
 import { EnumCustomerRegistrationStatus, EnumCustomerType, Address } from '@/model/account';
+import { Card } from '@/model/payment';
 import {
   EnumKycDocumentType,
   KycDocument,
@@ -698,8 +708,10 @@ import {
 import {
   UboDeclaration, UboCommand,
 } from '@/model/ubo-declaration';
+import AccountApi from '../../service/account';
 import ProfileApi from '../../service/profile';
 import ProviderApi from '../../service/provider';
+import PaymentApi from '../../service/payment';
 import KycDocumentApi from '../../service/kyc-document';
 import UboDeclarationApi from '../../service/ubo-declaration';
 import Modal from '../../components/Modal.vue';
@@ -722,9 +734,13 @@ localize({
 })
 export default class DashboardHome extends Vue {
   // APIs
+  accountApi: AccountApi;
+
   profileApi: ProfileApi;
 
   providerApi: ProviderApi;
+
+  paymentApi: PaymentApi;
 
   kycDocumentApi: KycDocumentApi;
 
@@ -732,6 +748,8 @@ export default class DashboardHome extends Vue {
 
   // booleans for data loading
   isUserDataLoaded: boolean;
+
+  isCardsLoaded: boolean;
 
   isKycDocumentsLoaded: boolean;
 
@@ -752,11 +770,14 @@ export default class DashboardHome extends Vue {
 
   userData: null | Account;
 
-  password: string;
+  passwordCurrent: string;
 
-  passwordVerify: string;
+  passwordNew: string;
 
-  cards: string [];
+  passwordNewVerify: string;
+
+  // cards: string [];
+  cards: Card[];
 
   kycDocuments: KycDocument[] | null;
 
@@ -777,15 +798,21 @@ export default class DashboardHome extends Vue {
   constructor() {
     super();
 
+    this.accountApi = new AccountApi();
+
     this.profileApi = new ProfileApi();
 
     this.providerApi = new ProviderApi();
+
+    this.paymentApi = new PaymentApi();
 
     this.kycDocumentApi = new KycDocumentApi();
 
     this.uboDeclarationApi = new UboDeclarationApi();
 
     this.isUserDataLoaded = false;
+
+    this.isCardsLoaded = false;
 
     this.isKycDocumentsLoaded = false;
 
@@ -801,8 +828,9 @@ export default class DashboardHome extends Vue {
 
     this.selectedTab = 'general';
 
-    this.password = '';
-    this.passwordVerify = '';
+    this.passwordCurrent = '';
+    this.passwordNew = '';
+    this.passwordNewVerify = '';
 
     // this.bankAccountOwnerAddress = {
     //   city: '',
@@ -813,7 +841,8 @@ export default class DashboardHome extends Vue {
     //   region: '',
     // };
 
-    this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
+    // this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
+    this.cards = [];
 
     this.modalToShow = '';
 
@@ -835,6 +864,7 @@ export default class DashboardHome extends Vue {
 
   mounted(): void {
     this.loadUserData();
+    this.loadCards();
     this.loadKycDocuments();
     this.loadUboDeclarations();
   }
@@ -863,6 +893,19 @@ export default class DashboardHome extends Vue {
     });
   }
 
+  loadCards(): void {
+    this.isCardsLoaded = false;
+
+    this.paymentApi.getCards().then((cardsResponse) => {
+      if (cardsResponse.success) {
+        this.cards = cardsResponse.result;
+        this.isCardsLoaded = true;
+      } else {
+        console.log('error fetching cards');
+      }
+    });
+  }
+
   loadKycDocuments(): void {
     this.isKycDocumentsLoaded = false;
 
@@ -882,7 +925,7 @@ export default class DashboardHome extends Vue {
   }
 
   isLoading(): boolean {
-    if (!this.isUserDataLoaded || !this.isKycDocumentsLoaded || !this.isUboDeclarationsLoaded) {
+    if (!this.isUserDataLoaded || !this.isCardsLoaded || !this.isKycDocumentsLoaded || !this.isUboDeclarationsLoaded) {
       return true;
     }
     return false;
@@ -937,11 +980,6 @@ export default class DashboardHome extends Vue {
         });
         break;
       }
-      case 'password': {
-        // eslint-disable-next-line
-        console.log(this.password);
-        break;
-      }
       default:
     }
 
@@ -957,6 +995,17 @@ export default class DashboardHome extends Vue {
     });
 
     this.modalToShow = '';
+  }
+
+  onChangePassword(): void {
+    console.log('on change password');
+    this.accountApi.changePassword(this.passwordCurrent, this.passwordNew, this.passwordNewVerify).then((changePasswordResponse) => {
+      if (changePasswordResponse.success) {
+        console.log('password changed successfully!');
+      } else {
+        console.log('failed to change password');
+      }
+    });
   }
 
   onSubmitMangoPayField(modalData): void {
@@ -1093,6 +1142,21 @@ export default class DashboardHome extends Vue {
         this.loadUserData();
       } else {
         console.log('error submitting registration', submitRegistrationResponse);
+      }
+    });
+  }
+
+  /*
+    CARDS
+  */
+
+  addCard() {
+    this.paymentApi.createCardRegistration().then((createCardResponse) => {
+      if (createCardResponse.success) {
+        // submit card registration
+        console.log('TODO: submit card registration');
+      } else {
+        console.log('error initializing card creation');
       }
     });
   }
