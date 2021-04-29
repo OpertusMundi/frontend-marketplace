@@ -606,7 +606,7 @@
     </div>
 
     <!-- MODALS -->
-    <select-areas v-if="isSelectAreasModalOn" :show="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
+    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
   </div>
 </template>
 
