@@ -24,11 +24,13 @@ export default class CatalogueApi extends Api {
   }
 
   public async find(query: string | CatalogueQuery, page = 0, size = 10): Promise<CatalogueQueryResponse> {
-    const url = '/action/catalogue';
-
     const data: CatalogueQuery = typeof query === 'string' ? { query, page, size } : query;
 
-    return this.post<CatalogueQuery, CatalogueQueryResponseInternal>(url, data)
+    const params = Object.keys(data).map((k) => `${k}=${params[k]}`);
+
+    const url = `/action/catalogue?${params.join('&')}`;
+
+    return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
         const { data: serverResponse } = response;
 
