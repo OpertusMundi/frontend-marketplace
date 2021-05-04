@@ -1,4 +1,4 @@
-import { PageRequest, QueryResultPage } from '@/model/request';
+import { Order, PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
 import { EnumAssetType } from '@/model/enum';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
@@ -49,11 +49,109 @@ export enum EnumDeliveryMethod {
   PHYSICAL_PROVIDER = 'PHYSICAL_PROVIDER',
 }
 
+export enum EnumElasticSearchSortField {
+  TITLE = 'TITLE',
+  REVISION_DATE = 'REVISION_DATE',
+  SCORE = 'SCORE',
+}
+
 export interface CatalogueQuery extends PageRequest {
   /*
    * Query string used for full text search operation
    */
   query: string;
+}
+
+export interface ElasticCatalogueQuery {
+  /**
+   * Full text search
+   */
+  text: string;
+  /**
+   * The nature or genre of the resource
+   */
+  type: EnumAssetType[];
+  /**
+   * The file format, physical medium, or dimensions of the resource e.g. ESRI Shapefile
+   */
+  format: string[];
+  /**
+   * Information about the reference system in automated metadata
+   */
+  crs: string[];
+  /**
+   * Minimum price (excluding VAT)
+   */
+  minPrice: number;
+  /**
+   * Maximum price (excluding VAT)
+   */
+  maxPrice: number;
+  /**
+   * The temporal extent of the resource (start date) with YYYY-MM-DD format e.g. 2020-06-01
+   */
+  fromDate: string;
+  /**
+   * The temporal extent of the resource (end date) with YYYY-MM-DD format e.g. 2020-06-30
+   */
+  toDate: string;
+  /**
+   * A high-level classification scheme to assist in the grouping and topic-based
+   * search of available spatial data resources
+   */
+  topic: EnumTopicCategory[];
+  /**
+   * Minimum scale value
+   */
+  minScale: number;
+  /**
+   * Maximum scale value
+   */
+  maxScale: number;
+  /**
+   * Automated metadata attributes
+   */
+  attribute: string[];
+  /**
+   * Information about resource licensing
+   */
+  license: string[];
+  /**
+   * Name of an entity responsible for making the resource available
+   */
+  publisher: string[];
+  /**
+   * Sorting field
+   */
+  orderBy: EnumElasticSearchSortField;
+  /**
+   * Sorting direction
+   */
+  order: Order;
+  /**
+   * Pagination page index (default: 0)
+   */
+  page: number;
+  /**
+   * Pagination page size (default: 10)
+   */
+  size: number;
+  /**
+   * Bounding box top left longitude
+   */
+  topLeftX: number;
+  /**
+   * Bounding box top left latitude
+   */
+  topLeftY: number;
+  /**
+   * Bounding box bottom right longitude
+   */
+  bottomRightX: number;
+  /**
+   * Bounding box bottom right latitude
+   */
+  bottomRightY: number;
 }
 
 interface Keyword {

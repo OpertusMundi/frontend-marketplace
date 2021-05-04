@@ -6,7 +6,7 @@ import {
 } from '@/model';
 import { AxiosResponse } from 'axios';
 import {
-  CatalogueHarvestCommand, CatalogueHarvestImportCommand, EnumCatalogueType, Publisher,
+  CatalogueHarvestCommand, CatalogueHarvestImportCommand, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField, Publisher,
 } from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 
@@ -29,6 +29,37 @@ export default class CatalogueApi extends Api {
     const params = Object.keys(data).map((k) => `${k}=${params[k]}`);
 
     const url = `/action/catalogue?${params.join('&')}`;
+
+    return this.get<CatalogueQueryResponseInternal>(url)
+      .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
+        const { data: serverResponse } = response;
+
+        // Inject publishers
+        if (serverResponse.success) {
+          serverResponse.result.items = serverResponse.result.items.map((item) => ({
+            ...item,
+            publisher: serverResponse.publishers[item.publisherId],
+          }));
+        }
+
+        return serverResponse;
+      });
+  }
+
+  public async findAdvanced(query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
+    // Set defaults
+    const queryWithDefaults: Partial<ElasticCatalogueQuery> = {
+      page: 0,
+      size: 10,
+      orderBy: EnumElasticSearchSortField.SCORE,
+      order: 'DESC',
+      ...query,
+    };
+
+    const params = Object.keys(queryWithDefaults)
+      .map((k) => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : params[k]}`);
+
+    const url = `/action/catalogue/advanced?${params.join('&')}`;
 
     return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
