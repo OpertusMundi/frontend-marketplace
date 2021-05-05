@@ -22,7 +22,7 @@
                 <!-- <div @click="selectCountry(country)" :class="{'selected': areasSelectedForPurchase.includes(country.properties.CNTR_ID)}"> -->
                 <div @click="selectCountry(country)">
                   <span> {{ country.properties.NAME_ENGL }} </span>
-                  <span> + </span>
+                  <span v-if="selectedNutsCountry !== country.properties.id"> + </span>
                 </div>
                 <div v-if="selectedNutsCountry == country.properties.id">
                   <div v-if="!subAreasGeoJson && isMapStateCountryLevel">loading</div>
@@ -58,7 +58,7 @@
                 <button @click="onRemoveAreaFromList(area)">X</button>
               </div>
             </div>
-            <button @click="addToCart" class="btn btn--std btn--blue">ADD TO CART</button>
+            <button @click="addToCart" :disabled="!areasSelectedForPurchase.length" class="btn btn--std btn--blue">ADD TO CART</button>
             <div class="asset__shopcard">
               <ul class="asset__shopcard__priceoptions">
                 <li>+ 24% VAT (DUMMY)</li>
@@ -175,8 +175,6 @@ export default class SelectAreas extends Vue {
     europeGeoJsonOptions: {
       onEachFeature: (feature, layer) => {
         layer.on('click', () => {
-          // (this as any).$refs.mapSelectAreas.fitBounds(layer.getBounds());
-          // this.changeSelectedNutsCountry(feature.properties.id);
           this.selectCountry(feature);
         });
       },
@@ -185,10 +183,6 @@ export default class SelectAreas extends Vue {
       filter: (feature) => feature.properties?.code?.length === 4,
       onEachFeature: (feature, layer) => {
         layer.on('click', () => {
-          // (this as any).$refs.mapSelectAreas.fitBounds(layer.getBounds());
-          console.log(feature.properties.code);
-          console.log(feature.properties.name);
-          // layer.setStyle({ fillColor: 'red' });
           this.selectSubArea(feature.properties.code);
         });
       },
@@ -224,13 +218,11 @@ export default class SelectAreas extends Vue {
   }
 
   mounted() {
-    console.log('i am mounted!');
     this.show = true;
   }
 
   beforeDestroy() {
     this.show = false;
-    console.log('i am destroyed');
   }
 
   onCloseModal(): void {
@@ -241,12 +233,20 @@ export default class SelectAreas extends Vue {
   }
 
   addCountry() {
+    // remove child-areas OR parent-areas that may have been selected before
+    this.areasSelectedForPurchase.forEach((areaAlreadySelected) => {
+      if (areaAlreadySelected.startsWith(this.selectedNutsCountry) || this.selectedNutsCountry.startsWith(areaAlreadySelected)) {
+        this.areasSelectedForPurchase = this.areasSelectedForPurchase.filter((x) => x !== areaAlreadySelected);
+      }
+    });
+
     this.areasSelectedForPurchase.push(this.selectedNutsCountry);
     this.updateMapSelectionsStyle();
   }
 
   selectCountry(countryGeoJson) {
     const bounds = L.geoJSON(countryGeoJson).getBounds();
+    // increase max zoom level so that user can zoom into country sub-areas
     this.maxZoom = 13;
 
     setTimeout(() => {
@@ -259,6 +259,8 @@ export default class SelectAreas extends Vue {
     console.log(countryId);
 
     this.isAreasLoading = true;
+    this.subAreasGeoJson = null;
+
     this.spatialApi.findAllByPrefix(countryId).then((resp) => {
       if (resp.success) {
         // the following (SORT) should be avoided by fixing the API
@@ -284,6 +286,7 @@ export default class SelectAreas extends Vue {
   }
 
   selectSubArea(code: string): void {
+    // remove child-areas OR parent-areas that may have been selected before
     this.areasSelectedForPurchase.forEach((areaAlreadySelected) => {
       if (areaAlreadySelected.startsWith(code) || code.startsWith(areaAlreadySelected)) {
         this.areasSelectedForPurchase = this.areasSelectedForPurchase.filter((x) => x !== areaAlreadySelected);
@@ -308,22 +311,29 @@ export default class SelectAreas extends Vue {
     this.updateMapSelectionsStyle();
   }
 
+  // vue-leaflet style is not responsive. thus, each time area selection changes, the following method must be called so that map will be styled accordingly.
   updateMapSelectionsStyle() {
+    // COUNTRIES styling
     setTimeout(() => {
       (this as any).$refs.europeGeoJsonLayer.mapObject.setStyle((feature) => {
         for (let i = 0; i < this.areasSelectedForPurchase.length; i += 1) {
+          // if country is selected, paint it blue
           if (this.areasSelectedForPurchase[i] === feature.properties.CNTR_ID) {
             return { color: 'orangered', fillOpacity: 0.7, fillColor: 'blue' };
           }
+          // if area(s) of country is/are selected, painted light blue (lower opacity)
           if (this.areasSelectedForPurchase[i].startsWith(feature.properties.CNTR_ID)) {
             return { color: 'orangered', fillOpacity: 0.3, fillColor: 'blue' };
           }
         }
+        // if no selection relative to this country, leave it transparent (zero opacity)
         return { color: 'orangered', fillOpacity: 0 };
       });
     }, 0);
 
+    // SUB-AREAS styling
     setTimeout(() => {
+      // if area is selected OR its parent area is selected, paint it blue
       (this as any).$refs.subAreasGeoJsonLayer.mapObject.setStyle((feature) => {
         for (let i = 0; i < this.areasSelectedForPurchase.length; i += 1) {
           if (feature.properties.code.startsWith(this.areasSelectedForPurchase[i])) {
