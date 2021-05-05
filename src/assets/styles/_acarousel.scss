@@ -207,6 +207,9 @@
                 font-weight: 700;
                 font-size: em(30);
                 letter-spacing: 0.04em;
+                svg {
+                    width: 130px;
+                }
                 @media(max-width: 576px) { 
                     font-size: em(20);
                 }
