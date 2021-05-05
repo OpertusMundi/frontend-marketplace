@@ -42,7 +42,7 @@
     <section class="homepage__assets" data-aos="fade-in">
       <h4 class="homepage__assets__title">Popular Assets</h4>
       <div class="a_carousel draggable">
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--green">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
@@ -60,7 +60,7 @@
             </div>
           </div>
         </a>
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--purple">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
@@ -78,7 +78,7 @@
             </div>
           </div>
         </a>
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--blue">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
@@ -96,7 +96,7 @@
             </div>
           </div>
         </a>
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--green">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
@@ -114,7 +114,7 @@
             </div>
           </div>
         </a>
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--green">
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
@@ -132,7 +132,8 @@
             </div>
           </div>
         </a>
-        <a href="" class="a_carousel__item">
+        <a href="" class="a_carousel__item a_carousel__item--green">
+          <div class="a_carousel__item__bundle">BUNDLE</div>
           <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
           <div class="a_carousel__item__inner">
             <div class="a_carousel__item__top">
