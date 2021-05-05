@@ -56,10 +56,16 @@ export default class SpatialApi extends Api {
   }
 
   /**
-   * Get all regions by NUTS code prefix (the region for the prefix exact match is not returned)
+   * Get all regions by NUTS code prefix.
+   *
+   * The region for the prefix exact match is not returned.
+   *
+   * @param prefix The prefix to search for
+   * @param maxLevel The max level (inclusive) of the NUTS regions in the result. If not set, all regions are returned
+   * @returns 
    */
-  public async findAllByPrefix(prefix: string): Promise<ServerResponse<NutsRegionFeatureCollection>> {
-    const url = `/action/spatial/nuts/prefix/${prefix}`;
+  public async findAllByPrefix(prefix: string, maxLevel: number | null = null): Promise<ServerResponse<NutsRegionFeatureCollection>> {
+    const url = `/action/spatial/nuts/prefix/${prefix}?maxLevel=${maxLevel === null ? '' : maxLevel}`;
 
     return this.get<ServerResponse<NutsRegionFeatureCollection>>(url)
       .then((response: AxiosServerResponse<NutsRegionFeatureCollection>) => {
@@ -77,7 +83,7 @@ export default class SpatialApi extends Api {
    *
    * @param level NUTS level
    * @param bbox bounding box [minX, minY, maxX, maxY] in EPSG:4326 e.g. [-180, -90, 180, 90]
-   * @returns 
+   * @returns
    */
   public async wfs(level: number, bbox: [number, number, number, number]): Promise<NutsRegionFeatureCollection> {
     const url = `/action/spatial/nuts/${level}/wfs?bbox=${bbox.join(',')}`;

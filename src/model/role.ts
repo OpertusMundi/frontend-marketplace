@@ -3,3 +3,5 @@ export enum EnumRole {
   ROLE_USE = 'ROLE_USER',
   ROLE_DEVELOPER = 'ROLE_DEVELOPER',
 }
+
+export default EnumRole;

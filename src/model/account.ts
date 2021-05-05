@@ -198,7 +198,7 @@ export interface ConsumerProfessionalCommand extends CustomerCommand {
   companyType: string;
   headquartersAddress: AddressCommand;
   legalPersonType: EnumLegalPersonType;
-  legalRepresentative: CustomerRepresentativeCommand;
+  representative: CustomerRepresentativeCommand;
   /**
    * Base64 encoded company logo image
    */
@@ -521,4 +521,19 @@ export interface Account {
    * User name (always equal to user email)
    */
   username: string;
+}
+
+export interface PasswordChangeCommand {
+  /**
+   * Current password of the authenticated user
+   */
+  currentPassword: string;
+  /**
+   * New password
+   */
+  newPassword: string;
+  /**
+   * New password verification. Must match property `newPassword`
+   */
+  verifyNewPassword: string;
 }

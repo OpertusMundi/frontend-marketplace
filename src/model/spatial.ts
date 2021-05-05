@@ -21,7 +21,7 @@ export interface NutsRegionProperties {
   population: number;
 }
 
-export interface Feature<PropsType extends object, GeometryType extends GeoJSON.Geometry> {
+export interface Feature<PropsType extends unknown, GeometryType extends GeoJSON.Geometry> {
   /**
    * Feature identifier
    */
@@ -40,7 +40,7 @@ export interface Feature<PropsType extends object, GeometryType extends GeoJSON.
   properties: PropsType;
 }
 
-export interface FeatureCollection<PropsType extends object, GeometryType extends GeoJSON.Geometry, FeatureType extends Feature<PropsType, GeometryType>> {
+export interface FeatureCollection<PropsType extends unknown, GeometryType extends GeoJSON.Geometry, FeatureType extends Feature<PropsType, GeometryType>> {
   /**
    * Object type. Always equal to `FeatureCollection`
    */

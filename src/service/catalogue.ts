@@ -5,7 +5,9 @@ import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
 } from '@/model';
 import { AxiosResponse } from 'axios';
-import { CatalogueHarvestCommand, CatalogueHarvestImportCommand, EnumCatalogueType, Publisher } from '@/model/catalogue';
+import {
+  CatalogueHarvestCommand, CatalogueHarvestImportCommand, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField, Publisher,
+} from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 
 // Custom response types
@@ -22,11 +24,44 @@ export default class CatalogueApi extends Api {
   }
 
   public async find(query: string | CatalogueQuery, page = 0, size = 10): Promise<CatalogueQueryResponse> {
-    const url = '/action/catalogue';
-
     const data: CatalogueQuery = typeof query === 'string' ? { query, page, size } : query;
 
-    return this.post<CatalogueQuery, CatalogueQueryResponseInternal>(url, data)
+    const params = Object.keys(data).map((k) => `${k}=${params[k]}`);
+
+    const url = `/action/catalogue?${params.join('&')}`;
+
+    return this.get<CatalogueQueryResponseInternal>(url)
+      .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
+        const { data: serverResponse } = response;
+
+        // Inject publishers
+        if (serverResponse.success) {
+          serverResponse.result.items = serverResponse.result.items.map((item) => ({
+            ...item,
+            publisher: serverResponse.publishers[item.publisherId],
+          }));
+        }
+
+        return serverResponse;
+      });
+  }
+
+  public async findAdvanced(query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
+    // Set defaults
+    const queryWithDefaults: Partial<ElasticCatalogueQuery> = {
+      page: 0,
+      size: 10,
+      orderBy: EnumElasticSearchSortField.SCORE,
+      order: 'DESC',
+      ...query,
+    };
+
+    const params = Object.keys(queryWithDefaults)
+      .map((k) => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : params[k]}`);
+
+    const url = `/action/catalogue/advanced?${params.join('&')}`;
+
+    return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
         const { data: serverResponse } = response;
 
@@ -55,18 +90,18 @@ export default class CatalogueApi extends Api {
 
   public async harvest(command: CatalogueHarvestCommand): Promise<SimpleResponse> {
     const url = '/action/catalogue/harvest';
-    if (!command.type) {
-      command.type = EnumCatalogueType.CSW;
-    }
-    return this.post<CatalogueHarvestCommand, SimpleResponse>(url, command)
-      .then((response: AxiosResponse<SimpleResponse>) => {
-        const { data } = response;
 
-        return data;
-      });
+    return this.post<CatalogueHarvestCommand, SimpleResponse>(url, {
+      ...command,
+      type: command.type || EnumCatalogueType.CSW,
+    }).then((response: AxiosResponse<SimpleResponse>) => {
+      const { data } = response;
+
+      return data;
+    });
   }
 
-  public async findHarvested(catalogueUrl: string, page = 0, size = 10, query: string = ''): Promise<CatalogueQueryResponse> {
+  public async findHarvested(catalogueUrl: string, page = 0, size = 10, query = ''): Promise<CatalogueQueryResponse> {
     const url = `/action/catalogue/harvest?url=${catalogueUrl}&page=${page}&size=${size}&query=${query}`;
 
     return this.get<CatalogueQueryResponseInternal>(url)
@@ -88,5 +123,4 @@ export default class CatalogueApi extends Api {
         return data;
       });
   }
-
 }
