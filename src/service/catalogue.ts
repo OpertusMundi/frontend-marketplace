@@ -26,7 +26,7 @@ export default class CatalogueApi extends Api {
   public async find(query: string | CatalogueQuery, page = 0, size = 10): Promise<CatalogueQueryResponse> {
     const data: CatalogueQuery = typeof query === 'string' ? { query, page, size } : query;
 
-    const params = Object.keys(data).map((k) => `${k}=${params[k]}`);
+    const params = Object.keys(data).map((k) => `${k}=${data[k]}`);
 
     const url = `/action/catalogue?${params.join('&')}`;
 
@@ -57,7 +57,7 @@ export default class CatalogueApi extends Api {
     };
 
     const params = Object.keys(queryWithDefaults)
-      .map((k) => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : params[k]}`);
+      .map((k) => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : queryWithDefaults[k]}`);
 
     const url = `/action/catalogue/advanced?${params.join('&')}`;
 
