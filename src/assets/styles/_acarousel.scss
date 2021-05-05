@@ -207,8 +207,14 @@
                 font-weight: 700;
                 font-size: em(30);
                 letter-spacing: 0.04em;
-                svg {
-                    width: 130px;
+                &--open {
+                    display: flex;
+                    align-items: center;
+                    img {
+                        display: block;
+                        margin-right: 10px;
+                        height: 30px;
+                    }
                 }
                 @media(max-width: 576px) { 
                     font-size: em(20);
