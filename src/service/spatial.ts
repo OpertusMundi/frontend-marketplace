@@ -56,10 +56,16 @@ export default class SpatialApi extends Api {
   }
 
   /**
-   * Get all regions by NUTS code prefix (the region for the prefix exact match is not returned)
+   * Get all regions by NUTS code prefix.
+   *
+   * The region for the prefix exact match is not returned.
+   *
+   * @param prefix The prefix to search for
+   * @param maxLevel The max level (inclusive) of the NUTS regions in the result. If not set, all regions are returned
+   * @returns 
    */
-  public async findAllByPrefix(prefix: string): Promise<ServerResponse<NutsRegionFeatureCollection>> {
-    const url = `/action/spatial/nuts/prefix/${prefix}`;
+  public async findAllByPrefix(prefix: string, maxLevel: number | null = null): Promise<ServerResponse<NutsRegionFeatureCollection>> {
+    const url = `/action/spatial/nuts/prefix/${prefix}?maxLevel=${maxLevel === null ? '' : maxLevel}`;
 
     return this.get<ServerResponse<NutsRegionFeatureCollection>>(url)
       .then((response: AxiosServerResponse<NutsRegionFeatureCollection>) => {
