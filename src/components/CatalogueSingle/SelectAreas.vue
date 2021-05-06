@@ -22,7 +22,7 @@
                 <!-- <div @click="selectCountry(country)" :class="{'selected': areasSelectedForPurchase.includes(country.properties.CNTR_ID)}"> -->
                 <div @click="selectCountry(country)">
                   <span> {{ country.properties.NAME_ENGL }} </span>
-                  <span v-if="selectedNutsCountry !== country.properties.id"> + </span>
+                  <span v-if="selectedNutsCountry !== country.properties.id || !isMapStateCountryLevel"> + </span>
                 </div>
                 <div v-if="selectedNutsCountry == country.properties.id">
                   <div v-if="!subAreasGeoJson && isMapStateCountryLevel">loading</div>
@@ -38,6 +38,18 @@
           <div class="select-area-modal__col-map">
             <l-map ref="mapSelectAreas" :maxZoom="maxZoom" :minZoom="minZoom" :bounds="mapOptions.bounds" @zoomend="onZoomEnd" v-if="mapOptions">
               <div class="loader" v-if="isAreasLoading"><h2>LOADING</h2></div>
+
+              <transition name="fade" mode="out-in">
+                <div v-if="isMapStateCountryLevel" class="select-area-modal__col-map__map-msg select-area-modal__col-map__map-msg--blue">
+                  <h2> Click on an area to add to cart </h2>
+                </div>
+              </transition>
+              <transition name="fade" mode="out-in">
+                <div v-if="!isMapStateCountryLevel" class="select-area-modal__col-map__map-msg">
+                  <h2> Click on a country to select areas </h2>
+                </div>
+              </transition>
+
               <div class="select-area-modal__col-map__add-area" v-if="selectedNutsCountry && subAreasGeoJson && !areasSelectedForPurchase.includes(selectedNutsCountry)">
                 <h3>{{ europeGeoJson.features.find((x) => x.properties.id === selectedNutsCountry).properties.NAME_ENGL }}</h3>
                 <span>130,000 rows</span>
@@ -261,16 +273,13 @@ export default class SelectAreas extends Vue {
     this.isAreasLoading = true;
     this.subAreasGeoJson = null;
 
-    this.spatialApi.findAllByPrefix(countryId).then((resp) => {
+    this.spatialApi.findAllByPrefix(countryId, 2).then((resp) => {
       if (resp.success) {
-        // the following (SORT) should be avoided by fixing the API
+        // TODO: the following (SORT) should be avoided by fixing the API
         (resp as any).result.features.sort((a, b) => (a.properties.code > b.properties.code ? 1 : -1));
         // the following (REMOVE DUPLICATES) should be avoided by fixing the API
         // eslint-disable-next-line
         (resp as any).result.features = (resp as any).result.features.filter((val,ind,arr)=>arr.findIndex(t=>(t.properties.code === val.properties.code))===ind);
-        // the following (REMOVE NUTS-3) should be avoided by fixing the API
-        // eslint-disable-next-line
-        (resp as any).result.features = (resp as any).result.features.filter((item) => item.properties.code.length !== 5);
 
         this.subAreasGeoJson = resp.result;
         this.isMapStateCountryLevel = true;
@@ -293,6 +302,21 @@ export default class SelectAreas extends Vue {
       }
     });
 
+    // check if all child-nuts of parent area are selected
+    const selectedAreaCodeLength = code.length;
+    const parentArea = code.slice(0, -1);
+    // check how many areas of same nuts level AND with the same parent, exist
+    const counterNuts2 = this.subAreasGeoJson.features.filter((x) => x.properties.code.length === selectedAreaCodeLength && x.properties.code.startsWith(parentArea)).length;
+    // check how many of these are selected
+    const counterNuts2selected = this.areasSelectedForPurchase.filter((x) => x.length === selectedAreaCodeLength && x.startsWith(parentArea)).length;
+
+    // if all child-nuts of parent area are selected
+    if (counterNuts2selected === (counterNuts2 - 1)) {
+      this.areasSelectedForPurchase = this.areasSelectedForPurchase.filter((x) => !x.startsWith(parentArea));
+      this.selectSubArea(parentArea);
+      return;
+    }
+    // else
     this.areasSelectedForPurchase.push(code);
     this.updateMapSelectionsStyle();
   }
@@ -432,6 +456,7 @@ export default class SelectAreas extends Vue {
   &__header {
     width: 100%;
     display: flex;
+    margin-bottom: 20px;
 
     h3 {
       flex-grow: 1;
@@ -520,6 +545,22 @@ export default class SelectAreas extends Vue {
       border-radius: 10px;
       display: flex;
       flex-direction: column;
+    }
+
+    &__map-msg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      margin: 10px;
+      padding: 5px 10px 5px 10px;
+      z-index: 2000;
+      background: white;
+      border-radius: 5px;
+      cursor: default;
+
+      &--blue {
+        color: $secondColor;
+      }
     }
   }
 
