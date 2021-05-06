@@ -663,6 +663,8 @@ export default class CatalogueSingle extends Vue {
 
   catalogueItem: CatalogueItem;
 
+  isUserAuthenticated: boolean;
+
   // variables added for API metadata
 
   // we currently dont know the exact interface of the API metadata.
@@ -721,6 +723,8 @@ export default class CatalogueSingle extends Vue {
     this.selectedPricingModel = null;
     this.cartErrors = '';
     this.cartApi = new CartApi();
+
+    this.isUserAuthenticated = store.getters.isAuthenticated;
 
     this.map = {
       show: false,
@@ -850,7 +854,9 @@ export default class CatalogueSingle extends Vue {
         setTimeout(() => {
           this.calcAssetHeaderTitle();
           this.initMap();
-          this.setMinMaxZoomLevels();
+          if (this.isUserAuthenticated) { // setMinMaxZoomLevels() is called for metadata maps that are only shown to loggen in users
+            this.setMinMaxZoomLevels();
+          }
         }, 200);
 
         if ((this.catalogueItem as CatalogueItemDetails).automatedMetadata) {
@@ -868,7 +874,7 @@ export default class CatalogueSingle extends Vue {
       });
   }
 
-  setMinMaxZoomLevels() {
+  setMinMaxZoomLevels(): void {
     this.$nextTick(() => {
       const fitBoundsZoomLevel = (this as any).$refs.map.mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson((this.metadata as VectorMetadata).mbr)).getBounds());
 

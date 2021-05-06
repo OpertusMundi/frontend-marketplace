@@ -70,7 +70,7 @@
                 <button @click="onRemoveAreaFromList(area)">X</button>
               </div>
             </div>
-            <button @click="addToCart" :disabled="!areasSelectedForPurchase.length" class="btn btn--std btn--blue">ADD TO CART</button>
+            <button @click="addToCart" :disabled="!areasSelectedForPurchase.length" class="btn btn--std btn--blue mb-xs-20">ADD TO CART</button>
             <div class="asset__shopcard">
               <ul class="asset__shopcard__priceoptions">
                 <li>+ 24% VAT (DUMMY)</li>
@@ -124,14 +124,15 @@ import {
   Component,
   Vue,
   Prop,
-  Watch,
 } from 'vue-property-decorator';
 import store from '@/store';
-import L, { latLng } from 'leaflet';
+import L from 'leaflet';
 import {
-  LMap, LTileLayer, LPolygon, LGeoJson,
+  LMap, LTileLayer, LGeoJson,
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
+// eslint-disable-next-line
+import { GeoJsonObject } from 'geojson';
 import { CartAddItemCommand } from '../../model/cart';
 import CartApi from '../../service/cart';
 import SpatialApi from '../../service/spatial';
@@ -185,14 +186,18 @@ export default class SelectAreas extends Vue {
       fillOpacity: 0,
     },
     europeGeoJsonOptions: {
+      // eslint-disable-next-line
       onEachFeature: (feature, layer) => {
-        layer.on('click', () => {
+        layer.on('click', (): void => {
+          // eslint-disable-next-line
           this.selectCountry(feature);
         });
       },
     },
     subAreasGeoJsonOptions: {
+      // eslint-disable-next-line
       filter: (feature) => feature.properties?.code?.length === 4,
+      // eslint-disable-next-line
       onEachFeature: (feature, layer) => {
         layer.on('click', () => {
           this.selectSubArea(feature.properties.code);
@@ -205,46 +210,32 @@ export default class SelectAreas extends Vue {
     super();
 
     this.show = false;
-
     this.cartApi = new CartApi();
-
     this.spatialApi = new SpatialApi();
-
     this.isAreasLoading = false;
-
     this.isMapStateCountryLevel = false;
-
     this.minZoom = 0;
-
     this.maxZoom = 4;
-
     this.europeGeoJson = europeGeoJSON;
-
     this.subAreasGeoJson = null;
-
     this.areasSelectedForPurchase = [];
-
     this.fitBoundsCountryZoom = -1;
-
     this.selectedNutsCountry = '';
   }
 
-  mounted() {
+  mounted(): void {
     this.show = true;
   }
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     this.show = false;
   }
 
   onCloseModal(): void {
-    this.subAreasGeoJson = null;
-    this.areasSelectedForPurchase = [];
-    this.selectedNutsCountry = '';
     this.$emit('close');
   }
 
-  addCountry() {
+  addCountry(): void {
     // remove child-areas OR parent-areas that may have been selected before
     this.areasSelectedForPurchase.forEach((areaAlreadySelected) => {
       if (areaAlreadySelected.startsWith(this.selectedNutsCountry) || this.selectedNutsCountry.startsWith(areaAlreadySelected)) {
@@ -256,7 +247,7 @@ export default class SelectAreas extends Vue {
     this.updateMapSelectionsStyle();
   }
 
-  selectCountry(countryGeoJson) {
+  selectCountry(countryGeoJson: GeoJsonObject): void {
     const bounds = L.geoJSON(countryGeoJson).getBounds();
     // increase max zoom level so that user can zoom into country sub-areas
     this.maxZoom = 13;
@@ -266,7 +257,7 @@ export default class SelectAreas extends Vue {
       (this as any).$refs.mapSelectAreas.fitBounds(bounds);
     }, 0);
 
-    const countryId = countryGeoJson.properties.id;
+    const countryId = (countryGeoJson as any).properties.id;
     this.selectedNutsCountry = countryId;
     console.log(countryId);
 
@@ -336,7 +327,7 @@ export default class SelectAreas extends Vue {
   }
 
   // vue-leaflet style is not responsive. thus, each time area selection changes, the following method must be called so that map will be styled accordingly.
-  updateMapSelectionsStyle() {
+  updateMapSelectionsStyle(): void {
     // COUNTRIES styling
     setTimeout(() => {
       (this as any).$refs.europeGeoJsonLayer.mapObject.setStyle((feature) => {
@@ -369,7 +360,7 @@ export default class SelectAreas extends Vue {
     }, 0);
   }
 
-  onZoomEnd() {
+  onZoomEnd(): void {
     const currentZoom = (this as any).$refs.mapSelectAreas.mapObject.getZoom();
     console.log(currentZoom);
 
@@ -382,7 +373,7 @@ export default class SelectAreas extends Vue {
     }
   }
 
-  addToCart() {
+  addToCart(): void {
     console.log(this.areasSelectedForPurchase);
 
     const item: CartAddItemCommand = {
@@ -413,201 +404,6 @@ export default class SelectAreas extends Vue {
 <style lang="scss">
 @import "@/assets/styles/_assets.scss";
 @import "@/assets/styles/_btns.scss";
-
-.select-area-modal {
-  height: 100%;
-  width: 100%;
-  background: $lightBgColor;
-  border: solid 2px $secondColor;
-  border-radius: 13px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-
-  .loader {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    z-index: 9999;
-  }
-
-  &__wrapper {
-    position: fixed;
-    height: 100vh;
-    width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    padding: 20px;
-  }
-
-  &__btn-close {
-    cursor: pointer;
-  }
-
-  &__header {
-    width: 100%;
-    display: flex;
-    margin-bottom: 20px;
-
-    h3 {
-      flex-grow: 1;
-    }
-  }
-
-  &__body {
-    height: 100%;
-    display: flex;
-    flex-grow: 1;
-  }
-
-  &__body > div {
-    height: 100%;
-  }
-
-  &__col-areas {
-    // min-width: 290px;
-    width: 290px;
-    padding: 0 20px 0 0;
-    display: flex;
-    flex-direction: column;
-
-    h4 {
-      margin-bottom: 20px;
-    }
-
-    &__scroll-wrapper {
-      height: 0;
-      flex-grow: 1;
-      overflow-y: scroll;
-    }
-
-    &__area > div {
-      display: flex;
-      justify-content: space-between;
-      cursor: pointer;
-      padding: 0 10px 0 0;
-    }
-
-    .selected {
-      background: $secondColor;
-      color: #fff;
-    }
-
-    &__sub-areas {
-      display: flex;
-      flex-direction: column;
-
-      .nuts-1 {
-        font-size: 1.1em;
-      }
-      .nuts-2 {
-        font-size: 1em;
-        margin-left: 15px;
-      }
-      .nuts-3 {
-        font-size: .9em;
-        margin-left: 30px;
-      }
-
-      .selected {
-        background: $secondColor;
-        color: #fff;
-        padding: 5px;
-      }
-
-      &__area {
-        // margin: 5px 0 0 0;
-        padding: 5px 0 5px 0;
-        border-radius: 5px;
-      }
-    }
-  }
-
-  &__col-map {
-    flex-grow: 1;
-
-    &__add-area {
-      background: white;
-      z-index: 2000;
-      position: relative;
-      float: right;
-      margin: 20px;
-      padding: 10px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    &__map-msg {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      margin: 10px;
-      padding: 5px 10px 5px 10px;
-      z-index: 2000;
-      background: white;
-      border-radius: 5px;
-      cursor: default;
-
-      &--blue {
-        color: $secondColor;
-      }
-    }
-  }
-
-  &__col-submit {
-    width: 290px;
-    padding: 0 0 0 20px;
-
-    &__area-label {
-      // background: $secondColor;
-      // color: #fff;
-      background: #fff;
-      color: $secondColor;
-      border: solid 2px $secondColor;
-      border-radius: 5px;
-      margin: 0 5px 5px 5px;
-      padding: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      button {
-        background: transparent;
-        // color: #fff;
-        color: $secondColor;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      &__wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 10px;
-      }
-    }
-
-    // .card {
-    //   background: #fff;
-    //   border-radius: 10px;
-    //   min-width: 200px;
-    //   padding: 20px;
-
-    //   &__pricing-model-title {
-    //     color: $secondColor;
-    //   }
-    // }
-  }
-}
+@import "@/assets/styles/abstracts/_spacings.scss";
+@import "@/assets/styles/_cataloguesingle-selectareas.scss";
 </style>
