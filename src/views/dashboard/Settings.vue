@@ -779,7 +779,7 @@ export default class DashboardHome extends Vue {
 
   modalToShow: string;
 
-  userData: null | Account;
+  userData: Account;
 
   passwordCurrent: string;
 
@@ -813,34 +813,25 @@ export default class DashboardHome extends Vue {
     super();
 
     this.accountApi = new AccountApi();
-
     this.profileApi = new ProfileApi();
-
     this.providerApi = new ProviderApi();
-
     this.paymentApi = new PaymentApi();
-
     this.kycDocumentApi = new KycDocumentApi();
-
     this.uboDeclarationApi = new UboDeclarationApi();
 
     this.isUserDataLoaded = false;
-
     this.isCardsLoaded = false;
-
     this.isKycDocumentsLoaded = false;
-
     this.isUboDeclarationsLoaded = false;
-
     this.isUbosOfUboDeclarationLoaded = false;
 
     this.isUserDraft = false;
-
     this.draftStatus = '';
 
-    this.userData = null;
+    this.userData = {} as Account;
 
     this.selectedTab = 'general';
+    this.modalToShow = '';
 
     this.passwordCurrent = '';
     this.passwordNew = '';
@@ -850,18 +841,12 @@ export default class DashboardHome extends Vue {
 
     this.cards = [];
 
-    this.modalToShow = '';
-
     this.kycDocuments = null;
-
     this.kycNumberOfInputs = 1;
 
     this.uboDeclarations = null;
-
     this.selectedDeclaration = null;
-
     this.showUboForm = false;
-
     this.uboToAdd = this.initUboToAdd();
   }
 
@@ -951,20 +936,13 @@ export default class DashboardHome extends Vue {
   // eslint-disable-next-line
   onSubmitTopioAccountField(modalData: any): void {
     const data = {
-      // eslint-disable-next-line
-      firstName: this.userData!.profile.firstName,
-      // eslint-disable-next-line
-      image: this.userData!.profile.image,
-      // eslint-disable-next-line
-      imageMimeType: this.userData!.profile.imageMimeType,
-      // eslint-disable-next-line
-      lastName: this.userData!.profile.lastName,
-      // eslint-disable-next-line
-      locale: this.userData!.profile.locale,
-      // eslint-disable-next-line
-      mobile: this.userData!.profile.mobile,
-      // eslint-disable-next-line
-      phone: this.userData!.profile.phone,
+      firstName: this.userData.profile.firstName,
+      image: this.userData.profile.image,
+      imageMimeType: this.userData.profile.imageMimeType,
+      lastName: this.userData.profile.lastName,
+      locale: this.userData.profile.locale,
+      mobile: this.userData.profile.mobile,
+      phone: this.userData.profile.phone,
     };
 
     switch (modalData.modalId) {
@@ -1030,110 +1008,81 @@ export default class DashboardHome extends Vue {
   onSubmitMangoPayField(modalData): void {
     let draft;
     if (this.isUserDraft) { // if draft exists, update existing draft
-      // eslint-disable-next-line
-      draft = this.userData!.profile.provider.draft;
-
+      draft = this.userData.profile.provider.draft;
     } else { // if draft is null, copy current profile as draft
       draft = {};
       const propertiesToKeep = ['additionalInfo', 'bankAccount', 'companyNumber', 'companyType', 'email', 'headquartersAddress', 'legalPersonType', 'representative', 'logoImage', 'logoImageMimeType', 'name', 'phone', 'siteUrl', 'type'];
       // eslint-disable-next-line
-      Object.keys(this.userData!.profile.provider.current!).forEach((x) => {
+      Object.keys(this.userData.profile.provider.current!).forEach((x) => {
         if (propertiesToKeep.includes(x)) {
           // eslint-disable-next-line
-          draft[x] = this.userData!.profile.provider.current![x];
+          draft[x] = this.userData.profile.provider.current![x];
         }
       });
     }
 
     switch (modalData.modalId) {
       case 'companyName': {
-        // eslint-disable-next-line
-        draft!.name = modalData.inputValues[0].value;
+        draft.name = modalData.inputValues[0].value;
         break;
       }
       case 'vatNumber': {
-        // eslint-disable-next-line
-        draft!.companyNumber = modalData.inputValues[0].value;
+        draft.companyNumber = modalData.inputValues[0].value;
         break;
       }
       case 'companyType': {
-        // eslint-disable-next-line
-        draft!.companyType = modalData.inputValues[0].value;
+        draft.companyType = modalData.inputValues[0].value;
         break;
       }
       case 'companyEmail': {
-        // eslint-disable-next-line
-        draft!.email = modalData.inputValues[0].value;
+        draft.email = modalData.inputValues[0].value;
         break;
       }
       case 'siteUrl': {
-        // eslint-disable-next-line
-        draft!.siteUrl = modalData.inputValues[0].value;
+        draft.siteUrl = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountOwnerName': {
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerName = modalData.inputValues[0].value;
+        draft.bankAccount.ownerName = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountIban': {
-        // eslint-disable-next-line
-        draft!.bankAccount.iban = modalData.inputValues[0].value;
+        draft.bankAccount.iban = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountBic': {
-        // eslint-disable-next-line
-        draft!.bankAccount.bic = modalData.inputValues[0].value;
+        draft.bankAccount.bic = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountOwnerAddress': {
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.line1 = (this.$refs['bankAccountOwnerAddressLine1'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.line2 = (this.$refs['bankAccountOwnerAddressLine2'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.city = (this.$refs['bankAccountOwnerAddressCity'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.region = (this.$refs['bankAccountOwnerAddressRegion'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.postalCode = (this.$refs['bankAccountOwnerAddressPostalCode'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.bankAccount.ownerAddress.country = (this.$refs['bankAccountOwnerAddressCountry'] as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.line1 = (this.$refs.bankAccountOwnerAddressLine1 as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.line2 = (this.$refs.bankAccountOwnerAddressLine2 as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.city = (this.$refs.bankAccountOwnerAddressCity as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.region = (this.$refs.bankAccountOwnerAddressRegion as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.postalCode = (this.$refs.bankAccountOwnerAddressPostalCode as HTMLInputElement).value;
+        draft.bankAccount.ownerAddress.country = (this.$refs.bankAccountOwnerAddressCountry as HTMLInputElement).value;
         break;
       }
       case 'headquartersAddress': {
-        // eslint-disable-next-line
-        draft!.headquartersAddress.line1 = (this.$refs['headquartersAddressLine1'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.headquartersAddress.line2 = (this.$refs['headquartersAddressLine2'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.headquartersAddress.city = (this.$refs['headquartersAddressCity'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.headquartersAddress.region = (this.$refs['headquartersAddressRegion'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.headquartersAddress.postalCode = (this.$refs['headquartersAddressPostalCode'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.headquartersAddress.country = (this.$refs['headquartersAddressCountry'] as HTMLInputElement).value;
+        draft.headquartersAddress.line1 = (this.$refs.headquartersAddressLine1 as HTMLInputElement).value;
+        draft.headquartersAddress.line2 = (this.$refs.headquartersAddressLine2 as HTMLInputElement).value;
+        draft.headquartersAddress.city = (this.$refs.headquartersAddressCity as HTMLInputElement).value;
+        draft.headquartersAddress.region = (this.$refs.headquartersAddressRegion as HTMLInputElement).value;
+        draft.headquartersAddress.postalCode = (this.$refs.headquartersAddressPostalCode as HTMLInputElement).value;
+        draft.headquartersAddress.country = (this.$refs.headquartersAddressCountry as HTMLInputElement).value;
         break;
       }
       case 'representativeAddress': {
-        // eslint-disable-next-line
-        draft!.representative.address.line1 = (this.$refs['representativeAddressLine1'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.representative.address.line2 = (this.$refs['representativeAddressLine2'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.representative.address.city = (this.$refs['representativeAddressCity'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.representative.address.region = (this.$refs['representativeAddressRegion'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.representative.address.postalCode = (this.$refs['representativeAddressPostalCode'] as HTMLInputElement).value;
-        // eslint-disable-next-line
-        draft!.representative.address.country = (this.$refs['representativeAddressCountry'] as HTMLInputElement).value;
+        draft.representative.address.line1 = (this.$refs.representativeAddressLine1 as HTMLInputElement).value;
+        draft.representative.address.line2 = (this.$refs.representativeAddressLine2 as HTMLInputElement).value;
+        draft.representative.address.city = (this.$refs.representativeAddressCity as HTMLInputElement).value;
+        draft.representative.address.region = (this.$refs.representativeAddressRegion as HTMLInputElement).value;
+        draft.representative.address.postalCode = (this.$refs.representativeAddressPostalCode as HTMLInputElement).value;
+        draft.representative.address.country = (this.$refs.representativeAddressCountry as HTMLInputElement).value;
         break;
       }
       case 'iban': {
-        // eslint-disable-next-line
-        draft!.bankAccount.iban = modalData.inputValues[0].value;
+        draft.bankAccount.iban = modalData.inputValues[0].value;
         break;
       }
       default:
