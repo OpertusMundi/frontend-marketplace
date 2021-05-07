@@ -230,7 +230,7 @@
               <div class="tabs__tab tabs__tab__tab-general">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Image</strong></div>
-                  <div class="tabs__tab__list__item right"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image" style="border-radius: 50%"></div>
+                  <div class="tabs__tab__list__item right avatar"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image"></div>
                   <div class="tabs__tab__list__item"><button @click="modalToShow = 'image'" class="btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
 
@@ -880,7 +880,7 @@ export default class DashboardHome extends Vue {
       this.userData = response.result;
       this.isUserDraft = !!this.userData.profile.provider.draft;
 
-      // NEXT BLOCK ( OVERWRITE ) TO BE DELETED - DEVELOPMENT PURPOSE ONLY
+      // NEXT BLOCK ( OVERWRITE ) [TODO] TO BE DELETED - DEVELOPMENT PURPOSE ONLY
       // if (this.userData.profile.provider.draft) {
       //   this.userData.profile.provider.draft.status = EnumCustomerRegistrationStatus.DRAFT;
       // }
@@ -1013,9 +1013,10 @@ export default class DashboardHome extends Vue {
     if (this.isUserDraft) { // if draft exists, update existing draft
       draft = this.userData!.profile.provider.draft;
 
+      // TODO: delete next 3 lines if fixed
       // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
       // eslint-disable-next-line
-      delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
+      // delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
 
     } else { // if draft is null, copy current profile as draft
       draft = {};
@@ -1026,9 +1027,10 @@ export default class DashboardHome extends Vue {
           draft[x] = this.userData!.profile.provider.current![x];
         }
       });
+      // TODO: delete next 3 lines if fixed
       // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
       // eslint-disable-next-line
-      delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
+      // delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
     }
 
     switch (modalData.modalId) {
@@ -1096,17 +1098,17 @@ export default class DashboardHome extends Vue {
       }
       case 'representativeAddress': {
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.line1 = (this.$refs['representativeAddressLine1'] as HTMLInputElement).value;
+        draft!.representative.address.line1 = (this.$refs['representativeAddressLine1'] as HTMLInputElement).value;
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.line2 = (this.$refs['representativeAddressLine2'] as HTMLInputElement).value;
+        draft!.representative.address.line2 = (this.$refs['representativeAddressLine2'] as HTMLInputElement).value;
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.city = (this.$refs['representativeAddressCity'] as HTMLInputElement).value;
+        draft!.representative.address.city = (this.$refs['representativeAddressCity'] as HTMLInputElement).value;
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.region = (this.$refs['representativeAddressRegion'] as HTMLInputElement).value;
+        draft!.representative.address.region = (this.$refs['representativeAddressRegion'] as HTMLInputElement).value;
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.postalCode = (this.$refs['representativeAddressPostalCode'] as HTMLInputElement).value;
+        draft!.representative.address.postalCode = (this.$refs['representativeAddressPostalCode'] as HTMLInputElement).value;
         // eslint-disable-next-line
-        draft!.legalRepresentative.address.country = (this.$refs['representativeAddressCountry'] as HTMLInputElement).value;
+        draft!.representative.address.country = (this.$refs['representativeAddressCountry'] as HTMLInputElement).value;
         break;
       }
       case 'iban': {
@@ -1130,9 +1132,10 @@ export default class DashboardHome extends Vue {
   submitRegistrationFromDraft(): void {
     const draft = this.userData?.profile.provider.draft;
 
+    // TODO: delete next 3 lines if fixed
     // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API.
     // eslint-disable-next-line
-    delete Object.assign((draft as any), {['legalRepresentative']: (draft as any)['representative'] })['representative'];
+    // delete Object.assign((draft as any), {['legalRepresentative']: (draft as any)['representative'] })['representative'];
 
     console.log(draft);
     // AS ANY - TO BE CORRECTED

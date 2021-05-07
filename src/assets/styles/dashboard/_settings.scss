@@ -50,6 +50,11 @@
         display: flex;
         justify-content: flex-end;
       }
+
+      .avatar > img {
+        border: solid 2px #333333;
+        border-radius: 50%; 
+      }
     }
 
     &__kyc {
