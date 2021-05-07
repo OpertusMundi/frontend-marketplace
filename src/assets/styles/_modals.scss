@@ -61,6 +61,18 @@
   &__btn-close {
     cursor: pointer;
   }
+
+  &__errors {
+    max-width: 700px;
+    margin: 0 auto;
+    // border: 2px solid red;
+    color: red;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: em(15);
+    font-weight: 500;
+    text-align: center;
+  }
 }
 
 .modal-search{
