@@ -59,7 +59,7 @@ export default class CatalogueApi extends Api {
     };
 
     const params = Object.keys(queryWithDefaults)
-      .map((k) => `${k}=${Array.isArray(params[k]) ? params[k].join(',') : queryWithDefaults[k]}`);
+      .map((k) => `${k}=${Array.isArray(queryWithDefaults[k]) ? queryWithDefaults[k].join(',') : queryWithDefaults[k]}`);
 
     const url = `/action/catalogue/advanced?${params.join('&')}`;
 
