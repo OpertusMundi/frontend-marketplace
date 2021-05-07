@@ -23,23 +23,34 @@
         <modal :show="modalToShow == 'bankAccountIban'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change IBAN'" :modalId="'bankAccountIban'" :inputs="[{id: 'bankAccountIban', name: 'IBAN', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.iban : userData.profile.provider.current.bankAccount.iban, type: 'text'}]"></modal>
         <modal :show="modalToShow == 'bankAccountBic'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change BIC'" :modalId="'bankAccountBic'" :inputs="[{id: 'bankAccountBic', name: 'BIC', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.bic : userData.profile.provider.current.bankAccount.bic, type: 'text'}]"></modal>
 
-        <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="modalToShow = ''" :modalId="'password'">
+        <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="onPasswordModalDismiss" :modalId="'password'" :showCancelButton="false">
           <template v-slot:body>
-            <h1>Change password</h1>
+            <div v-if="!passwordChanged">
+              <h1>Change password</h1>
 
-            <div class="form-group">
-              <label for="modal_input_passwordCurrent" class="mt-xs-20"> Current password </label>
-              <input v-model="passwordCurrent" class="form-group__text" type="password" id="modal_input_passwordCurrent">
+              <div class="form-group">
+                <label for="modal_input_passwordCurrent" class="mt-xs-20"> Current password </label>
+                <input v-model="passwordCurrent" class="form-group__text" type="password" id="modal_input_passwordCurrent">
+                <transition name="fade" mode="out-in"><div class="modal__errors" v-if="passwordCurrentError">Incorrect password.</div></transition>
 
-              <label for="modal_input_passwordNew" class="mt-xs-20"> New password </label>
-              <input v-model="passwordNew" class="form-group__text" type="password" id="modal_input_passwordNew">
+                <label for="modal_input_passwordNew" class="mt-xs-20"> New password </label>
+                <input v-model="passwordNew" class="form-group__text" type="password" id="modal_input_passwordNew">
 
-              <label for="modal_input_passwordNewVerify" class="mt-xs-20"> Verify new password </label>
-              <input v-model="passwordNewVerify" class="form-group__text" type="password" id="modal_input_passwordNewVerify">
+                <label for="modal_input_passwordNewVerify" class="mt-xs-20"> Verify new password </label>
+                <input v-model="passwordNewVerify" class="form-group__text" type="password" id="modal_input_passwordNewVerify">
+              </div>
+            </div>
+            <div v-else>
+              <h1>Password is changed successfully!</h1>
             </div>
           </template>
 
-          <template v-slot:btn-submit><button class="btn btn--std btn--blue ml-xs-20" @click="onChangePassword" :disabled="passwordNew !== passwordNewVerify || passwordNew === '' || passwordCurrent === ''">CONFIRM</button></template>
+          <template v-slot:footer>
+            <button v-if="!passwordChanged" @click="onPasswordModalDismiss" class="btn btn--std btn--blue">CANCEL</button>
+            <button v-if="!passwordChanged" class="btn btn--std btn--blue ml-xs-20" @click="onChangePassword" :disabled="passwordNew !== passwordNewVerify || passwordNew === '' || passwordCurrent === ''">CONFIRM</button>
+
+            <button v-if="passwordChanged" @click="onPasswordModalDismiss" class="btn btn--std btn--blue">ΟΚ</button>
+          </template>
         </modal>
 
         <modal :withSlots="true" :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" :modalId="'bankAccountOwnerAddress'">
@@ -83,7 +94,7 @@
               </div>
             </div>
           </template>
-          <template v-slot:btn-submit>
+          <template v-slot:footer>
             <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'bankAccountOwnerAddress'})">CONFIRM</button>
           </template>
         </modal>
@@ -129,7 +140,7 @@
               </div>
             </div>
           </template>
-          <template v-slot:btn-submit>
+          <template v-slot:footer>
             <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'headquartersAddress'})">CONFIRM</button>
           </template>
         </modal>
@@ -175,7 +186,7 @@
               </div>
             </div>
           </template>
-          <template v-slot:btn-submit>
+          <template v-slot:footer>
             <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'representativeAddress'})">CONFIRM</button>
           </template>
         </modal>
@@ -192,7 +203,7 @@
             <button class="btn--std btn--outlineblue" @click="addKycInput">+ add page</button>
           </template>
 
-          <template v-slot:btn-submit>
+          <template v-slot:footer>
             <button v-if="modalToShow == 'kycIdentityProof'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('identityProof')">submit pages</button>
             <button v-if="modalToShow == 'kycArticlesOfAssociation'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('articlesOfAssociation')">submit pages</button>
             <button v-if="modalToShow == 'kycRegistrationProof'" class="btn--std btn--blue ml-xs-20" @click="onSubmitKycPages('registrationProof')">submit pages</button>
@@ -380,6 +391,7 @@
               <!-- <div v-if="isUserDraft && draftStatus=='SUBMITTED'" class="mt-xs-20 mb-xs-20">
                 <h3 class="settings__alert--blue">You have submitted changes and are pending approval.</h3>
               </div> -->
+              <h3 style="background: yellow;">[dev msg] this tab is for customers and is WIP state</h3>
 
               <div class="tabs__tab tabs__tab__payment_methods">
                 <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
@@ -697,7 +709,7 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
-import { EnumCustomerRegistrationStatus, EnumCustomerType, Address } from '@/model/account';
+import { EnumCustomerType } from '@/model/account';
 import { Card } from '@/model/payment';
 import {
   EnumKycDocumentType,
@@ -746,7 +758,7 @@ export default class DashboardHome extends Vue {
 
   uboDeclarationApi: UboDeclarationApi;
 
-  // booleans for data loading
+  // booleans for data loading status
   isUserDataLoaded: boolean;
 
   isCardsLoaded: boolean;
@@ -763,7 +775,6 @@ export default class DashboardHome extends Vue {
   draftStatus: string; // if user draft saved, the status of it (draft, cancelled, submitted, completed)
 
   // more
-
   selectedTab: string;
 
   modalToShow: string;
@@ -776,7 +787,10 @@ export default class DashboardHome extends Vue {
 
   passwordNewVerify: string;
 
-  // cards: string [];
+  passwordChanged: boolean;
+
+  passwordCurrentError: boolean;
+
   cards: Card[];
 
   kycDocuments: KycDocument[] | null;
@@ -831,17 +845,9 @@ export default class DashboardHome extends Vue {
     this.passwordCurrent = '';
     this.passwordNew = '';
     this.passwordNewVerify = '';
+    this.passwordChanged = false;
+    this.passwordCurrentError = false;
 
-    // this.bankAccountOwnerAddress = {
-    //   city: '',
-    //   country: '',
-    //   line1: '',
-    //   line2: '',
-    //   postalCode: '',
-    //   region: '',
-    // };
-
-    // this.cards = ['1234 5678 1234 5678', '1111 2222 3333 4444'];
     this.cards = [];
 
     this.modalToShow = '';
@@ -850,12 +856,9 @@ export default class DashboardHome extends Vue {
 
     this.kycNumberOfInputs = 1;
 
-    // this.uboDeclarations = [];
     this.uboDeclarations = null;
 
     this.selectedDeclaration = null;
-
-    // this.selectedUbo = null;
 
     this.showUboForm = false;
 
@@ -879,11 +882,6 @@ export default class DashboardHome extends Vue {
     this.profileApi.getProfile().then((response: ServerResponse<Account>) => {
       this.userData = response.result;
       this.isUserDraft = !!this.userData.profile.provider.draft;
-
-      // NEXT BLOCK ( OVERWRITE ) [TODO] TO BE DELETED - DEVELOPMENT PURPOSE ONLY
-      // if (this.userData.profile.provider.draft) {
-      //   this.userData.profile.provider.draft.status = EnumCustomerRegistrationStatus.DRAFT;
-      // }
 
       if (this.isUserDraft && this.userData.profile.provider.draft?.status) {
         this.draftStatus = this.userData.profile.provider.draft?.status;
@@ -953,12 +951,19 @@ export default class DashboardHome extends Vue {
   // eslint-disable-next-line
   onSubmitTopioAccountField(modalData: any): void {
     const data = {
+      // eslint-disable-next-line
       firstName: this.userData!.profile.firstName,
+      // eslint-disable-next-line
       image: this.userData!.profile.image,
+      // eslint-disable-next-line
       imageMimeType: this.userData!.profile.imageMimeType,
+      // eslint-disable-next-line
       lastName: this.userData!.profile.lastName,
+      // eslint-disable-next-line
       locale: this.userData!.profile.locale,
+      // eslint-disable-next-line
       mobile: this.userData!.profile.mobile,
+      // eslint-disable-next-line
       phone: this.userData!.profile.phone,
     };
 
@@ -998,71 +1003,86 @@ export default class DashboardHome extends Vue {
   }
 
   onChangePassword(): void {
-    console.log('on change password');
     this.accountApi.changePassword(this.passwordCurrent, this.passwordNew, this.passwordNewVerify).then((changePasswordResponse) => {
       if (changePasswordResponse.success) {
         console.log('password changed successfully!');
+        this.passwordCurrentError = false;
+        this.passwordChanged = true;
+      } else if (changePasswordResponse.messages[0].description === 'Access Denied') {
+        console.log('wrong current password');
+        this.passwordCurrentError = true;
       } else {
         console.log('failed to change password');
       }
     });
   }
 
+  onPasswordModalDismiss(): void {
+    this.passwordCurrent = '';
+    this.passwordNew = '';
+    this.passwordNewVerify = '';
+    this.passwordChanged = false;
+    this.passwordCurrentError = false;
+    this.modalToShow = '';
+  }
+
+  // eslint-disable-next-line
   onSubmitMangoPayField(modalData): void {
     let draft;
     if (this.isUserDraft) { // if draft exists, update existing draft
-      draft = this.userData!.profile.provider.draft;
-
-      // TODO: delete next 3 lines if fixed
-      // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
       // eslint-disable-next-line
-      // delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
+      draft = this.userData!.profile.provider.draft;
 
     } else { // if draft is null, copy current profile as draft
       draft = {};
       const propertiesToKeep = ['additionalInfo', 'bankAccount', 'companyNumber', 'companyType', 'email', 'headquartersAddress', 'legalPersonType', 'representative', 'logoImage', 'logoImageMimeType', 'name', 'phone', 'siteUrl', 'type'];
+      // eslint-disable-next-line
       Object.keys(this.userData!.profile.provider.current!).forEach((x) => {
         if (propertiesToKeep.includes(x)) {
           // eslint-disable-next-line
           draft[x] = this.userData!.profile.provider.current![x];
         }
       });
-      // TODO: delete next 3 lines if fixed
-      // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API. then, remove this line and change propertiesToKeep array accordingy
-      // eslint-disable-next-line
-      // delete Object.assign(draft, {['legalRepresentative']: draft['representative'] })['representative'];
     }
 
     switch (modalData.modalId) {
       case 'companyName': {
+        // eslint-disable-next-line
         draft!.name = modalData.inputValues[0].value;
         break;
       }
       case 'vatNumber': {
+        // eslint-disable-next-line
         draft!.companyNumber = modalData.inputValues[0].value;
         break;
       }
       case 'companyType': {
+        // eslint-disable-next-line
         draft!.companyType = modalData.inputValues[0].value;
         break;
       }
       case 'companyEmail': {
+        // eslint-disable-next-line
         draft!.email = modalData.inputValues[0].value;
         break;
       }
       case 'siteUrl': {
+        // eslint-disable-next-line
         draft!.siteUrl = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountOwnerName': {
+        // eslint-disable-next-line
         draft!.bankAccount.ownerName = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountIban': {
+        // eslint-disable-next-line
         draft!.bankAccount.iban = modalData.inputValues[0].value;
         break;
       }
       case 'bankAccountBic': {
+        // eslint-disable-next-line
         draft!.bankAccount.bic = modalData.inputValues[0].value;
         break;
       }
@@ -1112,6 +1132,7 @@ export default class DashboardHome extends Vue {
         break;
       }
       case 'iban': {
+        // eslint-disable-next-line
         draft!.bankAccount.iban = modalData.inputValues[0].value;
         break;
       }
@@ -1132,11 +1153,6 @@ export default class DashboardHome extends Vue {
   submitRegistrationFromDraft(): void {
     const draft = this.userData?.profile.provider.draft;
 
-    // TODO: delete next 3 lines if fixed
-    // rename 'representative' from CURRENT PROVIDER to 'legalRepresentative'. should be fixed in API.
-    // eslint-disable-next-line
-    // delete Object.assign((draft as any), {['legalRepresentative']: (draft as any)['representative'] })['representative'];
-
     console.log(draft);
     // AS ANY - TO BE CORRECTED
     this.isUserDataLoaded = false;
@@ -1153,7 +1169,7 @@ export default class DashboardHome extends Vue {
     CARDS
   */
 
-  addCard() {
+  addCard(): void {
     this.paymentApi.createCardRegistration().then((createCardResponse) => {
       if (createCardResponse.success) {
         // submit card registration
@@ -1207,7 +1223,7 @@ export default class DashboardHome extends Vue {
       default:
     }
 
-    // ATTENTION: it currently creates only PROVIDER document
+    // ATTENTION: it currently creates only PROVIDER document (TODO)
     const document: KycDocumentCommand = {
       customerType: EnumCustomerType.PROVIDER,
       type: documentType,
@@ -1303,7 +1319,7 @@ export default class DashboardHome extends Vue {
 
   canSubmitDeclaration(): boolean {
     const permittedStatuses = ['CREATED', 'INCOMPLETE'];
-    // !showUboForm && isUbosOfUboDeclarationLoaded && uboDeclarations[selectedDeclaration].ubos.length && (uboDeclarations[selectedDeclaration].status == 'CREATED' || uboDeclarations[selectedDeclaration].status == 'INCOMPLETE')
+    // eslint-disable-next-line
     if (this.showUboForm || !this.isUbosOfUboDeclarationLoaded || !this.uboDeclarations![this.selectedDeclaration!].ubos?.length || !permittedStatuses.includes(this.uboDeclarations![this.selectedDeclaration!].status)) {
       return false;
     }
@@ -1370,7 +1386,7 @@ export default class DashboardHome extends Vue {
   }
 
   submitUbo(): void {
-    // OVERWRITE FOR DEVELOPMENT PURPOSE
+    // OVERWRITE FOR DEVELOPMENT PURPOSE (TODO: submit birthdate in right format)
     this.uboToAdd.birthdate = '1980-01-01T00:00:00.000Z';
 
     // eslint-disable-next-line
@@ -1396,18 +1412,20 @@ export default class DashboardHome extends Vue {
   removeUboFromDeclaration(declarationId: string, uboId: string): void {
     this.uboDeclarationApi.removeUbo(declarationId, uboId).then((removeUboResponse) => {
       if (removeUboResponse.success) {
+        // eslint-disable-next-line
         const index = this.uboDeclarations![this.selectedDeclaration!].ubos.findIndex((x) => x.id === uboId);
+        // eslint-disable-next-line
         this.uboDeclarations![this.selectedDeclaration!].ubos.splice(index, 1);
       }
     });
   }
 
   submitDeclaration(): void {
+    // eslint-disable-next-line
     const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
     this.uboDeclarationApi.submitDeclaration(declarationId).then((submitDeclarationResponse) => {
       if (submitDeclarationResponse.success) {
         const index = this.uboDeclarations?.findIndex((x) => x.id === submitDeclarationResponse.result.id);
-        // this.uboDeclarations![index!] = submitDeclarationResponse.result;
         // eslint-disable-next-line
         Vue.set(this.uboDeclarations!, index!, submitDeclarationResponse.result);
       } else {
@@ -1419,7 +1437,6 @@ export default class DashboardHome extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/dashboard/_settings.scss";
-  // @import "@/assets/styles/_settings.scss";
   @import "@/assets/styles/_collection.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
   @import "@/assets/styles/abstracts/_spacings.scss";
