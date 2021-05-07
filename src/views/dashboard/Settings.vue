@@ -850,6 +850,8 @@ export default class DashboardHome extends Vue {
     this.uboToAdd = this.initUboToAdd();
   }
 
+  // TODO: add pagination to documents that support it (e.g. KYC)
+
   mounted(): void {
     this.loadUserData();
     this.loadCards();
