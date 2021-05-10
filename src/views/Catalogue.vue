@@ -423,7 +423,7 @@
           </div>
           <div class="filter-side-menu-bottom">
             <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
-            <button class="btn--std btn--blue">APPLY FILTERS</button>
+            <button @click="applyFilters" class="btn--std btn--blue">APPLY FILTERS</button>
           </div>
         </div>
       </div>
@@ -444,6 +444,9 @@ import CatalogueApi from '@/service/catalogue';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
+import { EnumAssetType } from '@/model/enum';
+import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import moment from 'moment';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
@@ -457,6 +460,7 @@ import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
 
 interface filterOption {
+  id: string,
   name: string,
   isChecked?: boolean
   value?: string | number
@@ -503,11 +507,11 @@ export default class Catalogue extends Vue {
 
   filterMoreSubmenuItemSelected: string;
 
-  filters: filterCategory[];
+  // filters: filterCategory[];
 
-  types: { name: string, pillLabel: string, isChecked: boolean }[];
+  types: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
 
-  topics: { name: string, pillLabel: string, isChecked: boolean }[];
+  topics: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
 
   updated: {dateFrom: string, dateTo: string, timeFrom: string, timeTo: string};
 
@@ -576,16 +580,37 @@ export default class Catalogue extends Vue {
 
     this.filterMoreSubmenuItemSelected = 'numberOfFeatures';
 
-    this.filters = [
+    // this.filters = [
+    //   {
+    //     name: 'topic',
+    //     // eslint-disable-next-line
+    //     options: [{ id: EnumTopicCategory.BIOTA, name: 'Biota', pillLabel: 'Biota', isChecked: false }, { id: EnumTopicCategory.BOUNDARIES, name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { id: EnumTopicCategory.CLIMA, name: 'Clima', pillLabel: 'Clima', isChecked: false }, { id: EnumTopicCategory.ECONOMY, name: 'Economy', pillLabel: 'Economy', isChecked: false }, { id: EnumTopicCategory.ELEVATION, name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { id: EnumTopicCategory.ENVIRONMENT, name: 'Environment', pillLabel: 'Environment', isChecked: false }, { id: EnumTopicCategory.FARMING, name: 'Farming', pillLabel: 'Farming', isChecked: false }, { id: EnumTopicCategory.GEO_SCIENTIFIC, name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { id: EnumTopicCategory.HEALTH, name: 'Health', pillLabel: 'Health', isChecked: false }, { id: EnumTopicCategory.IMAGERY, name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { id: EnumTopicCategory.INLAND_WATERS, name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { id: EnumTopicCategory.INTELLIGENCE_MILITARY, name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { id: EnumTopicCategory.LOCATION, name: 'Location', pillLabel: 'Location', isChecked: false }, { id: EnumTopicCategory.OCEANS, name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { id: EnumTopicCategory.PLANNING_CADASTRE, name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { id: EnumTopicCategory.SOCIETY, name: 'Society', pillLabel: 'Society', isChecked: false }, { id: EnumTopicCategory.STRUCTURE, name: 'Structure', pillLabel: 'Structure', isChecked: false }, { id: EnumTopicCategory.TRANSPORTATION, name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { id: EnumTopicCategory.UTILITIES_COMMUNICATION, name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }],
+    //   },
+    // ];
+
+    this.types = [
       {
-        name: 'topic',
-        options: [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }],
+        id: EnumAssetType.VECTOR,
+        name: 'Vector dataset',
+        pillLabel: 'Vector',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.RASTER,
+        name: 'Raster dataset',
+        pillLabel: 'Raster',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.SERVICE,
+        name: 'API',
+        pillLabel: 'API',
+        isChecked: false,
       },
     ];
 
-    this.types = [{ name: 'Vector dataset', pillLabel: 'Vector', isChecked: false }, { name: 'Raster dataset', pillLabel: 'Raster', isChecked: false }, { name: 'API', pillLabel: 'API', isChecked: false }];
-
-    this.topics = [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
+    // eslint-disable-next-line
+    this.topics = [{ id: EnumTopicCategory.BIOTA, name: 'Biota', pillLabel: 'Biota', isChecked: false }, { id: EnumTopicCategory.BOUNDARIES, name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { id: EnumTopicCategory.CLIMA, name: 'Clima', pillLabel: 'Clima', isChecked: false }, { id: EnumTopicCategory.ECONOMY, name: 'Economy', pillLabel: 'Economy', isChecked: false }, { id: EnumTopicCategory.ELEVATION, name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { id: EnumTopicCategory.ENVIRONMENT, name: 'Environment', pillLabel: 'Environment', isChecked: false }, { id: EnumTopicCategory.FARMING, name: 'Farming', pillLabel: 'Farming', isChecked: false }, { id: EnumTopicCategory.GEO_SCIENTIFIC, name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { id: EnumTopicCategory.HEALTH, name: 'Health', pillLabel: 'Health', isChecked: false }, { id: EnumTopicCategory.IMAGERY, name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { id: EnumTopicCategory.INLAND_WATERS, name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { id: EnumTopicCategory.INTELLIGENCE_MILITARY, name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { id: EnumTopicCategory.LOCATION, name: 'Location', pillLabel: 'Location', isChecked: false }, { id: EnumTopicCategory.OCEANS, name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { id: EnumTopicCategory.PLANNING_CADASTRE, name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { id: EnumTopicCategory.SOCIETY, name: 'Society', pillLabel: 'Society', isChecked: false }, { id: EnumTopicCategory.STRUCTURE, name: 'Structure', pillLabel: 'Structure', isChecked: false }, { id: EnumTopicCategory.TRANSPORTATION, name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { id: EnumTopicCategory.UTILITIES_COMMUNICATION, name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
 
     this.updated = {
       dateFrom: '',
@@ -976,6 +1001,46 @@ export default class Catalogue extends Vue {
     });
     label = label.substring(1);
     return label;
+  }
+
+  formatMoment(date: string, time?: string) {
+    if (time) {
+      return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
+    }
+    return moment(date).format('YYYYMMDD');
+  }
+
+  applyFilters(): void {
+    // const filters: string[] = [];
+    const filters: Partial<ElasticCatalogueQuery> = {};
+
+    console.log(this.getFiltersChecked('type'));
+
+    // TYPE
+    // this.getFiltersChecked('type').forEach((x) => {
+    //   if (x.id) {
+    //     this.
+    //   }
+    // });
+
+    // UPDATED
+    // if (this.updated.dateFrom) {
+    //   if (this.updated.timeFrom) {
+    //     console.log('time', this.updated.timeFrom);
+    //     filters.push(`fromDate_${this.formatMoment(this.updated.dateFrom, this.updated.timeFrom)}`);
+    //   } else {
+    //     filters.push(`fromDatDate_${this.formatMoment(this.updated.dateFrom)}`);
+    //   }
+    // }
+    // if (this.updated.dateTo) {
+    //   if (this.updated.timeTo) {
+    //     filters.push(`to_${this.formatMoment(this.updated.dateTo, this.updated.timeTo)}`);
+    //   } else {
+    //     filters.push(`to_${this.formatMoment(this.updated.dateTo)}`);
+    //   }
+    // }
+
+    console.log(filters);
   }
 }
 </script>
