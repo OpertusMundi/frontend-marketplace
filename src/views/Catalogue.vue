@@ -460,7 +460,7 @@ import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
 
 interface filterOption {
-  id: string,
+  id: string | EnumAssetType | EnumTopicCategory,
   name: string,
   isChecked?: boolean
   value?: string | number
@@ -509,9 +509,9 @@ export default class Catalogue extends Vue {
 
   // filters: filterCategory[];
 
-  types: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
+  types: { id: EnumAssetType, name: string, pillLabel: string, isChecked: boolean }[];
 
-  topics: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
+  topics: { id: EnumTopicCategory, name: string, pillLabel: string, isChecked: boolean }[];
 
   updated: {dateFrom: string, dateTo: string, timeFrom: string, timeTo: string};
 
@@ -1003,11 +1003,8 @@ export default class Catalogue extends Vue {
     return label;
   }
 
-  formatMoment(date: string, time?: string) {
-    if (time) {
-      return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
-    }
-    return moment(date).format('YYYYMMDD');
+  formatMoment(date: string, time: string) {
+    return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
   }
 
   applyFilters(): void {
@@ -1015,6 +1012,27 @@ export default class Catalogue extends Vue {
     const filters: Partial<ElasticCatalogueQuery> = {};
 
     console.log(this.getFiltersChecked('type'));
+
+    // TYPE
+    this.getFiltersChecked('type').forEach((x) => {
+      console.log(x.id);
+      if (filters.type) {
+        // eslint-disable-next-line
+        (filters.type).push(x.id as EnumAssetType);
+      } else {
+        filters.type = [];
+        (filters.type).push(x.id as EnumAssetType);
+      }
+    });
+
+    // UPDATED
+    // TODO: check format
+    if (this.updated.dateFrom) {
+      filters.fromDate = this.formatMoment(this.updated.dateFrom, this.updated.timeFrom);
+    }
+    if (this.updated.dateTo) {
+      filters.toDate = this.formatMoment(this.updated.dateTo, this.updated.timeTo);
+    }
 
     // TYPE
     // this.getFiltersChecked('type').forEach((x) => {
