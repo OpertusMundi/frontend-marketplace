@@ -173,7 +173,7 @@ interface Scale {
   /**
    * A short description
    */
-  theme: string;
+  description: string;
 }
 
 enum EnumResponsiblePartyRole {
@@ -284,6 +284,10 @@ interface BaseCatalogueItem {
    * The name of the organization responsible for the creation and maintenance of the metadata
    */
   metadataPointOfContactName: string;
+  /**
+   * Used for declaring open datasets
+   */
+  openDataset: boolean;
   /*
    * Provides the ID of a parent dataset
    */
@@ -364,6 +368,10 @@ interface BaseCatalogueItem {
    * The nature or genre of the resource
    */
   type: EnumAssetType | null;
+  /**
+   * True if the asset must be only used for Value-Added-Services (VAS)
+   */
+  userOnlyForVas: boolean;
   /*
    * Version of the resource
    */
@@ -763,6 +771,19 @@ export interface ResourceIngestionData {
    * The name of the created table. The table name is equal to the resource unique identifier
    */
   tableName: string;
+  /**
+   * Service endpoints. Only visible to asset owners
+   */
+  endpoints?: {
+    /**
+     * Service type
+     */
+    type: EnumSpatialDataServiceType,
+    /**
+     * Service endpoint URI
+     */
+    uri: string;
+  }[]
 }
 
 export interface CatalogueItem extends BaseCatalogueItem {
