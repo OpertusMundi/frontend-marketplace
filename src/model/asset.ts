@@ -1,4 +1,4 @@
-import { EnumSpatialDataServiceType } from '@/model/catalogue';
+import { EnumSpatialDataServiceType } from '@/model/enum';
 
 export enum EnumResourceType {
   FILE = 'FILE',

@@ -1,6 +1,6 @@
 import { Order, PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
-import { EnumAssetType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
 
@@ -8,16 +8,6 @@ export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
   NOT_CONFORMANT = 'NOT_CONFORMANT',
   NOT_EVALUATED = 'NOT_EVALUATED',
-}
-
-export enum EnumSpatialDataServiceType {
-  TMS = 'TMS',
-  WMS = 'WMS',
-  WFS = 'WFS',
-  WCS = 'WCS',
-  CSW = 'CSW',
-  DATA_API = 'DATA_API',
-  OGC_API = 'OGC_API',
 }
 
 export enum EnumTopicCategory {
