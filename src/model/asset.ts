@@ -108,12 +108,12 @@ export interface FileResource extends Resource {
 }
 
 interface Attributes {
-  cascaded: boolean;
-  fixedHeight: number;
-  fixedWidth: number;
-  noSubsets: boolean;
-  opaque: boolean;
-  queryable: boolean;
+  cascaded: boolean | null;
+  fixedHeight: number | null;
+  fixedWidth: number | null;
+  noSubsets: boolean | null;
+  opaque: boolean | null;
+  queryable: boolean | null;
 }
 
 interface Dimension {
