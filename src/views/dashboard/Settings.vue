@@ -900,7 +900,11 @@ export default class DashboardHome extends Vue {
 
   loadUserData(): void {
     this.profileApi.getProfile().then((response: ServerResponse<Account>) => {
-      this.userData = response.result;
+      if (response.success) {
+        this.userData = response.result;
+      } else {
+        // TODO: Handle error
+      }
     });
   }
 
