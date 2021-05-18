@@ -12,10 +12,10 @@
           v-if="map.show"
           :zoom="map.zoom"
           :center="map.center"
-          :options="map.mapOptions"
+          :options="map.options"
         >
           <l-tile-layer
-            :url="map.url"
+            :url="map.tilesUrl"
             :attribution="map.attribution"/>
           <l-geo-json
             ref="geoJsonLayer"
@@ -202,108 +202,109 @@
                       <p>Attributes content (DUMMY)</p>
                     </li>
                     <li v-if="activeProfilingTab == 2">
-                      <p>Contains map images with the geometry of the dataset</p>
-                      <hr>
-                      <!-- MBR -->
-                      <span class="map-type">MBR</span>
-                      <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-                      <div class="tab_maps-map">
-                        <l-map
-                          ref="mapMbr"
-                          v-if="map.show"
-                          :bounds="mbrToLeafletBounds(metadata.mbr)"
-                          :options="map.mapOptions"
-                        >
-                          <l-tile-layer
-                          :url="map.url"
-                          :attribution="map.attribution"/>
-                          <l-geo-json
-                            ref="geoJsonMbrLayer"
-                            v-if="metadata"
-                            :geojson="wktToGeoJson(metadata.mbr)"
-                            :optionsStyle="{color: 'orange'}"
-                          >
-                          </l-geo-json>
-                        </l-map>
+                      <div v-if="!$store.getters.isAuthenticated">
+                        <h2 style="background: yellow">[dev msg] user is not authenticated, maps are not shown</h2>
                       </div>
-                      <!-- CONVEX HULL -->
-                      <span class="map-type">Convex Hull</span>
-                      <p>Convex polygon enclosing all features</p>
-                      <div class="tab_maps-map">
-                        <l-map
-                          ref="mapConvexHull"
-                          v-if="map.show"
-                          :bounds="mbrToLeafletBounds(metadata.mbr)"
-                          :options="map.mapOptions"
-                        >
-                          <l-tile-layer
-                          :url="map.url"
-                          :attribution="map.attribution"/>
-                          <l-geo-json
-                            ref="geoJsonConvexHullLayer"
-                            v-if="metadata"
-                            :geojson="wktToGeoJson(metadata.convexHull)"
-                            :optionsStyle="{color: 'orange'}"
+                      <div v-else>
+                        <p>Contains map images with the geometry of the dataset</p>
+                        <hr>
+                        <p style="background: yellow">[dev msg] MAPS NOT SHOWN CORRECTLY, AS THEY ARE NOT FETCHED IN EPSG:4326.</p>
+                        <!-- MBR -->
+                        <span class="map-type">MBR</span>
+                        <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
+                        <div class="tab_maps-map">
+                          <l-map
+                            ref="mapMetadataMbr"
+                            v-if="mapMetadata.show"
+                            :bounds="mbrToLeafletBounds(metadata.mbr)"
+                            :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                            :options="mapMetadata.options"
                           >
-                          </l-geo-json>
-                        </l-map>
-                      </div>
-                      <!-- THUMBNAIL -->
-                      <span class="map-type">Thumbnail</span>
-                      <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-                      <div class="tab_maps-map tab_maps-map-thumbnail">
-                        <img
-                          v-if="metadata"
-                          :src="'data:image/png;base64, ' + metadata.thumbnail"
-                          alt="thumbnail"
-                        >
-                      </div>
-                      <!-- HEATMAP -->
-                      <span class="map-type">Heatmap</span>
-                      <p>Colormap with varying intensity according to the density of features</p>
-                      <div class="tab_maps-map">
-                        <l-map
-                          ref="mapHeatmap"
-                          v-if="map.show"
-                          :bounds="mbrToLeafletBounds(metadata.mbr)"
-                          :options="map.mapOptions"
-                        >
-                          <l-tile-layer
-                          :url="map.url"
-                          :attribution="map.attribution"/>
-                          <l-geo-json
-                            ref="geoJsonHeatmapLayer"
-                            v-if="metadata"
-                            :geojson="metadata.heatmap"
-                            :optionsStyle="heatmapStyle"
-                            :smoothFactor="0.2"
-                            :opacity="0.1"
-                            :options="{smoothFactor: 0.2}"
+                            <l-tile-layer
+                            :url="mapMetadata.tilesUrl"
+                            :attribution="mapMetadata.attribution"/>
+                            <l-geo-json
+                              :geojson="wktToGeoJson(metadata.mbr)"
+                              :optionsStyle="{color: 'orange'}"
+                            >
+                            </l-geo-json>
+                          </l-map>
+                        </div>
+                        <!-- CONVEX HULL -->
+                        <span class="map-type">Convex Hull</span>
+                        <p>Convex polygon enclosing all features</p>
+                        <div class="tab_maps-map">
+                          <l-map
+                            ref="mapMetadataConvexHull"
+                            v-if="mapMetadata.show"
+                            :bounds="mbrToLeafletBounds(metadata.mbr)"
+                            :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                            :options="mapMetadata.options"
                           >
-                          </l-geo-json>
-                        </l-map>
-                      </div>
-                      <!-- CLUSTERS -->
-                      <span class="map-type">Clusters</span>
-                      <p>Density-based spatial clusters of features</p>
-                      <div class="tab_maps-map">
-                        <l-map
-                          ref="mapClusters"
-                          v-if="map.show"
-                          :bounds="mbrToLeafletBounds(metadata.mbr)"
-                          :options="map.mapOptions"
-                        >
-                          <l-tile-layer
-                          :url="map.url"
-                          :attribution="map.attribution"/>
-                          <l-geo-json
-                            ref="geoJsonClustersLayer"
-                            v-if="metadata"
-                            :geojson="metadata.clusters"
-                            :optionsStyle="{color: 'orange'}"
+                            <l-tile-layer
+                            :url="mapMetadata.tilesUrl"
+                            :attribution="mapMetadata.attribution"/>
+                            <l-geo-json
+                              :geojson="wktToGeoJson(metadata.convexHull)"
+                              :optionsStyle="{color: 'orange'}"
+                            >
+                            </l-geo-json>
+                          </l-map>
+                        </div>
+                        <!-- THUMBNAIL -->
+                        <span class="map-type">Thumbnail</span>
+                        <p>Thumbnail image depicting the spatial coverage of the dataset</p>
+                        <div class="tab_maps-map tab_maps-map-thumbnail">
+                          <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
+                        </div>
+                        <!-- HEATMAP -->
+
+                        <!-- ATTENTION -->
+                        <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
+                        <span class="map-type">Heatmap</span>
+                        <p>Colormap with varying intensity according to the density of features</p>
+                        <div class="tab_maps-map">
+                          <l-map
+                            ref="mapMetadataHeatmap"
+                            v-if="mapMetadata.showHeatmap"
+                            :bounds="mbrToLeafletBounds(metadata.mbr)"
+                            :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                            :options="mapMetadata.options"
                           >
-                          </l-geo-json>
-                        </l-map>
+                            <l-tile-layer
+                              :url="mapMetadata.tilesUrl"
+                              :attribution="mapMetadata.attribution"/>
+                            <l-geo-json
+                              :geojson="metadata.heatmapGeoJson"
+                              :optionsStyle="mapMetadata.styleHeatmap"
+                              :smoothFactor="0.2"
+                              :opacity="0.1"
+                              :options="{smoothFactor: 0.2}"
+                            >
+                            </l-geo-json>
+                          </l-map>
+                        </div>
+                        <!-- CLUSTERS -->
+                        <span class="map-type">Clusters</span>
+                        <p>Density-based spatial clusters of features</p>
+                        <div class="tab_maps-map">
+                          <l-map
+                            ref="mapClusters"
+                            v-if="mapMetadata.show"
+                            :bounds="mbrToLeafletBounds(metadata.mbr)"
+                            :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                            :options="mapMetadata.options"
+                          >
+                            <l-tile-layer
+                            :url="mapMetadata.tilesUrl"
+                            :attribution="mapMetadata.attribution"/>
+                            <l-geo-json
+                              :geojson="metadata.clusters"
+                              :optionsStyle="{color: 'orange'}"
+                            >
+                            </l-geo-json>
+                          </l-map>
+                        </div>
                       </div>
                     </li>
                     <li v-if="activeProfilingTab == 3">
@@ -321,10 +322,16 @@
         </div>
         <div class="asset__sidebar">
           <div class="asset__shopcard">
+            <!-- <button @click="toggleSelectAreaModal" class="mb-xs-20">show 'select areas' dummy button</button> -->
             <div class="asset__shopcard__variations">
-              <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
+              <!-- <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
                 <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
                 <label :for="`p_variation_${pr_model.id}`">{{ pr_model.totalPrice === 0 ? 'FREE' : pr_model.totalPrice + prModelCurrencyFormat(pr_model.currency) }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
+              </div> -->
+
+              <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
+                <input type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
+                <label :for="`p_variation_${pr_model.model.key}`">{{ pr_model.model.type }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
               </div>
             </div>
             <ul class="asset__shopcard__priceoptions">
@@ -336,7 +343,10 @@
               <li><strong>Domain: </strong> Geomarketing (DUMMY)</li>
               <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
             </ul>
-            <div class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
+
+            <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="toggleSelectAreaModal" class="btn btn--std btn--blue">SELECT AREAS</a></div>
+            <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
+
             <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
             <ul class="asset__shopcard__buyinfo">
               <li><strong>Delivery type: </strong> From topio / vendor (DUMMY)</li>
@@ -595,6 +605,9 @@
         </div>
       </div>
     </div>
+
+    <!-- MODALS -->
+    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
   </div>
 </template>
 
@@ -603,6 +616,8 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   CatalogueItem, ServerResponse, CartAddItemCommand, Cart,
 } from '@/model';
+import { EnumPricingModel, BasePricingModelCommand } from '@/model/pricing-model';
+import { CatalogueItemDetails, VectorMetadata } from '@/model/catalogue';
 import store from '@/store';
 import moment from 'moment';
 import CatalogueApi from '@/service/catalogue';
@@ -624,8 +639,8 @@ import { reproject } from 'reproject';
 import { GeoJsonObject } from 'geojson';
 import { parse as wktToGeojsonParser } from 'wellknown';
 
-import mockMetadata from '../service/mock-data/vector-metadata';
 /* */
+import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 
 @Component({
   components: {
@@ -635,6 +650,7 @@ import mockMetadata from '../service/mock-data/vector-metadata';
     LPolygon,
     LGeoJson,
     JsonViewer,
+    SelectAreas,
   },
   filters: {
     format_date(value) {
@@ -647,13 +663,15 @@ export default class CatalogueSingle extends Vue {
 
   catalogueItem: CatalogueItem;
 
+  isUserAuthenticated: boolean;
+
   // variables added for API metadata
 
   // we currently dont know the exact interface of the API metadata.
   // we store our dummy API metadata to the following variable as any
   catalogueItemDummyMetadata: any = {};
 
-  // geojson we fetch from APIs metadata
+  // geojson fetched from APIs metadata
   geoJson!: GeoJsonObject;
 
   // a var for storing item type (value "api" for API)
@@ -672,9 +690,12 @@ export default class CatalogueSingle extends Vue {
 
   itemLoaded = false;
 
-  selectedPricingModel: string;
+  // selectedPricingModel: string;
+  selectedPricingModel: BasePricingModelCommand | null;
 
-  map:any;
+  map: any;
+
+  mapMetadata: any;
 
   cartErrors: string;
 
@@ -688,6 +709,8 @@ export default class CatalogueSingle extends Vue {
 
   metadata: any;
 
+  isSelectAreasModalOn: boolean;
+
   constructor() {
     super();
 
@@ -697,14 +720,17 @@ export default class CatalogueSingle extends Vue {
     this.catalogueItem = {} as CatalogueItem;
     this.catalogueItemType = '';
     this.catalogueApi = new CatalogueApi();
-    this.selectedPricingModel = '';
+    this.selectedPricingModel = null;
     this.cartErrors = '';
     this.cartApi = new CartApi();
+
+    this.isUserAuthenticated = store.getters.isAuthenticated;
+
     this.map = {
       show: false,
       zoom: 7,
       center: latLng(37.9782553, 23.7263485),
-      mapOptions: {
+      options: {
         zoomSnap: 0.5,
         zoomControl: false,
         dragging: false,
@@ -712,11 +738,31 @@ export default class CatalogueSingle extends Vue {
         doubleClickZoom: false,
       },
       coordinates_type: '',
-      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    };
+
+    this.mapMetadata = {
+      show: false,
+      showHeatmap: false,
+      options: {
+        minZoom: 1,
+        maxZoom: 10,
+      },
+      styleHeatmap: (feature) => ({
+        fillColor: feature.properties.fill,
+        color: feature.properties.fill,
+        fillOpacity: 0.7,
+        opacity: 0.4,
+        weight: 1,
+        stroke: true,
+      }),
+      tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
 
     this.metadata = null;
+    this.isSelectAreasModalOn = false;
   }
 
   mounted():void {
@@ -727,9 +773,9 @@ export default class CatalogueSingle extends Vue {
     this.loadAsset();
 
     // imitate REST-API latency
-    setTimeout(() => {
-      this.metadata = mockMetadata;
-    }, 3000);
+    // setTimeout(() => {
+    //   // this.metadata = mockMetadata;
+    // }, 3000);
   }
 
   @Watch('selectedPricingModel')
@@ -798,19 +844,52 @@ export default class CatalogueSingle extends Vue {
     /* */
 
     this.catalogueApi.findOne(catalogueItemID)
-      .then((queryResponse: ServerResponse<CatalogueItem>) => {
+      .then((queryResponse: ServerResponse<CatalogueItem | CatalogueItemDetails>) => {
         if (queryResponse.success === false && queryResponse.messages[0].code === 'BasicMessageCode.NotFound') {
           this.$router.push('/errors/404');
         }
         this.itemLoaded = true;
         this.catalogueItem = queryResponse.result;
-        console.log('catalogue item', this.catalogueItem);
         this.selectedVersion = this.catalogueItem.version;
         setTimeout(() => {
           this.calcAssetHeaderTitle();
           this.initMap();
+          if (this.isUserAuthenticated) { // setMinMaxZoomLevels() is called for metadata maps that are only shown to loggen in users
+            this.setMinMaxZoomLevels();
+          }
         }, 200);
+
+        if ((this.catalogueItem as CatalogueItemDetails).automatedMetadata) {
+          // TODO: why array of objects instead of object? should be fixed in API.
+          // eslint-disable-next-line
+          this.metadata = (this.catalogueItem as CatalogueItemDetails).automatedMetadata![0];
+          this.mapMetadata.show = true;
+
+          this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
+            this.$set(this.metadata, 'heatmapGeoJson', heatmapResponse);
+            this.mapMetadata.showHeatmap = true;
+            console.log(this.metadata.heatmapGeoJson);
+          });
+        }
       });
+  }
+
+  setMinMaxZoomLevels(): void {
+    this.$nextTick(() => {
+      const fitBoundsZoomLevel = (this as any).$refs.map.mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson((this.metadata as VectorMetadata).mbr)).getBounds());
+
+      const zoomOffset = 2;
+
+      const minZoom = fitBoundsZoomLevel - zoomOffset < 0 ? 0 : fitBoundsZoomLevel - zoomOffset;
+      const maxZoom = fitBoundsZoomLevel + zoomOffset;
+
+      Vue.set(this.mapMetadata.options, 'minZoom', minZoom);
+      Vue.set(this.mapMetadata.options, 'maxZoom', maxZoom);
+    });
+  }
+
+  toggleSelectAreaModal(): void {
+    this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
   }
 
   initMap(): void {
@@ -835,16 +914,17 @@ export default class CatalogueSingle extends Vue {
     this.map.center = polygon.getBounds().getCenter();
   }
 
-  heatmapStyle(feature: any): any {
-    return {
-      fillColor: feature.properties.fill,
-      color: feature.properties.fill,
-      fillOpacity: 0.7,
-      opacity: 0.4,
-      weight: 1,
-      stroke: true,
-    };
-  }
+  // eslint-disable-next-line
+  // heatmapStyle(feature: any): any {
+  //   return {
+  //     fillColor: feature.properties.fill,
+  //     color: feature.properties.fill,
+  //     fillOpacity: 0.7,
+  //     opacity: 0.4,
+  //     weight: 1,
+  //     stroke: true,
+  //   };
+  // }
 
   wktToGeoJson(wkt: string): any {
     return wktToGeojsonParser(wkt);
@@ -858,26 +938,28 @@ export default class CatalogueSingle extends Vue {
   }
 
   addToCart():void {
-    if (this.selectedPricingModel === '') {
+    if (!this.selectedPricingModel) {
       this.cartErrors = 'Please select a pricing model!';
       return;
     }
     this.cartErrors = '';
+    console.log('TODO: add to cart');
     // TODO: add to cart functions
-    const cartItem:CartAddItemCommand = {
-      assetId: this.catalogueItem.id,
-      pricingModelKey: this.selectedPricingModel,
-      parameters: {},
-    };
-    this.cartApi.addItem(cartItem)
-      .then((cartResponse: ServerResponse<Cart>) => {
-        if (cartResponse.success) {
-          store.commit('setCartItems', cartResponse.result);
-        } else {
-          // TODO: Handle error
-          console.error('cannot add item to cart!');
-        }
-      });
+
+    // const cartItem:CartAddItemCommand = {
+    //   assetId: this.catalogueItem.id,
+    //   pricingModelKey: this.selectedPricingModel.key,
+    //   parameters: {},
+    // };
+    // this.cartApi.addItem(cartItem)
+    //   .then((cartResponse: ServerResponse<Cart>) => {
+    //     if (cartResponse.success) {
+    //       store.commit('setCartItems', cartResponse.result);
+    //     } else {
+    //       // TODO: Handle error
+    //       console.error('cannot add item to cart!');
+    //     }
+    //   });
   }
 
   calcAssetHeaderTitle():void {
