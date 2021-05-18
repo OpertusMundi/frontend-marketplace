@@ -1,17 +1,19 @@
+import { EnumSpatialDataServiceType } from '@/model/enum';
+
 export enum EnumResourceType {
   FILE = 'FILE',
   SERVICE = 'SERVICE',
+}
+
+export enum EnumAssetAdditionalResource {
+  FILE = 'FILE',
+  URI = 'URI'
 }
 
 export enum EnumAssetSourceType {
   NETCDF = 'NETCDF',
   RASTER = 'RASTER',
   VECTOR = 'VECTOR',
-}
-
-export enum EnumServiceResourceType {
-  WFS = 'WFS',
-  WMS = 'WMS',
 }
 
 export interface AssetFileAdditionalResource {
@@ -35,6 +37,10 @@ export interface AssetFileAdditionalResource {
    * The file size
    */
   size: number;
+  /**
+   * Resource type
+   */
+  type: EnumAssetAdditionalResource.FILE;
 }
 
 export interface AssetFileAdditionalResourceCommand {
@@ -57,6 +63,10 @@ export interface AssetUriAdditionalResource {
    * The text displayed for the URI
    */
   text: string;
+  /**
+   * Resource type
+   */
+  type: EnumAssetAdditionalResource.URI;
 }
 
 export interface Resource {
@@ -65,7 +75,7 @@ export interface Resource {
    */
   id: string;
   /**
-   * Parent resource unique identifier
+   * Resource parent unique identifier
    */
   parentId: string;
 }
@@ -97,6 +107,22 @@ export interface FileResource extends Resource {
   format: string;
 }
 
+interface Attributes {
+  cascaded: boolean | null;
+  fixedHeight: number | null;
+  fixedWidth: number | null;
+  noSubsets: boolean | null;
+  opaque: boolean | null;
+  queryable: boolean | null;
+}
+
+interface Dimension {
+  defaultValue: string;
+  name: string;
+  unit: string;
+  values: string[];
+}
+
 export interface ServiceResource extends Resource {
   /**
    * Discriminator field used for deserializing the model to the appropriate data type
@@ -105,11 +131,55 @@ export interface ServiceResource extends Resource {
   /**
    * Service type
    */
-  serviceType: EnumServiceResourceType;
+  serviceType: EnumSpatialDataServiceType;
   /**
    * Service endpoint
    */
   endpoint: string;
+  /**
+   * Resource Attribute
+   */
+  attributes: Attributes;
+  /**
+   * The supported CRS of the resource
+   */
+  crs: string[];
+  /**
+   * A list of URLs pointing to the available styles of the resource
+   */
+  styles: string[];
+  /**
+   * The bounding box of the resource
+   */
+  bbox: unknown;
+  /**
+   * The dimensions of the resource (derived from WMS)
+   */
+  dimensions: Dimension[];
+  /**
+   * The output formats of the resource (derived from WMS/WFS/WCS)
+   */
+  outputFormats: string[];
+  /**
+   * The filter capabilities of the resource
+   */
+  filterCapabilities: string[];
+  /**
+   * The attribution of the resource
+   */
+  attribution: string;
+  /**
+   * Resource minimum scale denominator
+   */
+  minScale:number;
+  /**
+   * Resource maximum scale denominator
+   */
+  maxScale:number;
+  /**
+   * Resource tile sets
+   */
+  tileSets:unknown[];
 }
 
 export interface FileResourceCommand {

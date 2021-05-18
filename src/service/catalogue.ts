@@ -90,6 +90,30 @@ export default class CatalogueApi extends Api {
       });
   }
 
+  /**
+   * Find related assets for the given identifier
+   * @param id
+   * @returns
+   */
+  public async findRelated(id: string): Promise<CatalogueQueryResponse> {
+    const url = `/action/catalogue/${id}/related`;
+
+    return this.get<CatalogueQueryResponseInternal>(url)
+      .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
+        const { data: serverResponse } = response;
+
+        // Inject publishers
+        if (serverResponse.success) {
+          serverResponse.result.items = serverResponse.result.items.map((item) => ({
+            ...item,
+            publisher: serverResponse.publishers[item.publisherId],
+          }));
+        }
+
+        return serverResponse;
+      });
+  }
+
   public async harvest(command: CatalogueHarvestCommand): Promise<SimpleResponse> {
     const url = '/action/catalogue/harvest';
 

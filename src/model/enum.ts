@@ -14,6 +14,16 @@ export enum EnumAssetType {
   VECTOR = 'VECTOR',
 }
 
+export enum EnumSpatialDataServiceType {
+  TMS = 'TMS',
+  WMS = 'WMS',
+  WFS = 'WFS',
+  WCS = 'WCS',
+  CSW = 'CSW',
+  DATA_API = 'DATA_API',
+  OGC_API = 'OGC_API',
+}
+
 export enum EnumPaymentMethod {
   /**
    * Payment with registered card

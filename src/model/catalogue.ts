@@ -1,6 +1,6 @@
 import { Order, PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
-import { EnumAssetType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
 
@@ -8,16 +8,6 @@ export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
   NOT_CONFORMANT = 'NOT_CONFORMANT',
   NOT_EVALUATED = 'NOT_EVALUATED',
-}
-
-export enum EnumSpatialDataServiceType {
-  TMS = 'TMS',
-  WMS = 'WMS',
-  WFS = 'WFS',
-  WCS = 'WCS',
-  CSW = 'CSW',
-  DATA_API = 'DATA_API',
-  OGC_API = 'OGC_API',
 }
 
 export enum EnumTopicCategory {
@@ -173,7 +163,7 @@ interface Scale {
   /**
    * A short description
    */
-  theme: string;
+  description: string;
 }
 
 enum EnumResponsiblePartyRole {
@@ -284,6 +274,10 @@ interface BaseCatalogueItem {
    * The name of the organization responsible for the creation and maintenance of the metadata
    */
   metadataPointOfContactName: string;
+  /**
+   * Used for declaring open datasets
+   */
+  openDataset: boolean;
   /*
    * Provides the ID of a parent dataset
    */
@@ -364,6 +358,10 @@ interface BaseCatalogueItem {
    * The nature or genre of the resource
    */
   type: EnumAssetType | null;
+  /**
+   * True if the asset must be only used for Value-Added-Services (VAS)
+   */
+  userOnlyForVas: boolean;
   /*
    * Version of the resource
    */
@@ -763,6 +761,19 @@ export interface ResourceIngestionData {
    * The name of the created table. The table name is equal to the resource unique identifier
    */
   tableName: string;
+  /**
+   * Service endpoints. Only visible to asset owners
+   */
+  endpoints?: {
+    /**
+     * Service type
+     */
+    type: EnumSpatialDataServiceType,
+    /**
+     * Service endpoint URI
+     */
+    uri: string;
+  }[]
 }
 
 export interface CatalogueItem extends BaseCatalogueItem {

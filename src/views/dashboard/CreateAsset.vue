@@ -655,6 +655,7 @@ export default class CreateAsset extends Vue {
       metadataLanguage: '',
       metadataPointOfContactEmail: '',
       metadataPointOfContactName: '',
+      openDataset: false,
       parentId: '',
       publicAccessLimitations: '',
       publicationDate: '2020-06-02',
@@ -675,6 +676,7 @@ export default class CreateAsset extends Vue {
       title: '',
       topicCategory: [],
       type: null,
+      userOnlyForVas: false,
       version: '',
       pricingModels: [],
       geometry: {

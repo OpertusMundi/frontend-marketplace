@@ -62,7 +62,7 @@ export default class SpatialApi extends Api {
    *
    * @param prefix The prefix to search for
    * @param maxLevel The max level (inclusive) of the NUTS regions in the result. If not set, all regions are returned
-   * @returns 
+   * @returns
    */
   public async findAllByPrefix(prefix: string, maxLevel: number | null = null): Promise<ServerResponse<NutsRegionFeatureCollection>> {
     const url = `/action/spatial/nuts/prefix/${prefix}?maxLevel=${maxLevel === null ? '' : maxLevel}`;
