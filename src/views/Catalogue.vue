@@ -5,7 +5,7 @@
         <h1>Assets</h1>
       </div>
       <div class="form-group">
-        <input placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
+        <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
       </div>
 
       <!-- FILTERS MENU TAB-BAR -->
@@ -310,7 +310,14 @@
               <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
                 <span style="color: orange">more to be added</span>
-                <div class="checkbox-group mt-xs-10">
+                <div v-for="license in licenses" :key="license.id">
+                  <div class="checkbox-group mt-xs-10">
+                    <input v-model="license.isChecked" type="checkbox" class="mr-xs-10" :id="`license_${license.id}`">
+                    <label :for="`license_${license.id}`"> {{ license.name }}</label>
+                  </div>
+                </div>
+
+                <!-- <div class="checkbox-group mt-xs-10">
                   <input type="checkbox" class="mr-xs-10" id="license_open">
                   <label for="license_open"> Open license</label>
                 </div>
@@ -321,7 +328,7 @@
                 <div class="checkbox-group mt-xs-10">
                   <input type="checkbox" class="mr-xs-10" id="license_webgis">
                   <label for="license_webgis"> Web-GIS applications</label>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -336,7 +343,7 @@
               <!-- TYPE -->
               <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
                 {{ filter.pillLabel }}
-                <div class="close-button" @click="removeFilter('type', filter.name)"><font-awesome-icon icon="times" /></div>
+                <div class="close-button" @click="removeFilter('type', filter.id)"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- UPDATED -->
@@ -358,13 +365,13 @@
               <!-- TOPIC -->
               <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
                 <span>{{filter.pillLabel}}</span>
-                <div class="close-button" @click="removeFilter('topic', filter.name)"><font-awesome-icon icon="times" /></div>
+                <div class="close-button" @click="removeFilter('topic', filter.id)"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- FORMAT -->
               <div class="pill" v-for="filter in getFiltersChecked('format')" :key="filter.name">
                 <span>{{filter.name}}</span>
-                <div class="close-button" @click="removeFilter('format', filter.name)"><font-awesome-icon icon="times" /></div>
+                <div class="close-button" @click="removeFilter('format', filter.id)"><font-awesome-icon icon="times" /></div>
               </div>
 
               <!-- SCALE -->
@@ -419,11 +426,17 @@
                 <div class="close-button" @click="removeFilter('vendor')"><font-awesome-icon icon="times" /></div>
               </div>
 
+              <!-- LICENSES -->
+              <div v-if="licenses.some((x) => x.isChecked)" class="pill">
+                Licenses: {{ getInputsAsOneLabel(licenses.filter(x => x.isChecked).map(x => x.pillLabel)) }}
+                <div class="close-button" @click="removeFilter('license')"><font-awesome-icon icon="times" /></div>
+              </div>
+
             </div>
           </div>
           <div class="filter-side-menu-bottom">
             <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
-            <button class="btn--std btn--blue">APPLY FILTERS</button>
+            <button @click="applyFilters" class="btn--std btn--blue">APPLY FILTERS</button>
           </div>
         </div>
       </div>
@@ -444,6 +457,9 @@ import CatalogueApi from '@/service/catalogue';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
+import { EnumAssetType } from '@/model/enum';
+import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import moment from 'moment';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
@@ -457,15 +473,11 @@ import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
 
 interface filterOption {
+  id: string | EnumAssetType | EnumTopicCategory,
   name: string,
   isChecked?: boolean
   value?: string | number
   pillLabel?: string
-}
-
-interface filterCategory {
-  name: string,
-  options: filterOption[]
 }
 
 interface crs {
@@ -503,11 +515,11 @@ export default class Catalogue extends Vue {
 
   filterMoreSubmenuItemSelected: string;
 
-  filters: filterCategory[];
+  // filters: filterCategory[];
 
-  types: { name: string, pillLabel: string, isChecked: boolean }[];
+  types: { id: EnumAssetType, name: string, pillLabel: string, isChecked: boolean }[];
 
-  topics: { name: string, pillLabel: string, isChecked: boolean }[];
+  topics: { id: EnumTopicCategory, name: string, pillLabel: string, isChecked: boolean }[];
 
   updated: {dateFrom: string, dateTo: string, timeFrom: string, timeTo: string};
 
@@ -557,6 +569,8 @@ export default class Catalogue extends Vue {
 
   attributes: string[];
 
+  licenses: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
+
   constructor() {
     super();
 
@@ -576,16 +590,29 @@ export default class Catalogue extends Vue {
 
     this.filterMoreSubmenuItemSelected = 'numberOfFeatures';
 
-    this.filters = [
+    this.types = [
       {
-        name: 'topic',
-        options: [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }],
+        id: EnumAssetType.VECTOR,
+        name: 'Vector dataset',
+        pillLabel: 'Vector',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.RASTER,
+        name: 'Raster dataset',
+        pillLabel: 'Raster',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.SERVICE,
+        name: 'API',
+        pillLabel: 'API',
+        isChecked: false,
       },
     ];
 
-    this.types = [{ name: 'Vector dataset', pillLabel: 'Vector', isChecked: false }, { name: 'Raster dataset', pillLabel: 'Raster', isChecked: false }, { name: 'API', pillLabel: 'API', isChecked: false }];
-
-    this.topics = [{ name: 'Biota', pillLabel: 'Biota', isChecked: false }, { name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { name: 'Clima', pillLabel: 'Clima', isChecked: false }, { name: 'Economy', pillLabel: 'Economy', isChecked: false }, { name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { name: 'Environment', pillLabel: 'Environment', isChecked: false }, { name: 'Farming', pillLabel: 'Farming', isChecked: false }, { name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { name: 'Health', pillLabel: 'Health', isChecked: false }, { name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { name: 'Location', pillLabel: 'Location', isChecked: false }, { name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { name: 'Society', pillLabel: 'Society', isChecked: false }, { name: 'Structure', pillLabel: 'Structure', isChecked: false }, { name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
+    // eslint-disable-next-line
+    this.topics = [{ id: EnumTopicCategory.BIOTA, name: 'Biota', pillLabel: 'Biota', isChecked: false }, { id: EnumTopicCategory.BOUNDARIES, name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { id: EnumTopicCategory.CLIMA, name: 'Clima', pillLabel: 'Clima', isChecked: false }, { id: EnumTopicCategory.ECONOMY, name: 'Economy', pillLabel: 'Economy', isChecked: false }, { id: EnumTopicCategory.ELEVATION, name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { id: EnumTopicCategory.ENVIRONMENT, name: 'Environment', pillLabel: 'Environment', isChecked: false }, { id: EnumTopicCategory.FARMING, name: 'Farming', pillLabel: 'Farming', isChecked: false }, { id: EnumTopicCategory.GEO_SCIENTIFIC, name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { id: EnumTopicCategory.HEALTH, name: 'Health', pillLabel: 'Health', isChecked: false }, { id: EnumTopicCategory.IMAGERY, name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { id: EnumTopicCategory.INLAND_WATERS, name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { id: EnumTopicCategory.INTELLIGENCE_MILITARY, name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { id: EnumTopicCategory.LOCATION, name: 'Location', pillLabel: 'Location', isChecked: false }, { id: EnumTopicCategory.OCEANS, name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { id: EnumTopicCategory.PLANNING_CADASTRE, name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { id: EnumTopicCategory.SOCIETY, name: 'Society', pillLabel: 'Society', isChecked: false }, { id: EnumTopicCategory.STRUCTURE, name: 'Structure', pillLabel: 'Structure', isChecked: false }, { id: EnumTopicCategory.TRANSPORTATION, name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { id: EnumTopicCategory.UTILITIES_COMMUNICATION, name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
 
     this.updated = {
       dateFrom: '',
@@ -608,7 +635,9 @@ export default class Catalogue extends Vue {
 
     this.mapCoverageSelectionIsDrawn = false;
 
-    this.scaleValues = [10, 10000000];
+    this.scaleMin = 10;
+    this.scaleMax = 10000000;
+    this.scaleValues = [this.scaleMin, this.scaleMax];
     this.scaleSliderOptions = [
       { id: 10, name: '1 : 10' },
       { id: 100, name: '1 : 100' },
@@ -618,8 +647,6 @@ export default class Catalogue extends Vue {
       { id: 1000000, name: '1 : 1.000.000' },
       { id: 10000000, name: '1 : 10.000.000' },
     ];
-    this.scaleMin = 10;
-    this.scaleMax = 10000000;
 
     this.priceMin = null;
     this.priceMax = null;
@@ -636,6 +663,14 @@ export default class Catalogue extends Vue {
     this.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
     this.vendors = [''];
     this.attributes = [''];
+    this.licenses = [
+      // eslint-disable-next-line
+      { id: 'open', name: 'Open license', pillLabel: 'open', isChecked: false },
+      // eslint-disable-next-line
+      { id: 'within_organisation', name: 'Within your organisation', pillLabel: 'within organisation', isChecked: false },
+      // eslint-disable-next-line
+      { id: 'web_gis', name: 'Web-GIS applications', pillLabel: 'web-GIS', isChecked: false },
+    ];
   }
 
   @Watch('filterMenuItemSelected')
@@ -680,11 +715,11 @@ export default class Catalogue extends Vue {
     switch (category) {
       case 'type':
         // eslint-disable-next-line
-        this.types.find((x) => x.name === filterName)!.isChecked = false;
+        this.types.find((x) => x.id === filterName)!.isChecked = false;
         break;
       case 'topic': {
         // eslint-disable-next-line
-        this.topics.find((x) => x.name === filterName)!.isChecked = false;
+        this.topics.find((x) => x.id === filterName)!.isChecked = false;
         break;
       }
       case 'crs': {
@@ -724,7 +759,7 @@ export default class Catalogue extends Vue {
       case 'format': {
         const option = Object.values(this.formats)
           .flat()
-          .find((x) => x.name === filterName);
+          .find((x) => x.id === filterName);
         // eslint-disable-next-line
         option!.isChecked = false;
 
@@ -755,6 +790,13 @@ export default class Catalogue extends Vue {
         this.vendors = this.vendors.map(() => '');
         break;
       }
+      case 'license': {
+        this.licenses.forEach((x) => {
+          // eslint-disable-next-line
+          x.isChecked = false;
+        });
+        break;
+      }
       default:
     }
   }
@@ -763,7 +805,7 @@ export default class Catalogue extends Vue {
     this.filterMenuItemSelected = '';
   }
 
-  getFiltersChecked(category: string): filterOption[] {
+  getFiltersChecked(category: string): filterOption[] | crs[] {
     let result;
     switch (category) {
       case 'type':
@@ -782,6 +824,11 @@ export default class Catalogue extends Vue {
 
       case 'crs':
         result = this.crsList
+          .filter((x) => x.isChecked);
+        break;
+
+      case 'license':
+        result = this.licenses
           .filter((x) => x.isChecked);
         break;
 
@@ -976,6 +1023,126 @@ export default class Catalogue extends Vue {
     });
     label = label.substring(1);
     return label;
+  }
+
+  formatMoment(date: string, time: string): string {
+    return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
+  }
+
+  applyFilters(): void {
+    // const filters: string[] = [];
+    const filters: Partial<ElasticCatalogueQuery> = {};
+
+    // TEXT-SEARCH
+    filters.text = this.catalogQuery.query;
+
+    // PAGE PARAMS
+    filters.page = this.catalogQuery.page;
+    filters.size = this.catalogQuery.size;
+
+    // TYPE
+    if (this.getFiltersChecked('type').length) {
+      filters.type = [];
+      this.getFiltersChecked('type').forEach((x) => {
+        // eslint-disable-next-line
+        filters.type!.push(x.id as EnumAssetType);
+      });
+    }
+
+    // UPDATED
+    // TODO: check format
+    if (this.updated.dateFrom) {
+      filters.fromDate = this.formatMoment(this.updated.dateFrom, this.updated.timeFrom);
+    }
+    if (this.updated.dateTo) {
+      filters.toDate = this.formatMoment(this.updated.dateTo, this.updated.timeTo);
+    }
+
+    // TOPIC
+    if (this.getFiltersChecked('topic').length) {
+      filters.topic = [];
+      this.getFiltersChecked('topic').forEach((x) => {
+        // eslint-disable-next-line
+        filters.topic!.push(x.id as EnumTopicCategory);
+      });
+    }
+
+    // FORMAT
+    if (this.getFiltersChecked('format').length) {
+      filters.format = [];
+      this.getFiltersChecked('format').forEach((x) => {
+        // eslint-disable-next-line
+        filters.format!.push(x.id);
+      });
+    }
+
+    // CRS
+    if (this.getFiltersChecked('crs').length) {
+      filters.crs = [];
+      this.getFiltersChecked('crs').forEach((x) => {
+        // eslint-disable-next-line
+        filters.crs!.push((x as crs).code);
+      });
+    }
+
+    // SCALE
+    // TODO: check if should be changed so that max scale is bigger integer than min scale (as denominator)
+    const [selectedMinScale, selectedMaxScale] = this.scaleValues;
+    if (selectedMinScale !== this.scaleMin) {
+      filters.minScale = selectedMinScale;
+    }
+    if (selectedMaxScale !== this.scaleMax) {
+      filters.maxScale = selectedMaxScale;
+    }
+
+    // COVERAGE
+    if (this.mapCoverageSelectionBBox) {
+      const [minX, minY, maxX, maxY] = this.mapCoverageSelectionBBox.split(',');
+      filters.topLeftX = parseFloat(minX);
+      filters.topLeftY = parseFloat(maxY);
+      filters.bottomRightX = parseFloat(maxX);
+      filters.bottomRightY = parseFloat(minY);
+    }
+
+    // PRICE
+    if (this.priceMin) {
+      filters.minPrice = Number(this.priceMin);
+    }
+    if (this.priceMax) {
+      filters.maxPrice = Number(this.priceMax);
+    }
+
+    // ATTRIBUTES
+    if (this.attributes.length && this.attributes.some((x) => x.length)) {
+      filters.attribute = [];
+      this.attributes.filter((x) => x.length).forEach((x) => {
+        // eslint-disable-next-line
+        filters.attribute!.push(x);
+      });
+    }
+
+    // VENDORS
+    if (this.vendors.length && this.vendors.some((x) => x.length)) {
+      filters.publisher = [];
+      this.vendors.filter((x) => x.length).forEach((x) => {
+        // eslint-disable-next-line
+        filters.publisher!.push(x);
+      });
+    }
+
+    // LICENSE
+    if (this.getFiltersChecked('license').length) {
+      filters.license = [];
+      this.getFiltersChecked('license').forEach((x) => {
+        // eslint-disable-next-line
+        filters.license!.push(x.id);
+      });
+    }
+
+    console.log(filters);
+    this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
+      this.queryResults = advancedQueryResponse.result.items;
+    });
   }
 }
 </script>

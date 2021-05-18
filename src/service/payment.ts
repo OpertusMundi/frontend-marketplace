@@ -6,7 +6,7 @@ import {
 } from '@/model/order';
 import {
   BankwirePayIn,
-  Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand, PayIn,
+  Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand,
 } from '@/model/payment';
 
 /**
