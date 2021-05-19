@@ -2,6 +2,7 @@
 <html
   class="no-js no-svg"
   xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
   lang="en"
 >
@@ -26,7 +27,7 @@
     <meta name="_csrf_header" th:content="<%= '${_csrf.headerName}' %>" />
     
     <!-- Inject Thymeleaf block for Google-Analytics tracking code -->
-    <th:block th:if="${@environment.getProperty('opertusmundi.googleanalytics.tracker-id') != null}">
+    <th:block th:if="<%= '${@environment.getProperty(\'opertusmundi.googleanalytics.tracker-id\') != null}' %>">
       <th:block th:replace="googleanalytics-tracker.html" />
     </th:block>
   </head>
