@@ -32,7 +32,7 @@
           <button class="btn--std btn--outlineblue" @click="addKycInput">+ add page</button>
         </template>
 
-        <template v-slot:btn-submit>
+        <template v-slot:footer>
           <button @click="onSubmitKycPages">submit pages</button>
         </template>
       </modal>
@@ -40,6 +40,7 @@
   -------------------
   Props:
     withSlots?: boolean
+    showCancelButton?: boolean
     title: string
     modalId: string
     inputs: {
@@ -57,11 +58,11 @@
   FOR USE WITH SLOTS, pass prop:
     withSlots: true
   Do not pass inputs or title as props, these should be used in v-slot:body.
-  @submit is not emmited, submit logic should be handled in v-slot:btn-submit.
+  @submit is not emmited, submit logic should be handled in v-slot:footer.
 
   The following slots are required:
     <template v-slot:body></template>
-    <template v-slot:btn-submit></template>
+    <template v-slot:footer></template>
 -->
 
 <template>
@@ -94,11 +95,11 @@
 
         <!-- FOOTER -->
         <div class="mt-sm-20">
-          <button @click="onDismiss" class="btn--std btn--blue">cancel</button>
+          <button v-if="showCancelButton" @click="onDismiss" class="btn--std btn--blue">cancel</button>
           <!-- FOR USE WITHOUT SLOTS -->
           <button v-if="!withSlots" @click="onSubmit" class="btn--std btn--blue ml-xs-20">confirm</button>
           <!-- FOR USE WITH SLOTS -->
-          <slot v-if="withSlots" name="btn-submit"></slot>
+          <slot v-if="withSlots" name="footer"></slot>
         </div>
       </div>
     </div>
@@ -128,6 +129,8 @@ export default class Modal extends Vue {
   @Prop() private inputs!: Input[];
 
   @Prop() private withSlots?: boolean;
+
+  @Prop({ default: true }) private showCancelButton!: boolean;
 
   // eslint-disable-next-line
   readFile(i: number, e): void {
