@@ -37,114 +37,9 @@
       </div>
 
       <div class="collection__main">
-        <a href="#" class="asset_card">
-          <div class="asset_card__view"><span>VIEW ASSET</span></div>
-          <div class="asset_card__inner">
-            <div class="asset_card__top">
-              <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>Vector Dataset</span><span>Environment, Natural resources</span></div>
-              <div class="asset_card__top__right">
-                <span>Unpublished</span>
-                <div class="asset_card__top__right__symbol"><span></span><span></span><span></span></div>
-              </div>
-            </div>
-            <div class="asset_card__center">
-              <div class="asset_card__title">Lakes of Greece</div>
-              <div class="asset_card__price"><span>from</span>300€</div>
-            </div>
-            <div class="asset_card__bottom">
-              <div class="asset_card__bottom__left">
-                <div class="rating rating--dark"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
-                <div class="asset_card__bottom__left__info">
-                  <span><strong>Version: </strong>1.2</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
-                </div>
-              </div>
-              <div class="asset_card__bottom__right">
-                <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="#" class="asset_card">
-          <div class="asset_card__view"><span>VIEW ASSET</span></div>
-          <div class="asset_card__inner">
-            <div class="asset_card__top">
-              <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>Vector Dataset</span><span>Environment, Natural resources</span></div>
-              <div class="asset_card__top__right">
-                <span>Unpublished</span>
-                <div class="asset_card__top__right__symbol"><span></span><span></span><span></span></div>
-              </div>
-            </div>
-            <div class="asset_card__center">
-              <div class="asset_card__title">Lakes of Greece</div>
-              <div class="asset_card__price"><span>from</span>300€</div>
-            </div>
-            <div class="asset_card__bottom">
-              <div class="asset_card__bottom__left">
-                <div class="rating rating--dark"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
-                <div class="asset_card__bottom__left__info">
-                  <span><strong>Version: </strong>1.2</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
-                </div>
-              </div>
-              <div class="asset_card__bottom__right">
-                <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="#" class="asset_card">
-          <div class="asset_card__view"><span>VIEW ASSET</span></div>
-          <div class="asset_card__inner">
-            <div class="asset_card__top">
-              <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>Vector Dataset</span><span>Environment, Natural resources</span></div>
-              <div class="asset_card__top__right">
-                <span>Unpublished</span>
-                <div class="asset_card__top__right__symbol"><span></span><span></span><span></span></div>
-              </div>
-            </div>
-            <div class="asset_card__center">
-              <div class="asset_card__title">Lakes of Greece</div>
-              <div class="asset_card__price"><span>from</span>300€</div>
-            </div>
-            <div class="asset_card__bottom">
-              <div class="asset_card__bottom__left">
-                <div class="rating rating--dark"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
-                <div class="asset_card__bottom__left__info">
-                  <span><strong>Version: </strong>1.2</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
-                </div>
-              </div>
-              <div class="asset_card__bottom__right">
-                <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="#" class="asset_card">
-          <div class="asset_card__view"><span>VIEW ASSET</span></div>
-          <div class="asset_card__inner">
-            <div class="asset_card__top">
-              <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>Vector Dataset</span><span>Environment, Natural resources</span></div>
-              <div class="asset_card__top__right">
-                                      <span>Unpublished</span>
-                <div class="asset_card__top__right__symbol"><span></span><span></span><span></span></div>
-              </div>
-            </div>
-            <div class="asset_card__center">
-              <div class="asset_card__title">Lakes of Greece</div>
-              <div class="asset_card__price"><span>from</span>300€</div>
-            </div>
-            <div class="asset_card__bottom">
-              <div class="asset_card__bottom__left">
-                <div class="rating rating--dark"><span class="active">★</span><span>★</span><span>★</span><span>★</span><span>★</span><i>4.8/5</i></div>
-                <div class="asset_card__bottom__left__info">
-                  <span><strong>Version: </strong>1.2</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
-                </div>
-              </div>
-              <div class="asset_card__bottom__right">
-                <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
-              </div>
-            </div>
-          </div>
-        </a>
+        <catalogue-card :asset="{id:1, title:'Test Asset', type:'VECTOR'}"></catalogue-card>
+        <catalogue-card :asset="{id:1, title:'Test Asset', type:'RASTER'}"></catalogue-card>
+        <catalogue-card :asset="{id:1, title:'Test Asset', type:'NETCDF'}"></catalogue-card>
 
         <div class="more__bottom">
           <div class="more__bottom__block">
@@ -158,8 +53,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import CatalogueCard from '@/components/Catalogue/Card.vue';
 
-@Component
+@Component({
+  components: { CatalogueCard },
+})
 export default class DashboardProfile extends Vue {
 }
 </script>

@@ -689,7 +689,7 @@
         }
         &:hover {
             #{$ac}__inner {
-                border-color: $secondColor;
+                border-color: var(--color);
                 @media(min-width: 577px) {  
                     width: calc(100% - 50px)!important;
                 }
@@ -704,7 +704,7 @@
         top: 0;
         height: 99.9%;
         width: 100px;
-        background: $secondColor;
+        background: var(--color);
         color: #fff;
         display: flex;
         text-align: center;
@@ -729,8 +729,20 @@
         border: 2px solid #fff;
         border-radius: 20px;
         padding: 30px;
+        padding-left: 60px;
         width: 100%;
         transition: all 0.2s ease-in-out;
+        overflow: hidden;
+        &:after {
+            content: "";
+            width: 32px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: var(--color);
+            z-index: 1;
+        }
         @media(max-width: 576px) { 
             padding: 15px;
             border-radius: 10px;
@@ -739,7 +751,7 @@
 
     &:hover {
         #{$ac}__inner {
-            border-color: $secondColor;
+            border-color: var(--color);
             @media(min-width: 577px) {  
                 width: calc(100% - 80px);
             }
