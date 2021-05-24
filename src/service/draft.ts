@@ -187,7 +187,7 @@ export default class DraftAssetApi extends Api {
    * @param resource File to upload
    * @param command Command object with resource metadata
    */
-  public async uploadResource(key: string, resource: File, command: FileResourceCommand): Promise<ServerResponse<AssetDraft>> {
+  public async uploadResource(key: string, resource: File, command: FileResourceCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}/resources`;
 
     const form = new FormData();
@@ -198,6 +198,7 @@ export default class DraftAssetApi extends Api {
     }));
 
     return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
+      ...config,
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
