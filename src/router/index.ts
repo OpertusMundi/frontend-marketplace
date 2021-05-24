@@ -94,6 +94,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: '', layout: 'dashboard' },
       },
       {
+        path: 'notebooks',
+        name: 'Notebooks',
+        component: () => import(/* webpackChunkName: "dashboardnotebooks" */ '../views/dashboard/Notebooks.vue'),
+        meta: { requiresRole: '', layout: 'dashboard' },
+      },
+      {
         path: 'assets/create',
         name: 'CreateAsset',
         component: () => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
