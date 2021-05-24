@@ -10,12 +10,22 @@
       </div>
 
       <div class="dashboard__form">
-        <ul class="dashboard__form__nav">
+        <ul v-if="assetTypeGroup !== 'API'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Contract</a></li>
           <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
           <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Delivery</a></li>
+          <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
+          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
+        </ul>
+
+        <ul v-else class="dashboard__form__nav">
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Meadata</a></li>
+          <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
           <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
@@ -211,16 +221,19 @@
                 <div class="dashboard__form__step__pricing__inner">
                   <div class="row">
                     <div class="col-md-4">
-                      <button class="btn btn--std btn--blue" @click="addPricingModel" :disabled="isAddPricingModelDialogOpen">Add Pricing Model</button>
-                      <div v-for="(pricingModel, i) in asset.pricingModels" :key="i">Pricing Model {{ i + 1 }}</div>
+                      <button class="btn btn--std btn--blue" @click="addPricingModel" :disabled="selectedPricingModelForEditing !== null">Add Pricing Model</button>
+
+                      <div class="mt-xs-20">
+                        <button class="btn btn--std" :class="i == selectedPricingModelForEditing ? 'btn--dark' : 'btn--outlinedark'" @click="selectedPricingModelForEditing = i" v-for="(pricingModel, i) in asset.pricingModels" :key="i">Pricing Model {{ i + 1 }}</button>
+                      </div>
                     </div>
                     <div class="col-md-3">
-                      <div v-if="isAddPricingModelDialogOpen">
+                      <div v-if="selectedPricingModelForEditing !== null">
                         <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
                         <div class="form-group">
                           <div v-for="model in pricingModelTypes" :key="model.priceModel">
                             <label class="control control-radio" :for="`model_option_${model.priceModel}`">
-                              <input v-model="selectedPricingModelType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option_${model.priceModel}`" :value="model.priceModel">
+                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option_${model.priceModel}`" :value="model.priceModel">
                               {{ model.name }}
                               <div class="control_indicator"></div>
                             </label>
@@ -228,14 +241,55 @@
                         </div>
                         <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                         </validation-provider>
+                        <button class="btn btn--std btn--outlineblue" @click="removePricingModel">discard</button>
                       </div>
                     </div>
                     <div class="col-md-5">
-                      <div v-if="isAddPricingModelDialogOpen && selectedPricingModelType">
-                        <div v-if="selectedPricingModelType === 'FREE'">free</div>
-                        <div v-if="selectedPricingModelType === 'FIXED'">fixed</div>
-                        <div v-if="selectedPricingModelType === 'FIXED_PER_ROWS'">fixed per rows</div>
-                        <div v-if="selectedPricingModelType === 'FIXED_FOR_POPULATION'">fixed per population</div>
+                      <div v-if="selectedPricingModelForEditing !== null && asset.pricingModels[selectedPricingModelForEditing].type">
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FREE'">
+                          <p>Free</p>
+                          <button class="btn btn--std btn--blue" @click="setPricingModel('FREE')">Set Pricing Model</button>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED'">
+                          <p>Fixed</p>
+                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
+                            <div class="form-group">
+                              <label for="price">Price</label>
+                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                          <validation-provider v-slot="{ errors }" name="Number of years" rules="required">
+                            <div class="form-group">
+                              <label for="price">Number of years</label>
+                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED')">Set Pricing Model</button>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_PER_ROWS'">
+                          <p>Fixed per rows</p>
+                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
+                            <div class="form-group">
+                              <label for="price">Price</label>
+                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED_PER_ROWS')">Set Pricing Model</button>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_FOR_POPULATION'">
+                          <p>Fixed per population</p>
+                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
+                            <div class="form-group">
+                              <label for="price">Price</label>
+                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
+                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                            </div>
+                          </validation-provider>
+                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED_FOR_POPULATION')">Set Pricing Model</button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -246,17 +300,17 @@
                 <div class="form-group">
                   <label class="control control-radio">
                     Fixed price <span>Add the price of your asset in euros and choose from the other provided options. </span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="FIXED" @change="setPriceModel()" />
+                    <input type="radio" name="asset_type" v-model="priceModelType" value="FIXED" @change="setPricingModel()" />
                     <div class="control_indicator"></div>
                   </label>
                   <label class="control control-radio">
                     Subscription <span>Subscriptions to services are provided for a specific time period and are automatically renewed. </span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="SUBSCRIPTION" @change="setPriceModel()" />
+                    <input type="radio" name="asset_type" v-model="priceModelType" value="SUBSCRIPTION" @change="setPricingModel()" />
                     <div class="control_indicator"></div>
                   </label>
                   <label class="control control-radio">
                     Free <span>Provide your asset for free.</span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="FREE" @change="setPriceModel()" />
+                    <input type="radio" name="asset_type" v-model="priceModelType" value="FREE" @change="setPricingModel()" />
                     <div class="control_indicator"></div>
                   </label>
                   <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
@@ -320,7 +374,7 @@
                     <div class="col-md-6">
                       <validation-provider v-slot="{ errors }" name="Delivery method" rules="required">
                       <div class="form-group">
-                        <span style="background: yellow">TODO: fix values</span>
+                        <!-- todo: fix values -->
                         <label class="control control-radio">
                           By the platform
                           <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
@@ -608,15 +662,15 @@
                     </div>
                     <div class="dashboard__form__review__item__body">
                       <ul>
-                        <li><strong>Pricing type:</strong>{{ priceModelType }}</li>
+                        <!-- <li><strong>Pricing type:</strong>{{ priceModelType }}</li> -->
                         <li v-for="(pricingModel, index) in asset.pricingModels" v-bind:key="`pricingmodel${index}`">
-                          <span v-if="priceModelType === 'FIXED'">
-                            <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.totalPrice }}€ + {{ pricingModel.yearsOfUpdates }} years
+                          <span v-if="pricingModel.type === 'FIXED'">
+                            <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€ + {{ pricingModel.yearsOfUpdates }} years
                           </span>
-                          <span v-if="priceModelType === 'SUBSCRIPTION'">
+                          <span v-if="pricingModel.type === 'SUBSCRIPTION'">
                             <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.monthlyPrice }}€ + {{ pricingModel.duration }} months
                           </span>
-                          <span v-if="priceModelType === 'FREE'">
+                          <span v-if="pricingModel.type === 'FREE'">
                             <strong>Pricing model {{ index+1 }}:</strong>FREE
                           </span>
                         </li>
@@ -689,7 +743,14 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CatalogueItemCommand, ServerResponse } from '@/model';
-import { BasePricingModelCommand, EnumPricingModel } from '@/model/pricing-model';
+import {
+  BasePricingModelCommand,
+  EnumPricingModel,
+  // FreePricingModelCommand,
+  // FixedPricingModelCommand,
+  // FixedRowPricingModelCommand,
+  // FixedPopulationPricingModelCommand,
+} from '@/model/pricing-model';
 import { EnumAssetType } from '@/model/enum';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
@@ -703,7 +764,6 @@ import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
 import { EnumConformity } from '@/model/catalogue';
-import { FileResourceCommand } from '@/model/asset';
 import store from '@/store';
 
 Vue.use(VueCardFormat);
@@ -747,13 +807,11 @@ export default class CreateAsset extends Vue {
 
   availableFormats: string[];
 
-  isAddPricingModelDialogOpen: boolean;
-
   contract: string;
 
   pricingModelTypes: any;
 
-  selectedPricingModelType: string;
+  selectedPricingModelForEditing: number | null;
 
   totalSteps = 7;
 
@@ -786,8 +844,6 @@ export default class CreateAsset extends Vue {
     this.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
 
     this.availableFormats = [];
-
-    this.isAddPricingModelDialogOpen = false;
 
     this.contract = '';
 
@@ -852,7 +908,7 @@ export default class CreateAsset extends Vue {
       { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
       { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
     ];
-    this.selectedPricingModelType = '';
+    this.selectedPricingModelForEditing = null;
     // const priceModel = { type: '' } as BasePricingModelCommand;
     // const priceModel = { type: 'UNDEFINED' } as BasePricingModelCommand;
     // this.asset.pricingModels = [];
@@ -902,8 +958,7 @@ export default class CreateAsset extends Vue {
     });
   }
 
-  @Watch('asset.type', { immediate: true }) onAssetTypeGroupChange() {
-    console.log('TEST');
+  @Watch('asset.type', { immediate: true }) onAssetTypeGroupChange(): void {
     this.asset.format = '';
     const selectedType = this.asset.type;
     this.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
@@ -917,25 +972,34 @@ export default class CreateAsset extends Vue {
   //   return formats;
   // }
 
-  setPriceModel():void {
-    // const priceModel = { type: this.priceModelType } as BasePricingModelCommand;
-    // this.asset.pricingModels = [];
-    // this.asset.pricingModels.push(priceModel);
+  setPricingModel():void {
+    this.selectedPricingModelForEditing = null;
   }
 
   addPricingModel():void {
-    this.isAddPricingModelDialogOpen = true;
-    const priceModel = {} as BasePricingModelCommand;
+    const priceModel = {
+      // type: EnumPricingModel.UNDEFINED,
+      type: '' as EnumPricingModel,
+      domainRestrictions: [],
+      coverageRestrictionContinents: [],
+      consumerRestrictionContinents: [],
+      coverageRestrictionCountries: [],
+      consumerRestrictionCountries: [],
+    } as BasePricingModelCommand;
     this.asset.pricingModels.push(priceModel);
+    this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
   }
 
-  removePricingModel(index:number):void {
-    this.asset.pricingModels.splice(index, 1);
+  removePricingModel(): void {
+    const i = this.selectedPricingModelForEditing;
+    this.selectedPricingModelForEditing = null;
+    // eslint-disable-next-line
+    this.asset.pricingModels.splice(i!, 1);
   }
 
-  readFile(e) {
+  // eslint-disable-next-line
+  readFile(e): void {
     const [file] = e.srcElement.files;
-    // this.uploadedFile = file;
     this.fileToUpload.isFileSelected = true;
     this.fileToUpload.file = file;
     this.fileToUpload.fileName = file.name;
@@ -954,6 +1018,7 @@ export default class CreateAsset extends Vue {
     if (this.fileToUpload.isFileSelected) {
       const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
       if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
+        // eslint-disable-next-line
         alert('format-extension mismatch (not compatible)');
         return;
       }
@@ -1009,16 +1074,31 @@ export default class CreateAsset extends Vue {
           console.log('draft created');
           const draftAssetKey = response.result.key;
 
-          this.uploading.status = true;
-          this.uploading.completed = false;
-          this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }).then((uploadResponse) => {
-            if (uploadResponse.success) {
-              console.log('uploaded resource!!!');
-            } else {
-              console.log(uploadResponse);
-              console.log('error uploading resource');
-            }
-          });
+          if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
+            this.uploading.status = true;
+            this.uploading.completed = false;
+            this.uploading.title = 'Your resource is being uploaded';
+            this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
+              if (uploadResponse.success) {
+                console.log('uploaded resource!!!');
+                this.uploading.completed = true;
+                this.uploading.title = 'Your asset is uploaded successfully!';
+                this.uploading.subtitle = '';
+                this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
+                  if (submitResponse.success) {
+                    console.log('asset submitted successfully');
+                  } else {
+                    console.log('error submitting asset', submitResponse);
+                  }
+                });
+              } else {
+                console.log(uploadResponse);
+                console.log('error uploading resource');
+              }
+            });
+          } else {
+            this.uploading.completed = true;
+          }
         } else {
           console.log('error creating draft', response);
           this.uploading.status = false;
@@ -1046,5 +1126,6 @@ export default class CreateAsset extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_forms.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>
