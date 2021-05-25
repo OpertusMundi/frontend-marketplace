@@ -83,13 +83,25 @@ export interface SalesQuery extends BaseQuery {
 }
 
 export enum EnumAssetSource {
+  /**
+   * Search operation views
+   */
   SEARCH = 'SEARCH',
+  /**
+   * Record views
+   */
   VIEW = 'VIEW',
+  /**
+   * Related assets operation views
+   */
   REFERENCE = 'REFERENCE',
 }
 
 export enum EnumAssetQueryMetric {
-  COUNT = 'COUNT',
+  /**
+   * Number of views
+   */
+  COUNT = 'COUNT_VIEWS',
 }
 
 export interface AssetQuery extends BaseQuery {

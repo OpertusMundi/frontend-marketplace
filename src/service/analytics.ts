@@ -1,7 +1,7 @@
 import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
-import { SalesQuery, DataSeries } from '@/model/analytics';
+import { SalesQuery, DataSeries, AssetQuery } from '@/model/analytics';
 
 export default class AnalyticsApi extends Api {
   constructor() {
@@ -57,6 +57,17 @@ export default class AnalyticsApi extends Api {
     const url = '/action/analytics/sales';
 
     return this.post<SalesQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response: AxiosServerResponse<DataSeries>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async executeAssetQuery(query: AssetQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/assets';
+
+    return this.post<AssetQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
 
