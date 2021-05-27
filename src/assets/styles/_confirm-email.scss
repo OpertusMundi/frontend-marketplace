@@ -1,0 +1,53 @@
+.confirm-email {
+    background: #f2f2f2;
+    &__hero {
+        position: relative;
+        height: 550px;
+        width: 100%;
+        background: $gradient_main;
+        padding:0 15px;
+        padding-top: $header_height;
+        z-index: 10;
+        @media(max-width: 576px) {
+            height: unset;
+        }
+
+        &__content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin:0 auto;
+            width: 100%;
+            height: 100%;
+            padding: 50px 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            &__title {
+                color :#fff;
+                font-family: $titleFont;
+                font-weight: 700;
+                @include fluid-type(30px, 45px);
+                margin-bottom: 40px;
+                span {
+                    color: $mainColor;
+                }
+            }
+            &__text {
+                margin-top: 110px;
+                max-width: 400px;
+                @media(max-width: 576px) {
+                    margin-top: 80px;
+                }
+                p {
+                    color: #fff;
+                    font-weight: 500;
+                    line-height: 1.4em;
+                }
+            }
+        }
+    }
+}
