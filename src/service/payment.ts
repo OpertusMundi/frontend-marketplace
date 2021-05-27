@@ -1,12 +1,17 @@
 import Api from '@/service/api';
 
-import { AxiosServerResponse, ServerResponse } from '@/model/response';
+import {
+  AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
+} from '@/model/response';
+import { Sorting } from '@/model/request';
 import {
   Order,
 } from '@/model/order';
 import {
   BankwirePayIn,
   Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand,
+  EnumPayInSortField,
+  EnumTransactionStatus,
 } from '@/model/payment';
 
 /**
@@ -172,5 +177,24 @@ export default class PaymentApi extends Api {
 
         return data;
       });
+  }
+
+  /**
+   * Search consumer PayIn records (ROLE_CONSUMER is required)
+   *
+   * @param status
+   * @param page
+   * @param size
+   * @param sorting
+   * @returns
+   */
+  public async findAllConsumerPayIns(
+    status: EnumTransactionStatus | null = null, page = 0, size = 10, sorting: Sorting<EnumPayInSortField>,
+  ): Promise<AxiosPageResponse<BankwirePayIn | CardDirectPayIn>> {
+    const { id: field, order } = sorting;
+
+    const url = `/action/payments/payins/consumer?page=${page}&size=${size}&status=${status || ''}&orderBy=${field}&order=${order}`;
+
+    return this.get<ServerResponse<PageResult<BankwirePayIn | CardDirectPayIn>>>(url);
   }
 }
