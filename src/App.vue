@@ -73,6 +73,7 @@ export default class App extends Vue {
 
     this.noHeader = [
       'Login',
+      'Register',
     ];
     this.noHeaderBgArray = [
       'Home',
@@ -103,6 +104,9 @@ export default class App extends Vue {
       this.showFooter = true;
     } else {
       this.headerClass = 'bg';
+      // todo: next 2 lines to be tested
+      this.showHeader = true;
+      this.showFooter = true;
     }
   }
 

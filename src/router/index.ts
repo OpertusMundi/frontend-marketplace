@@ -163,6 +163,19 @@ const routes: RouteConfig[] = [
     },
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import(/* webpackChunkName: "register" */ '../views/Register.vue'),
+    meta: {
+      hideForAuth: true,
+    },
+  },
+  {
+    path: '/confirmemail',
+    name: 'ConfirmEmail',
+    component: () => import(/* webpackChunkName: "confirmemail" */ '../views/ConfirmEmail.vue'),
+  },
+  {
     path: '/become-vendor',
     name: 'BocomeVendor',
     component: () => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
@@ -208,6 +221,12 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (to.name === 'ConfirmEmail' && from.name === 'Register') {
+      return { x: 0, y: 0 };
+    }
+    return savedPosition;
+  },
 });
 
 router.beforeEach((to, from, next) => {
@@ -215,6 +234,12 @@ router.beforeEach((to, from, next) => {
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {
     next({ name: 'User' });
+  }
+
+  if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
+    next('/error/401');
+  } else {
+    next();
   }
 
   if (role && !store.getters.hasRole(role)) {

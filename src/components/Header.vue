@@ -225,7 +225,7 @@
           </div>
         </div>
         <div class="header__login" v-else>
-          <router-link to="/signin">Login</router-link><span>/</span><router-link to="/login">Register</router-link>
+          <router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link>
         </div>
       </div>
     </div>

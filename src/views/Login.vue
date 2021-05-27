@@ -23,7 +23,7 @@
       </validation-observer>
       <div class="login__helpers">
         <router-link to="/forgot-password">Forgot your password?</router-link><br>
-        <router-link to="/login">Don’t have an account yet? Register</router-link>
+        <router-link to="/register">Don’t have an account yet? Register</router-link>
       </div>
     </div>
   </div>

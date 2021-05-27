@@ -82,14 +82,14 @@
                 <validation-provider v-slot="{ errors }" name="Type" rules="required">
                   <div class="form-group">
                     <label for="multiselect_type">Type</label>
-                    <multiselect id="multiselect_type" v-model="asset.type" :options="assetTypes" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
+                    <multiselect id="multiselect_type" v-model="asset.type" :options="menusData.assetTypes" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
                 <validation-provider v-slot="{ errors }" name="Type" rules="required">
                   <div class="form-group">
                     <label for="multiselect_type">Format</label>
-                    <multiselect :disabled="!asset.type" id="multiselect_type" v-model="asset.format" :options="availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
+                    <multiselect :disabled="!asset.type" id="multiselect_type" v-model="asset.format" :options="menusData.availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
@@ -224,7 +224,7 @@
                       <button class="btn btn--std btn--blue" @click="addPricingModel" :disabled="selectedPricingModelForEditing !== null">Add Pricing Model</button>
 
                       <div class="mt-xs-20">
-                        <button class="btn btn--std" :class="i == selectedPricingModelForEditing ? 'btn--dark' : 'btn--outlinedark'" @click="selectedPricingModelForEditing = i" v-for="(pricingModel, i) in asset.pricingModels" :key="i">Pricing Model {{ i + 1 }}</button>
+                        <button class="card card--clickable" :class="i == selectedPricingModelForEditing ? 'card--selected' : ''" @click="selectedPricingModelForEditing = i" v-for="(pricingModel, i) in asset.pricingModels" :key="i">Pricing Model {{ i + 1 }}</button>
                       </div>
                     </div>
                     <div class="col-md-3">
@@ -248,7 +248,7 @@
                       <div v-if="selectedPricingModelForEditing !== null && asset.pricingModels[selectedPricingModelForEditing].type">
                         <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FREE'">
                           <p>Free</p>
-                          <button class="btn btn--std btn--blue" @click="setPricingModel('FREE')">Set Pricing Model</button>
+                          <button class="btn btn--std btn--blue" @click.prevent="setPricingModel('FREE')">Set Pricing Model</button>
                         </div>
                         <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED'">
                           <p>Fixed</p>
@@ -265,6 +265,15 @@
                               <input v-model="asset.pricingModels[selectedPricingModelForEditing].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
                               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                             </div>
+                          </validation-provider>
+                          <validation-provider>
+                          <div class="form-group">
+                            <label class="typo__label">Domain Restrictions</label>
+                            <multiselect
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].domainRestrictions" track-by="code" placeholder="Search domain" label="name" :options="menusData.domainRestrictions.options" :multiple="true">
+                            </multiselect>
+                            <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
+                          </div>
                           </validation-provider>
                           <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED')">Set Pricing Model</button>
                         </div>
@@ -795,6 +804,12 @@ export default class CreateAsset extends Vue {
     step7: InstanceType<typeof ValidationObserver>,
   }
 
+  menusData: {
+    assetTypes: string[],
+    availableFormats: string[],
+    domainRestrictions: { options: any[], selected: any[] },
+  };
+
   catalogueApi: CatalogueApi;
 
   draftAssetApi: DraftAssetApi;
@@ -803,9 +818,9 @@ export default class CreateAsset extends Vue {
 
   assetTypeGroup: string; // Data File / API / Collection
 
-  assetTypes: string[];
+  // assetTypes: string[];
 
-  availableFormats: string[];
+  // availableFormats: string[];
 
   contract: string;
 
@@ -840,10 +855,30 @@ export default class CreateAsset extends Vue {
 
     this.assetTypeGroup = '';
 
-    // this.assetTypes = Object.values(EnumAssetType);
-    this.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
-
-    this.availableFormats = [];
+    this.menusData = { assetTypes: [], availableFormats: [], domainRestrictions: { options: [], selected: [] } };
+    this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
+    this.menusData.domainRestrictions.options = [
+      {
+        name: 'Photogrammetry',
+        code: 'PH',
+      },
+      {
+        name: 'Geograpgy',
+        code: 'GE',
+      },
+      {
+        name: 'Elevation',
+        code: 'EL',
+      },
+      {
+        name: 'Pharming',
+        code: 'PA',
+      },
+      {
+        name: 'Health',
+        code: 'HE',
+      },
+    ];
 
     this.contract = '';
 
@@ -943,6 +978,7 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep():void {
+    console.log(this.asset);
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
         if (this.currentStep === this.totalSteps) {
@@ -961,7 +997,7 @@ export default class CreateAsset extends Vue {
   @Watch('asset.type', { immediate: true }) onAssetTypeGroupChange(): void {
     this.asset.format = '';
     const selectedType = this.asset.type;
-    this.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
+    this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
   }
 
   // availableFormats(): string[] {
@@ -1030,6 +1066,17 @@ export default class CreateAsset extends Vue {
 
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
+
+    // fix pricing models format (vue-multiselect can't bind values but whole objects)
+    /* eslint-disable no-param-reassign */
+    this.asset.pricingModels.forEach((x) => {
+      x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
+      x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
+      x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
+      x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
+      x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
+    });
+    /* eslint-enable no-param-reassign */
 
     const config: AxiosRequestConfig = {
       onUploadProgress: (progressEvent: any): void => {
@@ -1128,4 +1175,33 @@ export default class CreateAsset extends Vue {
   @import "@/assets/styles/_forms.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
+
+  .card {
+    padding: 30px;
+    background: #fff;
+    letter-spacing: 0.06em;
+    font-size: .8em;
+    border: solid 2px $darkColor;
+    border-radius: 7px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &--selected {
+      border: solid 2px $secondColor;
+    }
+
+    &--clickable {
+      cursor: pointer;
+    }
+
+  .form-group .multiselect__option--highlight {
+    background: $secondColor !important;
+  }
+
+  .form-group .multiselect__tag {
+    background: $secondColor !important;
+  }
+  }
 </style>

@@ -491,6 +491,17 @@
     }
     .multiselect {
         margin-bottom: 10px;
+        &__tag {
+            background: $secondColor;
+        }
+        &__tag-icon {
+            &:hover {
+                background: transparent;
+            }
+            &::after {
+                color: #fff;
+            }
+        }
         &__tags {
             border: 1px solid $darkColor;
         }
@@ -511,6 +522,10 @@
                 color: $darkColor;
                 span {
                     // font-weight: 500;
+                }
+                &:after {
+                    background: $secondColor;
+                    color: #fff;
                 }
             }
             &--selected {
