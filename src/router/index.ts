@@ -159,7 +159,7 @@ const routes: RouteConfig[] = [
   {
     path: '/register',
     name: 'Register',
-    component: () => import(/* webpackChunkName: "login" */ '../views/Register.vue'),
+    component: () => import(/* webpackChunkName: "register" */ '../views/Register.vue'),
     meta: {
       hideForAuth: true,
     },
@@ -167,7 +167,7 @@ const routes: RouteConfig[] = [
   {
     path: '/confirmemail',
     name: 'ConfirmEmail',
-    component: () => import(/* webpackChunkName: "login" */ '../views/ConfirmEmail.vue'),
+    component: () => import(/* webpackChunkName: "confirmemail" */ '../views/ConfirmEmail.vue'),
   },
   {
     path: '/become-vendor',
