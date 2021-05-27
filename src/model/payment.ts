@@ -41,6 +41,12 @@ export enum EnumTransactionStatus {
   SUCCEEDED = 'SUCCEEDED',
 }
 
+export enum EnumPayInSortField {
+  EXECUTED_ON = 'EXECUTED_ON',
+  REFERENCE_NUMBER = 'REFERENCE_NUMBER',
+  TOTAL_PRICE = 'TOTAL_PRICE',
+}
+
 export interface Transfer {
   /**
    * Funds debited from buyer's wallet and credited to seller's wallet
@@ -136,7 +142,7 @@ export interface PayIn {
   /**
    * PayIn payments. A PayIn may include a single order or multiple subscription billing records
    */
-  items: PayInItem[];
+  items?: PayInItem[];
   /**
    * The total price of all PayIn items (the debited funds of the PayIn)
    */
@@ -198,7 +204,7 @@ export interface BankwirePayIn extends PayIn {
   /**
    * The user has to proceed a Bank wire to this bank account
    */
-  bankAccount: BankAccount;
+  bankAccount?: BankAccount;
 }
 
 export interface CardDirectPayIn extends PayIn {
@@ -214,7 +220,7 @@ export interface CardDirectPayIn extends PayIn {
    * Redirect URL if 3-D Secure validation is required. If not empty, the client
    * must initiate the 3-D Secure validation process.
    */
-  secureModeRedirectURL: string;
+  secureModeRedirectURL?: string;
 }
 
 export interface CardDirectPayInCommand {
