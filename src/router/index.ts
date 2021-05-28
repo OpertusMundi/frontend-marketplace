@@ -176,6 +176,16 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "confirmemail" */ '../views/ConfirmEmail.vue'),
   },
   {
+    path: '/account/registration/success',
+    name: 'RegistrationSuccess',
+    component: () => import(/* webpackChunkName: "registrationsuccess" */ '../views/RegistrationSuccess.vue'),
+  },
+  {
+    path: '/account/registration/failure',
+    name: 'RegistrationFailure',
+    component: () => import(/* webpackChunkName: "registrationfailure" */ '../views/RegistrationFailure.vue'),
+  },
+  {
     path: '/become-vendor',
     name: 'BocomeVendor',
     component: () => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
