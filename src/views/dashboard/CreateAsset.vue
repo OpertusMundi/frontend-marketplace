@@ -1176,19 +1176,6 @@ export default class CreateAsset extends Vue {
   }
 
   addPricingModel():void {
-    console.log('add pricing model');
-    // const priceModel = {
-    //   type: '' as EnumPricingModel,
-    //   domainRestrictions: [],
-    //   coverageRestrictionContinents: [],
-    //   consumerRestrictionContinents: [],
-    //   coverageRestrictionCountries: [],
-    //   consumerRestrictionCountries: [],
-    //   includeDomainRestrictions: false,
-    //   includeCoverageRestrictions: false,
-    //   includeConsumerRestrictions: false,
-    // } as BasePricingModelCommand;
-    // this.asset.pricingModels.push(priceModel);
     this.asset.pricingModels.push({} as BasePricingModelCommand);
     this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
   }
@@ -1227,10 +1214,12 @@ export default class CreateAsset extends Vue {
       }
       default:
     }
+    // eslint-disable-next-line
     Vue.set(this.asset.pricingModels, this.selectedPricingModelForEditing!, pricingModel);
   }
 
   addDiscountRate(): void {
+    // eslint-disable-next-line
     (this.asset.pricingModels[this.selectedPricingModelForEditing!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
   }
 
@@ -1248,13 +1237,6 @@ export default class CreateAsset extends Vue {
     this.fileToUpload.file = file;
     this.fileToUpload.fileName = file.name;
     this.fileToUpload.fileExtension = file.name.split('.').pop();
-
-    // const extension = file.name.split('.').pop();
-    // const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
-    // console.log(acceptedExtensions, extension);
-    // if (!acceptedExtensions.includes(extension)) {
-    //   alert('format-extension mismatch (not compatible)');
-    // }
   }
 
   submitForm():void {
@@ -1299,59 +1281,59 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    // this.draftAssetApi.create(this.asset, config)
-    //   .then((response: ServerResponse<AssetDraft>) => {
-    //     if (response.success) {
-    //       console.log('draft created');
-    //       const draftAssetKey = response.result.key;
+    this.draftAssetApi.create(this.asset, config)
+      .then((response: ServerResponse<AssetDraft>) => {
+        if (response.success) {
+          console.log('draft created');
+          const draftAssetKey = response.result.key;
 
-    //       if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
-    //         this.uploading.status = true;
-    //         this.uploading.completed = false;
-    //         this.uploading.title = 'Your resource is being uploaded';
-    //         this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
-    //           if (uploadResponse.success) {
-    //             console.log('uploaded resource!!!');
-    //             this.uploading.completed = true;
-    //             this.uploading.title = 'Your asset is uploaded successfully!';
-    //             this.uploading.subtitle = '';
-    //             this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
-    //               if (submitResponse.success) {
-    //                 console.log('asset submitted successfully');
-    //               } else {
-    //                 console.log('error submitting asset', submitResponse);
-    //               }
-    //             });
-    //           } else {
-    //             console.log(uploadResponse);
-    //             console.log('error uploading resource');
-    //           }
-    //         });
-    //       } else {
-    //         this.uploading.completed = true;
-    //       }
-    //     } else {
-    //       console.log('error creating draft', response);
-    //       this.uploading.status = false;
-    //       this.uploading.completed = true;
-    //       this.uploading.errors = response.messages;
-    //       setTimeout(() => {
-    //         this.uploading.errors = [];
-    //       }, 10000);
-    //       setTimeout(() => {
-    //         window.scrollTo(0, document.body.scrollHeight);
-    //       }, 300);
-    //     }
-    //   })
-    //   .catch((error: AxiosError) => {
-    //     if (error.response) {
-    //       this.uploading.errors = error.response.data.messages;
-    //       setTimeout(() => {
-    //         this.uploading.errors = [];
-    //       }, 10000);
-    //     }
-    //     this.uploading.status = false;
-    //   });
+          if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
+            this.uploading.status = true;
+            this.uploading.completed = false;
+            this.uploading.title = 'Your resource is being uploaded';
+            this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
+              if (uploadResponse.success) {
+                console.log('uploaded resource!!!');
+                this.uploading.completed = true;
+                this.uploading.title = 'Your asset is uploaded successfully!';
+                this.uploading.subtitle = '';
+                this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
+                  if (submitResponse.success) {
+                    console.log('asset submitted successfully');
+                  } else {
+                    console.log('error submitting asset', submitResponse);
+                  }
+                });
+              } else {
+                console.log(uploadResponse);
+                console.log('error uploading resource');
+              }
+            });
+          } else {
+            this.uploading.completed = true;
+          }
+        } else {
+          console.log('error creating draft', response);
+          this.uploading.status = false;
+          this.uploading.completed = true;
+          this.uploading.errors = response.messages;
+          setTimeout(() => {
+            this.uploading.errors = [];
+          }, 10000);
+          setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+          }, 300);
+        }
+      })
+      .catch((error: AxiosError) => {
+        if (error.response) {
+          this.uploading.errors = error.response.data.messages;
+          setTimeout(() => {
+            this.uploading.errors = [];
+          }, 10000);
+        }
+        this.uploading.status = false;
+      });
   }
 }
 </script>
