@@ -44,9 +44,15 @@
           </validation-provider>
 
           <div>
-            <div class="d-flex align-items-center justify-content-center">
+            <!-- <div class="d-flex align-items-center justify-content-center">
               <input class="mr-xs-10" @change="onAcceptTermsChange" type="checkbox" v-model="termsAccepted" id="terms">
               <label for="terms">I 've read and accept <strong><a class="login__helpers" href="/terms">Terms & Conditions</a></strong></label>
+            </div> -->
+            <div>
+              <div class="form-group-checkbox form-group-checkbox--centered">
+                <input @change="onAcceptTermsChange" type="checkbox" v-model="termsAccepted" id="terms">
+                <label for="terms">I 've read and accept the <strong><a class="login__helpers" href="/terms">Terms & Conditions</a></strong></label>
+              </div>
             </div>
             <span class="login__form__errors" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register.</span>
           </div>
@@ -187,6 +193,7 @@ export default class Login extends Vue {
 <style lang="scss">
   // borrows styling from _login.scss
   @import "@/assets/styles/_login.scss";
+  @import "@/assets/styles/_forms.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
 </style>

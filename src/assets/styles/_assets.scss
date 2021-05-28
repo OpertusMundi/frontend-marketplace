@@ -204,6 +204,22 @@
             padding: 15px;
         }
 
+        &__price {
+            color: $secondColor;
+            display: inline-flex;
+            span {
+                font-weight: 400;
+                line-height: 72%;
+                &:nth-child(1) {
+                    font-size: em(40);
+                }
+                &:nth-child(2) {
+                    margin-left: 10px;
+                    font-size: em(16);
+                }
+            }
+        }
+
         &__errors {
             color: red;
             margin-top: -20px;

@@ -74,54 +74,54 @@
 
                 <validation-provider v-slot="{ errors }" name="Title" rules="required">
                 <div class="form-group">
-                  <label for="metadata_title">Title</label>
+                  <label for="metadata_title">Title *</label>
                   <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" v-model="asset.title">
                   <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                 </div>
                 </validation-provider>
                 <validation-provider v-slot="{ errors }" name="Type" rules="required">
                   <div class="form-group">
-                    <label for="multiselect_type">Type</label>
+                    <label for="multiselect_type">Type *</label>
                     <multiselect id="multiselect_type" v-model="asset.type" :options="menusData.assetTypes" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
                 <validation-provider v-slot="{ errors }" name="Type" rules="required">
                   <div class="form-group">
-                    <label for="multiselect_type">Format</label>
+                    <label for="multiselect_type">Format *</label>
                     <multiselect :disabled="!asset.type" id="multiselect_type" v-model="asset.format" :options="menusData.availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Language" rules="required">
+                <validation-provider v-slot="{ errors }" name="Language">
                 <div class="form-group">
                   <label for="metadata_language">Language</label>
                   <input type="text" class="form-group__text" name="metadata_language" id="metadata_language" v-model="asset.language">
                   <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                 </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Editor's name" rules="required">
+                <validation-provider v-slot="{ errors }" name="Editor's name">
                   <div class="form-group">
                     <label for="editor">Editor</label>
                     <input type="text" name="publisherName" class="form-group__text" id="" v-model="asset.publisherName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Editor's email" rules="required|email">
+                <validation-provider v-slot="{ errors }" name="Editor's email" rules="email">
                   <div class="form-group">
                     <label for="">Editor’s email</label>
                     <input type="text" class="form-group__text" id="" name="publisherEmail" v-model="asset.publisherEmail">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Maintenance manager name" rules="required">
+                <validation-provider v-slot="{ errors }" name="Maintenance manager name">
                   <div class="form-group">
                     <label for="">Maintenance manager</label>
                     <input type="text" class="form-group__text" id="" name="metadataPointOfContactName" v-model="asset.metadataPointOfContactName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Maintenance manager’s email" rules="required|email">
+                <validation-provider v-slot="{ errors }" name="Maintenance manager’s email" rules="email">
                   <div class="form-group">
                     <label for="">Maintenance manager’s email</label>
                     <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="asset.metadataPointOfContactEmail">
@@ -130,7 +130,7 @@
                 </validation-provider>
                 <validation-provider v-slot="{ errors }" name="Version" rules="required">
                   <div class="form-group">
-                    <label for="">Version</label>
+                    <label for="">Version *</label>
                     <input type="text" class="form-group__text" id="" name="version" v-model="asset.version">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
@@ -142,14 +142,14 @@
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider> -->
-                <validation-provider v-slot="{ errors }" name="Asset short description" rules="required">
+                <validation-provider v-slot="{ errors }" name="Asset short description">
                   <div class="form-group">
                     <label for="">Asset short description</label>
                     <input type="text" class="form-group__text" id="" name="abstractText" v-model="asset.abstract">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Metadata language" rules="required">
+                <validation-provider v-slot="{ errors }" name="Metadata language">
                   <div class="form-group">
                     <label for="">Metadata language</label>
                     <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="asset.metadataLanguage">
@@ -231,74 +231,170 @@
                       <div v-if="selectedPricingModelForEditing !== null">
                         <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
                         <div class="form-group">
-                          <div v-for="model in pricingModelTypes" :key="model.priceModel">
-                            <label class="control control-radio" :for="`model_option_${model.priceModel}`">
-                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option_${model.priceModel}`" :value="model.priceModel">
-                              {{ model.name }}
-                              <div class="control_indicator"></div>
-                            </label>
-                          </div>
+                          <form>
+                            <div v-for="model in pricingModelTypes" :key="model.priceModel">
+                              <label class="control control-radio" :for="`model_option_${model.priceModel}`">
+                                <!-- <input @change="onChangePricingModelType(model.priceModel)" v-model="tempSelectedType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel"> -->
+                                <input @change="onChangePricingModelType(model.priceModel)" v-model="asset.pricingModels[selectedPricingModelForEditing].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel">
+                                {{ model.name }}
+                                <div class="control_indicator"></div>
+                              </label>
+                            </div>
+                          </form>
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                         </div>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                         </validation-provider>
                         <button class="btn btn--std btn--outlineblue" @click="removePricingModel">discard</button>
                       </div>
                     </div>
                     <div class="col-md-5">
                       <div v-if="selectedPricingModelForEditing !== null && asset.pricingModels[selectedPricingModelForEditing].type">
+                        <!-- free -->
                         <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FREE'">
-                          <p>Free</p>
-                          <button class="btn btn--std btn--blue" @click.prevent="setPricingModel('FREE')">Set Pricing Model</button>
                         </div>
+                        <!-- fixed -->
                         <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED'">
-                          <p>Fixed</p>
-                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
-                            <div class="form-group">
-                              <label for="price">Price</label>
-                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
-                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                            </div>
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                          <div class="form-group">
+                            <label for="fixed_price">Price</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="fixed_price" name="fixed_price">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
                           </validation-provider>
-                          <validation-provider v-slot="{ errors }" name="Number of years" rules="required">
-                            <div class="form-group">
-                              <label for="price">Number of years</label>
-                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
-                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                            </div>
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required">
+                          <div class="form-group">
+                            <label for="number_of_years">Number of years</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
                           </validation-provider>
+                        </div>
+                        <!-- fixed per rows -->
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_PER_ROWS'">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                          <div class="form-group">
+                            <label for="fpr_price">Price</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required">
+                          <div class="form-group">
+                            <label for="min_rows">Minimum rows</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].minRows" type="number" class="form-group__text" id="min_rows" name="min_rows">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                          <div v-for="(discountRate, i) in asset.pricingModels[selectedPricingModelForEditing].discountRates" :key="i" class="row">
+                            <div class="col-xs-6">
+                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                              <div class="form-group">
+                                <label for="fpr_count">Threshold</label>
+                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
+                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                              </div>
+                              </validation-provider>
+                            </div>
+                            <div class="col-xs-6">
+                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                              <div class="form-group">
+                                <label for="fpr_discount">Discount %</label>
+                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
+                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                              </div>
+                              </validation-provider>
+                            </div>
+                          </div>
+                          <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                        </div>
+                        <!-- fixed for population -->
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_FOR_POPULATION'">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                          <div class="form-group">
+                            <label for="ffp_price">Price</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required">
+                          <div class="form-group">
+                            <label for="min_percentage">Minimum population percentage</label>
+                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].minPercent" type="number" class="form-group__text" id="min_percentage" name="min_percentage">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                          <div v-for="(discountRate, i) in asset.pricingModels[selectedPricingModelForEditing].discountRates" :key="i" class="row">
+                            <div class="col-md-6">
+                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                              <div class="form-group">
+                                <label for="ffp_count">Threshold</label>
+                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
+                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                              </div>
+                              </validation-provider>
+                            </div>
+                            <div class="col-md-6">
+                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                              <div class="form-group">
+                                <label for="ffp_discount">Discount percent %</label>
+                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
+                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                              </div>
+                              </validation-provider>
+                            </div>
+                          </div>
+                          <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                        </div>
+                        <!-- common fields for all pricing models -->
+                        <div class="form-group-checkbox">
+                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeDomainRestrictions" type="checkbox" id="include_domain_restrictions" name="include_domain_restrictions">
+                          <label for="include_domain_restrictions">Include domain restrictions?</label>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeDomainRestrictions">
                           <validation-provider>
                           <div class="form-group">
                             <label class="typo__label">Domain Restrictions</label>
                             <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].domainRestrictions" track-by="code" placeholder="Search domain" label="name" :options="menusData.domainRestrictions.options" :multiple="true">
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].domainRestrictions" track-by="code" placeholder="Search domain" label="name" :options="menusData.domainRestrictions" :multiple="true">
                             </multiselect>
-                            <!-- <pre class="language-json"><code>{{ value  }}</code></pre> -->
                           </div>
                           </validation-provider>
-                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED')">Set Pricing Model</button>
                         </div>
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_PER_ROWS'">
-                          <p>Fixed per rows</p>
-                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
-                            <div class="form-group">
-                              <label for="price">Price</label>
-                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
-                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                            </div>
+                        <div class="form-group-checkbox">
+                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeCoverageRestrictions" type="checkbox" id="include_coverage_restrictions" name="include_coverage_restrictions">
+                          <label for="include_coverage_restrictions">Include coverage restrictions?</label>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeCoverageRestrictions">
+                          <validation-provider>
+                          <div class="form-group">
+                            <label class="typo__label">Coverage Restrictions</label>
+                            <multiselect
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].coverageRestrictionContinents" track-by="code" placeholder="Restrict coverage by continents" label="name" :options="menusData.continents" :multiple="true">
+                            </multiselect>
+                            <multiselect
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].coverageRestrictionCountries" track-by="code" placeholder="Restrict coverage by countries" label="name" :options="menusData.countries" :multiple="true">
+                            </multiselect>
+                          </div>
                           </validation-provider>
-                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED_PER_ROWS')">Set Pricing Model</button>
                         </div>
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_FOR_POPULATION'">
-                          <p>Fixed per population</p>
-                          <validation-provider v-slot="{ errors }" name="Price" rules="required">
-                            <div class="form-group">
-                              <label for="price">Price</label>
-                              <input v-model="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="price" name="price">
-                              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                            </div>
+                        <div class="form-group-checkbox">
+                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeConsumerRestrictions" type="checkbox" id="include_consumer_restrictions" name="include_consumer_restrictions">
+                          <label for="include_consumer_restrictions">Include consumer restrictions?</label>
+                        </div>
+                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeConsumerRestrictions">
+                          <validation-provider>
+                          <div class="form-group">
+                            <label class="typo__label">Consumer Restrictions</label>
+                            <multiselect
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].consumerRestrictionContinents" track-by="code" placeholder="Restrict consumers by continents" label="name" :options="menusData.continents" :multiple="true">
+                            </multiselect>
+                            <multiselect
+                              v-model="asset.pricingModels[selectedPricingModelForEditing].consumerRestrictionCountries" track-by="code" placeholder="Restrict consumers by countries" label="name" :options="menusData.countries" :multiple="true">
+                            </multiselect>
+                          </div>
                           </validation-provider>
-                          <button class="btn btn--std btn--blue" @click="setPricingModel('FIXED_FOR_POPULATION')">Set Pricing Model</button>
                         </div>
+                        <button class="btn btn--std btn--blue mt-xs-20" @click="setPricingModel">Set Pricing Model</button>
                       </div>
                     </div>
                   </div>
@@ -723,8 +819,8 @@
           </div>
         </div>
         <div class="dashboard__form__navbuttons">
-          <button class="btn--std btn--blue" @click.prevent="previousStep()">PREVIOUS</button>
-          <button class="btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
+          <button class="btn btn--std btn--blue" @click.prevent="previousStep()">PREVIOUS</button>
+          <button class="btn btn--std btn--blue" :disabled="isButtonDisabled('next')" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
     </div>
@@ -754,7 +850,12 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CatalogueItemCommand, ServerResponse } from '@/model';
 import {
   BasePricingModelCommand,
+  DiscountRate,
   EnumPricingModel,
+  FixedPopulationPricingModelCommand,
+  FixedPricingModelCommand,
+  FixedRowPricingModelCommand,
+  FreePricingModelCommand,
   // FreePricingModelCommand,
   // FixedPricingModelCommand,
   // FixedRowPricingModelCommand,
@@ -807,7 +908,9 @@ export default class CreateAsset extends Vue {
   menusData: {
     assetTypes: string[],
     availableFormats: string[],
-    domainRestrictions: { options: any[], selected: any[] },
+    domainRestrictions: any[],
+    continents: any[],
+    countries: any[],
   };
 
   catalogueApi: CatalogueApi;
@@ -827,6 +930,8 @@ export default class CreateAsset extends Vue {
   pricingModelTypes: any;
 
   selectedPricingModelForEditing: number | null;
+
+  // tempSelectedType: string;
 
   totalSteps = 7;
 
@@ -855,15 +960,21 @@ export default class CreateAsset extends Vue {
 
     this.assetTypeGroup = '';
 
-    this.menusData = { assetTypes: [], availableFormats: [], domainRestrictions: { options: [], selected: [] } };
+    this.menusData = {
+      assetTypes: [],
+      availableFormats: [],
+      domainRestrictions: [],
+      continents: [],
+      countries: [],
+    };
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
-    this.menusData.domainRestrictions.options = [
+    this.menusData.domainRestrictions = [
       {
         name: 'Photogrammetry',
         code: 'PH',
       },
       {
-        name: 'Geograpgy',
+        name: 'Geography',
         code: 'GE',
       },
       {
@@ -877,6 +988,48 @@ export default class CreateAsset extends Vue {
       {
         name: 'Health',
         code: 'HE',
+      },
+    ];
+
+    this.menusData.continents = [
+      {
+        name: 'Europe',
+        code: 'EUROPE',
+      },
+      {
+        name: 'Africa',
+        code: 'AFRICA',
+      },
+      {
+        name: 'Asia',
+        code: 'ASIA',
+      },
+      {
+        name: 'North America',
+        code: 'NORTH_AMERICA',
+      },
+      {
+        name: 'South America',
+        code: 'SOUTH_AMERICA',
+      },
+      {
+        name: 'Oceania',
+        code: 'OCEANIA',
+      },
+      {
+        name: 'Antarctica',
+        code: 'ANTARCTICA',
+      },
+    ];
+
+    this.menusData.countries = [
+      {
+        name: 'France',
+        code: 'FRA',
+      },
+      {
+        name: 'Spain',
+        code: 'ESP',
       },
     ];
 
@@ -944,6 +1097,7 @@ export default class CreateAsset extends Vue {
       { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
     ];
     this.selectedPricingModelForEditing = null;
+    // this.tempSelectedType = '';
     // const priceModel = { type: '' } as BasePricingModelCommand;
     // const priceModel = { type: 'UNDEFINED' } as BasePricingModelCommand;
     // this.asset.pricingModels = [];
@@ -978,7 +1132,7 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep():void {
-    console.log(this.asset);
+    // console.log(this.asset);
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
         if (this.currentStep === this.totalSteps) {
@@ -994,36 +1148,90 @@ export default class CreateAsset extends Vue {
     });
   }
 
+  isButtonDisabled(button: string): boolean {
+    switch (button) {
+      case 'next': {
+        if (this.currentStep === 4 && this.selectedPricingModelForEditing !== null) {
+          return true;
+        }
+        return false;
+      }
+      default:
+        return false;
+    }
+  }
+
   @Watch('asset.type', { immediate: true }) onAssetTypeGroupChange(): void {
     this.asset.format = '';
     const selectedType = this.asset.type;
     this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
   }
 
-  // availableFormats(): string[] {
-  //   const selectedType = this.asset.type;
-  //   console.log('s', selectedType);
-  //   const formats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
-  //   console.log('f', formats);
-  //   return formats;
-  // }
-
-  setPricingModel():void {
+  async setPricingModel(): Promise<void> {
+    const isValid = await this.$refs.step4.validate();
+    if (!isValid) {
+      return;
+    }
     this.selectedPricingModelForEditing = null;
   }
 
   addPricingModel():void {
-    const priceModel = {
-      // type: EnumPricingModel.UNDEFINED,
+    console.log('add pricing model');
+    // const priceModel = {
+    //   type: '' as EnumPricingModel,
+    //   domainRestrictions: [],
+    //   coverageRestrictionContinents: [],
+    //   consumerRestrictionContinents: [],
+    //   coverageRestrictionCountries: [],
+    //   consumerRestrictionCountries: [],
+    //   includeDomainRestrictions: false,
+    //   includeCoverageRestrictions: false,
+    //   includeConsumerRestrictions: false,
+    // } as BasePricingModelCommand;
+    // this.asset.pricingModels.push(priceModel);
+    this.asset.pricingModels.push({} as BasePricingModelCommand);
+    this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
+  }
+
+  onChangePricingModelType(model: EnumPricingModel): void {
+    console.log(model);
+    const pricingModel = {
       type: '' as EnumPricingModel,
       domainRestrictions: [],
       coverageRestrictionContinents: [],
       consumerRestrictionContinents: [],
       coverageRestrictionCountries: [],
       consumerRestrictionCountries: [],
+      includeDomainRestrictions: false,
+      includeCoverageRestrictions: false,
+      includeConsumerRestrictions: false,
     } as BasePricingModelCommand;
-    this.asset.pricingModels.push(priceModel);
-    this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
+    switch (model) {
+      case EnumPricingModel.FREE: {
+        (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
+        break;
+      }
+      case EnumPricingModel.FIXED: {
+        (pricingModel as FixedPricingModelCommand).type = EnumPricingModel.FIXED;
+        break;
+      }
+      case EnumPricingModel.FIXED_PER_ROWS: {
+        (pricingModel as FixedRowPricingModelCommand).type = EnumPricingModel.FIXED_PER_ROWS;
+        (pricingModel as FixedRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        break;
+      }
+      case EnumPricingModel.FIXED_FOR_POPULATION: {
+        (pricingModel as FixedPopulationPricingModelCommand).type = EnumPricingModel.FIXED_FOR_POPULATION;
+        (pricingModel as FixedPopulationPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        break;
+      }
+      default:
+    }
+    Vue.set(this.asset.pricingModels, this.selectedPricingModelForEditing!, pricingModel);
+  }
+
+  addDiscountRate(): void {
+    (this.asset.pricingModels[this.selectedPricingModelForEditing!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
   }
 
   removePricingModel(): void {
@@ -1075,6 +1283,9 @@ export default class CreateAsset extends Vue {
       x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
       x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
       x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
+      delete (x as any).includeDomainRestrictions;
+      delete (x as any).includeCoverageRestrictions;
+      delete (x as any).includeConsumerRestrictions;
     });
     /* eslint-enable no-param-reassign */
 
@@ -1087,13 +1298,40 @@ export default class CreateAsset extends Vue {
       },
     };
     console.log('ASSET', this.asset);
+
     // this.draftAssetApi.create(this.asset, config)
     //   .then((response: ServerResponse<AssetDraft>) => {
     //     if (response.success) {
-    //       this.uploading.completed = true;
-    //       this.uploading.title = 'Your asset has been submitted for review';
-    //       this.uploading.subtitle = 'You’ll be notified by email for this process';
+    //       console.log('draft created');
+    //       const draftAssetKey = response.result.key;
+
+    //       if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
+    //         this.uploading.status = true;
+    //         this.uploading.completed = false;
+    //         this.uploading.title = 'Your resource is being uploaded';
+    //         this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
+    //           if (uploadResponse.success) {
+    //             console.log('uploaded resource!!!');
+    //             this.uploading.completed = true;
+    //             this.uploading.title = 'Your asset is uploaded successfully!';
+    //             this.uploading.subtitle = '';
+    //             this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
+    //               if (submitResponse.success) {
+    //                 console.log('asset submitted successfully');
+    //               } else {
+    //                 console.log('error submitting asset', submitResponse);
+    //               }
+    //             });
+    //           } else {
+    //             console.log(uploadResponse);
+    //             console.log('error uploading resource');
+    //           }
+    //         });
+    //       } else {
+    //         this.uploading.completed = true;
+    //       }
     //     } else {
+    //       console.log('error creating draft', response);
     //       this.uploading.status = false;
     //       this.uploading.completed = true;
     //       this.uploading.errors = response.messages;
@@ -1114,60 +1352,6 @@ export default class CreateAsset extends Vue {
     //     }
     //     this.uploading.status = false;
     //   });
-
-    this.draftAssetApi.create(this.asset, config)
-      .then((response: ServerResponse<AssetDraft>) => {
-        if (response.success) {
-          console.log('draft created');
-          const draftAssetKey = response.result.key;
-
-          if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
-            this.uploading.status = true;
-            this.uploading.completed = false;
-            this.uploading.title = 'Your resource is being uploaded';
-            this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
-              if (uploadResponse.success) {
-                console.log('uploaded resource!!!');
-                this.uploading.completed = true;
-                this.uploading.title = 'Your asset is uploaded successfully!';
-                this.uploading.subtitle = '';
-                this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
-                  if (submitResponse.success) {
-                    console.log('asset submitted successfully');
-                  } else {
-                    console.log('error submitting asset', submitResponse);
-                  }
-                });
-              } else {
-                console.log(uploadResponse);
-                console.log('error uploading resource');
-              }
-            });
-          } else {
-            this.uploading.completed = true;
-          }
-        } else {
-          console.log('error creating draft', response);
-          this.uploading.status = false;
-          this.uploading.completed = true;
-          this.uploading.errors = response.messages;
-          setTimeout(() => {
-            this.uploading.errors = [];
-          }, 10000);
-          setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight);
-          }, 300);
-        }
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          this.uploading.errors = error.response.data.messages;
-          setTimeout(() => {
-            this.uploading.errors = [];
-          }, 10000);
-        }
-        this.uploading.status = false;
-      });
   }
 }
 </script>

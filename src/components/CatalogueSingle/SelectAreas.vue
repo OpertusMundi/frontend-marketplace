@@ -70,15 +70,47 @@
                 <button @click="onRemoveAreaFromList(area)">X</button>
               </div>
             </div>
-            <button @click="addToCart" :disabled="!areasSelectedForPurchase.length" class="btn btn--std btn--blue mb-xs-20">ADD TO CART</button>
-            <div class="asset__shopcard">
+            <span class="select-area-modal__col-submit__message" v-if="!areasSelectedForPurchase.length">Please, select areas to calculate price.</span>
+            <button @click="getQuotation" v-if="!quotationResult" :disabled="!areasSelectedForPurchase.length || isQuotationLoading" class="btn btn--std btn--white mb-xs-20">{{ isQuotationLoading ? 'Please Wait...' : 'Calculate Price' }}</button>
+
+            <div class="asset__shopcard" v-if="quotationResult">
+              <div class="asset__shopcard__price">
+                <span>{{ quotationResult.quotation.totalPriceExcludingTax }}</span>
+                <span>{{ quotationResult.quotation.currency }}</span>
+              </div>
+              <ul class="asset__shopcard__priceoptions mt-xs-20">
+                <li>+ {{ quotationResult.quotation.taxPercent }}% VAT</li>
+                <li>Total Price: {{ quotationResult.quotation.totalPrice }} {{ quotationResult.quotation.currency }}</li>
+                <li>
+                  <strong>Domain: </strong>
+                  <span v-if="!quotationResult.model.domainRestrictions.length">no restrictions</span>
+                  <span v-for="(domain, i) in quotationResult.model.domainRestrictions" :key="domain">{{ domain }}{{i !== quotationResult.model.domainRestrictions.length - 1 ? ', ' : ''}}</span>
+                </li>
+                <li>
+                  <strong>Coverager restriction: </strong>
+                  <span v-if="!quotationResult.model.coverageRestrictionContinents.length && !quotationResult.model.coverageRestrictionCountries.length">no restriction</span>
+                  <span v-for="(coverage, i) in quotationResult.model.coverageRestrictionContinents.concat(quotationResult.model.coverageRestrictionCountries)" :key="i">{{ coverage }}{{i !== quotationResult.model.coverageRestrictionContinents.concat(quotationResult.model.coverageRestrictionCountries).length - 1 ? ', ' : ''}}</span>
+                </li>
+                <li>
+                  <strong>Consumers restriction: </strong>
+                  <span v-if="!quotationResult.model.consumerRestrictionContinents.length && !quotationResult.model.consumerRestrictionCountries.length">no restriction</span>
+                  <span v-for="(coverage, i) in quotationResult.model.consumerRestrictionContinents.concat(quotationResult.model.consumerRestrictionCountries)" :key="i">{{ coverage }}{{i !== quotationResult.model.consumerRestrictionContinents.concat(quotationResult.model.consumerRestrictionCountries).length - 1 ? ', ' : ''}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <button @click="addToCart" v-if="quotationResult" class="btn btn--std btn--blue mt-xs-20">ADD TO CART</button>
+
+            <!-- <div class="asset__shopcard">
               <ul class="asset__shopcard__priceoptions">
                 <li>+ 24% VAT (DUMMY)</li>
                 <li>+ 5,99€ delivery to Poland (DUMMY)</li>
               </ul>
               <ul class="asset__shopcard__buyinfo pt-sm-10">
                 <li><strong>Asset application restrictions</strong></li>
-                <li><strong>Domain: </strong> Geomarketing (DUMMY)</li>
+                <li>
+                  <strong>Domain: </strong> dummy domain
+                </li>
                 <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
               </ul>
               <ul class="asset__shopcard__buyinfo">
@@ -89,11 +121,9 @@
               <div class="asset-owner">
                 <div class="asset-owner__inner">
                   <div class="asset-owner__inner__logo">
-                    <!-- <img :src="catalogueItem.logoImage" :alt="catalogueItem.publisher.name"> -->
                   </div>
                   <div class="asset-owner__inner__info">
                     <div class="asset-owner__inner__info__name">
-                      <!-- <a href="#">{{ catalogueItem.publisher.name }}</a> -->
                       <a href="#">
                         <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 33 31" style="enable-background:new 0 0 33 31;" xml:space="preserve">
                           <path style="fill:#FFFFFF;"
@@ -102,16 +132,10 @@
                         </svg>
                       </a>
                     </div>
-                    <!-- <div class="rating rating--dark">
-                      <span v-for="index in 5" v-bind:key="`${index}_rating`" :class="{ 'active' : index <= catalogueItem.publisher.rating }">★</span>
-                      <i>{{catalogueItem.publisher.rating ? catalogueItem.publisher.rating : '- '}}/5</i>
-                    </div> -->
-                    <!-- <div class="asset-owner__inner__info__country">{{ catalogueItem.publisher.city }}, {{ catalogueItem.publisher.country }}</div> -->
-                    <!-- <div class="asset-owner__inner__info__date">Joined {{ catalogueItem.publisher.joinedAt | format_date }}</div> -->
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
           </div>
         </div>
@@ -124,6 +148,7 @@ import {
   Component,
   Vue,
   Prop,
+  Watch,
 } from 'vue-property-decorator';
 import store from '@/store';
 import L from 'leaflet';
@@ -134,9 +159,11 @@ import 'leaflet/dist/leaflet.css';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 import { CartAddItemCommand } from '../../model/cart';
+import QuotationApi from '../../service/quotation';
 import CartApi from '../../service/cart';
 import SpatialApi from '../../service/spatial';
 import europeGeoJSON from '../../service/lists/europe-geojson';
+import { EffectivePricingModel, QuotationCommand } from '../../model/pricing-model';
 
 @Component({
   components: {
@@ -152,11 +179,15 @@ export default class SelectAreas extends Vue {
 
   show: boolean;
 
+  quotationApi: QuotationApi;
+
   cartApi: CartApi;
 
   spatialApi: SpatialApi;
 
   isAreasLoading: boolean;
+
+  isQuotationLoading: boolean;
 
   isMapStateCountryLevel: boolean;
 
@@ -173,6 +204,8 @@ export default class SelectAreas extends Vue {
   fitBoundsCountryZoom: number;
 
   selectedNutsCountry: string;
+
+  quotationResult: EffectivePricingModel | null;
 
   mapOptions: any = {
     tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -210,9 +243,11 @@ export default class SelectAreas extends Vue {
     super();
 
     this.show = false;
+    this.quotationApi = new QuotationApi();
     this.cartApi = new CartApi();
     this.spatialApi = new SpatialApi();
     this.isAreasLoading = false;
+    this.isQuotationLoading = false;
     this.isMapStateCountryLevel = false;
     this.minZoom = 0;
     this.maxZoom = 4;
@@ -221,6 +256,7 @@ export default class SelectAreas extends Vue {
     this.areasSelectedForPurchase = [];
     this.fitBoundsCountryZoom = -1;
     this.selectedNutsCountry = '';
+    this.quotationResult = null;
   }
 
   mounted(): void {
@@ -233,6 +269,10 @@ export default class SelectAreas extends Vue {
 
   onCloseModal(): void {
     this.$emit('close');
+  }
+
+  @Watch('areasSelectedForPurchase', { immediate: true }) onAreasSelectedForPurchaseChange(): void {
+    this.quotationResult = null;
   }
 
   addCountry(): void {
@@ -373,6 +413,27 @@ export default class SelectAreas extends Vue {
     }
   }
 
+  getQuotation(): void {
+    this.isQuotationLoading = true;
+    const quotation: QuotationCommand = {
+      assetId: this.assetId,
+      pricingModelKey: this.pricingModelKey,
+      parameters: {
+        nuts: this.areasSelectedForPurchase,
+      },
+    };
+    this.quotationApi.create(quotation).then((quotationResponse) => {
+      if (quotationResponse.success) {
+        this.quotationResult = quotationResponse.result;
+        console.log('quot', this.quotationResult);
+      } else {
+        // todo: handle error
+        console.log('error getting quotation', quotationResponse);
+      }
+      this.isQuotationLoading = false;
+    });
+  }
+
   addToCart(): void {
     console.log(this.areasSelectedForPurchase);
 
@@ -394,6 +455,7 @@ export default class SelectAreas extends Vue {
       if (addItemResp.success) {
         console.log('item added successfully');
         store.commit('setCartItems', addItemResp.result);
+        this.$router.push('/');
       } else {
         console.log('error adding item');
       }
