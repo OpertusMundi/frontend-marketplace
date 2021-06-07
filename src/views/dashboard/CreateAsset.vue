@@ -856,10 +856,6 @@ import {
   FixedPricingModelCommand,
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
-  // FreePricingModelCommand,
-  // FixedPricingModelCommand,
-  // FixedRowPricingModelCommand,
-  // FixedPopulationPricingModelCommand,
 } from '@/model/pricing-model';
 import { EnumAssetType } from '@/model/enum';
 import CatalogueApi from '@/service/catalogue';
@@ -1097,11 +1093,6 @@ export default class CreateAsset extends Vue {
       { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
     ];
     this.selectedPricingModelForEditing = null;
-    // this.tempSelectedType = '';
-    // const priceModel = { type: '' } as BasePricingModelCommand;
-    // const priceModel = { type: 'UNDEFINED' } as BasePricingModelCommand;
-    // this.asset.pricingModels = [];
-    // this.asset.pricingModels.push(priceModel);
 
     this.uploading = {
       status: false,
@@ -1121,6 +1112,7 @@ export default class CreateAsset extends Vue {
   //   console.log(this.$route.params.error);
   //   console.log(this.asset.pricingModels);
   // }
+
   goToStep(step:number):void {
     this.currentStep = step;
   }
