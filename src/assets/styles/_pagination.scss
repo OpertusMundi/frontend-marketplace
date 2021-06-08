@@ -1,0 +1,22 @@
+.pagination-wrapper {
+  font-size: 20px;
+  letter-spacing: .5px;
+  width: 100%;
+  text-align: center;
+
+  span {
+    margin-left: 10px;
+  }
+
+  .page {
+    cursor: pointer;
+
+    &--current {
+      color: $secondColor;
+    }
+  }
+
+  .arrow {
+    cursor: pointer;
+  }
+}
