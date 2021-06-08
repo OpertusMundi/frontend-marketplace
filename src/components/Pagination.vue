@@ -33,11 +33,11 @@ const numberOfShownFirstLastPages = 4;
 @Component({
 })
 export default class Pagination extends Vue {
-  @Prop({ default: 0 }) private currentPage!: number;
+  @Prop({ required: true }) private currentPage!: number;
 
-  @Prop() private itemsPerPage!: number;
+  @Prop({ required: true }) private itemsPerPage!: number;
 
-  @Prop() private itemsTotal!: number;
+  @Prop({ required: true }) private itemsTotal!: number;
 
   showPagination(): boolean {
     if (this.totalPages() > 1) {
