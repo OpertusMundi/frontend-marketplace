@@ -35,7 +35,7 @@ const initialState: State = {
 
 const getters = {
   csrfHeader: (state: State): string | null => state.csrf.header,
-  hasRole: (state: State) => (role: EnumRole): boolean => state.account.roles.includes(role),
+  hasRole: (state: State) => (role: EnumRole[]): boolean => role.some((x) => state.account.roles.includes(x)),
   isAuthenticated: (state: State): boolean => !!state.auth.token || !!state.account.profile,
 };
 
