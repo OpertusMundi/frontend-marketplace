@@ -97,7 +97,7 @@ export default class DashboardMain extends Vue {
     const route = routes.filter((x) => !x.children).concat(routes.filter((x) => x.children).flatMap((x) => x.children) as RouteConfig[])
       .find((x) => x.name === routeName);
 
-    const requiredRole: string = route && route.meta && route.meta.requiresRole ? route.meta.requiresRole : '';
+    const requiredRole: string[] | null = route && route.meta && route.meta.requiresRole ? route.meta.requiresRole : null;
 
     if (requiredRole && !store.getters.hasRole(requiredRole)) {
       return false;
