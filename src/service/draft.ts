@@ -41,7 +41,13 @@ export default class DraftAssetApi extends Api {
 
     const url = `/action/drafts?page=${page}&size=${size}&${queryString.join('&')}&orderBy=${field}&order=${order}`;
 
-    return this.get<ServerResponse<PageResult<AssetDraft>>>(url);
+    const config = {
+      // headers: {
+      //   'Content-Type': 'application/json',
+      // },
+    };
+
+    return this.get<ServerResponse<PageResult<AssetDraft>>>(url, config);
   }
 
   /**

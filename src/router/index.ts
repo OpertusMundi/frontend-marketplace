@@ -88,6 +88,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: '', layout: 'dashboard' },
       },
       {
+        path: 'assets/preview/:id',
+        name: 'AssetPreview',
+        component: () => import(/* webpackChunkName: "dashboardassetpreview" */ '../views/dashboard/AssetPreview.vue'),
+        meta: { requiresRole: '', layout: 'dashboard' },
+      },
+      {
         path: 'storage',
         name: 'Storage',
         component: () => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
