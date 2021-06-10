@@ -782,6 +782,10 @@ export interface CatalogueItem extends BaseCatalogueItem {
    */
   id: string;
   /*
+   * Channel of asset distribution
+   */
+  deliveryMethod: EnumDeliveryMethod;
+  /*
    * Pricing model available for the asset
    */
   pricingModels: EffectivePricingModel[];
