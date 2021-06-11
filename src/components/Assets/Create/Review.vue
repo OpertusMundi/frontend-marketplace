@@ -23,18 +23,18 @@
             </div>
             <div class="dashboard__form__review__item__body">
               <ul>
-                <li><strong>Language:</strong>{{ asset.language }}</li>
-                <li><strong>Editor:</strong>{{ asset.publisherName }}</li>
-                <li><strong>Editor’s email:</strong>{{ asset.publisherEmail }}</li>
-                <li><strong>Maintenance manager:</strong>{{ asset.metadataPointOfContactName }}</li>
-                <li><strong>Maintenance manager’s email:</strong>{{ asset.metadataPointOfContactEmail }}</li>
-                <li><strong>Version:</strong>{{ asset.version }}</li>
+                <li v-if="asset.language"><strong>Language:</strong>{{ asset.language }}</li>
+                <li v-if="asset.publisherName"><strong>Editor:</strong>{{ asset.publisherName }}</li>
+                <li v-if="asset.publisherEmail"><strong>Editor’s email:</strong>{{ asset.publisherEmail }}</li>
+                <li v-if="asset.metadataPointOfContactName"><strong>Maintenance manager:</strong>{{ asset.metadataPointOfContactName }}</li>
+                <li v-if="asset.metadataPointOfContactEmail"><strong>Maintenance manager’s email:</strong>{{ asset.metadataPointOfContactEmail }}</li>
+                <li v-if="asset.version"><strong>Version:</strong>{{ asset.version }}</li>
                 <!-- <li><strong>Identifier:</strong>{{ asset.language }}</li> -->
-                <li><strong>Asset title:</strong>{{ asset.title }}</li>
-                <li><strong>Asset short description:</strong>{{ asset.abstractText }}</li>
-                <li><strong>Metadata language:</strong>{{ asset.metadataLanguage }}</li>
-                <li><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
-                <li><strong>Scale:</strong>{{ asset.scale }}</li>
+                <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
+                <li v-if="asset.abstractText"><strong>Asset short description:</strong>{{ asset.abstractText }}</li>
+                <li v-if="asset.metadataLanguage"><strong>Metadata language:</strong>{{ asset.metadataLanguage }}</li>
+                <li v-if="asset.metadataDate"><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
+                <li v-if="asset.scale"><strong>Scale:</strong>{{ asset.scale }}</li>
               </ul>
             </div>
           </div>
@@ -62,14 +62,21 @@
               <ul>
                 <!-- <li><strong>Pricing type:</strong>{{ priceModelType }}</li> -->
                 <li v-for="(pricingModel, index) in asset.pricingModels" v-bind:key="`pricingmodel${index}`">
-                  <span v-if="pricingModel.type === 'FIXED'">
-                    <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€ + {{ pricingModel.yearsOfUpdates }} years
-                  </span>
-                  <span v-if="pricingModel.type === 'SUBSCRIPTION'">
-                    <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.monthlyPrice }}€ + {{ pricingModel.duration }} months
-                  </span>
                   <span v-if="pricingModel.type === 'FREE'">
-                    <strong>Pricing model {{ index+1 }}:</strong>FREE
+                    <strong>Pricing model {{ index + 1 }}:</strong>FREE
+                  </span>
+                  <span v-if="pricingModel.type === 'FIXED'">
+                    <strong>Pricing model {{ index + 1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€, {{ pricingModel.yearsOfUpdates }} {{ pricingModel.yearsOfUpdates == 1 ? 'year' : 'years' }} of updates
+                  </span>
+                  <span v-if="pricingModel.type === 'FIXED_PER_ROWS'">
+                    <strong>Pricing model {{ index + 1 }}:</strong>
+                    {{ pricingModel.totalPriceExcludingTax }}€, minimum rows: {{ pricingModel.minRows }} <br>
+                    <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                  </span>
+                  <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
+                    <strong>Pricing model {{ index + 1 }}:</strong>
+                    {{ pricingModel.totalPriceExcludingTax }}€, minimum percent: {{ pricingModel.minPercent }} <br>
+                    <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
                   </span>
                 </li>
               </ul>
@@ -116,7 +123,11 @@ import { ValidationObserver } from 'vee-validate';
   },
 })
 export default class Review extends Vue {
-  @Prop() private asset!: CatalogueItemCommand;
+  @Prop({ required: true }) private asset!: CatalogueItemCommand;
+
+  goToStep(step: number): void {
+    this.$emit('goToStep', step);
+  }
 }
 </script>
 <style lang="scss">

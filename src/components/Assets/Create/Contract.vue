@@ -11,7 +11,7 @@
           <p>Assign a contract template to your asset</p>
             <validation-provider v-slot="{ errors }" name="Contract Tamplate" rules="required">
               <div class="form-group">
-                <multiselect v-model="contract" :options="['Contract template #1','Contract template #2','Contract template #3']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select a contract template"></multiselect>
+                <multiselect v-model="contractLocal" :options="['Contract template #1','Contract template #2','Contract template #3']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select a contract template"></multiselect>
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
               </div>
             </validation-provider>
@@ -27,7 +27,12 @@
   </validation-observer>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Watch,
+  Prop,
+} from 'vue-property-decorator';
 import Multiselect from 'vue-multiselect';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
@@ -42,15 +47,17 @@ extend('required', required);
   },
 })
 export default class Contract extends Vue {
-  contract: string;
+  @Prop({ required: true }) private contract!: string;
+
+  contractLocal: string;
 
   constructor() {
     super();
 
-    this.contract = '';
+    this.contractLocal = this.contract;
   }
 
-  @Watch('contract')
+  @Watch('contractLocal')
   onContractChange(contract: string): void {
     this.$emit('update:contract', contract);
   }

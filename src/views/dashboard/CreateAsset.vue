@@ -30,30 +30,43 @@
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
         <div class="dashboard__form__steps">
+          <transition name="fade" mode="out-in">
           <div class="dashboard__form__steps__inner">
 
             <!-- ASSET TYPE -->
-            <!-- <type :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type> -->
-            <type ref="step1" v-show="currentStep == 1" @update:assetMainType="x => assetMainType = x"></type>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
+            <!-- </transition> -->
 
             <!-- METADATA -->
-            <metadata ref="step2" v-show="currentStep == 2" @update:asset="x => asset = x"></metadata>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <metadata ref="step2" :asset.sync="asset" v-if="currentStep == 2"></metadata>
+            <!-- </transition> -->
 
             <!-- CONTRACT -->
-            <contract ref="step3" v-show="currentStep == 3" @update:contract="x => contract = x"></contract>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <contract ref="step3" :contract.sync="contract" v-if="currentStep == 3"></contract>
+            <!-- </transition> -->
 
             <!-- PRICING -->
-            <pricing ref="step4" v-show="currentStep == 4" @update:pricingModels="x => asset.pricingModels = x"></pricing>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" v-if="currentStep == 4"></pricing>
+            <!-- </transition> -->
 
             <!-- DELIVERY -->
-            <delivery ref="step5" v-show="currentStep == 5" @update:deliveryMethod="x => asset.deliveryMethod = x" @update:fileToUpload="x => fileToUpload = x"></delivery>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep == 5"></delivery>
+            <!-- </transition> -->
 
             <!-- PAYOUT -->
-            <payout ref="step6" v-show="currentStep == 6"></payout>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <payout ref="step6" v-if="currentStep == 6"></payout>
+            <!-- </transition> -->
 
             <!-- REVIEW -->
-            <review ref="step7" :asset="asset" v-show="currentStep == 7"></review>
-
+            <!-- <transition name="fade" mode="out-in"> -->
+              <review ref="step7" :asset="asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+            <!-- </transition> -->
 
             <div class="dashboard__form__errors" v-if="uploading.errors.length">
               <ul>
@@ -62,10 +75,10 @@
             </div>
 
           </div>
+          </transition>
         </div>
         <div class="dashboard__form__navbuttons">
           <button class="btn btn--std btn--blue" @click.prevent="previousStep()">PREVIOUS</button>
-          <!-- <button class="btn btn--std btn--blue" :disabled="isButtonDisabled('next')" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button> -->
           <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
@@ -105,6 +118,8 @@ import { AxiosError, AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
+import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
+import { EnumAssetType } from '@/model/enum';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
 import Metadata from '@/components/Assets/Create/Metadata.vue';
@@ -150,14 +165,6 @@ export default class CreateAsset extends Vue {
     step7: InstanceType<typeof ValidationObserver>,
   }
 
-  // menusData: {
-  //   assetTypes: string[],
-  //   availableFormats: string[],
-  //   domainRestrictions: any[],
-  //   continents: any[],
-  //   countries: any[],
-  // };
-
   catalogueApi: CatalogueApi;
 
   draftAssetApi: DraftAssetApi;
@@ -166,25 +173,12 @@ export default class CreateAsset extends Vue {
 
   assetMainType: string; // Data File / API / Collection
 
-  // assetTypes: string[];
-
-  // availableFormats: string[];
-
-  // contract: string;
-
-  // pricingModelTypes: any;
-
-  // selectedPricingModelForEditing: number | null;
-
-  // tempSelectedType: string;
+  contract: string;
 
   totalSteps = 7;
 
   currentStep = 1;
 
-  // creatidCardValid = false;
-
-  // uploadedFile: File;
   fileToUpload: {isFileSelected: boolean, file: File, fileName: string, fileExtension: string};
 
   uploading:any;
@@ -195,7 +189,6 @@ export default class CreateAsset extends Vue {
     // TODO: do validation of filetype<->format before uploading file
     console.log(store.getters.getConfig);
 
-    // this.uploadedFile = {} as File;
     this.fileToUpload = {
       isFileSelected: false,
       file: {} as File,
@@ -205,90 +198,63 @@ export default class CreateAsset extends Vue {
 
     this.assetMainType = '';
 
-    this.asset = {} as CatalogueItemCommand;
+    this.asset = {
+      abstract: '',
+      additionalResources: [],
+      conformity: EnumConformity.NOT_EVALUATED,
+      creationDate: '2020-06-02',
+      dateEnd: '2020-06-02',
+      dateStart: '2020-06-02',
+      deliveryMethod: '' as EnumDeliveryMethod,
+      format: '',
+      ingested: false,
+      keywords: [],
+      language: '',
+      license: '',
+      lineage: '',
+      metadataDate: '2020-06-02',
+      metadataLanguage: '',
+      metadataPointOfContactEmail: '',
+      metadataPointOfContactName: '',
+      openDataset: false,
+      parentId: '',
+      publicAccessLimitations: '',
+      publicationDate: '2020-06-02',
+      publisherEmail: '',
+      publisherName: '',
+      referenceSystem: '',
+      resourceLocator: '',
+      responsibleParty: [],
+      revisionDate: '2020-06-02',
+      resources: [],
+      scales: [],
+      spatialDataServiceOperations: [],
+      spatialDataServiceQueryables: [],
+      spatialDataServiceType: null,
+      spatialDataServiceVersion: null,
+      spatialResolution: null,
+      suitableFor: [],
+      title: '',
+      topicCategory: [],
+      type: '' as EnumAssetType,
+      userOnlyForVas: false,
+      version: '',
+      pricingModels: [],
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [20.94818115234375, 36.40359962073253],
+            [23.57940673828125, 36.40359962073253],
+            [23.57940673828125, 38.31795595794451],
+            [20.94818115234375, 38.31795595794451],
+            [20.94818115234375, 36.40359962073253],
+          ],
+        ],
+      } as GeoJSON.Polygon,
+    };
 
-    // this.menusData = {
-    //   assetTypes: [],
-    //   availableFormats: [],
-    //   domainRestrictions: [],
-    //   continents: [],
-    //   countries: [],
-    // };
-    // this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
-    // this.menusData.domainRestrictions = [
-    //   {
-    //     name: 'Photogrammetry',
-    //     code: 'PH',
-    //   },
-    //   {
-    //     name: 'Geography',
-    //     code: 'GE',
-    //   },
-    //   {
-    //     name: 'Elevation',
-    //     code: 'EL',
-    //   },
-    //   {
-    //     name: 'Pharming',
-    //     code: 'PA',
-    //   },
-    //   {
-    //     name: 'Health',
-    //     code: 'HE',
-    //   },
-    // ];
-
-    // this.menusData.continents = [
-    //   {
-    //     name: 'Europe',
-    //     code: 'EUROPE',
-    //   },
-    //   {
-    //     name: 'Africa',
-    //     code: 'AFRICA',
-    //   },
-    //   {
-    //     name: 'Asia',
-    //     code: 'ASIA',
-    //   },
-    //   {
-    //     name: 'North America',
-    //     code: 'NORTH_AMERICA',
-    //   },
-    //   {
-    //     name: 'South America',
-    //     code: 'SOUTH_AMERICA',
-    //   },
-    //   {
-    //     name: 'Oceania',
-    //     code: 'OCEANIA',
-    //   },
-    //   {
-    //     name: 'Antarctica',
-    //     code: 'ANTARCTICA',
-    //   },
-    // ];
-
-    // this.menusData.countries = [
-    //   {
-    //     name: 'France',
-    //     code: 'FRA',
-    //   },
-    //   {
-    //     name: 'Spain',
-    //     code: 'ESP',
-    //   },
-    // ];
-
-    // this.contract = '';
-
-    // this.pricingModelTypes = [
-    //   { name: 'Free', priceModel: EnumPricingModel.FREE },
-    //   { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
-    //   { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
-    //   { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
-    // ];
-    // this.selectedPricingModelForEditing = null;
+    this.contract = '';
 
     this.uploading = {
       status: false,
@@ -304,11 +270,6 @@ export default class CreateAsset extends Vue {
     this.draftAssetApi = new DraftAssetApi();
   }
 
-  // mounted():void {
-  //   console.log(this.$route.params.error);
-  //   console.log(this.asset.pricingModels);
-  // }
-
   goToStep(step:number):void {
     this.currentStep = step;
   }
@@ -320,34 +281,6 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep():void {
-    // console.log(this.asset);
-    // this.$refs[`step${this.currentStep}`].validate().then((success) => {
-    //   if (success) {
-    //     if (this.currentStep === this.totalSteps) {
-    //       this.submitForm();
-    //     } else {
-    // this.currentStep += 1;
-    // window.scrollTo({
-    //   top: 0,
-    //   behavior: 'smooth',
-    // });
-    //     }
-    //   }
-    // });
-
-    // this.$refs[`step${this.currentStep}`].validate().then((isValid) => {
-    //   if (isValid) {
-    //     if (this.currentStep === this.totalSteps) {
-    //       this.submitForm();
-    //     } else {
-    //       this.currentStep += 1;
-    //       window.scrollTo({
-    //         top: 0,
-    //         behavior: 'smooth',
-    //       });
-    //     }
-    //   }
-    // });
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
@@ -364,109 +297,18 @@ export default class CreateAsset extends Vue {
     });
   }
 
-  // isButtonDisabled(button: string): boolean {
-  //   switch (button) {
-  //     case 'next': {
-  //       if (this.currentStep === 4 && this.selectedPricingModelForEditing !== null) {
-  //         return true;
-  //       }
-  //       return false;
-  //     }
-  //     default:
-  //       return false;
-  //   }
-  // }
-
-  // @Watch('asset.type', { immediate: true }) onAssetMainTypeChange(): void {
-  //   this.asset.format = '';
-  //   const selectedType = this.asset.type;
-  //   this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
-  // }
-
-  // async setPricingModel(): Promise<void> {
-  //   const isValid = await this.$refs.step4.validate();
-  //   if (!isValid) {
-  //     return;
-  //   }
-  //   this.selectedPricingModelForEditing = null;
-  // }
-
-  // addPricingModel():void {
-  //   this.asset.pricingModels.push({} as BasePricingModelCommand);
-  //   this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
-  // }
-
-  // onChangePricingModelType(model: EnumPricingModel): void {
-  //   console.log(model);
-  //   const pricingModel = {
-  //     type: '' as EnumPricingModel,
-  //     domainRestrictions: [],
-  //     coverageRestrictionContinents: [],
-  //     consumerRestrictionContinents: [],
-  //     coverageRestrictionCountries: [],
-  //     consumerRestrictionCountries: [],
-  //     includeDomainRestrictions: false,
-  //     includeCoverageRestrictions: false,
-  //     includeConsumerRestrictions: false,
-  //   } as BasePricingModelCommand;
-  //   switch (model) {
-  //     case EnumPricingModel.FREE: {
-  //       (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
-  //       break;
-  //     }
-  //     case EnumPricingModel.FIXED: {
-  //       (pricingModel as FixedPricingModelCommand).type = EnumPricingModel.FIXED;
-  //       break;
-  //     }
-  //     case EnumPricingModel.FIXED_PER_ROWS: {
-  //       (pricingModel as FixedRowPricingModelCommand).type = EnumPricingModel.FIXED_PER_ROWS;
-  //       (pricingModel as FixedRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
-  //       break;
-  //     }
-  //     case EnumPricingModel.FIXED_FOR_POPULATION: {
-  //       (pricingModel as FixedPopulationPricingModelCommand).type = EnumPricingModel.FIXED_FOR_POPULATION;
-  //       (pricingModel as FixedPopulationPricingModelCommand).discountRates = [{}] as DiscountRate[];
-  //       break;
-  //     }
-  //     default:
-  //   }
-  //   // eslint-disable-next-line
-  //   Vue.set(this.asset.pricingModels, this.selectedPricingModelForEditing!, pricingModel);
-  // }
-
-  // addDiscountRate(): void {
-  //   // eslint-disable-next-line
-  //   (this.asset.pricingModels[this.selectedPricingModelForEditing!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
-  // }
-
-  // removePricingModel(): void {
-  //   const i = this.selectedPricingModelForEditing;
-  //   this.selectedPricingModelForEditing = null;
-  //   // eslint-disable-next-line
-  //   this.asset.pricingModels.splice(i!, 1);
-  // }
-
-  // eslint-disable-next-line
-  readFile(e): void {
-    const [file] = e.srcElement.files;
-    this.fileToUpload.isFileSelected = true;
-    this.fileToUpload.file = file;
-    this.fileToUpload.fileName = file.name;
-    this.fileToUpload.fileExtension = file.name.split('.').pop();
-  }
-
   submitForm():void {
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
       const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
       if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
+        // TODO: make it a modal
         // eslint-disable-next-line
         alert('format-extension mismatch (not compatible)');
         return;
       }
     }
 
-    // TODO: submit form!
     this.uploading.status = true;
     this.uploading.errors = [];
 

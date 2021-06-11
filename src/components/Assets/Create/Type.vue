@@ -9,17 +9,17 @@
           <div class="form-group">
             <label class="control control-radio">
               Data File
-              <input type="radio" name="asset_type" v-model="assetMainType" value="datafile" />
+              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="datafile" />
               <div class="control_indicator"></div>
             </label>
             <label class="control control-radio">
               API
-              <input type="radio" name="asset_type" v-model="assetMainType" value="API" />
+              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="API" />
               <div class="control_indicator"></div>
             </label>
             <label class="control control-radio">
               Collection
-              <input type="radio" name="asset_type" v-model="assetMainType" value="collection" />
+              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="collection" />
               <div class="control_indicator"></div>
             </label>
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
@@ -29,7 +29,12 @@
   </validation-observer>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Watch,
+  Prop,
+} from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 
@@ -42,19 +47,21 @@ extend('required', required);
   },
 })
 export default class Type extends Vue {
+  @Prop({ required: true }) private assetMainType!: string;
+
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>,
   }
 
-  assetMainType: string;
+  assetMainTypeLocal: string;
 
   constructor() {
     super();
 
-    this.assetMainType = '';
+    this.assetMainTypeLocal = this.assetMainType;
   }
 
-  @Watch('assetMainType')
+  @Watch('assetMainTypeLocal')
   onAssetMainTypeChange(assetMainType: string): void {
     this.$emit('update:assetMainType', assetMainType);
   }

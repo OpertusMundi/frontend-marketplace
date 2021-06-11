@@ -231,6 +231,10 @@ interface BaseCatalogueItem {
    */
   dateStart: string;
   /*
+   * Channel of asset distribution
+   */
+  deliveryMethod: EnumDeliveryMethod;
+  /*
    * The file format, physical medium, or dimensions of the resource
    */
   format: string;
@@ -781,10 +785,6 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Catalogue item identifier (UUID)
    */
   id: string;
-  /*
-   * Channel of asset distribution
-   */
-  deliveryMethod: EnumDeliveryMethod;
   /*
    * Pricing model available for the asset
    */

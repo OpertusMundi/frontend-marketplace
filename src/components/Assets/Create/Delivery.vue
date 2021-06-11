@@ -16,19 +16,19 @@
                 <label class="control control-radio">
                   By the platform
                   <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethod" :value="'DIGITAL_PLATFORM'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'DIGITAL_PLATFORM'" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   Digital Provider
                   <span>Digital Provider</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethod" :value="'DIGITAL_PROVIDER'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'DIGITAL_PROVIDER'" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   Physical Provider
                   <span>Physical Provider.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethod" :value="'PHYSICAL_PROVIDER'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'PHYSICAL_PROVIDER'" />
                   <div class="control_indicator"></div>
                 </label>
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
@@ -39,6 +39,16 @@
               <div v-if="deliveryMethod === 'DIGITAL_PLATFORM'">
                 <h1>Upload Asset</h1>
                 <input type="file" @change="readFile($event)">
+
+                <!-- a dummy hidden input to be cathced by validation observer if no file selected -->
+                <div v-if="!fileToUploadLocal.isFileSelected">
+                  <validation-provider v-slot="{ errors }" name="Upload" rules="required">
+                    <div class="form-group mt-xs-20">
+                      <input type="text" hidden>
+                      <div class="errors" v-if="errors.length"><span class="mt-xs-20">Upload is required</span></div>
+                    </div>
+                  </validation-provider>
+                </div>
               </div>
             </div>
           </div>
@@ -101,11 +111,24 @@
   </validation-observer>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Watch,
+  Prop,
+} from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
+import { EnumDeliveryMethod } from '@/model/catalogue';
 
 extend('required', required);
+
+interface FileToUpload {
+  isFileSelected: boolean,
+  file: File,
+  fileName: string,
+  fileExtension: string,
+}
 
 @Component({
   components: {
@@ -114,28 +137,27 @@ extend('required', required);
   },
 })
 export default class Delivery extends Vue {
+  @Prop({ required: true }) private deliveryMethod!: EnumDeliveryMethod;
+
+  @Prop({ required: true }) private fileToUpload!: FileToUpload;
+
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>,
   }
 
-  deliveryMethod: string;
+  deliveryMethodLocal: EnumDeliveryMethod;
 
-  fileToUpload: {isFileSelected: boolean, file: File, fileName: string, fileExtension: string};
+  fileToUploadLocal: FileToUpload;
 
   constructor() {
     super();
 
-    this.deliveryMethod = '';
+    this.deliveryMethodLocal = this.deliveryMethod;
 
-    this.fileToUpload = {
-      isFileSelected: false,
-      file: {} as File,
-      fileName: '',
-      fileExtension: '',
-    };
+    this.fileToUploadLocal = this.fileToUpload;
   }
 
-  @Watch('deliveryMethod')
+  @Watch('deliveryMethodLocal')
   onDeliveryMethodChange(deliveryMethod: string): void {
     this.$emit('update:deliveryMethod', deliveryMethod);
   }
@@ -143,17 +165,13 @@ export default class Delivery extends Vue {
   // eslint-disable-next-line
   readFile(e): void {
     const [file] = e.srcElement.files;
-    this.fileToUpload.isFileSelected = true;
-    this.fileToUpload.file = file;
-    this.fileToUpload.fileName = file.name;
-    this.fileToUpload.fileExtension = file.name.split('.').pop();
+    this.fileToUploadLocal.isFileSelected = true;
+    this.fileToUploadLocal.file = file;
+    this.fileToUploadLocal.fileName = file.name;
+    this.fileToUploadLocal.fileExtension = file.name.split('.').pop();
 
-    this.$emit('update:fileToUpload', this.fileToUpload);
+    this.$emit('update:fileToUpload', this.fileToUploadLocal);
   }
-
-  // validate(): Promise<boolean> {
-  //   return this.$refs.refObserver.validate();
-  // }
 }
 </script>
 <style lang="scss">
