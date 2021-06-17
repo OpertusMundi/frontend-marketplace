@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard__inner">
     <div class="dashboard__head">
-      <div class="dashboard__head__helpers">
+      <div class="dashboard__head__helpers dashboard__head__helpers--full-width">
 
         <h1>Assets</h1>
         <router-link to="/dashboard/assets/create" class="btn--std btn--blue">ADD AN ASSET</router-link>
