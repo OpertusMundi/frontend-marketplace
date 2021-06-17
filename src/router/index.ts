@@ -106,7 +106,7 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
       {
-        path: 'assets/create',
+        path: 'assets/create/:id?',
         name: 'CreateAsset',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },

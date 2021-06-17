@@ -1,5 +1,6 @@
 <template>
-  <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="asset_card">
+  <!-- <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="asset_card"> -->
+  <router-link :to="asset.status === 'DRAFT' ? `/dashboard/assets/create/${asset.key}` : `/dashboard/assets/preview/${asset.key}`" class="asset_card">
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">

@@ -61,14 +61,15 @@ export default class Type extends Vue {
     this.assetMainTypeLocal = this.assetMainType;
   }
 
-  @Watch('assetMainTypeLocal')
-  onAssetMainTypeChange(assetMainType: string): void {
-    this.$emit('update:assetMainType', assetMainType);
+  @Watch('assetMainType')
+  onAssetMainTypeChange(assetMainType): void {
+    this.assetMainTypeLocal = assetMainType;
   }
 
-  // validate(): Promise<boolean> {
-  //   return this.$refs.refObserver.validate();
-  // }
+  @Watch('assetMainTypeLocal')
+  onAssetMainTypeChangeLocal(assetMainType: string): void {
+    this.$emit('update:assetMainType', assetMainType);
+  }
 }
 </script>
 <style lang="scss">
