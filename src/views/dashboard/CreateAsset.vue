@@ -298,8 +298,6 @@ export default class CreateAsset extends Vue {
     this.draftAssetApi.findOne(this.assetId).then((assetResponse) => {
       this.asset = { ...this.asset, ...assetResponse.result.command };
 
-      this.fixDataForForm();
-
       // todo: use Enum (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
         this.assetMainType = 'datafile';
@@ -339,135 +337,25 @@ export default class CreateAsset extends Vue {
     });
   }
 
-  // submitForm(isDraft = false): void {
-  //   // if user has selected file to upload, check if format is compatible with file extension
-  //   if (this.fileToUpload.isFileSelected) {
-  //     const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
-  //     if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
-  //       // TODO: make it a modal
-  //       // eslint-disable-next-line
-  //       alert('format-extension mismatch (not compatible)');
-  //       return;
-  //     }
-  //   }
-
-  //   this.uploading.status = true;
-  //   this.uploading.errors = [];
-
-  //   // fix dates format
-  //   this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
-
-  //   // fix pricing models format (vue-multiselect can't bind values but whole objects)
-  //   /* eslint-disable no-param-reassign */
-  //   this.asset.pricingModels.forEach((x) => {
-  //     x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
-  //     x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
-  //     x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
-  //     x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
-  //     x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
-  //     delete (x as any).includeDomainRestrictions;
-  //     delete (x as any).includeCoverageRestrictions;
-  //     delete (x as any).includeConsumerRestrictions;
-  //   });
-  //   /* eslint-enable no-param-reassign */
-
-  //   const config: AxiosRequestConfig = {
-  //     onUploadProgress: (progressEvent: any): void => {
-  //       const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-  //       if (totalLength !== null) {
-  //         this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
-  //       }
-  //     },
-  //   };
-  //   console.log('ASSET', this.asset);
-
-  //   this.draftAssetApi.create(this.asset, config)
-  //     .then((response: ServerResponse<AssetDraft>) => {
-  //       if (response.success) {
-  //         console.log('draft created');
-  //         const draftAssetKey = response.result.key;
-
-  //         if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
-  //           this.uploading.status = true;
-  //           this.uploading.completed = false;
-  //           this.uploading.title = 'Your resource is being uploaded';
-  //           this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
-  //             if (uploadResponse.success) {
-  //               console.log('uploaded resource!!!');
-  //               this.uploading.completed = true;
-  //               this.uploading.title = 'Your asset is uploaded successfully!';
-  //               this.uploading.subtitle = '';
-  //               this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
-  //                 if (submitResponse.success) {
-  //                   console.log('asset submitted successfully');
-  //                 } else {
-  //                   console.log('error submitting asset', submitResponse);
-  //                 }
-  //               });
-  //             } else {
-  //               console.log(uploadResponse);
-  //               console.log('error uploading resource');
-  //             }
-  //           });
-  //         } else {
-  //           this.uploading.completed = true;
-  //         }
-  //       } else {
-  //         console.log('error creating draft', response);
-  //         this.uploading.status = false;
-  //         this.uploading.completed = true;
-  //         this.uploading.errors = response.messages;
-  //         setTimeout(() => {
-  //           this.uploading.errors = [];
-  //         }, 10000);
-  //         setTimeout(() => {
-  //           window.scrollTo(0, document.body.scrollHeight);
-  //         }, 300);
-  //       }
-  //     })
-  //     .catch((error: AxiosError) => {
-  //       if (error.response) {
-  //         this.uploading.errors = error.response.data.messages;
-  //         setTimeout(() => {
-  //           this.uploading.errors = [];
-  //         }, 10000);
-  //       }
-  //       this.uploading.status = false;
-  //     });
-  // }
-
   isButtonSaveDraftShown(): boolean {
-    if (this.asset.pricingModels.length && this.selectedPricingModelForEditing === null) {
-      return true;
+    if (!this.assetMainType) {
+      return false;
     }
-    return false;
-  }
-
-  fixDataForForm(): void {
-    console.log('todo');
+    if (!this.asset.pricingModels.length || this.selectedPricingModelForEditing !== null) {
+      return false;
+    }
+    if (!this.asset.title || !this.asset.type || !this.asset.format || !this.asset.version) {
+      return false;
+    }
+    return true;
   }
 
   fixDataForSubmitting(): void {
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
-
-    // fix pricing models format (vue-multiselect can't bind values but whole objects)
-    /* eslint-disable no-param-reassign */
-    this.asset.pricingModels.forEach((x) => {
-      x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
-      x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
-      x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
-      x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
-      x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
-      delete (x as any).includeDomainRestrictions;
-      delete (x as any).includeCoverageRestrictions;
-      delete (x as any).includeConsumerRestrictions;
-    });
-    /* eslint-enable no-param-reassign */
   }
 
   async submitForm(isDraft = false): Promise<void> {
-    console.log('submit form');
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
       console.log('file is selected');
@@ -482,8 +370,8 @@ export default class CreateAsset extends Vue {
       console.log('no file selected');
     }
 
-    this.uploading.status = true;
-    this.uploading.errors = [];
+    // this.uploading.status = true;
+    // this.uploading.errors = [];
 
     this.fixDataForSubmitting();
 
@@ -497,7 +385,9 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    const draftAssetResponse: ServerResponse<AssetDraft> | void = await this.draftAssetApi.create(this.asset, config)
+    // const draftAssetResponse: ServerResponse<AssetDraft> | void = isDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
+    // const draftAssetResponse: ServerResponse<AssetDraft> | void = await this.draftAssetApi.create(this.asset, config)
+    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
       .catch((err: AxiosError) => { console.log('eeeee', err); });
     const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
     const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
@@ -510,6 +400,7 @@ export default class CreateAsset extends Vue {
 
     if (this.fileToUpload.isFileSelected) {
       this.uploading.status = true;
+      this.uploading.errors = [];
       this.uploading.completed = false;
       this.uploading.title = 'Your resource is being uploaded';
       // todo: catch error
@@ -517,24 +408,37 @@ export default class CreateAsset extends Vue {
 
       if (uploadResponse.success) {
         console.log('uploaded resource!');
-        this.uploading.completed = true;
-        this.uploading.title = 'Your asset is uploaded successfully!';
-        this.uploading.subtitle = '';
+        // this.uploading.completed = true;
+        // this.uploading.title = 'Your asset is uploaded successfully!';
+        // this.uploading.subtitle = '';
       } else {
         console.log('error uploading resource', uploadResponse);
         this.onError(uploadResponse);
+        this.uploading.completed = true;
+        this.uploading.title = 'Error uploading asset';
+        this.uploading.subtitle = '';
+        return;
       }
     }
 
-    if (!isDraft) {
+    if (isDraft) {
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.title = 'Draft saved!';
+      this.uploading.subtitle = '';
+    } else {
       // todo: catch error
       const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-
-      if (!submitResponse.success) {
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.subtitle = '';
+      if (submitResponse.success) {
         console.log('submitted successfully!');
+        this.uploading.title = 'Asset created!';
       } else {
         console.log('error submitting asset', submitResponse);
         this.onError(submitResponse);
+        this.uploading.title = 'Error creating asset';
       }
     }
   }

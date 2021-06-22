@@ -210,7 +210,7 @@ export default class Metadata extends Vue {
     this.$emit('update:asset', asset);
   }
 
-  @Watch('assetLocal.type', { immediate: true }) onAssetMainTypeChange(): void {
+  @Watch('assetLocal.type', { immediate: false }) onAssetMainTypeChange(): void {
     this.assetLocal.format = '';
     const selectedType = this.asset.type;
     this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);

@@ -267,16 +267,6 @@ export default class Pricing extends Vue {
   constructor() {
     super();
 
-    this.pricingModelsLocal = this.pricingModels;
-    this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
-
-    this.pricingModelTypes = [
-      { name: 'Free', priceModel: EnumPricingModel.FREE },
-      { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
-      { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
-      { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
-    ];
-
     this.menusData = { domainRestrictions: [], continents: [], countries: [] };
     this.menusData.domainRestrictions = [
       {
@@ -342,11 +332,74 @@ export default class Pricing extends Vue {
         code: 'ESP',
       },
     ];
+
+    this.pricingModelsLocal = [];
+
+    this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
+
+    this.pricingModelTypes = [
+      { name: 'Free', priceModel: EnumPricingModel.FREE },
+      { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
+      { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
+      { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
+    ];
+
+    console.log('constructor');
+  }
+
+  @Watch('pricingModels', { immediate: true, deep: true })
+  onPricingModelsChange(): void {
+    this.fixPricingModelsFormatFromParent();
   }
 
   @Watch('selectedPricingModelForEditingLocal')
-  onContractChange(selectedPricingModelForEditing: number | null): void {
+  onPricingModelChange(selectedPricingModelForEditing: number | null): void {
     this.$emit('update:selectedPricingModelForEditing', selectedPricingModelForEditing);
+  }
+
+  created(): void {
+    this.fixPricingModelsFormatFromParent();
+  }
+
+  fixPricingModelsFormatFromParent(): void {
+    this.pricingModelsLocal = [];
+    this.pricingModels.forEach((x) => {
+      console.log('foreach');
+      const pricingModel = {
+        ...x,
+        ...{
+          includeDomainRestrictions: !!x.domainRestrictions.length,
+          includeCoverageRestrictions: !!x.coverageRestrictionContinents.length || !!x.coverageRestrictionCountries.length,
+          includeConsumerRestrictions: !!x.consumerRestrictionContinents.length || !!x.consumerRestrictionCountries.length,
+        },
+      };
+      this.pricingModelsLocal.push(pricingModel);
+    });
+    this.pricingModelsLocal.forEach((model) => {
+      /* eslint-disable no-param-reassign */
+      console.log('m', this.menusData);
+      model.domainRestrictions = model.domainRestrictions.map((x) => this.menusData.domainRestrictions.find((y) => y.code === x));
+      model.coverageRestrictionContinents = model.coverageRestrictionContinents.map((x) => this.menusData.continents.find((y) => y.code === x));
+      model.coverageRestrictionCountries = model.coverageRestrictionCountries.map((x) => this.menusData.countries.find((y) => y.code === x));
+      model.consumerRestrictionContinents = model.consumerRestrictionContinents.map((x) => this.menusData.continents.find((y) => y.code === x));
+      model.consumerRestrictionCountries = model.consumerRestrictionCountries.map((x) => this.menusData.countries.find((y) => y.code === x));
+      /* eslint-enable no-param-reassign */
+    });
+  }
+
+  fixPricingModelsFormatForParent(): void {
+    this.pricingModelsLocal.forEach((x) => {
+      /* eslint-disable no-param-reassign */
+      x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
+      x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
+      x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
+      x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
+      x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
+      delete (x as any).includeDomainRestrictions;
+      delete (x as any).includeCoverageRestrictions;
+      delete (x as any).includeConsumerRestrictions;
+      /* eslint-enable no-param-reassign */
+    });
   }
 
   addPricingModel():void {
@@ -359,6 +412,7 @@ export default class Pricing extends Vue {
     this.selectedPricingModelForEditingLocal = null;
     // eslint-disable-next-line
     this.pricingModelsLocal.splice(i!, 1);
+    this.$emit('update:pricingModels', this.pricingModelsLocal);
   }
 
   onChangePricingModelType(model: EnumPricingModel): void {
@@ -404,25 +458,17 @@ export default class Pricing extends Vue {
     (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
   }
 
-  // isNonSetPricingModel(): boolean {
-  //   if (this.selectedPricingModelForEditingLocal !== null && this.pricingModels[this.selectedPricingModelForEditingLocal].type) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
   async setPricingModel(): Promise<void> {
     const isValid = await this.$refs.refPricingModelDetails.validate();
     if (!isValid) {
       return;
     }
     this.selectedPricingModelForEditingLocal = null;
+
+    this.fixPricingModelsFormatForParent();
+
     this.$emit('update:pricingModels', this.pricingModelsLocal);
   }
-
-  // validate(): Promise<boolean> {
-  //   return this.$refs.refObserver.validate();
-  // }
 }
 </script>
 <style lang="scss">
