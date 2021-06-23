@@ -263,7 +263,7 @@
           <button class="homepage__video__button"><img src="@/assets/images/icons/home/video-btn.svg"/></button>
           <img src="@/assets/images/home/video-thumb.jpg" class="homepage__video__thumbnail"/>
           </div>
-           <video class="homepage__video__player" controls id="video">
+           <video class="homepage__video__player" controls ref="videoplayer">
             <source src="@/assets/videos/sample-video.mp4" type="video/mp4">
           </video>
         </div>
@@ -318,7 +318,7 @@ export default class Header extends Vue {
   mounted(): void {
     this.initAOS();
     this.carouselLeftOffset();
-    this.videoElem = document.getElementById('video');
+    this.videoElem = this.$refs.videoplayer;
     slider.init();
     window.addEventListener('resize', this.carouselLeftOffset);
   }

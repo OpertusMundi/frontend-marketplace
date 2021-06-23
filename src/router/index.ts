@@ -212,9 +212,19 @@ const routes: RouteConfig[] = [
     component: () => import(/* webpackChunkName: "vendorbenefits" */ '../views/VendorBenefits.vue'),
   },
   {
+    path: '/vendor-benefits-old',
+    name: 'VendorBenefitsOld',
+    component: () => import(/* webpackChunkName: "vendorbenefits" */ '../views/VendorBenefitsOld.vue'),
+  },
+  {
     path: '/user-benefits',
     name: 'UserBenefits',
     component: () => import(/* webpackChunkName: "userbenefits" */ '../views/UserBenefits.vue'),
+  },
+  {
+    path: '/user-benefits-old',
+    name: 'UserBenefitsOld',
+    component: () => import(/* webpackChunkName: "userbenefits" */ '../views/UserBenefitsOld.vue'),
   },
   {
     path: '/admin',
