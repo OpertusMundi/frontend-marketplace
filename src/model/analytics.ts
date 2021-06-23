@@ -15,11 +15,11 @@ interface TemporalDimension {
   /**
    * Min date in YYYY-MM-DD ISO format
    */
-  min: string;
+  min?: string;
   /**
    * Max date in YYYY-MM-DD ISO format
    */
-  max: string;
+  max?: string;
 }
 
 interface SpatialDimension {
@@ -31,7 +31,7 @@ interface SpatialDimension {
    * Country codes in ISO 3166-1 alpha-2 format. If one or more codes are
    * specified, data will be filtered using the specified codes
    */
-  codes: string[];
+  codes?: string[];
 }
 
 interface SegmentDimension {
@@ -43,31 +43,31 @@ interface SegmentDimension {
    * If one or more segments are selected, data will be filtered using the
    * specified segments
    */
-  segments: EnumTopicCategory;
+  segments?: EnumTopicCategory;
 }
 
 interface BaseQuery {
   /**
    * Temporal dimension constraints
    */
-  time: TemporalDimension | null;
+  time?: TemporalDimension | null;
   /**
    * Spatial dimension constraints
    */
-  areas: SpatialDimension | null;
+  areas?: SpatialDimension | null;
   /**
    * Segment dimension constraints
    */
-  segments: SegmentDimension | null;
+  segments?: SegmentDimension | null;
   /**
    * One or more publishers for grouping data. This option is available only to platform
    * administrators. For providers, the service automatically sets the value to the provider key.
    */
-  publishers: string[] | null;
+  publishers?: string[] | null;
   /**
    * One or more asset PIDs for grouping data
    */
-  assets: string[] | null;
+  assets?: string[] | null;
 }
 
 export enum EnumSalesQueryMetric {
