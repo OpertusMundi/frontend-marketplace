@@ -147,61 +147,10 @@ export default class Metadata extends Vue {
     this.menusData = { assetTypes: [], availableFormats: [] };
 
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
+  }
 
-    // this.asset = {
-    //   abstract: '',
-    //   additionalResources: [],
-    //   conformity: EnumConformity.NOT_EVALUATED,
-    //   creationDate: '2020-06-02',
-    //   dateEnd: '2020-06-02',
-    //   dateStart: '2020-06-02',
-    //   format: '',
-    //   ingested: false,
-    //   keywords: [],
-    //   language: '',
-    //   license: '',
-    //   lineage: '',
-    //   metadataDate: '2020-06-02',
-    //   metadataLanguage: '',
-    //   metadataPointOfContactEmail: '',
-    //   metadataPointOfContactName: '',
-    //   openDataset: false,
-    //   parentId: '',
-    //   publicAccessLimitations: '',
-    //   publicationDate: '2020-06-02',
-    //   publisherEmail: '',
-    //   publisherName: '',
-    //   referenceSystem: '',
-    //   resourceLocator: '',
-    //   responsibleParty: [],
-    //   revisionDate: '2020-06-02',
-    //   resources: [],
-    //   scales: [],
-    //   spatialDataServiceOperations: [],
-    //   spatialDataServiceQueryables: [],
-    //   spatialDataServiceType: null,
-    //   spatialDataServiceVersion: null,
-    //   spatialResolution: null,
-    //   suitableFor: [],
-    //   title: '',
-    //   topicCategory: [],
-    //   type: '' as EnumAssetType,
-    //   userOnlyForVas: false,
-    //   version: '',
-    //   pricingModels: [],
-    //   geometry: {
-    //     type: 'Polygon',
-    //     coordinates: [
-    //       [
-    //         [20.94818115234375, 36.40359962073253],
-    //         [23.57940673828125, 36.40359962073253],
-    //         [23.57940673828125, 38.31795595794451],
-    //         [20.94818115234375, 38.31795595794451],
-    //         [20.94818115234375, 36.40359962073253],
-    //       ],
-    //     ],
-    //   } as GeoJSON.Polygon,
-    // };
+  created(): void {
+    this.populateAvailableFormatsForSelectedType();
   }
 
   @Watch('assetLocal', { deep: true })
@@ -212,6 +161,10 @@ export default class Metadata extends Vue {
 
   @Watch('assetLocal.type', { immediate: false }) onAssetMainTypeChange(): void {
     this.assetLocal.format = '';
+    this.populateAvailableFormatsForSelectedType();
+  }
+
+  populateAvailableFormatsForSelectedType(): void {
     const selectedType = this.asset.type;
     this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
   }
