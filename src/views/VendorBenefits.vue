@@ -39,7 +39,7 @@
        </div>
      </div>
      <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-left">
+        <div class="benefits__img" data-aos="fade-right">
          <img src="@/assets/images/vendors_benefits/vendors-price.svg"/>
        </div>
        <div class="benefits__text" data-aos="fade-up">
@@ -54,12 +54,12 @@
             <p>When you publish an asset in Topio, all the terms, restrictions, and pricing models you have defined are used to automatically generate a contract template, which customers accept, and digitally sign, to purchase your asset.</p>
             <router-link to="/">SHOW MORE</router-link>
        </div>
-       <div class="benefits__img" data-aos="fade-right">
+       <div class="benefits__img" data-aos="fade-left">
          <img src="@/assets/images/vendors_benefits/vendors-contracts.svg"/>
        </div>
      </div>
       <div class="benefits__row">
-        <div class="benefits__img">
+        <div class="benefits__img" data-aos="fade-right">
          <img src="@/assets/images/vendors_benefits/vendors-paid.svg"/>
        </div>
        <div class="benefits__text" data-aos="fade-up">
@@ -79,7 +79,7 @@
        </div>
      </div>
       <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-left">
+        <div class="benefits__img" data-aos="fade-right">
          <img src="@/assets/images/vendors_benefits/vendors-get-data.svg"/>
        </div>
        <div class="benefits__text" data-aos="fade-up">
@@ -94,12 +94,12 @@
             <p>Topio provides you with all the tools you need to manage your assets, monitor your transactions, keep track of your payments, and gain insights over how your assets perform. All within a free, simple to use, personalized, and secure Dashboard integrated in Topio. Everything in one place, and for all of our suppliers.</p>
             <router-link to="/">SHOW MORE</router-link>
        </div>
-       <div class="benefits__img" data-aos="fade-right">
+       <div class="benefits__img" data-aos="fade-left">
          <img src="@/assets/images/vendors_benefits/vendors-control.svg"/>
        </div>
      </div>
      <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-left">
+        <div class="benefits__img" data-aos="fade-right">
          <img src="@/assets/images/vendors_benefits/vendors-eu.svg"/>
        </div>
        <div class="benefits__text" data-aos="fade-up">
@@ -204,10 +204,5 @@ export default class VendorBenefits extends Vue {
 }
 </script>
 <style lang="scss">
-/*
-.header--nobg{
-      background: #20206E !important;
-}
-*/
-  @import "@/assets/styles/_page-benefits.scss";
+  @import "@/assets/styles/_page-benefits-vendors.scss";
 </style>
