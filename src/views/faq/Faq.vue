@@ -46,20 +46,23 @@ page: any;
 
 searchResultsActive = false;
 
+wpUrl: string;
+
 constructor() {
   super();
 
   this.categories = [];
   this.page = [];
+  this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
 }
 
 mounted():void {
-  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/faq_categories?parent=0`).then((response) => {
+  axios.get(`${this.wpUrl}/wp-json/wp/v2/faq_categories?parent=0`).then((response) => {
     this.categories = response.data;
   }).catch((error) => {
     console.log(error);
   });
-  axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=faq`).then((response) => {
+  axios.get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=faq`).then((response) => {
     this.page = response.data;
   }).catch((error) => {
     console.log(error);
