@@ -112,19 +112,24 @@
 .benefits {
 	&__row {
 		display: flex;
-		flex-wrap: wrap;
-		flex-direction: row;
+		flex-wrap: nowrap;
+		flex-direction: column;
 		justify-content: space-between;
 		margin-bottom: 100px;
 		height: 100%;
-		align-items: center;
 		@media (min-width: 768px) {
+			flex-direction: row;
 			margin-bottom: 150px;
 			align-items: flex-start;
 		}
 		@media (min-width: 991px) {
+			flex-direction: row;
 			margin-bottom: 50px;
 			align-items: flex-start;
+			flex-wrap: wrap;
+		}
+		&:nth-child(2n + 0) {
+			flex-direction: row-reverse;
 		}
 	}
 	&__text {
@@ -148,16 +153,30 @@
 			margin-top: 25px;
 			font-weight: 500;
 		}
+		.expand-btn {
+			@include fluid-type(12px, 15px);
+			margin-top: 15px;
+			display: block;
+			color: #190aff;
+			margin-top: 25px;
+			font-weight: 500;
+			text-transform: uppercase;
+			cursor: pointer;
+		}
 	}
 	&__img {
-		flex: 1 0 60%;
-		padding: 0 30px 30px 30px;
+		flex: 0 1 100%;
+		padding: 50px;
+		order: 1;
 		@media (min-width: 768px) {
-			padding: 0 75px 75px 75px;
+			padding: 75px;
+			flex: 0 1 100%;
+			order: 0;
 		}
 		@media (min-width: 991px) {
 			flex: 1 0 50%;
 			padding: 0 100px 100px 100px;
+			order: 0;
 		}
 	}
 }
