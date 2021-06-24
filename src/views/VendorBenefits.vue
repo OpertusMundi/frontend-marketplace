@@ -10,84 +10,37 @@
    <section class="benefits">
      <div class="benefits__row" v-for="item, index in benefits" :key="item.id">
        <div class="benefits__text" data-aos="fade-up">
-         <span>{{ index }} + {{item.show}}</span>
         <div class="benefits__text__rendered"  v-html="item.description_short"></div>
          <transition name="fade" mode="out-in">
-        <div class="benefits__text__rendered" v-html="item.description_full" v-show="item.show"></div>
+          <div class="benefits__text__rendered" v-html="item.description_full" v-show="item.show"></div>
          </transition>
          <div v-if="item.description_full.length" @click="getItemId(index)" class="expand-btn">{{item.show ? 'show less' : 'show more' }}</div>
        </div>
-       <div class="benefits__img" data-aos="fade-left">
+       <div class="benefits__img" :data-aos="index%2 ? 'fade-right' : 'fade-left'">
          <img :src="item.image.url"/>
        </div>
      </div>
    </section>
     </div>
     <div class="m_container">
-      <section class="card">
-        <div class="card__title">
-          <h3>6 steps to grow your business</h3>
+      <section class="card" data-aos="fade-up" v-if="pagedata[0].acf.steps.length">
+        <div class="card__title" data-aos="fade-up" data-aos-delay="200">
+          <h3>{{ pagedata[0].acf.steps_heading }}</h3>
         </div>
-        <div class="card__container">
-        <div class="card__grid">
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>1</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Register in the market as a supplier</h3>
-             <p>Full KYB compliance<br/>Direct payments to your account</p>
-           </div>
+         <div class="card__container">
+          <template v-for="(step, totalIndex) in colArray">
+            <div :key="step.name" class="card__grid">
+              <template v-for="(item, index) in step">
+                <div class="card__grid__item" :key="item.id" data-aos="fade-up" data-aos-delay="400">
+                  <div class="card__grid__number">
+                    <h1>{{(totalIndex*Math.ceil(pagedata[0].acf.steps.length / 2))+(index+1)}}</h1>
+                  </div>
+                  <div class="card__grid__text" v-html="item.content"></div>
+                </div>
+              </template>
+            </div>
+          </template>
          </div>
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>2</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Add metadata to your asset</h3>
-             <p>Create from new or import existing<br/>Metadata built for trading not, curation</p>
-           </div>
-         </div>
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>3</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Upload your asset (optional)</h3>
-             <p>We create automated metadata helping consumers make informed decisions<br/>We deliver you asset to consumers</p>
-           </div>
-         </div>
-        </div>
-         <div class="card__grid">
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>4</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Select your pricing model and price</h3>
-             <p>Support for all pricing models and options<br/>Build trust with consumers</p>
-           </div>
-         </div>
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>5</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Select your terms</h3>
-             <p>We provide you with ready-to-use templates.<br/> You select the terms and we automate contracts with consumers</p>
-           </div>
-         </div>
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>6</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Review and publish</h3>
-             <p>Our helpdesk reviews the asset, we get in touch if needed and you are ready to publish it</p>
-           </div>
-         </div>
-         </div>
-        </div>
       </section>
     </div>
   </div>
@@ -110,7 +63,7 @@ export default class VendorBenefits extends Vue {
 
   benefits: any;
 
-  showIndex: any;
+  colArray:any;
 
   constructor() {
     super();
@@ -119,7 +72,7 @@ export default class VendorBenefits extends Vue {
     this.loaded = false;
     this.show = false;
     this.benefits = [];
-    this.showIndex = null;
+    this.colArray = [];
     this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
   }
 
@@ -129,6 +82,14 @@ export default class VendorBenefits extends Vue {
 
   created():void {
     this.getPageData();
+  }
+
+  slpitSteps():void {
+    const cloned = this.pagedata[0].acf.steps.slice();
+    while (cloned.length > 0) {
+      const chunk = cloned.splice(0, Math.ceil(this.pagedata[0].acf.steps.length / 2));
+      this.colArray.push(chunk);
+    }
   }
 
   initAOS = (): void => {
@@ -142,22 +103,21 @@ export default class VendorBenefits extends Vue {
     axios.get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=vendor-benefits`).then((response) => {
       this.pagedata = response.data;
       this.benefits = response.data[0].acf.benefits;
+      if (response.data[0].acf.steps) {
+        this.slpitSteps();
+      }
       this.benefits.forEach((element) => {
         this.$set(element, 'show', false);
       });
-      console.log(this.benefits);
     }).catch((error) => {
       console.log(error);
     }).finally(() => {
       this.loaded = true;
-      console.log('data fetching completed');
     });
   }
 
-  getItemId(value): void {
+  getItemId(value: number): void {
     this.benefits[value].show = !this.benefits[value].show;
-    // this.$set(this.benefits.show, value, true);
-    // console.log(this.benefits[value].show);
   }
 }
 </script>

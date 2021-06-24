@@ -1,140 +1,46 @@
 <template>
-  <div class="page page--nooverflow">
+  <div class="page page--nooverflow" v-if="loaded">
     <div class="vendors-container">
     <section class="page__hero">
       <div class="page__hero__inner">
-        <h1>Explore. Create. Expand.</h1>
-        <h2>A marketplace where you can do more</h2>
+          <h1>{{ pagedata[0].acf.heading }}</h1>
+        <h2>{{ pagedata[0].acf.subheading }}</h2>
       </div>
     </section>
    <section class="benefits">
-     <div class="benefits__row">
+     <div class="benefits__row" v-for="item, index in benefits" :key="item.id">
        <div class="benefits__text" data-aos="fade-up">
-         <h3>All the data you need</h3>
-            <p>Looking for geospatial data and services for Europe? You’ve come to the right place! Topio is the one-stop-shop for all kinds of geospatial information.</p>
-            <router-link to="/">SHOW MORE</router-link>
+        <div class="benefits__text__rendered"  v-html="item.description_short"></div>
+         <transition name="fade" mode="out-in">
+          <div class="benefits__text__rendered" v-html="item.description_full" v-show="item.show"></div>
+         </transition>
+         <div v-if="item.description_full.length" @click="getItemId(index)" class="expand-btn">{{item.show ? 'show less' : 'show more' }}</div>
        </div>
-       <div class="benefits__img" data-aos="fade-left">
-         <img src="@/assets/images/vendors_benefits/data-need.svg"/>
+       <div class="benefits__img" :data-aos="index%2 ? 'fade-right' : 'fade-left'">
+         <img :src="item.image.url"/>
        </div>
-     </div>
-      <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-right">
-         <img src="@/assets/images/vendors_benefits/powerfull-search.svg"/>
-       </div>
-       <div class="benefits__text" data-aos="fade-up">
-         <h3>Powerfull search</h3>
-            <p>Search for all geospatial data in one place, simple as that. We know how it feels when you endlessly browse the web to find the missing data you want for your product or your client. We’ve been there ourselves.</p>
-            <router-link to="/">SHOW MORE</router-link>
-        </div>
-     </div>
-     <div class="benefits__row">
-       <div class="benefits__text" data-aos="fade-up">
-         <h3>Sneak-peak inside data</h3>
-            <p>When you buy data, you typically only know in advance some information about the coverage and contents. Then you pay up, and anxiously wait to see whether what you were promised is actually what you were looking for. This doesn’t really work, does it? If you are buying a car, aren’t supposed to see the real thing, or even test drive it first?</p>
-            <router-link to="/">SHOW MORE</router-link>
-       </div>
-       <div class="benefits__img" data-aos="fade-left">
-         <img src="@/assets/images/vendors_benefits/sneak-peak.svg"/>
-       </div>
-     </div>
-     <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-right">
-         <img src="@/assets/images/vendors_benefits/vendors-get-data.svg"/>
-       </div>
-       <div class="benefits__text" data-aos="fade-up">
-         <h3>Clear terms and prices</h3>
-            <p>All assets in Topio are available with clear terms, pricing options, and prices, before you purchase them! Weird right? Not having to exchange several emails, browse through hundreds of documentation pages, request and wait for a quote, or dealing with preferential pricing for your competitors. Not anymore, with Topio you how much it costs and what you can do with an asset, before you purchase it.</p>
-            <router-link to="/">SHOW MORE</router-link>
-        </div>
-     </div>
-     <div class="benefits__row">
-       <div class="benefits__text" data-aos="fade-up">
-         <h3>Safe purchases and deliveries</h3>
-            <p>Found what you want to purchase? Just add to your cart, agree to the terms, pay, and get it delivered in minutes. Simple as that!</p>
-            <router-link to="/">SHOW MORE</router-link>
-       </div>
-       <div class="benefits__img" data-aos="fade-left">
-         <img src="@/assets/images/vendors_benefits/purchases-deliveries.svg"/>
-       </div>
-     </div>
-      <div class="benefits__row">
-        <div class="benefits__img" data-aos="fade-right">
-         <img src="@/assets/images/vendors_benefits/vendors-paid.svg"/>
-       </div>
-       <div class="benefits__text" data-aos="fade-up">
-         <h3>Do more</h3>
-            <p>Congrats on purchasing your first asset from Topio. But wait, don’t leave yet, there is more! You can use the data you buy, and data you own, right here.</p>
-            <router-link to="/">SHOW MORE</router-link>
-        </div>
      </div>
    </section>
     </div>
     <div class="m_container">
-      <section class="card">
-        <div class="card__title">
-          <h3>6 steps to create and expand</h3>
+      <section class="card" data-aos="fade-up" v-if="pagedata[0].acf.steps.length">
+        <div class="card__title" data-aos="fade-up" data-aos-delay="200">
+          <h3>{{ pagedata[0].acf.steps_heading }}</h3>
         </div>
-        <div class="card__container">
-        <div class="card__grid">
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>1</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Register in the market as a consumer</h3>
-             <p>Full KYB compliance<br/>Registered users get access to free tiers of topio services</p>
-           </div>
+         <div class="card__container">
+          <template v-for="(step, totalIndex) in colArray">
+            <div :key="step.name" class="card__grid">
+              <template v-for="(item, index) in step">
+                <div class="card__grid__item" :key="item.id" data-aos="fade-up" data-aos-delay="400">
+                  <div class="card__grid__number">
+                    <h1>{{(totalIndex*Math.ceil(pagedata[0].acf.steps.length / 2))+(index+1)}}</h1>
+                  </div>
+                  <div class="card__grid__text" v-html="item.content"></div>
+                </div>
+              </template>
+            </div>
+          </template>
          </div>
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>2</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Search for an asset</h3>
-             <p>Search for all types of geospatial assets<br/>Filter and use based on rich metadata</p>
-           </div>
-         </div>
-         <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>3</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>View an asset</h3>
-             <p>Know what you will receive before purchase<br/>Automated metadata, clear terms and prices</p>
-           </div>
-         </div>
-        </div>
-         <div class="card__grid">
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>4</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Purchase asset</h3>
-             <p>Just add to basket and pay<br/>Automatic contract generation</p>
-           </div>
-         </div>
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>5</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Receive asset</h3>
-             <p>We process the payment and either deliver the asset immediately, or instruct the supplier to deliver to you</p>
-           </div>
-         </div>
-           <div class="card__grid__item">
-           <div class="card__grid__number">
-             <h1>6</h1>
-             </div>
-           <div class="card__grid__text">
-             <h3>Trust purchases</h3>
-             <p>If the asset has not been delivered by the supplier we will return you the payment,  no questions asked</p>
-           </div>
-         </div>
-         </div>
-        </div>
       </section>
     </div>
   </div>
@@ -143,12 +49,47 @@
 import { Component, Vue } from 'vue-property-decorator';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import axios from 'axios';
 
 @Component
 export default class VendorBenefits extends Vue {
+  pagedata: any;
+
+  wpUrl: string;
+
+  loaded: boolean;
+
+  show: boolean;
+
+  benefits: any;
+
+  colArray:any;
+
+  constructor() {
+    super();
+
+    this.pagedata = null;
+    this.loaded = false;
+    this.show = false;
+    this.benefits = [];
+    this.colArray = [];
+    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
+  }
+
   mounted():void {
     this.initAOS();
-    this.headerStatic();
+  }
+
+  created():void {
+    this.getPageData();
+  }
+
+  slpitSteps():void {
+    const cloned = this.pagedata[0].acf.steps.slice();
+    while (cloned.length > 0) {
+      const chunk = cloned.splice(0, Math.ceil(this.pagedata[0].acf.steps.length / 2));
+      this.colArray.push(chunk);
+    }
   }
 
   initAOS = (): void => {
@@ -158,8 +99,26 @@ export default class VendorBenefits extends Vue {
     });
   }
 
-  headerStatic = (): void => {
-    console.log(this.$root);
+  getPageData(): void {
+    axios.get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=user-benefits`).then((response) => {
+      this.pagedata = response.data;
+      this.benefits = response.data[0].acf.benefits;
+      if (response.data[0].acf.steps) {
+        this.slpitSteps();
+      }
+      this.benefits.forEach((element) => {
+        this.$set(element, 'show', false);
+      });
+      console.log(this.pagedata);
+    }).catch((error) => {
+      console.log(error);
+    }).finally(() => {
+      this.loaded = true;
+    });
+  }
+
+  getItemId(value: number): void {
+    this.benefits[value].show = !this.benefits[value].show;
   }
 }
 </script>

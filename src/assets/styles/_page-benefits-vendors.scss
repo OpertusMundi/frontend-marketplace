@@ -129,7 +129,9 @@
 			flex-wrap: wrap;
 		}
 		&:nth-child(2n + 0) {
-			flex-direction: row-reverse;
+			@media (min-width: 991px) {
+				flex-direction: row-reverse;
+			}
 		}
 	}
 	&__text {
@@ -233,6 +235,7 @@
 			height: 75px;
 			max-width: 75px;
 			display: flex;
+			flex: 1 0 100%;
 			@media (min-width: 768px) {
 				height: 100px;
 				max-width: 100px;

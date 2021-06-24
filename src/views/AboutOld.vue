@@ -1,31 +1,17 @@
 <template>
-  <div class="page page--nooverflow about" >
+  <div class="page page--nooverflow about">
     <section class="page__hero page__hero--about">
       <div class="page__hero__inner">
         <div class="page__hero__head s_container">
-          <h1>{{ pagedata[0].acf.heading }}</h1>
-          <h2>{{ pagedata[0].acf.subheading }}</h2>
-           <div class="about__sections">
-             <template v-for="section in pagedata[0].acf.sections">
-             <div :key="section.id" class="about__sections__row" data-aos="" data-aos-offset="350">
-               <div class="about__sections__row__block about__sections__row__block--main">
-                  <h3 class="about__sections__row__block__title">{{ section.heading }}</h3>
-                  <div class="about__sections__row__block__text" v-html="section.content"></div>
-                  </div>
-                  <div class="about__sections__row__block about__sections__row__block--image">
-                <img :src="section.image.url" alt="">
-              </div>
-             </div>
-             </template>
-           </div>
-          <!-- <div class="about__sections">
+          <h1>Search. Share. Trade. Use.</h1>
+          <h2>We are here to deliver a breakthrough in the trading and sharing of commercial geospatial data assets across borders and sectors. All in an easy way; all through a single point of entry. </h2>
+          <div class="about__sections">
             <div class="about__sections__row" data-aos="" data-aos-offset="350">
               <div class="about__sections__row__block about__sections__row__block--main">
                 <h3 class="about__sections__row__block__title">Our vision</h3>
                 <div class="about__sections__row__block__text">
-                  <p>We want to provide a central one-stop hub for geospatial data that guarantees affordability and flexibility in line with the needs of all users regardless of their size, domain, and expertise. We plan to make it simple, fast, cost-effective and safe for data owners and data users alike.</p>
-                  </div>
-                </div>
+                  <p>We want to provide a central one-stop hub for geospatial data that guarantees affordability and flexibility in line with the needs of all users regardless of their size, domain, and expertise. We plan to make it simple, fast, cost-effective and safe for data owners and data users alike.</p></div>
+              </div>
               <div class="about__sections__row__block about__sections__row__block--image">
                 <img src="@/assets/images/about/about1.svg" alt="">
               </div>
@@ -76,7 +62,7 @@
                 <img src="@/assets/images/about/about4.svg" alt="">
               </div>
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
     </section>
@@ -86,45 +72,17 @@
 import { Component, Vue } from 'vue-property-decorator';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import axios from 'axios';
 
 @Component
 export default class About extends Vue {
-  pagedata: any;
-
-  wpUrl: any;
-
-  loaded: boolean;
-
-  constructor() {
-    super();
-
-    this.pagedata = null;
-    this.loaded = false;
-    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
-  }
-
-  created():void {
-    this.getPageData();
+  mounted():void {
+    this.initAOS();
   }
 
   initAOS = (): void => {
     AOS.init({
       duration: 600,
       easing: 'ease-in-out-cubic',
-    });
-  }
-
-  getPageData():void {
-    axios.get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=about`).then((response) => {
-      this.pagedata = response.data;
-      console.log(this.pagedata);
-    }).catch((error) => {
-      console.log(error);
-    }).finally(() => {
-      this.loaded = true;
-      this.initAOS();
-      console.log('content is loaded');
     });
   }
 }
