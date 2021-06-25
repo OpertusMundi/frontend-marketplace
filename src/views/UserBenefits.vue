@@ -1,5 +1,5 @@
 <template>
-  <div class="page page--nooverflow" v-if="loaded">
+  <div class="page page--nooverflow" v-if="pagedata">
     <div class="vendors-container">
     <section class="page__hero">
       <div class="page__hero__inner">
@@ -55,10 +55,6 @@ import axios from 'axios';
 export default class VendorBenefits extends Vue {
   pagedata: any;
 
-  wpUrl: string;
-
-  loaded: boolean;
-
   show: boolean;
 
   benefits: any;
@@ -69,15 +65,9 @@ export default class VendorBenefits extends Vue {
     super();
 
     this.pagedata = null;
-    this.loaded = false;
     this.show = false;
     this.benefits = [];
     this.colArray = [];
-    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
-  }
-
-  mounted():void {
-    this.initAOS();
   }
 
   created():void {
@@ -100,7 +90,7 @@ export default class VendorBenefits extends Vue {
   }
 
   getPageData(): void {
-    axios.get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=user-benefits`).then((response) => {
+    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=user-benefits`).then((response) => {
       this.pagedata = response.data;
       this.benefits = response.data[0].acf.benefits;
       if (response.data[0].acf.steps) {
@@ -109,11 +99,12 @@ export default class VendorBenefits extends Vue {
       this.benefits.forEach((element) => {
         this.$set(element, 'show', false);
       });
-      console.log(this.pagedata);
     }).catch((error) => {
       console.log(error);
     }).finally(() => {
-      this.loaded = true;
+      setTimeout(() => {
+        this.initAOS();
+      }, 500);
     });
   }
 

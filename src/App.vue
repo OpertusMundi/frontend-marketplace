@@ -79,8 +79,6 @@ export default class App extends Vue {
       'Home',
       'CatalogueSingle',
       'OrderThankYou',
-      'UserBenefits',
-      'VendorBenefits',
     ];
   }
 
