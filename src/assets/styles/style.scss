@@ -1,25 +1,25 @@
 // @import "../../node_modules/aos/src/sass/aos.scss";
-@import "./abstracts/all";
-@import "fonts";
-@import "reset";
-@import "variables";
-@import "mixins";
-@import "header";
-@import "footer";
-@import "btns";
-@import "loader";
-@import "tooltips";
-@import "arrows";
+@import './abstracts/all';
+@import 'fonts';
+@import 'reset';
+@import 'variables';
+@import 'mixins';
+@import 'header';
+@import 'footer';
+@import 'btns';
+@import 'loader';
+@import 'tooltips';
+@import 'arrows';
 // @import "select";
 // @import "homepage";
 // @import "search";
 // @import "acarousel";
 // @import "page";
-@import "about";
-@import "terms";
+@import 'about';
+@import 'terms';
 // @import "settings";
-@import "filters";
-@import "modals";
+@import 'filters';
+@import 'modals';
 // @import "dashboard";
 // @import "forms";
 // @import "assets";
@@ -82,7 +82,7 @@ h6 {
 	position: relative;
 	margin: 0 auto;
 	padding: 0 25px;
-	@media (max-width: 576px) {
+	@media (max-width: 991px) {
 		padding: 0 15px;
 	}
 }
