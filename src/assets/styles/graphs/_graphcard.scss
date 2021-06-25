@@ -1,0 +1,102 @@
+.graphcard {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  margin-top: 40px;
+  &__head {
+    &__data {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      &__left {
+        h3 {
+          font-size: em(25);
+          font-weight: 700;
+          display: inline-block;
+          margin-right: 40px;
+        }
+        a {
+          color: $darkColor;
+        }
+        p {
+          font-size: em(14);
+          color: $labelColor;
+          margin-top: 10px;
+        }
+      }
+      &__right {
+        ul {
+          display: flex;
+          border-radius: 5px;
+          overflow: hidden;
+          border: 1px solid $greyColor;
+          li {
+            a {
+              display: block;
+              padding: 8px 10px 7px;
+              font-size: em(12);
+              color: $darkColor;
+              border-right: 1px solid $greyColor;
+              font-weight: 600;
+              transition: all 0.4s ease;
+            }
+            &:last-child {
+              a {
+                border: none;
+              }
+            }
+            &.active, &:hover  {
+              a {
+                background: $secondColor;
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+    }
+    &__filters {
+      &__assets {
+        display: flex;
+        .multiselect {
+          margin-right: 30px;
+          color: $darkColor;
+          max-width: 300px;
+          width: 100%;
+          position: relative;
+          z-index: 100;
+          &:last-child {
+            margin-right: 0px;
+          }
+          &__tags {
+            border-radius: 10px;
+          }
+          &__option {
+            padding-bottom: 0;
+          }
+          &__single {
+            font-size: em(16);
+            font-weight: 500;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+          &__placeholder {
+            color: $darkColor;
+            font-size: em(16);
+            font-weight: 500;
+          }
+          &__content-wrapper {
+            overflow-y: scroll;
+            max-height: 400px;
+            width:auto;
+            border: none;
+            background: $lightBgColor;
+            border-radius: 10px;
+          }
+        }
+      }
+    }
+  }
+}

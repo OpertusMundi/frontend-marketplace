@@ -18,6 +18,7 @@
     "awesome-phonenumber": "^2.43.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
+    "echarts": "^5.1.2",
     "file-saver": "^2.0.5",
     "flexboxgrid": "^6.3.1",
     "flickity": "^2.2.1",
