@@ -137,6 +137,7 @@ export default class SalesBarGraphCard extends Vue {
           // eslint-disable-next-line
           this.segments = response.result!;
           this.chartOptions = this.getOptions();
+          this.formatSeries();
         }
       });
   }
@@ -184,57 +185,51 @@ export default class SalesBarGraphCard extends Vue {
       return null;
     }
     const name = 'Sales per segment';
-
     return {
-      credits: { enabled: false },
+      chart: {
+        type: 'column',
+      },
       title: {
-        show: false,
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow',
-        },
-        // formatter: (params: any) => {
-        //   return useIntl().formatNumber(
-        //     Array.isArray(params) ? params[0].value : params.value,
-        //     { currency: 'EUR', style: 'currency', currencyDisplay: 'symbol' }
-        //   );
-        // },
-      },
-      legend: {
-        data: [name],
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true,
+        text: '',
       },
       xAxis: {
-        type: 'value',
-        axisLabel: {
-          formatter: (value: number) => {
-            if (value < 1000) {
-              return value;
-            }
-            if (value < 1000000) {
-              return `${value / 1000} K`;
-            }
-            return `${value / 1000000} M`;
-          },
-        },
+        categories: [...new Map(this.segments.points.map((item) => [item.segment, item])).values()].map((a) => a.segment),
+        crosshair: true,
       },
       yAxis: {
-        type: 'category',
-        data: this.segments.points.map((p) => p.segment),
+        min: 0,
+        title: {
+          text: 'Sales in €',
+        },
       },
-      series: [{
-        name,
-        type: 'bar',
-        data: this.segments.points.map((p) => p.value),
-      }],
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:.1f} €</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true,
+      },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0,
+        },
+      },
+      series: this.formatSeries(),
     };
+  }
+
+  formatSeries() {
+    const series:Array<any> = [];
+    const assetsName:any = [...new Map(this.segments.points.map((item) => [item.asset, item])).values()].map((a) => a.asset);
+    assetsName.forEach((assetName) => {
+      const assetObj = {
+        name: assetName,
+        data: this.segments?.points.filter((item) => item?.asset === assetName).map((a) => a.value),
+      };
+      series.push(assetObj);
+    });
+    return series;
   }
 }
 </script>

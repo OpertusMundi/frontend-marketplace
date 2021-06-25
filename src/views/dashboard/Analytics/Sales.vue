@@ -13,7 +13,16 @@
       <a href="#" class="analytics__types__item" @click.prevent="activeTab='bars'" :class="{ active: activeTab == 'bars' }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="">
-          <h5>Viewer market segment</h5>
+          <h5>Market segment sales</h5>
+        </div>
+        <div class="analytics__types__item__desc">
+          Some text...
+        </div>
+      </a>
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab='bars_transaction'" :class="{ active: activeTab == 'bars_transaction' }">
+        <div class="analytics__types__item__upper">
+          <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="">
+          <h5>Market segment transactions</h5>
         </div>
         <div class="analytics__types__item__desc">
           Some text...
@@ -33,6 +42,9 @@
     <div class="analytics__cards">
       <div class="analytics__cards__item" v-if="activeTab == 'heatmap'">
         <sales-heat-map-graph-card></sales-heat-map-graph-card>
+      </div>
+      <div class="analytics__cards__item" v-if="activeTab == 'bars_transaction'">
+        <sales-bar-graph-card></sales-bar-graph-card>
       </div>
       <div class="analytics__cards__item" v-if="activeTab == 'bars'">
         <sales-bar-graph-card></sales-bar-graph-card>
