@@ -1,5 +1,5 @@
 <template>
-<div class="wrapper">
+<div class="wrapper" v-if="pagedata">
   <div class="homepage">
     <section class="homepage__hero">
       <shape></shape>
@@ -13,33 +13,32 @@
       </div>
     </section>
     <section class="homepage__big_blocks">
-      <div class="s_container">
+         <h4 class="homepage__big_blocks__title" data-aos="fade-up">{{ pagedata.section_one_heading }}</h4>
+      <div class="m_container">
         <div class="homepage__big_blocks__inner">
-          <div class="homepage__big_blocks__item" data-aos="fade-up">
-            <img src="@/assets/images/icons/frictionless.svg" alt="" class="homepage__big_blocks__item__icon">
-            <h3 class="homepage__big_blocks__item__title">Frictionless data</h3>
-            <p class="homepage__big_blocks__item__text">
-              A simple, fast, and safe way for all geodata users to search for and acquire commercial geospatial data assets, regardless of their sector and size.
-            </p>
-          </div>
-          <div class="homepage__big_blocks__item" data-aos="fade-up" data-aos-delay="300">
-            <img src="@/assets/images/icons/quality.svg" alt="" class="homepage__big_blocks__item__icon">
-            <h3 class="homepage__big_blocks__item__title">Increased quality</h3>
-            <p class="homepage__big_blocks__item__text">
-              High-quality geospatial assets and transparent licencing agreements that put an end to vendor lock-in and scaling barriers. Take advantage of efficient, scalable products and business models across all sectors!
-            </p>
-          </div>
-          <div class="homepage__big_blocks__item" data-aos="fade-up" data-aos-delay="600">
-            <img src="@/assets/images/icons/unlock.svg" alt="" class="homepage__big_blocks__item__icon">
-            <h3 class="homepage__big_blocks__item__title">Unlock the value of your data</h3>
-            <p class="homepage__big_blocks__item__text">
-              Expanded geographical and sectoral coverage that enables assets to tap into new revenue streams, synergies, and business models by harnessing their added value at minimal costs and effort.
-            </p>
-          </div>
+          <template v-for="(item, index) in pagedata.section_one">
+           <div :key="item.id" class="homepage__big_blocks__item" data-aos="fade-up" :data-aos-delay="index * 250">
+             <img v-if="item.image.url" :src="item.image.url" alt="" class="homepage__big_blocks__item__icon" />
+              <div class="homepage__big_blocks__item__content" v-html="item.content"></div>
+           </div>
+           </template>
         </div>
       </div>
     </section>
-    <section class="homepage__assets" data-aos="fade-in">
+     <section class="homepage__big_blocks">
+         <h4 class="homepage__big_blocks__title" data-aos="fade-up">{{ pagedata.section_two_heading }}</h4>
+      <div class="m_container">
+        <div class="homepage__big_blocks__inner">
+          <template v-for="(item, index) in pagedata.section_two">
+           <div :key="item.id" class="homepage__big_blocks__item" data-aos="fade-up" :data-aos-delay="index * 250">
+             <img v-if="item.image.url" :src="item.image.url" alt="" class="homepage__big_blocks__item__icon" />
+              <div class="homepage__big_blocks__item__content" v-html="item.content"></div>
+           </div>
+           </template>
+        </div>
+      </div>
+    </section>
+    <section class="homepage__assets" data-aos="fade-in" data-aos-delay="500">
       <h4 class="homepage__assets__title">Popular Assets</h4>
       <div class="a_carousel draggable">
         <a href="" class="a_carousel__item a_carousel__item--green">
@@ -156,30 +155,33 @@
         </a>
       </div>
       <div class="homepage__assets__btn">
-        <router-link to="/catalogue" class="btn btn--std btn--blue">EXPLORE ASSETS</router-link>
+        <router-link to="/catalogue" class="btn btn--std btn--blue">ALL ASSETS</router-link>
       </div>
     </section>
-    <section class="homepage__small_blocks">
-      <h4 class="homepage__small_blocks__title" data-aos="fade-in">Topio is different</h4>
+      <section class="homepage__video">
+      <div class="m_container">
+        <div class="homepage__video__placeholder" data-aos="fade-up" data-aos-delay="400">
+          <div class="homepage__video__overlay" :class="[isClicked ? 'hidden' : 'shownk']" @click.once="videoClicked()">
+          <button class="homepage__video__button"><img src="@/assets/images/icons/home/video-btn.svg"/></button>
+          <img :src="pagedata.video_thumbnail.url" class="homepage__video__thumbnail"/>
+          </div>
+           <video class="homepage__video__player" controls ref="videoplayer">
+            <source :src="pagedata.video_file.url" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </section>
+     <section class="homepage__small_blocks">
+      <h4 class="homepage__small_blocks__title" data-aos="fade-in">{{ pagedata.section_footer_heading }}</h4>
       <div class="m_container">
         <div class="homepage__small_blocks__inner">
-          <div class="homepage__small_blocks__item" data-aos="fade-up" data-aos-delay="100">
-            <img src="@/assets/images/icons/nofees.svg" alt="" class="homepage__small_blocks__item__icon">
-            <p class="homepage__small_blocks__item__text">No fees for data sales or registration</p>
+          <template v-for="(item, index) in pagedata.section_footer">
+          <div :key="item.id" class="homepage__small_blocks__item" data-aos="fade-up" :data-aos-delay="index * 100 + 100">
+            <img :src="item.image.url" alt="" class="homepage__small_blocks__item__icon">
+            <div class="homepage__small_blocks__item__text" v-html="item.content">
+            </div>
           </div>
-          <div class="homepage__small_blocks__item" data-aos="fade-up" data-aos-delay="400">
-            <img src="@/assets/images/icons/marketplace.svg" alt="" class="homepage__small_blocks__item__icon">
-            <p class="homepage__small_blocks__item__text">Find, purchase, and use geospatial data assets on a top-class single marketplace</p>
-          </div>
-          <div class="homepage__small_blocks__item" data-aos="fade-up" data-aos-delay="700">
-            <img src="@/assets/images/icons/simple.svg" alt="" class="homepage__small_blocks__item__icon">
-            <p class="homepage__small_blocks__item__text">Simple, easy-to-use services for everyone who uses geodata and services</p>
-          </div>
-          <div class="homepage__small_blocks__item" data-aos="fade-up" data-aos-delay="1000">
-            <img src="@/assets/images/icons/trust.svg" alt="" class="homepage__small_blocks__item__icon">
-            <p class="homepage__small_blocks__item__text">Unique infrastructure that embraces traceability and auditability in favor of trust and safety</p>
-          </div>
-
+          </template>
         </div>
       </div>
     </section>
@@ -195,6 +197,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import $ from '@/assets/scripts/jquery_cs';
 import slider from '@/assets/scripts/slider';
+import axios from 'axios';
 
 @Component({
   components: { Shape, Search },
@@ -202,8 +205,25 @@ import slider from '@/assets/scripts/slider';
 export default class Header extends Vue {
   searchResultsActive = false;
 
+  isClicked: boolean;
+
+  videoElem: any;
+
+  pagedata: any;
+
+  constructor() {
+    super();
+
+    this.pagedata = null;
+    this.isClicked = false;
+    this.videoElem = null;
+  }
+
+  created(): void {
+    this.getPageData();
+  }
+
   mounted(): void {
-    this.initAOS();
     this.carouselLeftOffset();
     slider.init();
     window.addEventListener('resize', this.carouselLeftOffset);
@@ -225,6 +245,22 @@ export default class Header extends Vue {
     const widthCont = $('.s_container')[0];
     const offset = (window.innerWidth - widthCont.getBoundingClientRect().width) / 2;
     document.documentElement.style.setProperty('--container-s-left-space', `${offset}px`);
+  }
+
+  videoClicked(): void {
+    this.isClicked = true;
+    this.videoElem = this.$refs.videoplayer;
+    this.videoElem.play();
+  }
+
+  getPageData():void {
+    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=home`).then((response) => {
+      this.pagedata = response.data[0].acf;
+    }).catch((error) => {
+      console.log(error);
+    }).finally(() => {
+      this.initAOS();
+    });
   }
 }
 </script>
