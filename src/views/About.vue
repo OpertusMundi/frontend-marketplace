@@ -5,19 +5,19 @@
         <div class="page__hero__head s_container">
           <h1>{{ pagedata.heading }}</h1>
           <h2>{{ pagedata.subheading }}</h2>
-           <div class="about__sections">
-             <template v-for="section in pagedata.sections">
-             <div :key="section.id" class="about__sections__row" data-aos="" data-aos-offset="350">
-               <div class="about__sections__row__block about__sections__row__block--main">
+          <div class="about__sections">
+            <template v-for="section in pagedata.sections">
+              <div :key="section.id" class="about__sections__row" data-aos="" data-aos-offset="350">
+                <div class="about__sections__row__block about__sections__row__block--main">
                   <h3 class="about__sections__row__block__title">{{ section.heading }}</h3>
                   <div class="about__sections__row__block__text" v-html="section.content"></div>
-                  </div>
-                  <div class="about__sections__row__block about__sections__row__block--image">
-                <img :src="section.image.url" alt="">
+                </div>
+                <div class="about__sections__row__block about__sections__row__block--image">
+                  <img :src="section.image.url" alt="" />
+                </div>
               </div>
-             </div>
-             </template>
-           </div>
+            </template>
+          </div>
         </div>
       </div>
     </section>
@@ -33,13 +33,20 @@ import axios from 'axios';
 export default class About extends Vue {
   pagedata: any;
 
+  wpUrl: string;
+
   constructor() {
     super();
 
     this.pagedata = null;
+    this.wpUrl = '';
   }
 
-  created():void {
+  created(): void {
+    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
+  }
+
+  mounted(): void {
     this.getPageData();
   }
 
@@ -48,19 +55,23 @@ export default class About extends Vue {
       duration: 600,
       easing: 'ease-in-out-cubic',
     });
-  }
+  };
 
-  getPageData():void {
-    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=about`).then((response) => {
-      this.pagedata = response.data[0].acf;
-    }).catch((error) => {
-      console.log(error);
-    }).finally(() => {
-      this.initAOS();
-    });
+  async getPageData(): Promise<void> {
+    axios
+      .get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=about`)
+      .then((response) => {
+        this.pagedata = response.data[0].acf;
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        this.initAOS();
+      });
   }
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_page.scss";
+@import '@/assets/styles/_page.scss';
 </style>

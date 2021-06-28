@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
-      <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu" ></app-header>
+      <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu"></app-header>
     </transition>
     <transition name="fade" mode="out-in">
-      <router-view :showMenuMobile="showMenuMobile" @showHideMobileMenu="toggleMobileMenu" />
+      <router-view :showMenuMobile="showMenuMobile" v-if="!$store.getters.isLoading" @showHideMobileMenu="toggleMobileMenu" />
     </transition>
     <transition name="fade" mode="out-in">
       <app-footer v-if="showFooter"></app-footer>
@@ -47,17 +47,17 @@ export default class App extends Vue {
 
   cartApi: CartApi;
 
-  showHeader= true;
+  showHeader = true;
 
-  showFooter= true;
+  showFooter = true;
 
   showMenuMobile = false;
 
   headerClass = 'bg';
 
-  noHeaderBgArray:Array<string | null | undefined>;
+  noHeaderBgArray: Array<string | null | undefined>;
 
-  noHeader:Array<string | null | undefined>;
+  noHeader: Array<string | null | undefined>;
 
   constructor() {
     super();
@@ -71,19 +71,12 @@ export default class App extends Vue {
     this.cartApi = new CartApi();
     this.profileApi = new ProfileApi();
 
-    this.noHeader = [
-      'Login',
-      'Register',
-    ];
-    this.noHeaderBgArray = [
-      'Home',
-      'CatalogueSingle',
-      'OrderThankYou',
-    ];
+    this.noHeader = ['Login', 'Register'];
+    this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
   }
 
   @Watch('$route', { immediate: true, deep: true })
-  showHideHeader():void {
+  showHideHeader(): void {
     if (this.$route.meta.layout === 'dashboard') {
       this.showHeader = true;
       this.headerClass = 'header--dashboard';
@@ -114,12 +107,8 @@ export default class App extends Vue {
 
   mounted(): void {
     // Initialize CSRF token
-    const token = document
-      .querySelector('meta[name=_csrf]')
-      ?.getAttribute('content');
-    const header = document
-      .querySelector('meta[name=_csrf_header]')
-      ?.getAttribute('content');
+    const token = document.querySelector('meta[name=_csrf]')?.getAttribute('content');
+    const header = document.querySelector('meta[name=_csrf_header]')?.getAttribute('content');
 
     if (token && header) {
       store.commit('setCsrfToken', { token, header });
@@ -146,7 +135,8 @@ export default class App extends Vue {
             console.log(error);
             store.commit('setLoading', false);
           });
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.log('getConfiguration error', err);
         store.commit('setLoading', false);
       });
@@ -154,12 +144,13 @@ export default class App extends Vue {
     this.getCartItems();
   }
 
-  toggleMobileMenu(status:boolean):void {
+  toggleMobileMenu(status: boolean): void {
     this.showMenuMobile = status;
   }
 
-  getCartItems():void {
-    this.cartApi.getCart()
+  getCartItems(): void {
+    this.cartApi
+      .getCart()
       .then((cartResponse: ServerResponse<Cart>) => {
         if (cartResponse.success) {
           store.commit('setCartItems', cartResponse.result);
@@ -179,26 +170,21 @@ export default class App extends Vue {
     const name = 'Home';
 
     // Logout
-    this.accountApi
-      .logout()
-      .then((logoutResponse: ServerResponse<LogoutResult>) => {
-        if (logoutResponse.success) {
-          // Set CSRF Token
-          const {
-            csrfToken: token,
-            csrfHeader: header,
-          } = logoutResponse.result;
+    this.accountApi.logout().then((logoutResponse: ServerResponse<LogoutResult>) => {
+      if (logoutResponse.success) {
+        // Set CSRF Token
+        const { csrfToken: token, csrfHeader: header } = logoutResponse.result;
 
-          store.commit('setCsrfToken', { token, header });
+        store.commit('setCsrfToken', { token, header });
 
-          // Update user data
-          store.commit('logout');
+        // Update user data
+        store.commit('logout');
 
-          if (router.currentRoute.name !== name) {
-            router.push({ name });
-          }
+        if (router.currentRoute.name !== name) {
+          router.push({ name });
         }
-      });
+      }
+    });
   }
 }
 </script>
