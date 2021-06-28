@@ -1,36 +1,36 @@
 <template>
   <div class="analytics__group">
     <div class="analytics__types">
-      <a href="#" class="analytics__types__item" @click.prevent="activeTab='heatmap'" :class="{ active: activeTab == 'heatmap' }">
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'heatmap'" :class="{ active: activeTab == 'heatmap' }">
         <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
+          <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="" />
           <h5>Viewer location</h5>
         </div>
         <div class="analytics__types__item__desc">
           See the countries your assets are most popular at.
         </div>
       </a>
-      <a href="#" class="analytics__types__item" @click.prevent="activeTab='bars'" :class="{ active: activeTab == 'bars' }">
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'bars_sales'" :class="{ active: activeTab == 'bars_sales' }">
         <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="">
+          <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="" />
           <h5>Market segment sales</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          Find out the market industries your assets are most popular at.
         </div>
       </a>
-      <a href="#" class="analytics__types__item" @click.prevent="activeTab='bars_transaction'" :class="{ active: activeTab == 'bars_transaction' }">
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'bars_transaction'" :class="{ active: activeTab == 'bars_transaction' }">
         <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="">
+          <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="" />
           <h5>Market segment transactions</h5>
         </div>
         <div class="analytics__types__item__desc">
           Some text...
         </div>
       </a>
-      <a href="#" class="analytics__types__item" @click.prevent="activeTab='segments'" :class="{ active: activeTab == 'segments' }">
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'segments'" :class="{ active: activeTab == 'segments' }">
         <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/pie_chart_icon.svg" alt="">
+          <img src="@/assets/images/icons/dashboard/pie_chart_icon.svg" alt="" />
           <h5>Subscriber segments</h5>
         </div>
         <div class="analytics__types__item__desc">
@@ -43,11 +43,11 @@
       <div class="analytics__cards__item" v-if="activeTab == 'heatmap'">
         <sales-heat-map-graph-card></sales-heat-map-graph-card>
       </div>
-      <div class="analytics__cards__item" v-if="activeTab == 'bars_transaction'">
-        <sales-bar-graph-card></sales-bar-graph-card>
+      <div class="analytics__cards__item" v-if="activeTab == 'bars_sales'">
+        <sales-bar-graph-card :salesQueryMetricType="'SUM_SALES'"></sales-bar-graph-card>
       </div>
-      <div class="analytics__cards__item" v-if="activeTab == 'bars'">
-        <sales-bar-graph-card></sales-bar-graph-card>
+      <div class="analytics__cards__item" v-if="activeTab == 'bars_transaction'">
+        <sales-bar-graph-card :salesQueryMetricType="'COUNT_TRANSACTIONS'"></sales-bar-graph-card>
       </div>
       <div class="analytics__cards__item" v-if="activeTab == 'segments'">
         segments
@@ -75,5 +75,4 @@ export default class DashboardAnalyticsExplore extends Vue {
   }
 }
 </script>
-<style lang="scss">
-</style>
+<style lang="scss"></style>

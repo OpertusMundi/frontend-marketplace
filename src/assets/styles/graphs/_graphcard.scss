@@ -57,8 +57,12 @@
       }
     }
     &__filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       &__assets {
         display: flex;
+        flex:0 1 100%;
         .multiselect {
           margin-right: 30px;
           color: $darkColor;
@@ -96,6 +100,8 @@
             border-radius: 10px;
           }
         }
+      }
+      &__time{
       }
     }
   }
