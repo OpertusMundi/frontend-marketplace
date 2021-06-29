@@ -9,10 +9,18 @@
         </div>
         <div class="graphcard__head__data__right">
           <ul>
-            <li><a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a></li>
-            <li><a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a></li>
-            <li><a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a></li>
-            <li><a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a></li>
+            <li>
+              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+            </li>
+            <li>
+              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+            </li>
+            <li>
+              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+            </li>
+            <li>
+              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -69,7 +77,9 @@
       <thead>
         <tr>
           <th></th>
-          <th v-for="header in formatTable()" class="data_table__header" :key="header.id">{{ header.name }}</th>
+          <th v-for="header in formatTable()" class="data_table__header" :key="header.id">
+            {{ header.name }}
+          </th>
         </tr>
       </thead>
 
