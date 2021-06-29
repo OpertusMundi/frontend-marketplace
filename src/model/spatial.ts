@@ -53,3 +53,8 @@ export interface FeatureCollection<PropsType extends unknown, GeometryType exten
 
 export type NutsRegionFeature = Feature<NutsRegionProperties, GeoJSON.MultiPolygon>;
 export type NutsRegionFeatureCollection = FeatureCollection<NutsRegionProperties, GeoJSON.MultiPolygon, NutsRegionFeature>;
+
+export interface EpsgCode {
+  code: number;
+  name: string;
+}
