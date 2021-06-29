@@ -84,10 +84,8 @@
       </thead>
 
       <tbody>
-        <tr class="data_table__data" v-for="data in formatSeries()" :key="data.name">
-          {{
-            data.name
-          }}
+        <tr class="data_table__data" v-for="data in seriesData" :key="data.name">
+          <td>{{ data.name }}</td>
           <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ value }}</td>
         </tr>
       </tbody>
@@ -135,9 +133,11 @@ export default class SalesBarGraphCard extends Vue {
 
   analyticsApi: AnalyticsApi;
 
-  segments: DataSeries;
+  analyticsData: DataSeries;
 
-  assetsQuery: string[] | null;
+  assetsQuery: string[];
+
+  segmentsNames: string[];
 
   chartOptions: any | null;
 
@@ -151,7 +151,7 @@ export default class SalesBarGraphCard extends Vue {
 
   temporalUnitMax: string;
 
-  tableData: any;
+  seriesData: any;
 
   constructor() {
     super();
@@ -164,11 +164,13 @@ export default class SalesBarGraphCard extends Vue {
 
     this.analyticsApi = new AnalyticsApi();
 
-    this.segments = {} as DataSeries;
+    this.analyticsData = {} as DataSeries;
 
     this.chartOptions = null;
 
     this.assetsQuery = [];
+
+    this.segmentsNames = [];
 
     this.date = null;
 
@@ -178,7 +180,7 @@ export default class SalesBarGraphCard extends Vue {
 
     this.temporalUnit = EnumTemporalUnit.YEAR;
 
-    this.tableData = [];
+    this.seriesData = [];
 
     this.momentFormat = {
       // [optional] Date to String
@@ -194,7 +196,6 @@ export default class SalesBarGraphCard extends Vue {
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    console.log(EnumTemporalUnit);
     // await this.getAnalytics();
   }
 
@@ -217,11 +218,10 @@ export default class SalesBarGraphCard extends Vue {
         // eslint-disable-next-line
         response.result!.points.reverse();
         // eslint-disable-next-line
-        this.segments = response.result!;
+        this.analyticsData = response.result!;
+        this.segmentsNames = this.formatSegmentsNames();
+        this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
-        this.formatSeries();
-        this.formatTable();
-        console.log(this.formatSeries());
       }
     });
   }
@@ -248,7 +248,6 @@ export default class SalesBarGraphCard extends Vue {
     this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
       if (resp.data.success) {
         this.assets = resp.data.result.items;
-        console.log(this.assets);
       } else {
         console.log('error', resp.data);
       }
@@ -256,7 +255,7 @@ export default class SalesBarGraphCard extends Vue {
   }
 
   getOptions(): any {
-    if (!this.segments) {
+    if (!this.analyticsData) {
       return null;
     }
     // const name = 'Sales per segment';
@@ -277,7 +276,7 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       xAxis: {
-        categories: [...new Map(this.segments.points.map((item) => [item.segment, item])).values()].map((a) => a.segment),
+        categories: this.segmentsNames,
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,
@@ -306,39 +305,49 @@ export default class SalesBarGraphCard extends Vue {
         },
         formatter: (a) => {
           const point = a.chart.hoverPoint;
-          console.log(point);
           return `${point.y}€ <br>${point.category}`;
         },
       },
-      series: this.formatSeries(),
+      series: this.seriesData,
     };
+  }
+
+  formatSegmentsNames(): string[] {
+    let names: Array<any> = [];
+    names = [...new Map(this.analyticsData.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
+    return names;
   }
 
   formatSeries(): any[] {
     const series: Array<any> = [];
-    const assetsName: any = [...new Map(this.segments.points.map((item) => [item.asset, item])).values()].map((a) => a.asset);
-    assetsName.forEach((assetName) => {
+    if (this.assetsQuery?.length > 1) {
+      this.assetsQuery.forEach((assetName) => {
+        const data: Array<number> = [];
+        this.segmentsNames.forEach((segName) => {
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
+          if (value.length > 0) {
+            data.push(value[0]);
+          } else {
+            data.push(0);
+          }
+        });
+        const assetObj = {
+          name: assetName,
+          showInLegend: true,
+          data,
+        };
+        series.push(assetObj);
+      });
+    } else {
+      const data = this.analyticsData?.points.map((a) => a.value);
       const assetObj = {
-        name: assetName,
+        name: this.assetsQuery[0],
         showInLegend: true,
-        data: this.segments?.points.filter((item) => item?.asset === assetName).map((a) => a.value),
+        data,
       };
       series.push(assetObj);
-    });
+    }
     return series;
-  }
-
-  formatTable(): any[] {
-    const segments: Array<any> = [];
-    const segmentsName: any = [...new Map(this.segments.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
-    segmentsName.forEach((segmentName) => {
-      const segObj = {
-        name: segmentName,
-        data: this.segments?.points.filter((item) => item?.segment === segmentName).map((a) => a.value),
-      };
-      segments.push(segObj);
-    });
-    return segments;
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
@@ -351,7 +360,6 @@ export default class SalesBarGraphCard extends Vue {
   dateValueChange(value: string | any[]): void {
     this.temporalUnitMin = moment(value[0]).format('YYYY-MM-DD');
     this.temporalUnitMax = moment(value[1]).format('YYYY-MM-DD');
-    console.log(this.temporalUnitMin, this.temporalUnitMax);
     if (value.length > 0) {
       this.getAnalytics();
     }
