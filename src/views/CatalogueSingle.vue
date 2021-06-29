@@ -142,10 +142,10 @@ export default class CatalogueSingle extends Vue {
   }
 
   mounted():void {
-    this.calcAssetHeaderTitle();
-    window.addEventListener('resize', () => {
-      this.calcAssetHeaderTitle();
-    });
+    // this.calcAssetHeaderTitle();
+    // window.addEventListener('resize', () => {
+    //   this.calcAssetHeaderTitle();
+    // });
     this.loadAsset();
 
     // imitate REST-API latency
@@ -155,7 +155,7 @@ export default class CatalogueSingle extends Vue {
   }
 
   beforeDestroy():void {
-    window.removeEventListener('resize', this.calcAssetHeaderTitle);
+    // window.removeEventListener('resize', this.calcAssetHeaderTitle);
   }
 
   loadAsset(): void {
@@ -170,9 +170,9 @@ export default class CatalogueSingle extends Vue {
         console.log('catalog item', this.catalogueItem);
         this.selectedVersion = this.catalogueItem.version;
         this.isItemLoaded = true;
-        setTimeout(() => {
-          this.calcAssetHeaderTitle();
-        }, 200);
+        // setTimeout(() => {
+        //   this.calcAssetHeaderTitle();
+        // }, 200);
 
         if ((this.catalogueItem as CatalogueItemDetails).automatedMetadata) {
           // TODO: why array of objects instead of object? should be fixed in API.
@@ -203,14 +203,14 @@ export default class CatalogueSingle extends Vue {
   //   };
   // }
 
-  calcAssetHeaderTitle():void {
-    const assetHead:HTMLElement|null = document.querySelector('.asset__head');
-    let assetHeadHeight = 0;
-    if (assetHead) {
-      assetHeadHeight = assetHead.offsetHeight;
-    }
-    document.documentElement.style.setProperty('--asset-head-height', `${assetHeadHeight}px`);
-  }
+  // calcAssetHeaderTitle():void {
+  //   const assetHead:HTMLElement|null = document.querySelector('.asset__head');
+  //   let assetHeadHeight = 0;
+  //   if (assetHead) {
+  //     assetHeadHeight = assetHead.offsetHeight;
+  //   }
+  //   document.documentElement.style.setProperty('--asset-head-height', `${assetHeadHeight}px`);
+  // }
 }
 </script>
 <style lang="scss">

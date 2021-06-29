@@ -39,7 +39,7 @@ export default class AssetHeadMap extends Vue {
 
   map: any;
 
-  mapRef: any;
+  resizeObserver: any;
 
   constructor() {
     super();
@@ -62,15 +62,23 @@ export default class AssetHeadMap extends Vue {
   }
 
   mounted(): void {
-    console.log('map mo');
+    this.resizeObserver = new (window as any).ResizeObserver((entries) => {
+      entries.forEach(() => {
+        (this as any).$refs.map.mapObject.invalidateSize();
+      });
+    });
+    // eslint-disable-next-line
+    this.resizeObserver.observe(document.querySelector('.asset__map__inner')!);
 
-    setTimeout(() => {
-      Vue.set(this.map, 'show', true);
-    }, 400);
+    Vue.set(this.map, 'show', true);
+  }
+
+  beforeDestroy():void {
+    // eslint-disable-next-line
+    this.resizeObserver.unobserve(document.querySelector('.asset__map__inner')!);
   }
 }
 </script>
 <style lang="scss">
-  // @import "~leaflet/dist/leaflet.css";
   @import "@/assets/styles/_assets.scss";
 </style>
