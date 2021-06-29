@@ -25,6 +25,11 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
+    path: '/review/:key',
+    name: 'ReviewAsset',
+    component: (): Promise<any> => import(/* webpackChunkName: "reviewasset" */ '../views/CatalogueSingle.vue'),
+  },
+  {
     path: '/terms',
     name: 'Terms',
     component: (): Promise<any> => import(/* webpackChunkName: "terms" */ '../views/Terms.vue'),

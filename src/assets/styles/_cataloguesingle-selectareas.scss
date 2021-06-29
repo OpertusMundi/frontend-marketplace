@@ -1,5 +1,6 @@
 .select-area-modal {
-  height: 100%;
+  margin-top: 85px;
+  height: calc(100% - 85px);
   width: 100%;
   background: $lightBgColor;
   border: solid 2px $secondColor;

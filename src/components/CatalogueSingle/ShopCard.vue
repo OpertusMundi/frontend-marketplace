@@ -56,6 +56,9 @@
         </div>
       </div>
     </div>
+
+    <!-- MODALS -->
+    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
   </div>
 </template>
 <script lang="ts">
@@ -65,14 +68,21 @@ import {
   Prop,
   Watch,
 } from 'vue-property-decorator';
+import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import { CatalogueItem } from '@/model';
 import { BasePricingModelCommand } from '@/model/pricing-model';
 
-@Component
+@Component({
+  components: {
+    SelectAreas,
+  },
+})
 export default class ShopCard extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
   selectedPricingModel: BasePricingModelCommand | null;
+
+  isSelectAreasModalOn: boolean;
 
   cartErrors: string;
 
@@ -80,6 +90,7 @@ export default class ShopCard extends Vue {
     super();
 
     this.selectedPricingModel = null;
+    this.isSelectAreasModalOn = false;
     this.cartErrors = '';
   }
 
@@ -126,6 +137,10 @@ export default class ShopCard extends Vue {
       default:
         return '';
     }
+  }
+
+  toggleSelectAreaModal(): void {
+    this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
   }
 }
 </script>

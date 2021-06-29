@@ -41,6 +41,17 @@ import { CatalogueItem } from '@/model';
 })
 export default class ApiUsageExample extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
+
+  // a dummy API response example
+  apiSampleResponse: any = {
+    status: 'ok',
+    geometries: {
+      foo: 'foo',
+      bar: 'bar',
+    },
+    fooNumber: 123,
+  }
+  /* */
 }
 </script>
 <style lang="scss">
