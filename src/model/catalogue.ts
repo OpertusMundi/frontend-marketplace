@@ -231,6 +231,10 @@ interface BaseCatalogueItem {
    */
   dateStart: string;
   /*
+   * Channel of asset distribution
+   */
+  deliveryMethod: EnumDeliveryMethod;
+  /*
    * The file format, physical medium, or dimensions of the resource
    */
   format: string;

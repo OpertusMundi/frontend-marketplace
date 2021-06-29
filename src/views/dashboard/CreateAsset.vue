@@ -4,13 +4,13 @@
       <div class="dashboard__head">
         <h1>Add an asset</h1>
         <div class="dashboard__head__helpers">
-          <a href="#" class="btn btn--outlineblue">SAVE DRAFT</a>
+          <button href="#" class="btn btn--outlineblue" @click="submitForm(true)" v-if="isButtonSaveDraftShown()">SAVE DRAFT</button>
           <a href="#" class="btn btn--outlineblue">EXIT</a>
         </div>
       </div>
 
       <div class="dashboard__form">
-        <ul v-if="assetTypeGroup !== 'API'" class="dashboard__form__nav">
+        <ul v-if="assetMainType !== 'API'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Contract</a></li>
@@ -30,797 +30,56 @@
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
         <div class="dashboard__form__steps">
+          <transition name="fade" mode="out-in">
           <div class="dashboard__form__steps__inner">
 
             <!-- ASSET TYPE -->
-            <validation-observer ref="step1">
-            <div class="dashboard__form__step" v-if="currentStep == 1">
-                <div class="dashboard__form__step__title">
-                  <h3>Select asset type</h3>
-                  <p>Select the type of your asset. <br>Note that the next steps will be optimised based on this type.</p>
-                </div>
-                <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
-                  <div class="form-group">
-                    <label class="control control-radio">
-                      Data File
-                      <input type="radio" name="asset_type" v-model="assetTypeGroup" value="datafile" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      API
-                      <input type="radio" name="asset_type" v-model="assetTypeGroup" value="API" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      Collection
-                      <input type="radio" name="asset_type" v-model="assetTypeGroup" value="collection" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                </validation-provider>
-            </div>
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
+            <!-- </transition> -->
 
             <!-- METADATA -->
-            <validation-observer ref="step2">
-            <div class="dashboard__form__step" v-if="currentStep == 2">
-              <div class="dashboard__form__step__title">
-                <h3>Add asset metadata</h3>
-                <p>Fill in your asset metadata. If you already have compatible metadata, please upload them. You can still edit them. <br>All metadata will be available to prospective clients under a CC-BY-NC 4.0 license to facilitate asset discovery from consumers.</p>
-              </div>
-
-              <div v-if="assetTypeGroup == 'datafile'">
-
-                <validation-provider v-slot="{ errors }" name="Title" rules="required">
-                <div class="form-group">
-                  <label for="metadata_title">Title *</label>
-                  <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" v-model="asset.title">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Type" rules="required">
-                  <div class="form-group">
-                    <label for="multiselect_type">Type *</label>
-                    <multiselect id="multiselect_type" v-model="asset.type" :options="menusData.assetTypes" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Type" rules="required">
-                  <div class="form-group">
-                    <label for="multiselect_type">Format *</label>
-                    <multiselect :disabled="!asset.type" id="multiselect_type" v-model="asset.format" :options="menusData.availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Language">
-                <div class="form-group">
-                  <label for="metadata_language">Language</label>
-                  <input type="text" class="form-group__text" name="metadata_language" id="metadata_language" v-model="asset.language">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Editor's name">
-                  <div class="form-group">
-                    <label for="editor">Editor</label>
-                    <input type="text" name="publisherName" class="form-group__text" id="" v-model="asset.publisherName">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Editor's email" rules="email">
-                  <div class="form-group">
-                    <label for="">Editor’s email</label>
-                    <input type="text" class="form-group__text" id="" name="publisherEmail" v-model="asset.publisherEmail">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Maintenance manager name">
-                  <div class="form-group">
-                    <label for="">Maintenance manager</label>
-                    <input type="text" class="form-group__text" id="" name="metadataPointOfContactName" v-model="asset.metadataPointOfContactName">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Maintenance manager’s email" rules="email">
-                  <div class="form-group">
-                    <label for="">Maintenance manager’s email</label>
-                    <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="asset.metadataPointOfContactEmail">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Version" rules="required">
-                  <div class="form-group">
-                    <label for="">Version *</label>
-                    <input type="text" class="form-group__text" id="" name="version" v-model="asset.version">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <!-- <validation-provider v-slot="{ errors }" name="Asset title" rules="required">
-                  <div class="form-group">
-                    <label for="">Asset title</label>
-                    <input type="text" class="form-group__text" id="" name="title" v-model="asset.title">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider> -->
-                <validation-provider v-slot="{ errors }" name="Asset short description">
-                  <div class="form-group">
-                    <label for="">Asset short description</label>
-                    <input type="text" class="form-group__text" id="" name="abstractText" v-model="asset.abstract">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Metadata language">
-                  <div class="form-group">
-                    <label for="">Metadata language</label>
-                    <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="asset.metadataLanguage">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-                <!-- <validation-provider v-slot="{ errors }" name="Metadata date" rules="required">
-                  <div class="form-group">
-                    <label for="">Metadata date</label>
-                    <datepicker v-model="asset.metadataDate" name="metadataDate" format="dd/MM/yyyy" input-class="form-group__text"></datepicker>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider> -->
-                <!-- <validation-provider v-slot="{ errors }" name="Scale" rules="required">
-                  <div class="form-group">
-                    <label for="">Scale</label>
-                    <input type="text" class="form-group__text" id="" name="scale" v-model="asset.scale">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider> -->
-
-              </div>
-              <div v-if="assetTypeGroup == 'API'">
-                <h1>api</h1>
-              </div>
-              <div v-if="assetTypeGroup == 'collection'">
-                <h1>collection</h1>
-              </div>
-
-            </div>
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <metadata ref="step2" :asset.sync="asset" v-if="currentStep == 2"></metadata>
+            <!-- </transition> -->
 
             <!-- CONTRACT -->
-            <validation-observer ref="step3">
-            <div class="dashboard__form__step" v-if="currentStep == 3">
-              <div class="dashboard__form__step__title">
-                <h3>Contract template</h3>
-                <p>Assign a contract template to your asset</p>
-              </div>
-              <div class="dashboard__form__step__contract">
-                <div class="dashboard__form__step__contract__inner">
-                  <h5>Existing templates</h5>
-                  <p>Assign a contract template to your asset</p>
-                    <validation-provider v-slot="{ errors }" name="Contract Tamplate" rules="required">
-                      <div class="form-group">
-                        <multiselect v-model="contract" :options="['Contract template #1','Contract template #2','Contract template #3']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select a contract template"></multiselect>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                      </div>
-                    </validation-provider>
-                </div>
-                <div class="dashboard__form__step__contract__seperator">or</div>
-                <div class="dashboard__form__step__contract__inner">
-                  <h5>Create a new one</h5>
-                  <p>By creating a new contract, you will exit this wizard, the asset will be saved as draft and you can continue editing it afterwards.</p>
-                  <a href="#">Create a new contract</a>
-                </div>
-              </div>
-            </div>
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <contract ref="step3" :contract.sync="contract" v-if="currentStep == 3"></contract>
+            <!-- </transition> -->
 
             <!-- PRICING -->
-            <validation-observer ref="step4">
-            <div class="dashboard__form__step dashboard__form__step--pricing" v-if="currentStep == 4">
-              <div class="dashboard__form__step__title">
-                <h3>Pricing model</h3>
-                <p>Assign one or more pricing models to your asset. If there are multiple, select one as default. Some options may be disabled based on the previous steps. All prices must not include VAT.</p>
-              </div>
-              <div class="dashboard__form__step__pricing__">
-                <div class="dashboard__form__step__pricing__inner">
-                  <div class="row">
-                    <div class="col-md-4">
-                      <button class="btn btn--std btn--blue" @click="addPricingModel" :disabled="selectedPricingModelForEditing !== null">Add Pricing Model</button>
-
-                      <div class="mt-xs-20">
-                        <button class="card card--clickable" :class="i == selectedPricingModelForEditing ? 'card--selected' : ''" @click="selectedPricingModelForEditing = i" v-for="(pricingModel, i) in asset.pricingModels" :key="i">Pricing Model {{ i + 1 }}</button>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div v-if="selectedPricingModelForEditing !== null">
-                        <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
-                        <div class="form-group">
-                          <form>
-                            <div v-for="model in pricingModelTypes" :key="model.priceModel">
-                              <label class="control control-radio" :for="`model_option_${model.priceModel}`">
-                                <!-- <input @change="onChangePricingModelType(model.priceModel)" v-model="tempSelectedType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel"> -->
-                                <input @change="onChangePricingModelType(model.priceModel)" v-model="asset.pricingModels[selectedPricingModelForEditing].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel">
-                                {{ model.name }}
-                                <div class="control_indicator"></div>
-                              </label>
-                            </div>
-                          </form>
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                        </div>
-                        </validation-provider>
-                        <button class="btn btn--std btn--outlineblue" @click="removePricingModel">discard</button>
-                      </div>
-                    </div>
-                    <div class="col-md-5">
-                      <div v-if="selectedPricingModelForEditing !== null && asset.pricingModels[selectedPricingModelForEditing].type">
-                        <!-- free -->
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FREE'">
-                        </div>
-                        <!-- fixed -->
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED'">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                          <div class="form-group">
-                            <label for="fixed_price">Price</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="fixed_price" name="fixed_price">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required">
-                          <div class="form-group">
-                            <label for="number_of_years">Number of years</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                        </div>
-                        <!-- fixed per rows -->
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_PER_ROWS'">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                          <div class="form-group">
-                            <label for="fpr_price">Price</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required">
-                          <div class="form-group">
-                            <label for="min_rows">Minimum rows</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].minRows" type="number" class="form-group__text" id="min_rows" name="min_rows">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                          <div v-for="(discountRate, i) in asset.pricingModels[selectedPricingModelForEditing].discountRates" :key="i" class="row">
-                            <div class="col-xs-6">
-                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
-                              <div class="form-group">
-                                <label for="fpr_count">Threshold</label>
-                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
-                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                              </div>
-                              </validation-provider>
-                            </div>
-                            <div class="col-xs-6">
-                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
-                              <div class="form-group">
-                                <label for="fpr_discount">Discount %</label>
-                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
-                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                              </div>
-                              </validation-provider>
-                            </div>
-                          </div>
-                          <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
-                        </div>
-                        <!-- fixed for population -->
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].type === 'FIXED_FOR_POPULATION'">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                          <div class="form-group">
-                            <label for="ffp_price">Price</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].totalPriceExcludingTax" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required">
-                          <div class="form-group">
-                            <label for="min_percentage">Minimum population percentage</label>
-                            <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].minPercent" type="number" class="form-group__text" id="min_percentage" name="min_percentage">
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                          </div>
-                          </validation-provider>
-                          <div v-for="(discountRate, i) in asset.pricingModels[selectedPricingModelForEditing].discountRates" :key="i" class="row">
-                            <div class="col-md-6">
-                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
-                              <div class="form-group">
-                                <label for="ffp_count">Threshold</label>
-                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
-                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                              </div>
-                              </validation-provider>
-                            </div>
-                            <div class="col-md-6">
-                              <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
-                              <div class="form-group">
-                                <label for="ffp_discount">Discount percent %</label>
-                                <input v-model.number="asset.pricingModels[selectedPricingModelForEditing].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
-                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                              </div>
-                              </validation-provider>
-                            </div>
-                          </div>
-                          <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
-                        </div>
-                        <!-- common fields for all pricing models -->
-                        <div class="form-group-checkbox">
-                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeDomainRestrictions" type="checkbox" id="include_domain_restrictions" name="include_domain_restrictions">
-                          <label for="include_domain_restrictions">Include domain restrictions?</label>
-                        </div>
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeDomainRestrictions">
-                          <validation-provider>
-                          <div class="form-group">
-                            <label class="typo__label">Domain Restrictions</label>
-                            <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].domainRestrictions" track-by="code" placeholder="Search domain" label="name" :options="menusData.domainRestrictions" :multiple="true">
-                            </multiselect>
-                          </div>
-                          </validation-provider>
-                        </div>
-                        <div class="form-group-checkbox">
-                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeCoverageRestrictions" type="checkbox" id="include_coverage_restrictions" name="include_coverage_restrictions">
-                          <label for="include_coverage_restrictions">Include coverage restrictions?</label>
-                        </div>
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeCoverageRestrictions">
-                          <validation-provider>
-                          <div class="form-group">
-                            <label class="typo__label">Coverage Restrictions</label>
-                            <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].coverageRestrictionContinents" track-by="code" placeholder="Restrict coverage by continents" label="name" :options="menusData.continents" :multiple="true">
-                            </multiselect>
-                            <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].coverageRestrictionCountries" track-by="code" placeholder="Restrict coverage by countries" label="name" :options="menusData.countries" :multiple="true">
-                            </multiselect>
-                          </div>
-                          </validation-provider>
-                        </div>
-                        <div class="form-group-checkbox">
-                          <input v-model="asset.pricingModels[selectedPricingModelForEditing].includeConsumerRestrictions" type="checkbox" id="include_consumer_restrictions" name="include_consumer_restrictions">
-                          <label for="include_consumer_restrictions">Include consumer restrictions?</label>
-                        </div>
-                        <div v-if="asset.pricingModels[selectedPricingModelForEditing].includeConsumerRestrictions">
-                          <validation-provider>
-                          <div class="form-group">
-                            <label class="typo__label">Consumer Restrictions</label>
-                            <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].consumerRestrictionContinents" track-by="code" placeholder="Restrict consumers by continents" label="name" :options="menusData.continents" :multiple="true">
-                            </multiselect>
-                            <multiselect
-                              v-model="asset.pricingModels[selectedPricingModelForEditing].consumerRestrictionCountries" track-by="code" placeholder="Restrict consumers by countries" label="name" :options="menusData.countries" :multiple="true">
-                            </multiselect>
-                          </div>
-                          </validation-provider>
-                        </div>
-                        <button class="btn btn--std btn--blue mt-xs-20" @click="setPricingModel">Set Pricing Model</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
-                <div class="form-group">
-                  <label class="control control-radio">
-                    Fixed price <span>Add the price of your asset in euros and choose from the other provided options. </span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="FIXED" @change="setPricingModel()" />
-                    <div class="control_indicator"></div>
-                  </label>
-                  <label class="control control-radio">
-                    Subscription <span>Subscriptions to services are provided for a specific time period and are automatically renewed. </span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="SUBSCRIPTION" @change="setPricingModel()" />
-                    <div class="control_indicator"></div>
-                  </label>
-                  <label class="control control-radio">
-                    Free <span>Provide your asset for free.</span>
-                    <input type="radio" name="asset_type" v-model="priceModelType" value="FREE" @change="setPricingModel()" />
-                    <div class="control_indicator"></div>
-                  </label>
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                </div>
-              </validation-provider> -->
-              <!-- <div class="dashboard__form__step__pricing-model" v-if="priceModelType && priceModelType !== 'FREE'">
-                <div class="asset-pricing-model" v-for="(pricingModel,index) in asset.pricingModels" v-bind:key="index+'pr_model'">
-                  <div class="asset-pricing-model__fixed" v-if="priceModelType == 'FIXED'">
-                    <validation-provider v-slot="{ errors }" name="Price" rules="required"  tag="div" class="form-group form-group--inline">
-                        <label for="">Price in EUR</label>
-                        <input type="number" class="form-group__text" value="" v-model="pricingModel.totalPriceExcludingTax">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                    </validation-provider>
-                    <validation-provider v-slot="{ errors }" name="Updates" rules="required" tag="div" class="form-group form-group--inline">
-                      <label for="">Updates</label>
-                      <multiselect v-model="pricingModel.yearsOfUpdates" :options="['0','1','2','3','4','5','6','7','8','9','10','11','12']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="">
-                        <template slot="singleLabel" slot-scope="props">{{ props.option }} years</template>
-                        <template slot="option" slot-scope="props">{{ props.option }} years</template>
-                      </multiselect>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                    </validation-provider>
-                    <div class="form-group form-group--inline" style="min-width: unset;" v-if="index >= 1">
-                      <a href="#" @click.prevent="removePricingModel(index)" class="dashboard__form__step__pricing-model__remove">- REMOVE</a>
-                    </div>
-                  </div>
-                  <div class="asset-pricing-model__subscription" v-if="priceModelType == 'SUBSCRIPTION'">
-                    <validation-provider v-slot="{ errors }" name="Price" rules="required"  tag="div" class="form-group form-group--inline">
-                        <label for="">Monthly Price in EUR</label>
-                        <input type="number" class="form-group__text" value="" v-model="pricingModel.monthlyPrice">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                    </validation-provider>
-                    <validation-provider v-slot="{ errors }" name="Updates" rules="required" tag="div" class="form-group form-group--inline">
-                      <label for="">Time Period</label>
-                      <multiselect v-model="pricingModel.duration" :options="['0','1','2','3','4','5','6','7','8','9','10','11','12']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="">
-                        <template slot="singleLabel" slot-scope="props">{{ props.option }} months</template>
-                        <template slot="option" slot-scope="props">{{ props.option }} months</template>
-                      </multiselect>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                    </validation-provider>
-                    <div class="form-group form-group--inline" style="min-width: unset;" v-if="index >= 1">
-                      <a href="#" @click.prevent="removePricingModel(index)" class="dashboard__form__step__pricing-model__remove">- REMOVE</a>
-                    </div>
-                  </div>
-                </div>
-                <a href="#" @click.prevent="addPricingModel" class="dashboard__form__step__pricing-model__add">+ Add pricing model</a>
-              </div> -->
-            </div>
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep == 4"></pricing>
+            <!-- </transition> -->
 
             <!-- DELIVERY -->
-            <validation-observer ref="step5">
-            <div class="dashboard__form__step dashboard__form__step--delivery" v-if="currentStep == 5">
-              <div class="dashboard__form__step__delivery">
-                <div class="dashboard__form__step__delivery__inner">
-                  <div class="dashboard__form__step__title">
-                    <h3>Asset delivery</h3>
-                    <p>Select how your asset will reach consumers.</p>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6">
-                      <validation-provider v-slot="{ errors }" name="Delivery method" rules="required">
-                      <div class="form-group">
-                        <!-- todo: fix values -->
-                        <label class="control control-radio">
-                          By the platform
-                          <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                          <input type="radio" name="asset_delivery" v-model="asset.deliveryMethod" :value="'DIGITAL_PLATFORM'" />
-                          <div class="control_indicator"></div>
-                        </label>
-                        <label class="control control-radio">
-                          Digital Provider
-                          <span>Digital Provider</span>
-                          <input type="radio" name="asset_delivery" v-model="asset.deliveryMethod" :value="'DIGITAL_PROVIDER'" />
-                          <div class="control_indicator"></div>
-                        </label>
-                        <label class="control control-radio">
-                          Physical Provider
-                          <span>Physical Provider.</span>
-                          <input type="radio" name="asset_delivery" v-model="asset.deliveryMethod" :value="'PHYSICAL_PROVIDER'" />
-                          <div class="control_indicator"></div>
-                        </label>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                      </div>
-                      </validation-provider>
-                    </div>
-                    <div class="col-md-6">
-                      <div v-if="asset.deliveryMethod === 'DIGITAL_PLATFORM'">
-                        <h1>Upload Asset</h1>
-                        <input type="file" @change="readFile($event)">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                  <!-- <validation-provider v-slot="{ errors }" name="Delivery method" rules="required">
-                  <div class="form-group">
-                    <span style="background: yellow">TODO: fix values</span>
-                    <label class="control control-radio">
-                      By the platform
-                      <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                      <input type="radio" name="asset_delivery" v-model="asset.deliveryMethod" value="NONE" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      By own means
-                      <span>If your data is too large, updated daily, or you do not want to use our repository services, you can handle the delivery of the data asset to consumer through your own channel.</span>
-                      <input type="radio" name="asset_delivery" v-model="asset.deliveryMethod" value="owm_means" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                  </validation-provider>
-                </div> -->
-                <!-- <div class="dashboard__form__step__delivery__inner" v-if="asset.deliveryMethod === 'own_means'">
-                  <div class="dashboard__form__step__title">
-                    <p>Select specifically how the platform will have access to your asset</p>
-                  </div>
-                  <validation-provider v-slot="{ errors }" name="Asset access" rules="required">
-                  <div class="form-group">
-                    <label class="control control-radio">
-                      Direct upload
-                      <input type="radio" name="asset_access" v-model="asset.assetAccess" value="upload" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      Link to asset
-                      <input type="radio" name="asset_access" v-model="asset.assetAccess" value="link" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      From Web Service
-                      <input type="radio" name="asset_access" v-model="asset.assetAccess" value="webservice" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      Select from Storage
-                      <input type="radio" name="asset_access" v-model="asset.assetAccess" value="storage" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                  </validation-provider>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--upload" v-if="asset.assetAccess === 'upload'"></div>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--link" v-if="asset.assetAccess === 'link'">
-                    <validation-provider v-slot="{ errors }" name="Link" :rules="{ required: true, regex: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ }">
-                    <div class="form-group">
-                      <label for="asset_link">Please provide a direct web accessible link for the system to download the file from. </label>
-                      <input type="text" class="form-group__text" id="asset_link" v-model="asset.link">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                  </div>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--webservice" v-if="asset.assetAccess === 'webservice'"></div>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--storage" v-if="asset.assetAccess === 'storage'"></div>
-                </div> -->
-                <div class="dashboard__form__step__delivery__inner" v-if="asset.deliveryType === 'owm_means'">
-                  <div class="dashboard__form__step__title">
-                    <p>Please select one of the following options and provide the requested information. Delivery must take place within three (3) working days following a proof of payment provided to us by the consumer.</p>
-                  </div>
-                  <validation-provider v-slot="{ errors }" name="Own Means" rules="required">
-                  <div class="form-group">
-                    <label class="control control-radio">
-                      Digital delivery
-                      <input type="radio" name="asset_access" v-model="asset.ownMeansType" value="digital" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      Physical media
-                      <input type="radio" name="asset_access" v-model="asset.ownMeansType" value="physical" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                  </validation-provider>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--digital" v-if="asset.ownMeansType === 'digital'">
-                    <validation-provider v-slot="{ errors }" name="Notes for buyer" rules="required">
-                    <div class="form-group">
-                      <label for="asset_link">Notes for buyer</label>
-                      <textarea name="" id="" cols="20" rows="5" v-model="asset.ownMeansDigitalNotes"></textarea>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                  </div>
-                  <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--physical" v-if="asset.ownMeansType === 'physical'">
-                    <validation-provider v-slot="{ errors }" name="Type of physical media" rules="required">
-                      <div class="form-group">
-                        <label for="">Type of physical media</label>
-                        <input type="text" class="form-group__text" id="" v-model="asset.ownMeansPhysicallMediaType">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                    <validation-provider v-slot="{ errors }" name="Number of objects" rules="required">
-                      <div class="form-group">
-                        <label for="">Number of objects</label>
-                        <input type="text" class="form-group__text" id="" v-model="asset.ownMeansPhysicallMediaObjects">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </div>
-                    </validation-provider>
-                    <validation-provider v-slot="{ errors }" name="Notes for buyer" rules="required">
-                    <div class="form-group">
-                      <label for="asset_link">Notes for buyer</label>
-                      <textarea name="" id="" cols="20" rows="5" v-model="asset.ownMeansPhysicallNotes"></textarea>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep == 5"></delivery>
+            <!-- </transition> -->
 
             <!-- PAYOUT -->
-            <validation-observer ref="step6">
-            <!-- <div class="dashboard__form__step" v-if="currentStep == 6">
-                <div class="dashboard__form__step__title">
-                  <h3>Payout method</h3>
-                  <p>Select where your profits will be transferred</p>
-                </div>
-                <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
-                  <div class="form-group">
-                    <label class="control control-radio">
-                      Through the platform
-                      <input type="radio" name="asset_type" v-model="asset.paymentMethod" value="platform" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <label class="control control-radio">
-                      External means
-                      <input type="radio" name="asset_type" v-model="asset.paymentMethod" value="external" />
-                      <div class="control_indicator"></div>
-                    </label>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                </validation-provider>
-                <div class="dashboard__form__step__payment" v-if="asset.paymentMethod === 'external'">
-                  <validation-provider v-slot="{ errors }" name="Contract Tamplate" rules="required">
-                  <div class="form-group">
-                    <multiselect v-model="asset.paymentType" :options="['Paypal', 'Credit/Debit Card', 'Direct bank transfer']" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select a payment method"></multiselect>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                  </validation-provider>
-                  <div class="dashboard__form__step__payment__form" v-if="asset.paymentType === 'Paypal'">
-                    <div class="form-group-double">
-                      <validation-provider v-slot="{ errors }" name="Holder first name" rules="required" tag="div" class="form-group">
-                        <label for="paypalFirstName">Holder first name</label>
-                        <input type="text" class="form-group__text" id="paypalFirstName" v-model="asset.paypalFirstName">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </validation-provider>
-                      <validation-provider v-slot="{ errors }" name="Holder last name" rules="required" tag="div" class="form-group">
-                        <label for="paypalLastName">Holder last name</label>
-                        <input type="text" class="form-group__text" id="paypalLastName" v-model="asset.paypalLastName">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </validation-provider>
-                    </div>
-                    <validation-provider v-slot="{ errors }" name="Paypal account" rules="required" tag="div" class="form-group">
-                      <label for="paypalAccount">Paypal account</label>
-                      <input type="text" class="form-group__text" id="paypalAccount" v-model="asset.paypalAccount">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </validation-provider>
-                  </div>
-                  <div class="dashboard__form__step__payment__form" v-if="asset.paymentType === 'Credit/Debit Card'">
-                    <validation-provider v-slot="{ errors }" name="Holder name" rules="required" tag="div" class="form-group">
-                      <label for="creditCardholder">Holder name</label>
-                      <input type="text" class="form-group__text" id="creditCardholder" v-model="asset.creditCardHolder">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </validation-provider>
-                    <div class="form-group-multiple">
-                      <validation-provider v-slot="{ errors }" name="Card number" mode="lazy" rules="required|credit_card" tag="div" class="form-group form-group--full">
-                        <label for="creditCardNumber">Card number</label>
-                        <input type="text" class="form-group__text form-group__text--card" id="creditCardNumber" v-model="asset.creditCardNumber" v-cardformat:formatCardNumber>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </validation-provider>
-                      <validation-provider v-slot="{ errors }" name="Exp. date" mode="lazy" rules="required|credit_card_exp" tag="div" class="form-group">
-                        <label for="creditCardDate">Exp. date</label>
-                        <input type="text" class="form-group__text form-group__text--expdate" id="creditCardDate|credit_card_cvc" v-model="asset.creditCardDate" v-cardformat:formatCardExpiry>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </validation-provider>
-                      <validation-provider v-slot="{ errors }" name="Card CVC" mode="lazy" rules="required" tag="div" class="form-group">
-                        <label for="creditCardCvc">CVC</label>
-                        <input type="text" class="form-group__text form-group__text--cvc" id="creditCardCvc" v-model="asset.creditCardCvc" v-cardformat:formatCardCVC>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                      </validation-provider>
-                    </div>
-                  </div>
-                  <!- - <div class="dashboard__form__step__payment__form" v-if="asset.paymentType === 'Direct bank transfer'">direct</div> - ->
-                </div>
-            </div> -->
-            </validation-observer>
+            <!-- <transition name="fade" mode="out-in"> -->
+              <payout ref="step6" v-if="currentStep == 6"></payout>
+            <!-- </transition> -->
 
             <!-- REVIEW -->
-            <validation-observer ref="step7">
-            <div class="dashboard__form__step dashboard__form__step--review" v-if="currentStep == 7">
-              <div class="dashboard__form__review">
-                <div class="dashboard__form__review__inner">
+            <!-- <transition name="fade" mode="out-in"> -->
+              <review ref="step7" :asset="asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+            <!-- </transition> -->
 
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Asset type</h5>
-                      <a href="#" @click.prevent="goToStep(1)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <li><strong>Type:</strong>{{ asset.type }}</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Metadata</h5>
-                      <a href="#" @click.prevent="goToStep(2)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <li><strong>Language:</strong>{{ asset.language }}</li>
-                        <li><strong>Editor:</strong>{{ asset.publisherName }}</li>
-                        <li><strong>Editor’s email:</strong>{{ asset.publisherEmail }}</li>
-                        <li><strong>Maintenance manager:</strong>{{ asset.metadataPointOfContactName }}</li>
-                        <li><strong>Maintenance manager’s email:</strong>{{ asset.metadataPointOfContactEmail }}</li>
-                        <li><strong>Version:</strong>{{ asset.version }}</li>
-                        <!-- <li><strong>Identifier:</strong>{{ asset.language }}</li> -->
-                        <li><strong>Asset title:</strong>{{ asset.title }}</li>
-                        <li><strong>Asset short description:</strong>{{ asset.abstractText }}</li>
-                        <li><strong>Metadata language:</strong>{{ asset.metadataLanguage }}</li>
-                        <li><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
-                        <li><strong>Scale:</strong>{{ asset.scale }}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="dashboard__form__review__inner">
-
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Contract</h5>
-                      <a href="#" @click.prevent="goToStep(3)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <li><strong>Template:</strong></li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Pricing</h5>
-                      <a href="#" @click.prevent="goToStep(4)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <!-- <li><strong>Pricing type:</strong>{{ priceModelType }}</li> -->
-                        <li v-for="(pricingModel, index) in asset.pricingModels" v-bind:key="`pricingmodel${index}`">
-                          <span v-if="pricingModel.type === 'FIXED'">
-                            <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€ + {{ pricingModel.yearsOfUpdates }} years
-                          </span>
-                          <span v-if="pricingModel.type === 'SUBSCRIPTION'">
-                            <strong>Pricing model {{ index+1 }}:</strong>{{ pricingModel.monthlyPrice }}€ + {{ pricingModel.duration }} months
-                          </span>
-                          <span v-if="pricingModel.type === 'FREE'">
-                            <strong>Pricing model {{ index+1 }}:</strong>FREE
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Delivery</h5>
-                      <a href="#" @click.prevent="goToStep(5)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <li><strong>Method:</strong>{{ asset.deliveryType }}</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div class="dashboard__form__review__item">
-                    <div class="dashboard__form__review__item__head">
-                      <h5>Payout</h5>
-                      <a href="#" @click.prevent="goToStep(6)">EDIT</a>
-                    </div>
-                    <div class="dashboard__form__review__item__body">
-                      <ul>
-                        <li><strong>Method:</strong>{{ asset.paymentMethod }}</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            </validation-observer>
             <div class="dashboard__form__errors" v-if="uploading.errors.length">
               <ul>
                 <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">{{ error.description }}</li>
               </ul>
             </div>
+
           </div>
+          </transition>
         </div>
         <div class="dashboard__form__navbuttons">
           <button class="btn btn--std btn--blue" @click.prevent="previousStep()">PREVIOUS</button>
-          <button class="btn btn--std btn--blue" :disabled="isButtonDisabled('next')" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
+          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
     </div>
@@ -846,18 +105,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { CatalogueItemCommand, ServerResponse } from '@/model';
-import {
-  BasePricingModelCommand,
-  DiscountRate,
-  EnumPricingModel,
-  FixedPopulationPricingModelCommand,
-  FixedPricingModelCommand,
-  FixedRowPricingModelCommand,
-  FreePricingModelCommand,
-} from '@/model/pricing-model';
-import { EnumAssetType } from '@/model/enum';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 import { required, email, regex } from 'vee-validate/dist/rules';
@@ -869,8 +118,16 @@ import { AxiosError, AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
-import { EnumConformity } from '@/model/catalogue';
+import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
+import { EnumAssetType } from '@/model/enum';
 import store from '@/store';
+import Type from '@/components/Assets/Create/Type.vue';
+import Metadata from '@/components/Assets/Create/Metadata.vue';
+import Contract from '@/components/Assets/Create/Contract.vue';
+import Pricing from '@/components/Assets/Create/Pricing.vue';
+import Delivery from '@/components/Assets/Create/Delivery.vue';
+import Payout from '@/components/Assets/Create/Payout.vue';
+import Review from '@/components/Assets/Create/Review.vue';
 
 Vue.use(VueCardFormat);
 
@@ -888,6 +145,13 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     ValidationObserver,
     Multiselect,
     Datepicker,
+    Type,
+    Metadata,
+    Contract,
+    Pricing,
+    Delivery,
+    Payout,
+    Review,
   },
 })
 export default class CreateAsset extends Vue {
@@ -901,41 +165,26 @@ export default class CreateAsset extends Vue {
     step7: InstanceType<typeof ValidationObserver>,
   }
 
-  menusData: {
-    assetTypes: string[],
-    availableFormats: string[],
-    domainRestrictions: any[],
-    continents: any[],
-    countries: any[],
-  };
-
   catalogueApi: CatalogueApi;
 
   draftAssetApi: DraftAssetApi;
 
+  isEditingExistingDraft: boolean;
+
+  assetId: string; // if editing existing draft, the asset id (key) of draft asset
+
   asset: CatalogueItemCommand;
 
-  assetTypeGroup: string; // Data File / API / Collection
-
-  // assetTypes: string[];
-
-  // availableFormats: string[];
-
-  contract: string;
-
-  pricingModelTypes: any;
+  assetMainType: string; // Data File / API / Collection
 
   selectedPricingModelForEditing: number | null;
 
-  // tempSelectedType: string;
+  contract: string;
 
   totalSteps = 7;
 
   currentStep = 1;
 
-  creatidCardValid = false;
-
-  // uploadedFile: File;
   fileToUpload: {isFileSelected: boolean, file: File, fileName: string, fileExtension: string};
 
   uploading:any;
@@ -944,9 +193,8 @@ export default class CreateAsset extends Vue {
     super();
 
     // TODO: do validation of filetype<->format before uploading file
-    console.log(store.getters.getConfig);
+    console.log('config', store.getters.getConfig);
 
-    // this.uploadedFile = {} as File;
     this.fileToUpload = {
       isFileSelected: false,
       file: {} as File,
@@ -954,82 +202,33 @@ export default class CreateAsset extends Vue {
       fileExtension: '',
     };
 
-    this.assetTypeGroup = '';
+    this.assetMainType = '';
 
-    this.menusData = {
-      assetTypes: [],
-      availableFormats: [],
-      domainRestrictions: [],
-      continents: [],
-      countries: [],
-    };
-    this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
-    this.menusData.domainRestrictions = [
-      {
-        name: 'Photogrammetry',
-        code: 'PH',
-      },
-      {
-        name: 'Geography',
-        code: 'GE',
-      },
-      {
-        name: 'Elevation',
-        code: 'EL',
-      },
-      {
-        name: 'Pharming',
-        code: 'PA',
-      },
-      {
-        name: 'Health',
-        code: 'HE',
-      },
-    ];
+    this.selectedPricingModelForEditing = null;
 
-    this.menusData.continents = [
-      {
-        name: 'Europe',
-        code: 'EUROPE',
-      },
-      {
-        name: 'Africa',
-        code: 'AFRICA',
-      },
-      {
-        name: 'Asia',
-        code: 'ASIA',
-      },
-      {
-        name: 'North America',
-        code: 'NORTH_AMERICA',
-      },
-      {
-        name: 'South America',
-        code: 'SOUTH_AMERICA',
-      },
-      {
-        name: 'Oceania',
-        code: 'OCEANIA',
-      },
-      {
-        name: 'Antarctica',
-        code: 'ANTARCTICA',
-      },
-    ];
+    this.assetId = '';
 
-    this.menusData.countries = [
-      {
-        name: 'France',
-        code: 'FRA',
-      },
-      {
-        name: 'Spain',
-        code: 'ESP',
-      },
-    ];
+    this.asset = {} as CatalogueItemCommand;
+
+    this.isEditingExistingDraft = false;
 
     this.contract = '';
+
+    this.uploading = {
+      status: false,
+      percentage: 0,
+      title: 'Your asset is being uploaded',
+      subtitle: 'Don’t close this page until upload is complete',
+      completed: false,
+      errors: [],
+    };
+
+    this.catalogueApi = new CatalogueApi();
+    this.draftAssetApi = new DraftAssetApi();
+  }
+
+  created(): void {
+    console.log('created');
 
     this.asset = {
       abstract: '',
@@ -1038,6 +237,7 @@ export default class CreateAsset extends Vue {
       creationDate: '2020-06-02',
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
+      deliveryMethod: 'NONE' as EnumDeliveryMethod,
       format: '',
       ingested: false,
       keywords: [],
@@ -1086,32 +286,29 @@ export default class CreateAsset extends Vue {
       } as GeoJSON.Polygon,
     };
 
-    this.pricingModelTypes = [
-      { name: 'Free', priceModel: EnumPricingModel.FREE },
-      { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
-      { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
-      { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
-    ];
-    this.selectedPricingModelForEditing = null;
+    this.assetId = this.$route.params.id ? this.$route.params.id : '';
+    this.isEditingExistingDraft = !!this.assetId;
 
-    this.uploading = {
-      status: false,
-      percentage: 0,
-      title: 'Your asset is being uploaded',
-      subtitle: 'Don’t close this page until upload is complete',
-      completed: false,
-      errors: [],
-    };
-
-
-    this.catalogueApi = new CatalogueApi();
-    this.draftAssetApi = new DraftAssetApi();
+    if (this.isEditingExistingDraft) {
+      this.loadExistingDraftAsset();
+    }
   }
 
-  // mounted():void {
-  //   console.log(this.$route.params.error);
-  //   console.log(this.asset.pricingModels);
-  // }
+  loadExistingDraftAsset(): void {
+    this.draftAssetApi.findOne(this.assetId).then((assetResponse) => {
+      this.asset = { ...this.asset, ...assetResponse.result.command };
+
+      // todo: use Enum (Enums may have to be fixed to include NetCDF)
+      if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
+        this.assetMainType = 'datafile';
+      } else if (this.asset.type as string === 'API') {
+        this.assetMainType = 'API';
+      } else {
+        // todo
+        console.log('other main type');
+      }
+    });
+  }
 
   goToStep(step:number):void {
     this.currentStep = step;
@@ -1124,10 +321,10 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep():void {
-    // console.log(this.asset);
-    this.$refs[`step${this.currentStep}`].validate().then((success) => {
-      if (success) {
+    this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
+      if (isValid) {
         if (this.currentStep === this.totalSteps) {
+          console.log(this.asset);
           this.submitForm();
         } else {
           this.currentStep += 1;
@@ -1140,128 +337,43 @@ export default class CreateAsset extends Vue {
     });
   }
 
-  isButtonDisabled(button: string): boolean {
-    switch (button) {
-      case 'next': {
-        if (this.currentStep === 4 && this.selectedPricingModelForEditing !== null) {
-          return true;
-        }
-        return false;
-      }
-      default:
-        return false;
+  isButtonSaveDraftShown(): boolean {
+    if (!this.assetMainType) {
+      return false;
     }
-  }
-
-  @Watch('asset.type', { immediate: true }) onAssetTypeGroupChange(): void {
-    this.asset.format = '';
-    const selectedType = this.asset.type;
-    this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
-  }
-
-  async setPricingModel(): Promise<void> {
-    const isValid = await this.$refs.step4.validate();
-    if (!isValid) {
-      return;
+    if (!this.asset.pricingModels.length || this.selectedPricingModelForEditing !== null) {
+      return false;
     }
-    this.selectedPricingModelForEditing = null;
-  }
-
-  addPricingModel():void {
-    this.asset.pricingModels.push({} as BasePricingModelCommand);
-    this.selectedPricingModelForEditing = this.asset.pricingModels.length - 1;
-  }
-
-  onChangePricingModelType(model: EnumPricingModel): void {
-    console.log(model);
-    const pricingModel = {
-      type: '' as EnumPricingModel,
-      domainRestrictions: [],
-      coverageRestrictionContinents: [],
-      consumerRestrictionContinents: [],
-      coverageRestrictionCountries: [],
-      consumerRestrictionCountries: [],
-      includeDomainRestrictions: false,
-      includeCoverageRestrictions: false,
-      includeConsumerRestrictions: false,
-    } as BasePricingModelCommand;
-    switch (model) {
-      case EnumPricingModel.FREE: {
-        (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
-        break;
-      }
-      case EnumPricingModel.FIXED: {
-        (pricingModel as FixedPricingModelCommand).type = EnumPricingModel.FIXED;
-        break;
-      }
-      case EnumPricingModel.FIXED_PER_ROWS: {
-        (pricingModel as FixedRowPricingModelCommand).type = EnumPricingModel.FIXED_PER_ROWS;
-        (pricingModel as FixedRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
-        break;
-      }
-      case EnumPricingModel.FIXED_FOR_POPULATION: {
-        (pricingModel as FixedPopulationPricingModelCommand).type = EnumPricingModel.FIXED_FOR_POPULATION;
-        (pricingModel as FixedPopulationPricingModelCommand).discountRates = [{}] as DiscountRate[];
-        break;
-      }
-      default:
+    if (!this.asset.title || !this.asset.type || !this.asset.format || !this.asset.version) {
+      return false;
     }
-    // eslint-disable-next-line
-    Vue.set(this.asset.pricingModels, this.selectedPricingModelForEditing!, pricingModel);
+    return true;
   }
 
-  addDiscountRate(): void {
-    // eslint-disable-next-line
-    (this.asset.pricingModels[this.selectedPricingModelForEditing!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
+  fixDataForSubmitting(): void {
+    // fix dates format
+    this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
   }
 
-  removePricingModel(): void {
-    const i = this.selectedPricingModelForEditing;
-    this.selectedPricingModelForEditing = null;
-    // eslint-disable-next-line
-    this.asset.pricingModels.splice(i!, 1);
-  }
-
-  // eslint-disable-next-line
-  readFile(e): void {
-    const [file] = e.srcElement.files;
-    this.fileToUpload.isFileSelected = true;
-    this.fileToUpload.file = file;
-    this.fileToUpload.fileName = file.name;
-    this.fileToUpload.fileExtension = file.name.split('.').pop();
-  }
-
-  submitForm():void {
+  async submitForm(isDraft = false): Promise<void> {
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
+      console.log('file is selected');
       const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
       if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
+        // TODO: make it a modal
         // eslint-disable-next-line
         alert('format-extension mismatch (not compatible)');
         return;
       }
+    } else {
+      console.log('no file selected');
     }
 
-    // TODO: submit form!
-    this.uploading.status = true;
-    this.uploading.errors = [];
+    // this.uploading.status = true;
+    // this.uploading.errors = [];
 
-    // fix dates format
-    this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
-
-    // fix pricing models format (vue-multiselect can't bind values but whole objects)
-    /* eslint-disable no-param-reassign */
-    this.asset.pricingModels.forEach((x) => {
-      x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
-      x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
-      x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
-      x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
-      x.coverageRestrictionCountries = x.coverageRestrictionCountries.map((c: any) => c.code);
-      delete (x as any).includeDomainRestrictions;
-      delete (x as any).includeCoverageRestrictions;
-      delete (x as any).includeConsumerRestrictions;
-    });
-    /* eslint-enable no-param-reassign */
+    this.fixDataForSubmitting();
 
     const config: AxiosRequestConfig = {
       onUploadProgress: (progressEvent: any): void => {
@@ -1273,59 +385,71 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    this.draftAssetApi.create(this.asset, config)
-      .then((response: ServerResponse<AssetDraft>) => {
-        if (response.success) {
-          console.log('draft created');
-          const draftAssetKey = response.result.key;
+    // const draftAssetResponse: ServerResponse<AssetDraft> | void = isDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
+    // const draftAssetResponse: ServerResponse<AssetDraft> | void = await this.draftAssetApi.create(this.asset, config)
+    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
+      .catch((err: AxiosError) => { console.log('eeeee', err); });
+    const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
+    const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
+    console.log('draft status', isDraftCreated, draftAssetKey);
 
-          if (this.fileToUpload.isFileSelected) { // if a file is to be uploaded
-            this.uploading.status = true;
-            this.uploading.completed = false;
-            this.uploading.title = 'Your resource is being uploaded';
-            this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config).then((uploadResponse) => {
-              if (uploadResponse.success) {
-                console.log('uploaded resource!!!');
-                this.uploading.completed = true;
-                this.uploading.title = 'Your asset is uploaded successfully!';
-                this.uploading.subtitle = '';
-                this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset).then((submitResponse) => {
-                  if (submitResponse.success) {
-                    console.log('asset submitted successfully');
-                  } else {
-                    console.log('error submitting asset', submitResponse);
-                  }
-                });
-              } else {
-                console.log(uploadResponse);
-                console.log('error uploading resource');
-              }
-            });
-          } else {
-            this.uploading.completed = true;
-          }
-        } else {
-          console.log('error creating draft', response);
-          this.uploading.status = false;
-          this.uploading.completed = true;
-          this.uploading.errors = response.messages;
-          setTimeout(() => {
-            this.uploading.errors = [];
-          }, 10000);
-          setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight);
-          }, 300);
-        }
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          this.uploading.errors = error.response.data.messages;
-          setTimeout(() => {
-            this.uploading.errors = [];
-          }, 10000);
-        }
-        this.uploading.status = false;
-      });
+    if (!isDraftCreated && draftAssetResponse) {
+      console.log('error creating draft', draftAssetResponse);
+      this.onError(draftAssetResponse);
+    }
+
+    if (this.fileToUpload.isFileSelected) {
+      this.uploading.status = true;
+      this.uploading.errors = [];
+      this.uploading.completed = false;
+      this.uploading.title = 'Your resource is being uploaded';
+      // todo: catch error
+      const uploadResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
+
+      if (uploadResponse.success) {
+        console.log('uploaded resource!');
+        // this.uploading.completed = true;
+        // this.uploading.title = 'Your asset is uploaded successfully!';
+        // this.uploading.subtitle = '';
+      } else {
+        console.log('error uploading resource', uploadResponse);
+        this.onError(uploadResponse);
+        this.uploading.completed = true;
+        this.uploading.title = 'Error uploading asset';
+        this.uploading.subtitle = '';
+        return;
+      }
+    }
+
+    if (isDraft) {
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.title = 'Draft saved!';
+      this.uploading.subtitle = '';
+    } else {
+      // todo: catch error
+      const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.subtitle = '';
+      if (submitResponse.success) {
+        console.log('submitted successfully!');
+        this.uploading.title = 'Asset created!';
+      } else {
+        console.log('error submitting asset', submitResponse);
+        this.onError(submitResponse);
+        this.uploading.title = 'Error creating asset';
+      }
+    }
+  }
+
+  // todo
+  onError(response: ServerResponse<AssetDraft>): void {
+    this.uploading.errors = response.messages;
+    setTimeout(() => {
+      this.uploading.errors = [];
+    }, 10000);
+    this.uploading.status = false;
   }
 }
 </script>
