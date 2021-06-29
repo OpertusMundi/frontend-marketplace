@@ -9,9 +9,10 @@
         </div>
         <div class="graphcard__head__data__right">
           <ul>
-            <li><a href="#">DAY</a></li>
-            <li><a href="#">WEEK</a></li>
-            <li><a href="#">MONTH</a></li>
+            <li><a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a></li>
+            <li><a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a></li>
+            <li><a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a></li>
+            <li><a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a></li>
           </ul>
         </div>
       </div>
@@ -34,27 +35,27 @@
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <date-picker v-model="date" range placeholder="Time period" input-class="input__date_picker" :formatter="momentFormat">
+          <date-picker v-model="date" @change="dateValueChange(date)" range placeholder="Time period" input-class="input__date_picker">
             <span>antonis</span>
             <i slot="icon-calendar"></i>
             <template v-slot:header="{ emit }">
               <div class="nav_date">
-                <button class="nav_date__button" @click="emit(new Date())">
+                <button class="nav_date__button" @click="today(emit)">
                   <span class="nav_date__button__text">Today</span>
                 </button>
                 <button class="nav_date__button" @click="lastWeek(emit)">
                   <span class="nav_date__button__text">Last Week</span>
                 </button>
-                <button class="nav_date__button" @click="selectNextThreeDay(emit)">
+                <button class="nav_date__button" @click="lastMonth(emit)">
                   <span class="nav_date__button__text">Last Month</span>
                 </button>
-                <button class="nav_date__button" @click="selectNextThreeDay(emit)">
+                <button class="nav_date__button" @click="lastThreeMonths(emit)">
                   <span class="nav_date__button__text">Last 3 Months</span>
                 </button>
-                <button class="nav_date__button" @click="selectNextThreeDay(emit)">
+                <button class="nav_date__button" @click="lastSixMonths(emit)">
                   <span class="nav_date__button__text">Last 6 Months</span>
                 </button>
-                <button class="nav_date__button" @click="selectNextThreeDay(emit)">
+                <button class="nav_date__button" @click="lastYear(emit)">
                   <span class="nav_date__button__text">Last Year</span>
                 </button>
               </div>
@@ -64,6 +65,23 @@
       </div>
     </div>
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
+    <table class="data_table" v-if="chartOptions">
+      <thead>
+        <tr>
+          <th></th>
+          <th v-for="header in formatTable()" class="data_table__header" :key="header.id">{{ header.name }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr class="data_table__data" v-for="data in formatSeries()" :key="data.name">
+          {{
+            data.name
+          }}
+          <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ value }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -79,7 +97,9 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
-import { EnumSalesQueryMetric, SalesQuery, DataSeries } from '@/model/analytics';
+import {
+  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+} from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
@@ -115,6 +135,14 @@ export default class SalesBarGraphCard extends Vue {
 
   momentFormat: any;
 
+  temporalUnit: EnumTemporalUnit;
+
+  temporalUnitMin: string;
+
+  temporalUnitMax: string;
+
+  tableData: any;
+
   constructor() {
     super();
 
@@ -134,6 +162,14 @@ export default class SalesBarGraphCard extends Vue {
 
     this.date = null;
 
+    this.temporalUnitMin = '';
+
+    this.temporalUnitMax = '';
+
+    this.temporalUnit = EnumTemporalUnit.YEAR;
+
+    this.tableData = [];
+
     this.momentFormat = {
       // [optional] Date to String
       stringify: (date) => (date ? moment(date).format('LL') : ''),
@@ -148,6 +184,7 @@ export default class SalesBarGraphCard extends Vue {
 
   async mounted(): Promise<any> {
     await this.getAssets();
+    console.log(EnumTemporalUnit);
     // await this.getAnalytics();
   }
 
@@ -158,6 +195,11 @@ export default class SalesBarGraphCard extends Vue {
       },
       assets: this.assetsQuery,
       metric: this.salesQueryMetricType,
+      time: {
+        unit: this.temporalUnit,
+        min: this.temporalUnitMin,
+        max: this.temporalUnitMax,
+      },
     };
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
@@ -168,6 +210,8 @@ export default class SalesBarGraphCard extends Vue {
         this.segments = response.result!;
         this.chartOptions = this.getOptions();
         this.formatSeries();
+        this.formatTable();
+        console.log(this.formatSeries());
       }
     });
   }
@@ -205,10 +249,17 @@ export default class SalesBarGraphCard extends Vue {
     if (!this.segments) {
       return null;
     }
-    const name = 'Sales per segment';
+    // const name = 'Sales per segment';
     return {
       chart: {
         type: 'column',
+      },
+      plotOptions: {
+        series: {
+          borderWidth: 0.5,
+          borderColor: 'white',
+          borderRadius: 6,
+        },
       },
       showInLegend: true,
       colors: ['#190AFF', '#358F8B', '#A843B5'],
@@ -217,7 +268,6 @@ export default class SalesBarGraphCard extends Vue {
       },
       xAxis: {
         categories: [...new Map(this.segments.points.map((item) => [item.segment, item])).values()].map((a) => a.segment),
-        crosshair: { color: '#fff' },
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,
@@ -250,25 +300,17 @@ export default class SalesBarGraphCard extends Vue {
           return `${point.y}€ <br>${point.category}`;
         },
       },
-      plotOptions: {
-        column: {
-          pointPadding: 0.2,
-          borderWidth: 0,
-        },
-      },
       series: this.formatSeries(),
     };
   }
 
-  formatSeries() {
+  formatSeries(): any[] {
     const series: Array<any> = [];
     const assetsName: any = [...new Map(this.segments.points.map((item) => [item.asset, item])).values()].map((a) => a.asset);
     assetsName.forEach((assetName) => {
       const assetObj = {
         name: assetName,
         showInLegend: true,
-        borderRadius: 6,
-        borderWidth: 5,
         data: this.segments?.points.filter((item) => item?.asset === assetName).map((a) => a.value),
       };
       series.push(assetObj);
@@ -276,12 +318,147 @@ export default class SalesBarGraphCard extends Vue {
     return series;
   }
 
-  lastWeek(emit) {
-    const start = new Date();
-    const end = new Date();
-    end.setTime(end.getTime() + 7 * 24 * 3600 * 1000);
+  formatTable(): any[] {
+    const segments: Array<any> = [];
+    const segmentsName: any = [...new Map(this.segments.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
+    segmentsName.forEach((segmentName) => {
+      const segObj = {
+        name: segmentName,
+        data: this.segments?.points.filter((item) => item?.segment === segmentName).map((a) => a.value),
+      };
+      segments.push(segObj);
+    });
+    return segments;
+  }
+
+  setTemporalUnit(value: EnumTemporalUnit): void {
+    this.temporalUnit = value;
+    if (this.assetsQuery?.length) {
+      this.getAnalytics();
+    }
+  }
+
+  dateValueChange(value: string | any[]): void {
+    this.temporalUnitMin = moment(value[0]).format('YYYY-MM-DD');
+    this.temporalUnitMax = moment(value[1]).format('YYYY-MM-DD');
+    console.log(this.temporalUnitMin, this.temporalUnitMax);
+    if (value.length > 0) {
+      this.getAnalytics();
+    }
+  }
+
+  today(emit: (arg0: Date[]) => void): void {
+    const start = moment().toDate();
+    const end = moment().toDate();
     const date = [start, end];
     emit(date);
+    this.temporalUnitMin = moment().format('YYYY-MM-DD');
+    this.temporalUnitMax = moment().format('YYYY-MM-DD');
+  }
+
+  lastWeek(emit: (arg0: Date[]) => void): void {
+    const start = moment()
+      .subtract(1, 'weeks')
+      .startOf('week')
+      .toDate();
+    const end = moment()
+      .subtract(1, 'weeks')
+      .endOf('week')
+      .toDate();
+    const date = [start, end];
+    emit(date);
+    this.temporalUnitMin = moment()
+      .subtract(1, 'weeks')
+      .startOf('week')
+      .format('YYYY-MM-DD');
+    this.temporalUnitMax = moment()
+      .subtract(1, 'weeks')
+      .endOf('week')
+      .format('YYYY-MM-DD');
+  }
+
+  lastMonth(emit: (arg0: Date[]) => void): void {
+    const start = moment()
+      .subtract(1, 'months')
+      .startOf('month')
+      .toDate();
+    const end = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .toDate();
+    const date = [start, end];
+    emit(date);
+    this.temporalUnitMin = moment()
+      .subtract(1, 'months')
+      .startOf('month')
+      .format('YYYY-MM-DD');
+    this.temporalUnitMax = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .format('YYYY-MM-DD');
+  }
+
+  lastThreeMonths(emit: (arg0: Date[]) => void): void {
+    const start = moment()
+      .subtract(3, 'months')
+      .startOf('month')
+      .toDate();
+    const end = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .toDate();
+    const date = [start, end];
+    emit(date);
+    this.temporalUnitMin = moment()
+      .subtract(3, 'months')
+      .startOf('month')
+      .format('YYYY-MM-DD');
+    this.temporalUnitMax = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .format('YYYY-MM-DD');
+  }
+
+  lastSixMonths(emit: (arg0: Date[]) => void): void {
+    const start = moment()
+      .subtract(6, 'months')
+      .startOf('month')
+      .toDate();
+    const end = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .toDate();
+    const date = [start, end];
+    emit(date);
+    this.temporalUnitMin = moment()
+      .subtract(6, 'months')
+      .startOf('month')
+      .format('YYYY-MM-DD');
+    this.temporalUnitMax = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .format('YYYY-MM-DD');
+  }
+
+  lastYear(emit: (arg0: Date[]) => void): void {
+    const start = moment()
+      .subtract(12, 'months')
+      .startOf('month')
+      .toDate();
+    const end = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .toDate();
+    const date = [start, end];
+    emit(date);
+    this.temporalUnitMin = moment()
+      .subtract(12, 'months')
+      .startOf('month')
+      .format('YYYY-MM-DD');
+    this.temporalUnitMax = moment()
+      .subtract(1, 'months')
+      .endOf('month')
+      .format('YYYY-MM-DD');
   }
 }
 </script>
@@ -289,6 +466,7 @@ export default class SalesBarGraphCard extends Vue {
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_linegraph.scss';
 @import '@/assets/styles/graphs/_date-picker.scss';
+@import '@/assets/styles/graphs/_table.scss';
 .multiselect__option--highlight {
   background: none !important;
 }

@@ -1,0 +1,13 @@
+.data_table{
+  width: 100%;
+    overflow-x: scroll;
+  &__header{
+    font-size: 10px;
+    border:1px solid red;
+    padding:10px 5px;
+  }
+  &__data{
+    border: 1px solid grey;
+    font-size: 10px;
+  }
+}

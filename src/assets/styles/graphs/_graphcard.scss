@@ -40,6 +40,10 @@
               border-right: 1px solid $greyColor;
               font-weight: 600;
               transition: all 0.4s ease;
+              &.active{
+                background: $secondColor;
+                color: #fff;
+              }
             }
             &:last-child {
               a {
@@ -102,6 +106,9 @@
         }
       }
       &__time{
+        display: flex;
+        flex: 0 1 100%;
+        justify-content: flex-end;
       }
     }
   }
