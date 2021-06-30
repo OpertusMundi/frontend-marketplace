@@ -22,7 +22,7 @@
       <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
     </ul>
 
-    <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="toggleSelectAreaModal" class="btn btn--std btn--blue">SELECT AREAS</a></div>
+    <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="openSelectAreaModal" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
     <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
@@ -58,7 +58,7 @@
     </div>
 
     <!-- MODALS -->
-    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
+    <!-- <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas> -->
   </div>
 </template>
 <script lang="ts">
@@ -139,8 +139,9 @@ export default class ShopCard extends Vue {
     }
   }
 
-  toggleSelectAreaModal(): void {
-    this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
+  openSelectAreaModal(): void {
+    // eslint-disable-next-line
+    this.$emit('openSelectAreaModal', this.selectedPricingModel!.key);
   }
 }
 </script>

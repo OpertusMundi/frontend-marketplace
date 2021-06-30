@@ -1,7 +1,7 @@
 <template>
   <!-- <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="asset_card"> -->
   <!-- <router-link :to="asset.status === 'DRAFT' ? `/dashboard/assets/create/${asset.key}` : `/dashboard/assets/preview/${asset.key}`" class="asset_card"> -->
-  <router-link :to="getRouterLink(asset.status, asset.key)" class="asset_card">
+  <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card">
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
@@ -51,12 +51,12 @@ export default class AssetCard extends Vue {
     return status.replaceAll('_', ' ');
   }
 
-  getRouterLink(assetStatus: string, assetKey: string): string {
+  getRouterLink(assetStatus: string, assetKey: string, assetPublished: string): string {
     const links = {
       DRAFT: `/dashboard/assets/create/${assetKey}`,
       PENDING_PROVIDER_REVIEW: `/review/${assetKey}`,
     };
-    return links[assetStatus] ? links[assetStatus] : `/catalogue/${assetKey}`;
+    return links[assetStatus] ? links[assetStatus] : `/catalogue/${assetPublished}`;
   }
 }
 </script>

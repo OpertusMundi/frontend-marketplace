@@ -21,7 +21,7 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card :catalogueItem="catalogueItem"></shop-card>
+          <shop-card :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
 
           <other-available-options :catalogueItem="catalogueItem"></other-available-options>
         </div>
@@ -31,7 +31,7 @@
     <related-assets :catalogueItem="catalogueItem"></related-assets>
 
     <!-- MODALS -->
-    <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas>
+    <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModelKey"></select-areas>
   </div>
 </template>
 
@@ -78,6 +78,8 @@ export default class CatalogueSingle extends Vue {
 
   isItemLoaded: boolean;
 
+  selectedPricingModelKey: string;
+
   isSelectAreasModalOn: boolean;
 
   constructor() {
@@ -91,6 +93,8 @@ export default class CatalogueSingle extends Vue {
     this.isItemLoaded = false;
 
     this.catalogueItem = {} as CatalogueItem;
+
+    this.selectedPricingModelKey = '';
 
     this.isSelectAreasModalOn = false;
   }
@@ -134,8 +138,13 @@ export default class CatalogueSingle extends Vue {
     }
   }
 
-  toggleSelectAreaModal(): void {
+  openSelectAreaModal(key: string): void {
+    this.selectedPricingModelKey = key;
     this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
+  }
+
+  closeSelectAreaModal(): void {
+    this.isSelectAreasModalOn = false;
   }
 }
 </script>
