@@ -1,7 +1,7 @@
 .input__date_picker{
   min-height: 40px;
   display: block;
-  padding: 0px 40px 5px 8px;
+  padding: 5px 40px 5px 8px;
   border-radius: 10px;
   border: 1px solid #e8e8e8;
   background: #fff;
@@ -10,7 +10,7 @@
   color: $darkColor;
   &::placeholder{
     color: black;
-    font-size: em(12);
+    font-size: em(18);
     font-weight: 500;
   }
 }

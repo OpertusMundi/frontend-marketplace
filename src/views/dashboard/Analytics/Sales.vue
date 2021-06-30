@@ -44,10 +44,10 @@
         <sales-heat-map-graph-card></sales-heat-map-graph-card>
       </div>
       <div class="analytics__cards__item" v-if="activeTab == 'bars_sales'">
-        <sales-bar-graph-card :salesQueryMetricType="'SUM_SALES'"></sales-bar-graph-card>
+        <sales-bar-graph-card :salesQueryMetricType="'SUM_SALES'" :symbol="'€'" :symbolTitle="'Sale in €'"></sales-bar-graph-card>
       </div>
       <div class="analytics__cards__item" v-if="activeTab == 'bars_transaction'">
-        <sales-bar-graph-card :salesQueryMetricType="'COUNT_TRANSACTIONS'"></sales-bar-graph-card>
+        <sales-bar-graph-card :salesQueryMetricType="'COUNT_TRANSACTIONS'" :symbol="''" :symbolTitle="'Transactions'"></sales-bar-graph-card>
       </div>
       <div class="analytics__cards__item" v-if="activeTab == 'segments'">
         segments

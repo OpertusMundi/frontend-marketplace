@@ -7,6 +7,11 @@
     border:1px solid $lightBgColor;
     padding:10px 5px;
     text-align: left;
+    &:first-child{
+      background-color: white;
+      position:sticky;
+      left:0;
+    }
   }
   &__data{
     border: 1px solid $lightBgColor;
