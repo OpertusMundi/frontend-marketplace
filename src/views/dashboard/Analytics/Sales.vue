@@ -10,6 +10,15 @@
           See the countries your assets are most popular at.
         </div>
       </a>
+      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'line_transactions'" :class="{ active: activeTab == 'line_transactions' }">
+        <div class="analytics__types__item__upper">
+          <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="" />
+          <h5>Number of transactions</h5>
+        </div>
+        <div class="analytics__types__item__desc">
+          Day, week, month, EU country
+        </div>
+      </a>
       <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'bars_sales'" :class="{ active: activeTab == 'bars_sales' }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="" />
@@ -43,6 +52,9 @@
       <div class="analytics__cards__item" v-if="activeTab == 'heatmap'">
         <sales-heat-map-graph-card></sales-heat-map-graph-card>
       </div>
+      <div class="analytics__cards__item" v-if="activeTab == 'line_transactions'">
+        <sales-line-graph-card :salesQueryMetricType="'COUNT_TRANSACTIONS'" :symbol="''" :symbolTitle="'Transactions'"></sales-line-graph-card>
+      </div>
       <div class="analytics__cards__item" v-if="activeTab == 'bars_sales'">
         <sales-bar-graph-card :salesQueryMetricType="'SUM_SALES'" :symbol="'€'" :symbolTitle="'Sale in €'"></sales-bar-graph-card>
       </div>
@@ -61,9 +73,15 @@ import { Component, Vue } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
 import SalesBarGraphCard from './SalesBarGraphCard.vue';
 import SalesHeatMapGraphCard from './SalesHeatMapGraphCard.vue';
+import SalesLineGraphCard from './SalesLineGraphCard.vue';
 
 @Component({
-  components: { CatalogueCard, SalesBarGraphCard, SalesHeatMapGraphCard },
+  components: {
+    CatalogueCard,
+    SalesBarGraphCard,
+    SalesHeatMapGraphCard,
+    SalesLineGraphCard,
+  },
 })
 export default class DashboardAnalyticsExplore extends Vue {
   activeTab: string | null;

@@ -13,6 +13,13 @@
     font-size: em(18);
     font-weight: 500;
   }
+  &:focus-visible{
+  outline:red;
+  }
+  &:focus{
+    border-radius: 10px;
+    border: 1px solid $secondColor;
+    }
 }
 .nav_date {
   display: flex;
