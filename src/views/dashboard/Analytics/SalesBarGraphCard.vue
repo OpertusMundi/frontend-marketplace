@@ -77,22 +77,18 @@
       <thead>
         <tr>
           <th></th>
-          <th v-for="header in formatTable()" class="data_table__header" :key="header.id">
-            {{ header.name }}
-          </th>
+          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ upperCaseTransform(name) }}</th>
         </tr>
       </thead>
-
       <tbody>
-        <tr class="data_table__data" v-for="data in seriesData" :key="data.name">
-          <td>{{ data.name }}</td>
+        <tr class="data_table__row" v-for="data in seriesData" :key="data.name">
+          <td class="data_table__data">{{ data.name }}</td>
           <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ value }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
-
 <script lang="ts">
 import {
   Component, Watch, Vue, Prop,
@@ -183,14 +179,8 @@ export default class SalesBarGraphCard extends Vue {
     this.seriesData = [];
 
     this.momentFormat = {
-      // [optional] Date to String
       stringify: (date) => (date ? moment(date).format('LL') : ''),
-      // [optional]  String to Date
       parse: (value) => (value ? moment(value, 'LL').toDate() : null),
-      // [optional] getWeekNumber
-      getWeek: (date) => {
-        // a number
-      },
     };
   }
 
@@ -363,6 +353,11 @@ export default class SalesBarGraphCard extends Vue {
     if (value.length > 0) {
       this.getAnalytics();
     }
+  }
+
+  upperCaseTransform(value: string): any {
+    return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
+    // console.log(value);
   }
 
   today(emit: (arg0: Date[]) => void): void {
