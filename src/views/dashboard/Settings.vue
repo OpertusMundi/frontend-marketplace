@@ -710,7 +710,7 @@ import {
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
 import { EnumCustomerType } from '@/model/account';
-import { Card } from '@/model/payment';
+import { Card } from '@/model/payin';
 import {
   EnumKycDocumentType,
   KycDocument,
@@ -723,7 +723,7 @@ import {
 import AccountApi from '../../service/account';
 import ProfileApi from '../../service/profile';
 import ProviderApi from '../../service/provider';
-import PaymentApi from '../../service/payment';
+import PaymentApi from '../../service/consumer-payin';
 import KycDocumentApi from '../../service/kyc-document';
 import UboDeclarationApi from '../../service/ubo-declaration';
 import Modal from '../../components/Modal.vue';

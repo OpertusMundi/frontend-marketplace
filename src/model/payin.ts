@@ -47,6 +47,14 @@ export enum EnumPayInSortField {
   TOTAL_PRICE = 'TOTAL_PRICE',
 }
 
+export enum EnumPayInItemSortField {
+  CREATED_ON = 'CREATED_ON',
+  EXECUTED_ON = 'EXECUTED_ON',
+  MODIFIED_ON = 'MODIFIED_ON',
+  REFERENCE_NUMBER = 'REFERENCE_NUMBER',
+  STATUS = 'STATUS',
+}
+
 export interface Transfer {
   /**
    * Funds debited from buyer's wallet and credited to seller's wallet
@@ -110,6 +118,10 @@ export interface PayInItem {
    * Invoice line number
    */
   index: number;
+  /**
+   * Parent PayIn unique key
+   */
+  payIn: string;
   /**
    * Payment item type
    */

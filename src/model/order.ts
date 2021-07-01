@@ -9,6 +9,14 @@ export enum EnumOrderItemType {
   VAS = 'VAS',
 }
 
+export enum EnumOrderSortField {
+  CREATED_ON = 'CREATED_ON',
+  MODIFIED_ON = 'MODIFIED_ON',
+  REFERENCE_NUMBER = 'REFERENCE_NUMBER',
+  STATUS = 'STATUS',
+  TOTAL_PRICE = 'TOTAL_PRICE',
+}
+
 export enum EnumOrderStatus {
   /**
    * Order created
