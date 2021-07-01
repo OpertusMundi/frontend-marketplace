@@ -111,6 +111,10 @@ export interface PayInItem {
    */
   index: number;
   /**
+   * Parent PayIn unique key
+   */
+  payIn: string;
+  /**
    * Payment item type
    */
   type: EnumPaymentItemType;
