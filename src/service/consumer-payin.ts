@@ -12,12 +12,12 @@ import {
   Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand,
   EnumPayInSortField,
   EnumTransactionStatus,
-} from '@/model/payment';
+} from '@/model/payin';
 
 /**
  * All service methods require user to have role ROLE_CONSUMER unless otherwise noted
  */
-export default class PaymentApi extends Api {
+export default class ConsumerPayInApi extends Api {
   constructor() {
     super({ withCredentials: true });
   }
@@ -30,7 +30,7 @@ export default class PaymentApi extends Api {
    * is valid.
    */
   public async checkout(): Promise<ServerResponse<Order>> {
-    const url = '/action/payments/checkout';
+    const url = '/action/cart/checkout';
 
     return this.post<void, ServerResponse<Order>>(url)
       .then((response: AxiosServerResponse<Order>) => {
@@ -51,7 +51,7 @@ export default class PaymentApi extends Api {
    * @returns
    */
   public async getCards(page = 0, size = 10): Promise<ServerResponse<Card[]>> {
-    const url = `/action/payments/cards?page=${page}&size=${size}`;
+    const url = `/action/consumer/cards?page=${page}&size=${size}`;
 
     return this.get<ServerResponse<Card[]>>(url)
       .then((response: AxiosServerResponse<Card[]>) => {
@@ -70,7 +70,7 @@ export default class PaymentApi extends Api {
    * It is imperative to inform users, that we are registering their card.
    */
   public async createCardRegistration(): Promise<ServerResponse<CardRegistration>> {
-    const url = '/action/payments/cards';
+    const url = '/action/consumer/cards';
 
     return this.post<void, ServerResponse<CardRegistration>>(url)
       .then((response: AxiosServerResponse<CardRegistration>) => {
@@ -92,7 +92,7 @@ export default class PaymentApi extends Api {
    * @returns
    */
   public async completeCardRegistration(command: CardRegistrationCommand): Promise<ServerResponse<Card>> {
-    const url = '/action/payments/cards';
+    const url = '/action/consumer/cards';
 
     return this.put<CardRegistrationCommand, ServerResponse<Card>>(url, command)
       .then((response: AxiosServerResponse<Card>) => {
@@ -130,7 +130,7 @@ export default class PaymentApi extends Api {
    * @returns
    */
   public async createCardDirectPayIn(orderKey: string, command: CardDirectPayInCommand): Promise<ServerResponse<CardDirectPayIn>> {
-    const url = `/payments/card-direct/${orderKey}`;
+    const url = `/action/consumer/payins/card-direct/${orderKey}`;
 
     return this.post<CardDirectPayInCommand, ServerResponse<CardDirectPayIn>>(url, command)
       .then((response: AxiosServerResponse<CardDirectPayIn>) => {
@@ -152,7 +152,7 @@ export default class PaymentApi extends Api {
    * @returns
    */
   public async createBankwirePayIn(orderKey: string): Promise<ServerResponse<BankwirePayIn>> {
-    const url = `/payments/bankwire/${orderKey}`;
+    const url = `/action/consumer/payins/bankwire/${orderKey}`;
 
     return this.put<void, ServerResponse<BankwirePayIn>>(url)
       .then((response: AxiosServerResponse<BankwirePayIn>) => {
@@ -169,7 +169,7 @@ export default class PaymentApi extends Api {
    * @returns
    */
   public async getPayIn(payInKey: string): Promise<ServerResponse<BankwirePayIn | CardDirectPayIn>> {
-    const url = `/payments/payins/${payInKey}`;
+    const url = `/action/consumer/payins/${payInKey}`;
 
     return this.get<ServerResponse<BankwirePayIn | CardDirectPayIn>>(url)
       .then((response: AxiosServerResponse<BankwirePayIn | CardDirectPayIn>) => {
@@ -188,12 +188,12 @@ export default class PaymentApi extends Api {
    * @param sorting
    * @returns
    */
-  public async findAllConsumerPayIns(
+  public async findPayIns(
     status: EnumTransactionStatus | null = null, page = 0, size = 10, sorting: Sorting<EnumPayInSortField>,
   ): Promise<AxiosPageResponse<BankwirePayIn | CardDirectPayIn>> {
     const { id: field, order } = sorting;
 
-    const url = `/action/payments/payins/consumer?page=${page}&size=${size}&status=${status || ''}&orderBy=${field}&order=${order}`;
+    const url = `/action/consumer/payins?page=${page}&size=${size}&status=${status || ''}&orderBy=${field}&order=${order}`;
 
     return this.get<ServerResponse<PageResult<BankwirePayIn | CardDirectPayIn>>>(url);
   }
