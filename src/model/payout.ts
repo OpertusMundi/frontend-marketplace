@@ -1,7 +1,17 @@
 import { EnumTransactionStatus } from './payin';
 import { Refund } from './refund';
 
-export interface PayOutDto {
+export enum EnumPayOutSortField {
+  CREATED_ON = 'CREATED_ON',
+  EXECUTED_ON = 'EXECUTED_ON',
+  MODIFIED_ON = 'MODIFIED_ON',
+  BANKWIRE_REF = 'BANKWIRE_REF',
+  STATUS = 'STATUS',
+  FUNDS = 'FUNDS',
+  PROVIDER = 'PROVIDER',
+}
+
+export interface PayOut {
   /**
    * Payout platform unique key
    */
