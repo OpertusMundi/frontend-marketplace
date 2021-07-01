@@ -46,6 +46,10 @@
   text-align: center;
   & h1 {
     font-size: 2em;
+    color: $mainFontColor;
+  }
+  & label {
+    cursor: default;
   }
   &__wrapper {
     position: fixed;
