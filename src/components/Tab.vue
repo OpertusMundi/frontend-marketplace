@@ -1,6 +1,6 @@
 <template>
   <transition name="fade" mode="out-in">
-    <div class='tab' v-if='isActive'>
+    <div class="tab" v-if="isActive">
       <slot></slot>
     </div>
   </transition>

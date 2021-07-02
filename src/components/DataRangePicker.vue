@@ -1,5 +1,5 @@
 <template>
-  <date-picker v-model="date" @change="dateValueChange(date)" range placeholder="Time period" input-class="input__date_picker">
+  <date-picker v-model="date" @change="dateValueChange(date)" @clear="emptyValue(date)" range placeholder="Time period" input-class="input__date_picker" ref="datapicker">
     <i slot="icon-calendar"></i>
     <template v-slot:header="{ emit }">
       <div class="nav_date">
@@ -64,14 +64,40 @@ export default class DataRangePicker extends Vue {
     };
   }
 
-  dateValueChange(value: string | any[]): void {
-    this.dataMin = moment(value[0]).format('YYYY-MM-DD');
-    this.dataMax = moment(value[1]).format('YYYY-MM-DD');
+  mounted(): void {
+    this.initDatePicker();
+  }
+
+  initDatePicker() {
+    console.log(this.dataRangeMin);
+    const start = moment().subtract(7, 'd');
+    const end = moment().subtract(1, 'd');
+    const date = [start.toDate(), end.toDate()];
+    this.dataMin = start.format('YYYY-MM-DD');
+    this.dataMax = end.format('YYYY-MM-DD');
+    this.date = date;
     this.$emit('update:dataRangeMin', this.dataMin);
     this.$emit('update:dataRangeMax', this.dataMax);
-    if (value.length > 0) {
+  }
+
+  dateValueChange(value: string | any[]): void {
+    if (value[0] != null && value[1] != null) {
+      this.dataMin = moment(value[0]).format('YYYY-MM-DD');
+      this.dataMax = moment(value[1]).format('YYYY-MM-DD');
+      this.$emit('update:dataRangeMin', this.dataMin);
+      this.$emit('update:dataRangeMax', this.dataMax);
+      if (value.length > 0) {
+        this.$emit('triggerchange');
+        console.log('triggerchange');
+      }
+    } else {
+      this.dataMin = '';
+      this.dataMax = '';
+      this.$emit('update:dataRangeMin', this.dataMin);
+      this.$emit('update:dataRangeMax', this.dataMax);
       this.$emit('triggerchange');
     }
+    // console.log(value);
   }
 
   today(emit: (arg0: Date[]) => void): void {
@@ -146,6 +172,10 @@ export default class DataRangePicker extends Vue {
     this.dataMin = start.format('YYYY-MM-DD');
     this.dataMax = end.format('YYYY-MM-DD');
     emit(date);
+  }
+
+  emptyValue(value) {
+    console.log(value, 'empty event !!!');
   }
 }
 </script>

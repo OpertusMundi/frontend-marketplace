@@ -3,7 +3,7 @@
     <div class="graphcard__head">
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
-          <h3>Sales</h3>
+          <h3>{{ cardHeading }}</h3>
           <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
@@ -98,6 +98,8 @@ export default class SalesBarGraphCard extends Vue {
 
   @Prop({ default: null }) private symbolTitle!: string;
 
+  @Prop({ default: '' }) private cardHeading!: string;
+
   draftAssetApi: DraftAssetApi;
 
   assets: AssetDraft[];
@@ -145,7 +147,7 @@ export default class SalesBarGraphCard extends Vue {
 
     this.temporalUnitMax = '';
 
-    this.temporalUnit = EnumTemporalUnit.YEAR;
+    this.temporalUnit = EnumTemporalUnit.DAY;
 
     this.seriesData = [];
   }
@@ -216,6 +218,9 @@ export default class SalesBarGraphCard extends Vue {
     }
     // const name = 'Sales per segment';
     return {
+      credits: {
+        enabled: false,
+      },
       chart: {
         type: 'column',
       },

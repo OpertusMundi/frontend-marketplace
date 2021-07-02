@@ -78,7 +78,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
@@ -92,14 +92,14 @@ import moment from 'moment';
     highcharts: Chart,
   },
 })
-export default class SalesLineGraphCard extends Vue {
-  @Prop({ default: null }) private salesQueryMetricType!: EnumSalesQueryMetric;
+export default class ViewsLineGraphCard extends Vue {
+  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
+
+  @Prop({ default: '' }) private cardHeading!: string;
 
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
-
-  @Prop({ default: '' }) private cardHeading!: string;
 
   draftAssetApi: DraftAssetApi;
 
@@ -126,6 +126,8 @@ export default class SalesLineGraphCard extends Vue {
   seriesData: any;
 
   lineChartDate: any;
+
+  assetQueryMetricType: EnumAssetQueryMetric;
 
   constructor() {
     super();
@@ -155,6 +157,8 @@ export default class SalesLineGraphCard extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
+
+    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
   }
 
   async mounted(): Promise<any> {
@@ -163,12 +167,13 @@ export default class SalesLineGraphCard extends Vue {
   }
 
   getAnalytics(): void {
-    const segmentQuery: SalesQuery = {
+    const assetsViewsQuery: AssetQuery = {
       segments: {
         enabled: false,
       },
       assets: this.assetsQuery,
-      metric: this.salesQueryMetricType,
+      metric: this.assetQueryMetricType,
+      source: this.assetSourceEnum,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
@@ -176,7 +181,8 @@ export default class SalesLineGraphCard extends Vue {
       },
     };
 
-    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
+    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+      console.log(response);
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
@@ -186,6 +192,7 @@ export default class SalesLineGraphCard extends Vue {
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
+        console.log(this.analyticsData);
       }
     });
   }

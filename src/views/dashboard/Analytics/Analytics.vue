@@ -14,7 +14,7 @@
           <explore></explore>
         </tab>
         <tab title="Assets">
-          ASSETS
+          <assets></assets>
         </tab>
         <tab title="topio Marketplace">
           TOPIO
@@ -30,6 +30,7 @@ import Tab from '@/components/Tab.vue';
 import Tabs from '@/components/Tabs.vue';
 import Explore from './Explore.vue';
 import Sales from './Sales.vue';
+import Assets from './Assets.vue';
 
 @Component({
   components: {
@@ -37,11 +38,11 @@ import Sales from './Sales.vue';
     Tab,
     Explore,
     Sales,
+    Assets,
   },
 })
-export default class DashboardAnalytics extends Vue {
-}
+export default class DashboardAnalytics extends Vue {}
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_analytics.scss";
+@import '@/assets/styles/_analytics.scss';
 </style>

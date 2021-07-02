@@ -47,7 +47,7 @@
         </div>
       </div>
     </div>
-    <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
+    <highcharts v-if="chartOptions" :constructorType="'mapChart'" class="hc" :options="chartOptions" ref="chart"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
@@ -78,10 +78,15 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
-import { Chart } from 'highcharts-vue';
+import HighchartsVue, { Chart } from 'highcharts-vue';
+import Highcharts from 'highcharts';
 import moment from 'moment';
+import HighchartsMapModule from 'highcharts/modules/map';
+import mapData from '@highcharts/map-collection/custom/world.geo.json';
+
+HighchartsMapModule(Highcharts);
 
 @Component({
   components: {
@@ -92,14 +97,14 @@ import moment from 'moment';
     highcharts: Chart,
   },
 })
-export default class SalesLineGraphCard extends Vue {
-  @Prop({ default: null }) private salesQueryMetricType!: EnumSalesQueryMetric;
+export default class ViewsLineGraphCard extends Vue {
+  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
+
+  @Prop({ default: '' }) private cardHeading!: string;
 
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
-
-  @Prop({ default: '' }) private cardHeading!: string;
 
   draftAssetApi: DraftAssetApi;
 
@@ -115,6 +120,8 @@ export default class SalesLineGraphCard extends Vue {
 
   segmentsNames: string[];
 
+  locationData: string[];
+
   chartOptions: any | null;
 
   temporalUnit: EnumTemporalUnit;
@@ -126,6 +133,10 @@ export default class SalesLineGraphCard extends Vue {
   seriesData: any;
 
   lineChartDate: any;
+
+  assetQueryMetricType: EnumAssetQueryMetric;
+
+  countryCode?: string[];
 
   constructor() {
     super();
@@ -146,6 +157,8 @@ export default class SalesLineGraphCard extends Vue {
 
     this.segmentsNames = [];
 
+    this.locationData = [];
+
     this.temporalUnitMin = '';
 
     this.temporalUnitMax = '';
@@ -155,6 +168,10 @@ export default class SalesLineGraphCard extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
+
+    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
+
+    this.countryCode = [];
   }
 
   async mounted(): Promise<any> {
@@ -163,29 +180,36 @@ export default class SalesLineGraphCard extends Vue {
   }
 
   getAnalytics(): void {
-    const segmentQuery: SalesQuery = {
+    const assetsViewsQuery: AssetQuery = {
       segments: {
-        enabled: false,
+        enabled: true,
       },
       assets: this.assetsQuery,
-      metric: this.salesQueryMetricType,
+      metric: this.assetQueryMetricType,
+      source: this.assetSourceEnum,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
         max: this.temporalUnitMax,
       },
+      areas: {
+        enabled: true,
+        codes: this.countryCode,
+      },
     };
 
-    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
+    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
         this.segmentsNames = this.formatSegmentsNames();
+        this.locationData = this.formatLocation();
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
+        console.log(this.seriesData);
       }
     });
   }
@@ -226,141 +250,45 @@ export default class SalesLineGraphCard extends Vue {
 
     return {
       chart: {
-        type: 'areaspline',
-        zoomType: 'x',
-      },
-      credits: {
-        enabled: false,
+        map: mapData,
       },
       title: {
         text: '',
       },
-
-      xAxis: {
-        categories: this.lineChartDate,
-        type: 'datetime',
+      subtitle: {
+        text: '',
       },
-      yAxis: {
-        gridLineDashStyle: 'Dot',
-        gridLineWidth: 1,
-        gridLineColor: '#6C6C6C',
-        title: {
-          text: this.symbolTitle,
-        },
-      },
-      legend: {
+      mapNavigation: {
         enabled: true,
+        buttonOptions: {
+          alignTo: 'spacingBox',
+        },
       },
-      colors: [
+      colorAxis: {
+        minColor: '#F4F4FD',
+        maxColor: '#07006F',
+        min: 0,
+      },
+      series: [
         {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1,
+          name: 'Random data',
+          states: {
+            hover: {
+              color: '#BADA55',
+            },
           },
-          stops: [
-            [0, '#190AFF'],
-            [1, 'rgba(25,10,255,0)'],
-          ],
-        },
-        {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1,
+          dataLabels: {
+            enabled: false,
+            format: '{point.name}',
           },
-          stops: [
-            [0, '#358F8B'],
-            [1, 'rgba(53,143,139,0)'],
-          ],
-        },
-        {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1,
-          },
-          stops: [
-            [0, '#A843B5'],
-            [1, 'rgba(168,67,181,0)'],
+          allAreas: true,
+          data: [
+            ['gr', 50],
+            ['au', 1],
+            ['de', 3000],
           ],
         },
       ],
-      plotOptions: {
-        colorByPoint: true,
-        area: {
-          fillColor: [
-            {
-              linearGradient: {
-                x1: 0,
-                x2: 0,
-                y1: 0,
-                y2: 1,
-              },
-              stops: [
-                [0, '#190AFF'],
-                [1, 'rgba(25,10,255,0)'],
-              ],
-            },
-            {
-              linearGradient: {
-                x1: 0,
-                x2: 0,
-                y1: 0,
-                y2: 1,
-              },
-              stops: [
-                [0, '#358F8B'],
-                [1, 'rgba(53,143,139,0)'],
-              ],
-            },
-            {
-              linearGradient: {
-                x1: 0,
-                x2: 0,
-                y1: 0,
-                y2: 1,
-              },
-              stops: [
-                [0, '#A843B5'],
-                [1, 'rgba(168,67,181,0)'],
-              ],
-            },
-          ],
-          lineWidth: 0.2,
-          states: {
-            hover: {
-              lineWidth: 1,
-            },
-          },
-          threshold: null,
-        },
-      },
-
-      tooltip: {
-        shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
-        valueSuffix: this.symbol,
-        style: {
-          color: '#190AFF',
-          fontFamily: 'Roboto',
-          fontSize: '13px',
-        },
-        formatter: (a) => {
-          const point = a.chart.hoverPoint;
-          return this.symbol === ''
-            ? `${point.y} <br>${point.category}`
-            : `${point.y
-              .toString()
-              .replace(/(\.\d{2})\d*/, '$1')
-              .replace(/(\d)(?=(\d{3})+\b)/g, '$1,')}€ <br>${point.category}`;
-        },
-      },
-      series: this.seriesData,
     };
   }
 
@@ -370,37 +298,39 @@ export default class SalesLineGraphCard extends Vue {
     return names;
   }
 
+  formatLocation(): string[] {
+    let names: Array<any> = [];
+    names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.location), item])).values()].map((a) => a.location).reverse();
+    return names;
+  }
+
   formatSeries(): any[] {
     const series: Array<any> = [];
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.segmentsNames.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
-          if (value.length > 0) {
-            data.push(value[0]);
-          } else {
-            data.push(0);
-          }
+        this.locationData.forEach((segName: any) => {
+          // const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
+          const dataObj: any = {
+            code: segName.code,
+            lat: segName.lat,
+            lon: segName.lon,
+          };
+          data.push(dataObj);
+
+          // if (value.length > 0) {
+          //   data.push(dataObj);
+          //   console.log(segName, 'SEGNAME');
+          // } else {
+          //   data.push(0);
+          // }
         });
         const assetObj = {
-          marker: {
-            enabled: true,
-            symbol: 'circle',
-            lineWidth: 1,
-            radius: 4,
-            states: {
-              hover: {
-                enabled: true,
-              },
-            },
-          },
           name: assetName,
           showInLegend: true,
           data,
         };
         series.push(assetObj);
-        console.log(series, 'series');
       });
     } else {
       const data = this.analyticsData?.points.map((a) => a.value);
