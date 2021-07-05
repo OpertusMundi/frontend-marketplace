@@ -37,7 +37,7 @@
         <views-line-graph-card :assetSourceEnum="'SEARCH'" :cardHeading="'Appeared in search results'" :symbol="''" :symbolTitle="'Appeared in search results'"></views-line-graph-card>
       </div>
       <div class="analytics__cards__item" v-show="activeTab == 'viewer_location'">
-        <views-map-graph-card :assetSourceEnum="'VIEW'" :cardHeading="'Viewer location'" :symbol="''" :symbolTitle="'Viewer location'"></views-map-graph-card>
+        <views-map-graph-card :assetSourceEnum="'SEARCH'" :cardHeading="'Viewer location'" :symbol="''" :symbolTitle="'Viewer location'"></views-map-graph-card>
       </div>
     </div>
   </div>

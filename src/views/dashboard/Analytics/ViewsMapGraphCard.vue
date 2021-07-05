@@ -138,6 +138,8 @@ export default class ViewsLineGraphCard extends Vue {
 
   countryCode?: string[];
 
+  groupData: any;
+
   constructor() {
     super();
 
@@ -172,6 +174,8 @@ export default class ViewsLineGraphCard extends Vue {
     this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
 
     this.countryCode = [];
+
+    this.groupData = [];
   }
 
   async mounted(): Promise<any> {
@@ -182,7 +186,7 @@ export default class ViewsLineGraphCard extends Vue {
   getAnalytics(): void {
     const assetsViewsQuery: AssetQuery = {
       segments: {
-        enabled: true,
+        enabled: false,
       },
       assets: this.assetsQuery,
       metric: this.assetQueryMetricType,
@@ -207,8 +211,10 @@ export default class ViewsLineGraphCard extends Vue {
         this.segmentsNames = this.formatSegmentsNames();
         this.locationData = this.formatLocation();
         this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        // this.groupData = this.formatAnalytics();
+        // this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
+        this.formatSeries();
         console.log(this.seriesData);
       }
     });
@@ -217,7 +223,7 @@ export default class ViewsLineGraphCard extends Vue {
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
     // this.assetsQuery = newVal.map((a) => a.key); //TODO: get the PID of asset
-    this.assetsQuery = ['topio.the-company.1.VECTOR', 'topio.the-company.2.VECTOR', 'topio.the-company.3.VECTOR'];
+    this.assetsQuery = ['topio.the-company.1.VECTOR'];
     this.getAnalytics();
   }
 
@@ -282,19 +288,38 @@ export default class ViewsLineGraphCard extends Vue {
             format: '{point.name}',
           },
           allAreas: true,
-          data: [
-            ['gr', 50],
-            ['au', 1],
-            ['de', 3000],
-          ],
+          data: this.seriesData,
         },
       ],
     };
   }
 
+  formatSeries(): any {
+    // const result = Object.values(
+    //   this.analyticsData.points.reduce((acc, { value, ...rest }) => {
+    //     const key = Object.values(rest).join('|');
+    //     acc[key] = acc[key] || { ...rest, viewers: 0 };
+    //     acc[key].viewers += +value;
+    //     return acc;
+    //   }, {}),
+    // );
+
+    // console.log(result, 'result');
+    const result = Object.values(
+      this.analyticsData.points.reduce((acc, object: any) => {
+        const entry = object.location.code.toLowerCase();
+        (acc[entry] || (acc[entry] = [entry, 0]))[1] += object.value;
+        return acc;
+      }, {}),
+    );
+    console.log(result);
+    this.seriesData = result;
+  }
+
   formatSegmentsNames(): string[] {
     let names: Array<any> = [];
-    names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
+    // names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
+    names = [...new Map(this.analyticsData.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
     return names;
   }
 
@@ -304,56 +329,172 @@ export default class ViewsLineGraphCard extends Vue {
     return names;
   }
 
-  formatSeries(): any[] {
-    const series: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
-      this.assetsQuery.forEach((assetName) => {
-        const data: Array<number> = [];
-        this.locationData.forEach((segName: any) => {
-          // const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
-          const dataObj: any = {
-            code: segName.code,
-            lat: segName.lat,
-            lon: segName.lon,
-          };
-          data.push(dataObj);
+  // formatSeries(): any[] {
+  //   const series: Array<any> = [];
+  //   if (this.assetsQuery?.length > 1) {
+  //     this.assetsQuery.forEach((assetName) => {
+  //       const data: Array<number> = [];
+  //       this.analyticsData.points.forEach((segName: any) => {
+  //         // const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
+  //         // const dataObj: any = {
+  //         //   code: segName.code,
+  //         //   lat: segName.lat,
+  //         //   lon: segName.lon,
+  //         // };
 
-          // if (value.length > 0) {
-          //   data.push(dataObj);
-          //   console.log(segName, 'SEGNAME');
-          // } else {
-          //   data.push(0);
-          // }
-        });
-        const assetObj = {
-          name: assetName,
-          showInLegend: true,
-          data,
-        };
-        series.push(assetObj);
-      });
-    } else {
-      const data = this.analyticsData?.points.map((a) => a.value);
-      const assetObj = {
-        name: this.assetsQuery[0],
-        marker: {
-          enabled: true,
-          symbol: 'circle',
-          lineWidth: 1,
-          radius: 4,
-          states: {
-            hover: {
-              enabled: true,
-            },
-          },
-        },
-        showInLegend: true,
-        data,
-      };
-      series.push(assetObj);
-    }
-    return series;
-  }
+  //         // const dataObj: any = segName.location.code.toLowerCase(), segName.value];
+  //         const dataObj: any = {
+  //           location: segName.location.code.toLowerCase(),
+  //           value: segName.value,
+  //         };
+  //         data.push(dataObj);
+  //         console.log(segName, 'SEGNAME');
+  //       });
+  //       const assetObj = {
+  //         states: {
+  //           hover: {
+  //             color: '#BADA55',
+  //           },
+  //         },
+  //         dataLabels: {
+  //           enabled: false,
+  //           format: '{point.name}',
+  //         },
+  //         allAreas: true,
+  //         name: assetName,
+  //         showInLegend: true,
+  //         data,
+  //       };
+  //       series.push(assetObj);
+  //     });
+  //   } else {
+  //     const data = this.analyticsData?.points.map((a) => a.value);
+  //     const assetObj = {
+  //       name: this.assetsQuery[0],
+  //       marker: {
+  //         enabled: true,
+  //         symbol: 'circle',
+  //         lineWidth: 1,
+  //         radius: 4,
+  //         states: {
+  //           hover: {
+  //             enabled: true,
+  //           },
+  //         },
+  //       },
+  //       showInLegend: true,
+  //       data,
+  //     };
+  //     series.push(assetObj);
+  //   }
+  //   return series;
+  // }
+
+  // formatSeries(): any[] {
+  //   const series: Array<any> = [];
+  //   if (this.assetsQuery?.length > 1) {
+  //     this.assetsQuery.forEach((assetName) => {
+  //       const data: Array<number> = [];
+  //       this.locationData.forEach((segName: any) => {
+  //         const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
+  //         // const code = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
+  //         if (value.length > 0) {
+  //           // data.push(code[0]);
+  //           // console.log(segName.code, 'INHALT');
+  //           data.push(segName.code[0]);
+  //         } else {
+  //           data.push(0);
+  //         }
+  //       });
+  //       const assetObj = {
+  //         name: 'Random data',
+  //         states: {
+  //           hover: {
+  //             color: '#BADA55',
+  //           },
+  //         },
+  //         dataLabels: {
+  //           enabled: false,
+  //           format: '{point.name}',
+  //         },
+  //         allAreas: true,
+  //         data,
+  //       };
+  //       series.push(assetObj);
+  //       console.log(series, 'series');
+  //     });
+  //   } else {
+  //     const data = this.analyticsData?.points.map((a) => a.value);
+  //     const assetObj = {
+  //       name: this.assetsQuery[0],
+  //       marker: {
+  //         enabled: true,
+  //         symbol: 'circle',
+  //         lineWidth: 1,
+  //         radius: 4,
+  //         states: {
+  //           hover: {
+  //             enabled: true,
+  //           },
+  //         },
+  //       },
+  //       showInLegend: true,
+  //       data,
+  //     };
+  //     series.push(assetObj);
+  //   }
+  //   return series;
+  // }
+
+  // formatSeries(): any[] {
+  //   const series: Array<any> = [];
+  //   if (this.assetsQuery?.length > 1) {
+  //     this.assetsQuery.forEach((assetName) => {
+  //       const data: Array<number> = [];
+  //       this.locationData.forEach((segName: any) => {
+  //         const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
+  //         // const dataObj: any = {
+  //         //   code: segName.code,
+  //         //   lat: segName.lat,
+  //         //   lon: segName.lon,
+  //         // };
+  //         if (value.length > 0) {
+  //           const dataObj: any = [segName.code, value[0]];
+  //           data.push(dataObj);
+  //           console.log(segName, 'SEGNAME');
+  //         } else {
+  //           data.push(0);
+  //         }
+  //       });
+  //       const assetObj = {
+  //         name: assetName,
+  //         showInLegend: true,
+  //         data,
+  //       };
+  //       series.push(assetObj);
+  //     });
+  //   } else {
+  //     const data = this.analyticsData?.points.map((a) => a.value);
+  //     const assetObj = {
+  //       name: this.assetsQuery[0],
+  //       marker: {
+  //         enabled: true,
+  //         symbol: 'circle',
+  //         lineWidth: 1,
+  //         radius: 4,
+  //         states: {
+  //           hover: {
+  //             enabled: true,
+  //           },
+  //         },
+  //       },
+  //       showInLegend: true,
+  //       data,
+  //     };
+  //     series.push(assetObj);
+  //   }
+  //   return series;
+  // }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
