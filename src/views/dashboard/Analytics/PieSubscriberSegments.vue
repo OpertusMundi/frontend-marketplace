@@ -47,8 +47,12 @@
         </div>
       </div>
     </div>
-    <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
-    <table class="data_table" v-if="chartOptions">
+    <div class="pie-container">
+      <PieChart :analyticsData="analyticsData" :pieColor="bluePalette" />
+      <PieChart :analyticsData="analyticsData" :pieColor="greenPalette" />
+      <PieChart :analyticsData="analyticsData" :pieColor="magentaPalette" />
+    </div>
+    <!-- <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
           <th class="data_table__header">Asset</th>
@@ -61,7 +65,7 @@
           <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
   </div>
 </template>
 <script lang="ts">
@@ -78,11 +82,15 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-import HighCharts from 'highcharts';
+import Highcharts from 'highcharts';
+import exportingInit from 'highcharts/modules/exporting';
+import PieChart from '@/components/Charts/PieChart.vue';
+
+exportingInit(Highcharts);
 
 @Component({
   components: {
@@ -90,11 +98,12 @@ import HighCharts from 'highcharts';
     Multiselect,
     AssetMiniCard,
     DataRangePicker,
+    PieChart,
     highcharts: Chart,
   },
 })
 export default class SalesBarGraphCard extends Vue {
-  @Prop({ default: null }) private salesQueryMetricType!: EnumSalesQueryMetric;
+  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
 
   @Prop({ default: null }) private symbol!: string;
 
@@ -128,6 +137,16 @@ export default class SalesBarGraphCard extends Vue {
 
   lineChartDate: any;
 
+  assetQueryMetricType: EnumAssetQueryMetric;
+
+  countryCode?: string[];
+
+  bluePalette: string[];
+
+  greenPalette: string[];
+
+  magentaPalette: string[];
+
   constructor() {
     super();
 
@@ -156,6 +175,16 @@ export default class SalesBarGraphCard extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
+
+    this.countryCode = [];
+
+    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
+
+    this.bluePalette = ['rgb(0,0,146)', 'rgb(0,0,183)', 'rgb(0,0,219)', 'rgb(25,10,255)', 'rgb(61,46,255)', 'rgb(97,82,255)', 'rgb(134,119,255)', 'rgb(170,155,255)', 'rgb(207,192,255)', 'rgb(243,228,255)'];
+
+    this.greenPalette = ['rgb(0,71,67)', 'rgb(17,107,103)', 'rgb(53,143,139)', 'rgb(89,179,175)', 'rgb(125,215,211)', 'rgb(162,252,248)', 'rgb(198,255,255)'];
+
+    this.magentaPalette = ['rgb(59,0,72)', 'rgb(96,0,109)', 'rgb(132,31,145)', 'rgb(168,67,181)', 'rgb(204,103,217)', 'rgb(240,139,253)', 'rgb(255,176,255)'];
   }
 
   async mounted(): Promise<any> {
@@ -164,20 +193,25 @@ export default class SalesBarGraphCard extends Vue {
   }
 
   getAnalytics(): void {
-    const segmentQuery: SalesQuery = {
+    const assetsViewsQuery: AssetQuery = {
       segments: {
-        enabled: false,
+        enabled: true,
       },
       assets: this.assetsQuery,
-      metric: this.salesQueryMetricType,
+      metric: this.assetQueryMetricType,
+      source: this.assetSourceEnum,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
         max: this.temporalUnitMax,
       },
+      areas: {
+        enabled: false,
+        codes: this.countryCode,
+      },
     };
 
-    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
+    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
@@ -187,7 +221,8 @@ export default class SalesBarGraphCard extends Vue {
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
-        console.log(this.analyticsData);
+        console.log(this.seriesData);
+        console.log('Highcharts', Highcharts.setOptions({ colors: ['#50B432', '#ED561B'] }));
       }
     });
   }
@@ -224,12 +259,12 @@ export default class SalesBarGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
-    // const name = 'Sales per segment';
 
     return {
       chart: {
         type: 'pie',
       },
+      colors: ['#190AFF'],
       title: {
         text: 'Browser market shares. January, 2018',
       },
@@ -267,7 +302,7 @@ export default class SalesBarGraphCard extends Vue {
           data: [
             {
               name: 'Chrome',
-              y: 62.74,
+              y: 99.74,
               drilldown: 'Chrome',
             },
             {
@@ -303,91 +338,7 @@ export default class SalesBarGraphCard extends Vue {
           ],
         },
       ],
-      drilldown: {
-        series: [
-          {
-            name: 'Chrome',
-            id: 'Chrome',
-            data: [
-              ['v65.0', 0.1],
-              ['v64.0', 1.3],
-              ['v63.0', 53.02],
-              ['v62.0', 1.4],
-              ['v61.0', 0.88],
-              ['v60.0', 0.56],
-              ['v59.0', 0.45],
-              ['v58.0', 0.49],
-              ['v57.0', 0.32],
-              ['v56.0', 0.29],
-              ['v55.0', 0.79],
-              ['v54.0', 0.18],
-              ['v51.0', 0.13],
-              ['v49.0', 2.16],
-              ['v48.0', 0.13],
-              ['v47.0', 0.11],
-              ['v43.0', 0.17],
-              ['v29.0', 0.26],
-            ],
-          },
-          {
-            name: 'Firefox',
-            id: 'Firefox',
-            data: [
-              ['v58.0', 1.02],
-              ['v57.0', 7.36],
-              ['v56.0', 0.35],
-              ['v55.0', 0.11],
-              ['v54.0', 0.1],
-              ['v52.0', 0.95],
-              ['v51.0', 0.15],
-              ['v50.0', 0.1],
-              ['v48.0', 0.31],
-              ['v47.0', 0.12],
-            ],
-          },
-          {
-            name: 'Internet Explorer',
-            id: 'Internet Explorer',
-            data: [
-              ['v11.0', 6.2],
-              ['v10.0', 0.29],
-              ['v9.0', 0.27],
-              ['v8.0', 0.47],
-            ],
-          },
-          {
-            name: 'Safari',
-            id: 'Safari',
-            data: [
-              ['v11.0', 3.39],
-              ['v10.1', 0.96],
-              ['v10.0', 0.36],
-              ['v9.1', 0.54],
-              ['v9.0', 0.13],
-              ['v5.1', 0.2],
-            ],
-          },
-          {
-            name: 'Edge',
-            id: 'Edge',
-            data: [
-              ['v16', 2.6],
-              ['v15', 0.92],
-              ['v14', 0.4],
-              ['v13', 0.1],
-            ],
-          },
-          {
-            name: 'Opera',
-            id: 'Opera',
-            data: [
-              ['v50.0', 0.96],
-              ['v49.0', 0.82],
-              ['v12.1', 0.14],
-            ],
-          },
-        ],
-      },
+
       // chart: {
       //   type: 'areaspline',
       //   zoomType: 'x',
@@ -547,20 +498,9 @@ export default class SalesBarGraphCard extends Vue {
           }
         });
         const assetObj = {
-          marker: {
-            enabled: true,
-            symbol: 'circle',
-            lineWidth: 1,
-            radius: 4,
-            states: {
-              hover: {
-                enabled: true,
-              },
-            },
-          },
           name: assetName,
-          showInLegend: true,
-          data,
+          segment: 'segment',
+          y: data,
         };
         series.push(assetObj);
       });

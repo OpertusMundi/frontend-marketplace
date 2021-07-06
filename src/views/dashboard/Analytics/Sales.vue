@@ -74,7 +74,7 @@
         <sales-bar-graph-card :cardHeading="'Market Segment Transactions'" :salesQueryMetricType="'COUNT_TRANSACTIONS'" :symbol="''" :symbolTitle="'Transactions'"></sales-bar-graph-card>
       </div>
       <div class="analytics__cards__item" v-show="activeTab == 'segments'">
-        <pie-subscriber-segments :cardHeading="'Subscriber Segments'" :salesQueryMetricType="'COUNT_TRANSACTIONS'" :symbol="''" :symbolTitle="'Transactions'"></pie-subscriber-segments>
+        <pie-subscriber-segments :cardHeading="'Subscriber Segments'" :assetSourceEnum="'VIEW'" :symbol="''" :symbolTitle="'Transactions'"></pie-subscriber-segments>
       </div>
     </div>
   </div>
