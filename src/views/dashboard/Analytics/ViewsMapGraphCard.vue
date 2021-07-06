@@ -7,36 +7,10 @@
           <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
-        <div class="graphcard__head__data__right">
-          <ul>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
-            </li>
-          </ul>
-        </div>
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-          <multiselect v-model="selectedAssets[3]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
@@ -52,13 +26,13 @@
       <thead>
         <tr>
           <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+          <th v-for="(name, index) in tableData" class="data_table__header" :key="`segment_name_${index}`">{{ name.country }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.name">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
+        <tr class="data_table__row">
+          <td class="data_table__data">Asset Name</td>
+          <td class="data_table__data" v-for="value in tableData" :key="value.id">{{ formatValue(value.views) }}</td>
         </tr>
       </tbody>
     </table>
@@ -80,9 +54,8 @@ import AnalyticsApi from '@/service/analytics';
 import {
   EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
-import HighchartsVue, { Chart } from 'highcharts-vue';
+import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
-import moment from 'moment';
 import HighchartsMapModule from 'highcharts/modules/map';
 import mapData from '@highcharts/map-collection/custom/world.geo.json';
 
@@ -97,7 +70,7 @@ HighchartsMapModule(Highcharts);
     highcharts: Chart,
   },
 })
-export default class ViewsLineGraphCard extends Vue {
+export default class ViewsMapGraphCard extends Vue {
   @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
 
   @Prop({ default: '' }) private cardHeading!: string;
@@ -118,10 +91,6 @@ export default class ViewsLineGraphCard extends Vue {
 
   assetsQuery: string[];
 
-  segmentsNames: string[];
-
-  locationData: string[];
-
   chartOptions: any | null;
 
   temporalUnit: EnumTemporalUnit;
@@ -132,7 +101,7 @@ export default class ViewsLineGraphCard extends Vue {
 
   seriesData: any;
 
-  lineChartDate: any;
+  tableData: any;
 
   assetQueryMetricType: EnumAssetQueryMetric;
 
@@ -157,10 +126,6 @@ export default class ViewsLineGraphCard extends Vue {
 
     this.assetsQuery = [];
 
-    this.segmentsNames = [];
-
-    this.locationData = [];
-
     this.temporalUnitMin = '';
 
     this.temporalUnitMax = '';
@@ -169,7 +134,7 @@ export default class ViewsLineGraphCard extends Vue {
 
     this.seriesData = [];
 
-    this.lineChartDate = [];
+    this.tableData = [];
 
     this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
 
@@ -208,14 +173,9 @@ export default class ViewsLineGraphCard extends Vue {
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
-        this.segmentsNames = this.formatSegmentsNames();
-        this.locationData = this.formatLocation();
-        this.lineChartDate = this.formatTheDate();
-        // this.groupData = this.formatAnalytics();
-        // this.seriesData = this.formatSeries();
-        this.chartOptions = this.getOptions();
         this.formatSeries();
-        console.log(this.seriesData);
+        this.tableData = this.tableCountries();
+        this.chartOptions = this.getOptions();
       }
     });
   }
@@ -252,11 +212,12 @@ export default class ViewsLineGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
-    // const name = 'Sales per segment';
-
     return {
       chart: {
         map: mapData,
+      },
+      credits: {
+        enabled: false,
       },
       title: {
         text: '',
@@ -277,10 +238,10 @@ export default class ViewsLineGraphCard extends Vue {
       },
       series: [
         {
-          name: 'Random data',
+          name: 'Map',
           states: {
             hover: {
-              color: '#BADA55',
+              color: '#A843B5',
             },
           },
           dataLabels: {
@@ -294,286 +255,36 @@ export default class ViewsLineGraphCard extends Vue {
     };
   }
 
-  formatSeries(): any {
-    // const result = Object.values(
-    //   this.analyticsData.points.reduce((acc, { value, ...rest }) => {
-    //     const key = Object.values(rest).join('|');
-    //     acc[key] = acc[key] || { ...rest, viewers: 0 };
-    //     acc[key].viewers += +value;
-    //     return acc;
-    //   }, {}),
-    // );
-
-    // console.log(result, 'result');
-    const result = Object.values(
+  formatSeries() {
+    const result: any[] = Object.values(
       this.analyticsData.points.reduce((acc, object: any) => {
         const entry = object.location.code.toLowerCase();
         (acc[entry] || (acc[entry] = [entry, 0]))[1] += object.value;
         return acc;
       }, {}),
     );
-    console.log(result);
     this.seriesData = result;
+    // console.log(result, 'Reduce :P');
   }
 
-  formatSegmentsNames(): string[] {
-    let names: Array<any> = [];
-    // names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
-    names = [...new Map(this.analyticsData.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
-    return names;
+  tableCountries(): any {
+    const tableData: Array<any> = [];
+    this.seriesData.forEach((element) => {
+      console.log(element);
+      const tableObject = {
+        country: element[0].toUpperCase(),
+        views: element[1],
+      };
+      tableData.push(tableObject);
+    });
+    return tableData;
   }
-
-  formatLocation(): string[] {
-    let names: Array<any> = [];
-    names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.location), item])).values()].map((a) => a.location).reverse();
-    return names;
-  }
-
-  // formatSeries(): any[] {
-  //   const series: Array<any> = [];
-  //   if (this.assetsQuery?.length > 1) {
-  //     this.assetsQuery.forEach((assetName) => {
-  //       const data: Array<number> = [];
-  //       this.analyticsData.points.forEach((segName: any) => {
-  //         // const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
-  //         // const dataObj: any = {
-  //         //   code: segName.code,
-  //         //   lat: segName.lat,
-  //         //   lon: segName.lon,
-  //         // };
-
-  //         // const dataObj: any = segName.location.code.toLowerCase(), segName.value];
-  //         const dataObj: any = {
-  //           location: segName.location.code.toLowerCase(),
-  //           value: segName.value,
-  //         };
-  //         data.push(dataObj);
-  //         console.log(segName, 'SEGNAME');
-  //       });
-  //       const assetObj = {
-  //         states: {
-  //           hover: {
-  //             color: '#BADA55',
-  //           },
-  //         },
-  //         dataLabels: {
-  //           enabled: false,
-  //           format: '{point.name}',
-  //         },
-  //         allAreas: true,
-  //         name: assetName,
-  //         showInLegend: true,
-  //         data,
-  //       };
-  //       series.push(assetObj);
-  //     });
-  //   } else {
-  //     const data = this.analyticsData?.points.map((a) => a.value);
-  //     const assetObj = {
-  //       name: this.assetsQuery[0],
-  //       marker: {
-  //         enabled: true,
-  //         symbol: 'circle',
-  //         lineWidth: 1,
-  //         radius: 4,
-  //         states: {
-  //           hover: {
-  //             enabled: true,
-  //           },
-  //         },
-  //       },
-  //       showInLegend: true,
-  //       data,
-  //     };
-  //     series.push(assetObj);
-  //   }
-  //   return series;
-  // }
-
-  // formatSeries(): any[] {
-  //   const series: Array<any> = [];
-  //   if (this.assetsQuery?.length > 1) {
-  //     this.assetsQuery.forEach((assetName) => {
-  //       const data: Array<number> = [];
-  //       this.locationData.forEach((segName: any) => {
-  //         const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
-  //         // const code = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
-  //         if (value.length > 0) {
-  //           // data.push(code[0]);
-  //           // console.log(segName.code, 'INHALT');
-  //           data.push(segName.code[0]);
-  //         } else {
-  //           data.push(0);
-  //         }
-  //       });
-  //       const assetObj = {
-  //         name: 'Random data',
-  //         states: {
-  //           hover: {
-  //             color: '#BADA55',
-  //           },
-  //         },
-  //         dataLabels: {
-  //           enabled: false,
-  //           format: '{point.name}',
-  //         },
-  //         allAreas: true,
-  //         data,
-  //       };
-  //       series.push(assetObj);
-  //       console.log(series, 'series');
-  //     });
-  //   } else {
-  //     const data = this.analyticsData?.points.map((a) => a.value);
-  //     const assetObj = {
-  //       name: this.assetsQuery[0],
-  //       marker: {
-  //         enabled: true,
-  //         symbol: 'circle',
-  //         lineWidth: 1,
-  //         radius: 4,
-  //         states: {
-  //           hover: {
-  //             enabled: true,
-  //           },
-  //         },
-  //       },
-  //       showInLegend: true,
-  //       data,
-  //     };
-  //     series.push(assetObj);
-  //   }
-  //   return series;
-  // }
-
-  // formatSeries(): any[] {
-  //   const series: Array<any> = [];
-  //   if (this.assetsQuery?.length > 1) {
-  //     this.assetsQuery.forEach((assetName) => {
-  //       const data: Array<number> = [];
-  //       this.locationData.forEach((segName: any) => {
-  //         const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.location) === JSON.stringify(segName)).map((a) => a.value);
-  //         // const dataObj: any = {
-  //         //   code: segName.code,
-  //         //   lat: segName.lat,
-  //         //   lon: segName.lon,
-  //         // };
-  //         if (value.length > 0) {
-  //           const dataObj: any = [segName.code, value[0]];
-  //           data.push(dataObj);
-  //           console.log(segName, 'SEGNAME');
-  //         } else {
-  //           data.push(0);
-  //         }
-  //       });
-  //       const assetObj = {
-  //         name: assetName,
-  //         showInLegend: true,
-  //         data,
-  //       };
-  //       series.push(assetObj);
-  //     });
-  //   } else {
-  //     const data = this.analyticsData?.points.map((a) => a.value);
-  //     const assetObj = {
-  //       name: this.assetsQuery[0],
-  //       marker: {
-  //         enabled: true,
-  //         symbol: 'circle',
-  //         lineWidth: 1,
-  //         radius: 4,
-  //         states: {
-  //           hover: {
-  //             enabled: true,
-  //           },
-  //         },
-  //       },
-  //       showInLegend: true,
-  //       data,
-  //     };
-  //     series.push(assetObj);
-  //   }
-  //   return series;
-  // }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
     if (this.assetsQuery?.length) {
       this.getAnalytics();
     }
-  }
-
-  formatDate(value: any): any {
-    let date: any;
-    if (Object.prototype.hasOwnProperty.call(value, 'day')) {
-      date = moment()
-        .set({ year: value.year, month: value.month, date: value.day })
-        .format('MMM D, YY');
-      // console.log('day');
-    } else if (Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year') && !Object.prototype.hasOwnProperty.call(value, 'week')) {
-      date = moment()
-        .set({ year: value.year, month: value.month })
-        .format('MMMM YYYY');
-      // console.log('month');
-    } else if (Object.prototype.hasOwnProperty.call(value, 'week') && Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year')) {
-      const startWeek = moment()
-        .set('year', value.year)
-        .add(value.week, 'weeks')
-        .startOf('isoWeek')
-        .format('MMM D');
-      const endWeek = moment()
-        .set('year', value.year)
-        .add(value.week, 'weeks')
-        .endOf('isoWeek')
-        .format('MMM D, YY');
-      date = `${startWeek} - ${endWeek}`;
-      // console.log('week');
-    } else if (Object.prototype.hasOwnProperty.call(value, 'year')) {
-      date = moment()
-        .set({ year: value.year })
-        .format('YYYY');
-      // console.log('year');
-    }
-    // console.log(value);
-    return date;
-  }
-
-  formatTheDate(): string[] {
-    const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
-      this.segmentsNames.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment()
-            .set({ year: date.year, month: date.month, date: date.day })
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment()
-            .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment()
-            .set('year', date.year)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment()
-            .set('year', date.year)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment()
-            .set({ year: date.year })
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
-    return formattedDate;
   }
 
   formatValue(value: any): any {

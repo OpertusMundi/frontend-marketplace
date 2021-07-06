@@ -229,7 +229,6 @@ export default class ViewsLineGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
-    // const name = 'Sales per segment';
 
     return {
       chart: {
