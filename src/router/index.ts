@@ -135,6 +135,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'purchases',
+        name: 'Purchases',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardpurchases" */ '../views/dashboard/Purchases.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER], layout: 'dashboard' },
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsettings" */ '../views/dashboard/Settings.vue'),
