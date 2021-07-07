@@ -193,7 +193,15 @@
             display: block;
             padding-left: 15px;
             padding-right: 15px;
-          }
+        }
+
+        &--column{
+            flex-direction: column;
+            align-items: flex-start;
+            a {
+                color: $darkColor;
+            }
+        }
 
         &__helpers{
             display: flex;

@@ -1,7 +1,7 @@
 <template>
   <!-- <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="purchase_card"> -->
   <!-- <router-link :to="asset.status === 'DRAFT' ? `/dashboard/assets/create/${asset.key}` : `/dashboard/assets/preview/${asset.key}`" class="purchase_card"> -->
-  <router-link :to="`todo`" class="purchase_card purchase_card--purchase">
+  <router-link :to="`purchase/${ purchase.key }`" class="purchase_card purchase_card--purchase">
     <div class="purchase_card__view" :style="{'--color': getColor()}"><span>VIEW PURCHASE</span></div>
       <div class="purchase_card__inner" :style="{'--color': getColor()}">
       <!-- <div class="purchase_card__top">
