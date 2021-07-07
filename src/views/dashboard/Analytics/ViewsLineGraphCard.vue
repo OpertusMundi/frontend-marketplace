@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
+          <a href="#" @click.prevent="downloadCsv()"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
         <div class="graphcard__head__data__right">
@@ -47,7 +47,7 @@
         </div>
       </div>
     </div>
-    <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
+    <highcharts v-if="chartOptions" :options="chartOptions" ref="chart"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
@@ -82,6 +82,12 @@ import {
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import Highcharts from 'highcharts';
+import exportData from 'highcharts/modules/export-data';
+import exportingInit from 'highcharts/modules/exporting';
+
+exportingInit(Highcharts);
+exportData(Highcharts);
 
 @Component({
   components: {
@@ -233,6 +239,7 @@ export default class ViewsLineGraphCard extends Vue {
         type: 'areaspline',
         zoomType: 'x',
       },
+
       credits: {
         enabled: false,
       },
@@ -364,8 +371,20 @@ export default class ViewsLineGraphCard extends Vue {
               .replace(/(\d)(?=(\d{3})+\b)/g, '$1,')}€ <br>${point.category}`;
         },
       },
+      exporting: {
+        csv: {
+          itemDelimiter: ';',
+        },
+      },
       series: this.seriesData,
     };
+  }
+
+  downloadCsv(): void {
+    // const inhalt = Highcharts.chart(this.getOptions());
+    // inhalt.downloadCSV();
+    // console.log(inhalt);
+    // console.log(this.$refs.chart.options.downloadCSV());
   }
 
   formatSegmentsNames(): string[] {
