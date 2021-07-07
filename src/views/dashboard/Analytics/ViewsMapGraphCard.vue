@@ -4,7 +4,6 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
       </div>

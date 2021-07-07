@@ -4,7 +4,6 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <a href="#" @click.prevent="downloadCsv()"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
         <div class="graphcard__head__data__right">
@@ -47,7 +46,7 @@
         </div>
       </div>
     </div>
-    <highcharts v-if="chartOptions" :options="chartOptions" ref="chart"></highcharts>
+    <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
@@ -378,13 +377,6 @@ export default class ViewsLineGraphCard extends Vue {
       },
       series: this.seriesData,
     };
-  }
-
-  downloadCsv(): void {
-    // const inhalt = Highcharts.chart(this.getOptions());
-    // inhalt.downloadCSV();
-    // console.log(inhalt);
-    // console.log(this.$refs.chart.options.downloadCSV());
   }
 
   formatSegmentsNames(): string[] {

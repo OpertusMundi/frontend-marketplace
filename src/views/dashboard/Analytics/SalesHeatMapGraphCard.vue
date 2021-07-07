@@ -4,7 +4,6 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>Sales</h3>
-          <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt=""> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
         <div class="graphcard__head__data__right">
@@ -94,35 +93,34 @@ export default class SalesHeatMapGraphCard extends Vue {
       metric: EnumSalesQueryMetric.SUM_SALES,
     };
 
-    this.analyticsApi.executeSalesQuery(areaQuery)
-      .then((response) => {
-        if (response.success) {
-          // eslint-disable-next-line
-          const features = this.analyticsApi.toFeatureCollections(response.result!);
+    this.analyticsApi.executeSalesQuery(areaQuery).then((response) => {
+      if (response.success) {
+        // eslint-disable-next-line
+        const features = this.analyticsApi.toFeatureCollections(response.result!);
 
-          // Get min/max values
-          let min = Number.MAX_SAFE_INTEGER;
-          let max = 0;
-          features.features.forEach((f) => {
-            // eslint-disable-next-line
-            const value = f.properties.value;
-            min = value < min ? value : min;
-            max = value > max ? value : max;
-          });
-          // Normalize values to range [0,1]
-          features.features.forEach((f) => {
-            // eslint-disable-next-line
-            const value = f.properties.value;
-            // eslint-disable-next-line
-            f.properties.value = (value - min) / (max - min);
-          });
-          this.features = features;
-          this.chartOptions = this.getOptions();
-        }
-      });
+        // Get min/max values
+        let min = Number.MAX_SAFE_INTEGER;
+        let max = 0;
+        features.features.forEach((f) => {
+          // eslint-disable-next-line
+          const value = f.properties.value;
+          min = value < min ? value : min;
+          max = value > max ? value : max;
+        });
+        // Normalize values to range [0,1]
+        features.features.forEach((f) => {
+          // eslint-disable-next-line
+          const value = f.properties.value;
+          // eslint-disable-next-line
+          f.properties.value = (value - min) / (max - min);
+        });
+        this.features = features;
+        this.chartOptions = this.getOptions();
+      }
+    });
   }
 
-  getOptions():any {
+  getOptions(): any {
     if (!this.features) {
       return null;
     }
@@ -139,18 +137,9 @@ export default class SalesHeatMapGraphCard extends Vue {
     };
   }
 
-  async getAssets():Promise<any> {
+  async getAssets(): Promise<any> {
     const query = {
-      status: [
-        EnumDraftStatus.PUBLISHED,
-        EnumDraftStatus.DRAFT,
-        EnumDraftStatus.SUBMITTED,
-        EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-        EnumDraftStatus.HELPDESK_REJECTED,
-        EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-        EnumDraftStatus.PROVIDER_REJECTED,
-        EnumDraftStatus.POST_PROCESSING,
-      ],
+      status: [EnumDraftStatus.PUBLISHED, EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING],
     };
     const pageRequest = {
       page: 0,
@@ -171,9 +160,9 @@ export default class SalesHeatMapGraphCard extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/graphs/_graphcard.scss";
-  @import "@/assets/styles/graphs/_linegraph.scss";
-  .multiselect__option--highlight {
-    background: none!important;
-  }
+@import '@/assets/styles/graphs/_graphcard.scss';
+@import '@/assets/styles/graphs/_linegraph.scss';
+.multiselect__option--highlight {
+  background: none !important;
+}
 </style>

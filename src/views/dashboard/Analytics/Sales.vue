@@ -107,4 +107,6 @@ export default class DashboardAnalyticsExplore extends Vue {
   }
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+@import '@/assets/styles/graphs/_charts.scss';
+</style>
