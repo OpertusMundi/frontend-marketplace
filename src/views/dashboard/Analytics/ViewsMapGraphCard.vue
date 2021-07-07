@@ -255,7 +255,7 @@ export default class ViewsMapGraphCard extends Vue {
     };
   }
 
-  formatSeries() {
+  formatSeries(): any {
     const result: any[] = Object.values(
       this.analyticsData.points.reduce((acc, object: any) => {
         const entry = object.location.code.toLowerCase();
@@ -264,13 +264,11 @@ export default class ViewsMapGraphCard extends Vue {
       }, {}),
     );
     this.seriesData = result;
-    // console.log(result, 'Reduce :P');
   }
 
   tableCountries(): any {
     const tableData: Array<any> = [];
     this.seriesData.forEach((element) => {
-      console.log(element);
       const tableObject = {
         country: element[0].toUpperCase(),
         views: element[1],
@@ -287,7 +285,7 @@ export default class ViewsMapGraphCard extends Vue {
     }
   }
 
-  formatValue(value: any): any {
+  formatValue(value: string): any {
     const regex = value.toString();
     return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }

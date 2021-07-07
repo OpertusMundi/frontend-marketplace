@@ -31,7 +31,6 @@ export default class SalesBarGraphCard extends Vue {
 
   async mounted(): Promise<any> {
     this.chartOptions = this.getOptions();
-    console.log('Pie Chart is MOUNTED!!!');
   }
 
   getOptions(): any {
@@ -54,10 +53,10 @@ export default class SalesBarGraphCard extends Vue {
       },
       colors: this.pieColor,
       title: {
-        text: 'Asset Name 1',
+        text: '',
       },
       subtitle: {
-        text: 'Click the slices to view versions. Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>',
+        text: 'Asset',
       },
 
       accessibility: {
@@ -87,6 +86,12 @@ export default class SalesBarGraphCard extends Vue {
         {
           name: 'Browsers',
           colorByPoint: true,
+          dataLabels: {
+            connectorShape: 'straight',
+            style: {
+              fontSize: 8,
+            },
+          },
           data: [
             {
               name: 'BIOTA',
@@ -126,143 +131,6 @@ export default class SalesBarGraphCard extends Vue {
           ],
         },
       ],
-
-      // chart: {
-      //   type: 'areaspline',
-      //   zoomType: 'x',
-      // },
-      // credits: {
-      //   enabled: false,
-      // },
-      // title: {
-      //   text: this.symbolTitle,
-      // },
-
-      // xAxis: {
-      //   categories: this.lineChartDate,
-      //   type: 'datetime',
-      // },
-      // yAxis: {
-      //   gridLineDashStyle: 'Dot',
-      //   gridLineWidth: 1,
-      //   gridLineColor: '#6C6C6C',
-      //   title: {
-      //     text: this.symbolTitle,
-      //   },
-      // },
-      // legend: {
-      //   enabled: true,
-      // },
-      // colors: [
-      //   {
-      //     linearGradient: {
-      //       x1: 0,
-      //       x2: 0,
-      //       y1: 0,
-      //       y2: 1,
-      //     },
-      //     stops: [
-      //       [0, '#190AFF'],
-      //       [1, 'rgba(25,10,255,0)'],
-      //     ],
-      //   },
-      //   {
-      //     linearGradient: {
-      //       x1: 0,
-      //       x2: 0,
-      //       y1: 0,
-      //       y2: 1,
-      //     },
-      //     stops: [
-      //       [0, '#358F8B'],
-      //       [1, 'rgba(53,143,139,0)'],
-      //     ],
-      //   },
-      //   {
-      //     linearGradient: {
-      //       x1: 0,
-      //       x2: 0,
-      //       y1: 0,
-      //       y2: 1,
-      //     },
-      //     stops: [
-      //       [0, '#A843B5'],
-      //       [1, 'rgba(168,67,181,0)'],
-      //     ],
-      //   },
-      // ],
-      // plotOptions: {
-      //   colorByPoint: true,
-      //   area: {
-      //     fillColor: [
-      //       {
-      //         linearGradient: {
-      //           x1: 0,
-      //           x2: 0,
-      //           y1: 0,
-      //           y2: 1,
-      //         },
-      //         stops: [
-      //           [0, '#190AFF'],
-      //           [1, 'rgba(25,10,255,0)'],
-      //         ],
-      //       },
-      //       {
-      //         linearGradient: {
-      //           x1: 0,
-      //           x2: 0,
-      //           y1: 0,
-      //           y2: 1,
-      //         },
-      //         stops: [
-      //           [0, '#358F8B'],
-      //           [1, 'rgba(53,143,139,0)'],
-      //         ],
-      //       },
-      //       {
-      //         linearGradient: {
-      //           x1: 0,
-      //           x2: 0,
-      //           y1: 0,
-      //           y2: 1,
-      //         },
-      //         stops: [
-      //           [0, '#A843B5'],
-      //           [1, 'rgba(168,67,181,0)'],
-      //         ],
-      //       },
-      //     ],
-      //     lineWidth: 0.2,
-      //     states: {
-      //       hover: {
-      //         lineWidth: 1,
-      //       },
-      //     },
-      //     threshold: null,
-      //   },
-      // },
-
-      // tooltip: {
-      //   shadow: false,
-      //   borderWidth: 0,
-      //   backgroundColor: 'transparent',
-      //   valueSuffix: this.symbol,
-      //   style: {
-      //     color: '#190AFF',
-      //     fontFamily: 'Roboto',
-      //     fontSize: '13px',
-      //   },
-      //   formatter: (a) => {
-      //     const point = a.chart.hoverPoint;
-      //     return this.symbol === ''
-      //       ? `${point.y} <br>${point.category}`
-      //       : `${point.y
-      //         .toString()
-      //         .replace(/(\.\d{2})\d*/, '$1')
-      //         .replace(/(\d)(?=(\d{3})+\b)/g, '$1,')}€ <br>${point.category}`;
-      //   },
-      // },
-      // series: this.seriesData,
     };
   }
 }

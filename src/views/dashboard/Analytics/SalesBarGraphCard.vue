@@ -320,7 +320,6 @@ export default class SalesBarGraphCard extends Vue {
 
   upperCaseTransform(value: string): any {
     return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
-    // console.log(value);
   }
 }
 </script>

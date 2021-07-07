@@ -400,7 +400,6 @@ export default class SalesLineGraphCard extends Vue {
           data,
         };
         series.push(assetObj);
-        console.log(series, 'series');
       });
     } else {
       const data = this.analyticsData?.points.map((a) => a.value);

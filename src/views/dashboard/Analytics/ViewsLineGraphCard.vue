@@ -182,7 +182,6 @@ export default class ViewsLineGraphCard extends Vue {
     };
 
     this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
-      console.log(response);
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
@@ -192,7 +191,6 @@ export default class ViewsLineGraphCard extends Vue {
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
-        console.log(this.analyticsData);
       }
     });
   }
@@ -406,7 +404,6 @@ export default class ViewsLineGraphCard extends Vue {
           data,
         };
         series.push(assetObj);
-        console.log(series, 'series');
       });
     } else {
       const data = this.analyticsData?.points.map((a) => a.value);
@@ -444,12 +441,10 @@ export default class ViewsLineGraphCard extends Vue {
       date = moment()
         .set({ year: value.year, month: value.month, date: value.day })
         .format('MMM D, YY');
-      // console.log('day');
     } else if (Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year') && !Object.prototype.hasOwnProperty.call(value, 'week')) {
       date = moment()
         .set({ year: value.year, month: value.month })
         .format('MMMM YYYY');
-      // console.log('month');
     } else if (Object.prototype.hasOwnProperty.call(value, 'week') && Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year')) {
       const startWeek = moment()
         .set('year', value.year)
@@ -462,14 +457,11 @@ export default class ViewsLineGraphCard extends Vue {
         .endOf('isoWeek')
         .format('MMM D, YY');
       date = `${startWeek} - ${endWeek}`;
-      // console.log('week');
     } else if (Object.prototype.hasOwnProperty.call(value, 'year')) {
       date = moment()
         .set({ year: value.year })
         .format('YYYY');
-      // console.log('year');
     }
-    // console.log(value);
     return date;
   }
 
