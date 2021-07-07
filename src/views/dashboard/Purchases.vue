@@ -6,6 +6,20 @@
       </div>
     </div>
 
+    <div class="filters" v-if="!isLoading">
+      <div class="filters__block">
+        <p class="filters__title">{{ totalPurchases }} PURCHASES</p>
+      </div>
+      <div class="filters__block">
+        <div class="filters__block__select">
+          <label for="filter">STATUS: </label>
+          <select v-model="selectedStatus" name="filter" id="filter">
+            <option v-for="status in statusFilterOptions" :key="status" :value="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <purchase-card v-for="purchase in purchases" :key="purchase.key" :purchase="purchase"></purchase-card>
 
     <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalPurchases" @pageSelection="getOrders(null, $event, true)"></pagination>
@@ -16,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConsumerOrderApi from '@/service/consumer-order';
 import { EnumOrderSortField, EnumOrderStatus, Order } from '@/model/order';
 import { Sorting } from '@/model/request';
@@ -40,6 +54,10 @@ export default class DashboardPurchases extends Vue {
 
   currentPage: number;
 
+  statusFilterOptions: Array<EnumOrderStatus | string>;
+
+  selectedStatus: EnumOrderStatus | string;
+
   constructor() {
     super();
 
@@ -49,10 +67,27 @@ export default class DashboardPurchases extends Vue {
     this.purchases = [];
     this.totalPurchases = null;
     this.currentPage = 0;
+    this.statusFilterOptions = [
+      'ALL',
+      EnumOrderStatus.CREATED,
+      EnumOrderStatus.CHARGED,
+      EnumOrderStatus.PENDING,
+      EnumOrderStatus.CANCELLED,
+      EnumOrderStatus.REFUNDED,
+      EnumOrderStatus.SUCCEEDED,
+    ];
+    const [selectedStatus] = this.statusFilterOptions;
+    this.selectedStatus = selectedStatus;
   }
 
   mounted(): void {
     this.getOrders(null, 0);
+  }
+
+  @Watch('selectedStatus')
+  onSelectedStatusChange(selectedStatus: string): void {
+    const status = selectedStatus === 'ALL' ? null : [selectedStatus as EnumOrderStatus];
+    this.getOrders(status, 0, true);
   }
 
   getOrders(status: EnumOrderStatus[] | null, page: number, scrollBehavior = false): void {
@@ -86,4 +121,5 @@ export default class DashboardPurchases extends Vue {
 }
 </script>
 <style lang="scss">
+@import "@/assets/styles/_filters.scss";
 </style>
