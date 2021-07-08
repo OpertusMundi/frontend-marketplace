@@ -55,7 +55,8 @@ export default class ProviderOrderApi extends Api {
     const endpoint = '/action/provider/orders';
     const pagination = `page=${page}&size=${size}&orderBy=${field}&order=${order}`;
     const filters = `status=${status ? status.join(',') : ''}&referenceNumber=${referenceNumber || ''}`;
-    const url = endpoint + '?' + filters + '&' + pagination;
+    // const url = endpoint + '?' + filters + '&' + pagination;
+    const url = `${endpoint}?${filters}&${pagination}`;
 
     return this.get<ServerResponse<PageResult<Order>>>(url);
   }
