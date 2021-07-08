@@ -283,11 +283,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
     next('/error/401');
-  } else {
-    next();
-  }
-
-  if (role && !store.getters.hasRole(role)) {
+  } else if (role && !store.getters.hasRole(role)) {
     next('/error/401');
   } else {
     next();
