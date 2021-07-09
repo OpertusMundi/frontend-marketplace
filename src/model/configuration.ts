@@ -44,8 +44,34 @@ interface WordPressConfiguration {
   endpoint: string;
 }
 
+interface Country {
+  /**
+   * The country ISO 3166-1 alpha-2 code
+   */
+  code: string;
+  name: string;
+}
+
+interface CountryWithGeometry extends Country {
+  /**
+   * The bounding box of the country
+   */
+  geometry: GeoJSON.MultiPolygon;
+}
+
+interface Language {
+  /**
+   * The language ISO 639-1 two-letter code
+   */
+  code: string;
+  name: string;
+}
+
 export interface Configuration {
   asset: AssetConfiguration;
   authProviders: EnumAuthProvider[];
+  countries: Country[];
+  europeCountries: CountryWithGeometry[];
+  europeLanguages: Language[];
   wordPress: WordPressConfiguration;
 }

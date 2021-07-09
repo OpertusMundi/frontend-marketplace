@@ -283,15 +283,15 @@ interface Customer {
   emailVerifiedAt: string;
   kycLevel: EnumKycLevel;
   modifiedAt: string;
-  /**
-   * Payment provider unique user id
-   */
-  paymentProviderUser: string;
-  /**
-   * Payment provider unique waller id
-   */
-  paymentProviderWallet: string;
   type: EnumMangopayUserType;
+  /**
+   * Wallet funds. Wallet data is updated when a new PayIn, Transfer or PayOut is created.
+   */
+  walletFunds: number;
+  /**
+   * Wallet last update. Wallet data is updated when a new PayIn, Transfer or PayOut is created.
+   */
+  walletFundsUpdatedOn: string;
 }
 
 /**

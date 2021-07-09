@@ -5,12 +5,26 @@ import { AxiosResponse } from 'axios';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 
 import {
-  NutsRegionFeatureCollection, NutsRegionFeature, NutsRegionProperties,
+  NutsRegionFeatureCollection, NutsRegionFeature, NutsRegionProperties, EpsgCode,
 } from '@/model/spatial';
 
 export default class SpatialApi extends Api {
   constructor() {
     super({ withCredentials: true });
+  }
+
+  /**
+   * Get all EPSG codes supported by the platform
+   */
+  public async getEpsgCodes(): Promise<ServerResponse<EpsgCode[]>> {
+    const url = '/action/spatial/epsg';
+
+    return this.get<ServerResponse<EpsgCode[]>>(url)
+      .then((response: AxiosServerResponse<EpsgCode[]>) => {
+        const { data } = response;
+
+        return data;
+      });
   }
 
   /**
