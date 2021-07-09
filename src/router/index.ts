@@ -135,6 +135,30 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'orders',
+        name: 'Orders',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardorders" */ '../views/dashboard/Orders.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
+        path: 'order/:key',
+        name: 'OrderPreview',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardorderpreview" */ '../views/dashboard/OrderPreview.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
+        path: 'purchases',
+        name: 'Purchases',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardpurchases" */ '../views/dashboard/Purchases.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER], layout: 'dashboard' },
+      },
+      {
+        path: 'purchase/:key',
+        name: 'PurchasePreview',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardpurchasepreview" */ '../views/dashboard/PurchasePreview.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER], layout: 'dashboard' },
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsettings" */ '../views/dashboard/Settings.vue'),
@@ -265,11 +289,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
     next('/error/401');
-  } else {
-    next();
-  }
-
-  if (role && !store.getters.hasRole(role)) {
+  } else if (role && !store.getters.hasRole(role)) {
     next('/error/401');
   } else {
     next();
