@@ -228,9 +228,9 @@
             <li @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
             <li @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
             <li @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
-            <li @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
+            <li v-if="includeTabDueToRole('ROLE_CONSUMER')" @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
             <li @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
-            <li @click="selectTab('ubo')" :class="{ 'active': selectedTab=='ubo' }"><a href="#" @click.prevent="">UBO</a></li>
+            <li v-if="includeTabDueToRole('ROLE_PROVIDER')" @click="selectTab('ubo')" :class="{ 'active': selectedTab=='ubo' }"><a href="#" @click.prevent="">UBO</a></li>
           </ul>
         </div>
 
@@ -709,6 +709,9 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
+import store from '@/store';
+// eslint-disable-next-line
+import EnumRole from '@/model/role';
 import { EnumCustomerType } from '@/model/account';
 import { Card } from '@/model/payin';
 import {
@@ -793,6 +796,8 @@ export default class DashboardHome extends Vue {
 
   cards: Card[];
 
+  kycViewAsRole: EnumCustomerType;
+
   kycDocuments: KycDocument[] | null;
 
   kycNumberOfInputs: number;
@@ -841,6 +846,7 @@ export default class DashboardHome extends Vue {
 
     this.cards = [];
 
+    this.kycViewAsRole = {} as EnumCustomerType;
     this.kycDocuments = null;
     this.kycNumberOfInputs = 1;
 
@@ -879,8 +885,13 @@ export default class DashboardHome extends Vue {
   }
 
   loadCards(): void {
-    this.isCardsLoaded = false;
+    // if not consumer, do not load cards
+    if (!store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.isCardsLoaded = true;
+      return;
+    }
 
+    this.isCardsLoaded = false;
     this.paymentApi.getCards().then((cardsResponse) => {
       if (cardsResponse.success) {
         this.cards = cardsResponse.result;
@@ -894,15 +905,27 @@ export default class DashboardHome extends Vue {
   loadKycDocuments(): void {
     this.isKycDocumentsLoaded = false;
 
-    this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((documentsResponse) => {
+    // todo: handle case with both roles
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+      this.kycViewAsRole = EnumCustomerType.PROVIDER;
+    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.kycViewAsRole = EnumCustomerType.CONSUMER;
+    }
+
+    this.kycDocumentApi.findAll(this.kycViewAsRole).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
       this.isKycDocumentsLoaded = true;
     });
   }
 
   loadUboDeclarations(): void {
-    this.isUboDeclarationsLoaded = false;
+    // if not provider, do not load UBOs
+    if (!store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+      this.isUboDeclarationsLoaded = true;
+      return;
+    }
 
+    this.isUboDeclarationsLoaded = false;
     this.uboDeclarationApi.findAll().then((delcarationResponse) => {
       this.uboDeclarations = delcarationResponse.result.items;
       this.isUboDeclarationsLoaded = true;
@@ -922,6 +945,13 @@ export default class DashboardHome extends Vue {
 
   selectTab(tab: string): void {
     this.selectedTab = tab;
+  }
+
+  includeTabDueToRole(role: string): boolean {
+    if (store.getters.hasRole([role])) {
+      return true;
+    }
+    return false;
   }
 
   /*
