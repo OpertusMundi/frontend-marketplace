@@ -85,20 +85,20 @@ export default class AnalyticsApi extends Api {
       type: 'FeatureCollection',
       features: [],
     };
-
+    /* eslint-disable no-unused-expressions */
     data?.points.forEach((p, index) => {
       if (p.location?.lon && p.location?.lat && p.location?.code) {
         result.features.push({
           id: index,
           type: 'Feature',
           geometry: {
-            type: "Point",
+            type: 'Point',
             coordinates: [p.location.lon, p.location.lat],
           },
           properties: {
             label: p.location?.code,
             value: p.value,
-          }
+          },
         });
       }
     });
