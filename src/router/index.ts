@@ -182,6 +182,12 @@ const routes: RouteConfig[] = [
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardmesssagesthread" */ '../views/dashboard/MessagesThread.vue'),
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
+      {
+        path: 'analytics',
+        name: 'Analytics',
+        component: () => import(/* webpackChunkName: "dashboardfanalytics" */ '../views/dashboard/Analytics/Analytics.vue'),
+        meta: { requiresRole: '', layout: 'dashboard' },
+      },
     ],
   },
   {

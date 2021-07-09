@@ -1,0 +1,135 @@
+.input__date_picker{
+  min-height: 40px;
+  display: block;
+  padding: 5px 40px 5px 8px;
+  border-radius: 10px;
+  border: 1px solid #e8e8e8;
+  background: #fff;
+  width:100%;
+  font-size: em(12);
+  color: $darkColor;
+  &::placeholder{
+    color: black;
+    font-size: em(18);
+    font-weight: 500;
+  }
+  &:focus-visible{
+  outline:red;
+  }
+  &:focus{
+    border-radius: 10px;
+    border: 1px solid $secondColor;
+    }
+}
+.nav_date {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  &__button{
+    border:1px solid $greyColor;
+    padding:5px 10px;
+    border-radius:5px;
+    background-color: transparent;
+    transition: all 0.4s ease;
+    &:hover{
+    background-color: $secondColor;
+    }
+    &:hover &__text{
+      color:white;
+    }
+    &__text{
+      transition: all 0.4s ease;
+      color: $darkColor;
+      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 500;
+      font-family: "Roboto", sans-serif !important;
+    }
+  }
+}
+button.mx-btn.mx-btn-text.mx-btn-current-month {
+  color: black;
+  font-family: "Roboto", sans-serif !important;
+}
+button.mx-btn.mx-btn-text.mx-btn-current-year {
+  color: black;
+  font-family: "Roboto", sans-serif !important;
+}
+button.mx-btn.mx-btn-text {
+  color: black;
+  font-family: "Roboto", sans-serif !important;
+}
+.mx-table{
+  color: $darkColor;
+}
+td.cell.in-range:hover {
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+.mx-table-date .today {
+  color:$secondColor;
+  // background-color: $secondColor;
+  border: 1px solid $secondColor;
+  border-radius: 100%;
+}
+.mx-datepicker-main{
+  font-family: "Roboto", sans-serif !important;
+  font-weight: 500;
+}
+.mx-datepicker-header{
+  margin-bottom:15px;
+  border-bottom: none !important;
+  padding: 8px 0 8px 0;
+}
+.mx-datepicker-range.mx-datepicker-range.mx-datepicker {
+  max-width: 300px;
+  width:100%;
+}
+.mx-datepicker-main.mx-datepicker-popup {
+  border: 1px solid $secondColor;
+  background-color:$lightBgColor;
+  border-radius: 15px;
+}
+.mx-datepicker-content {
+  padding: 1rem;
+}
+.mx-calendar-content .cell.active {
+  color: #fff;
+  background-color:$secondColor;
+  border-radius: 50%;
+}
+.mx-calendar-content .cell:hover {
+  color: $secondColor;
+  background-color: $lightBgColor;
+  border-radius: 50%;
+}
+.mx-calendar-content .cell.in-range, .mx-calendar-content .cell.hover-in-range {
+  color: $secondColor;
+  background-color: $lightBgColor;
+}
+.mx-range-wrapper > div{
+  background-color: white;
+  border-radius: 15px;
+}
+.mx-range-wrapper > div:first-child{
+  margin-right:20px;
+}
+.mx-range-wrapper > div:last-child{
+  margin-left:20px;
+}
+.mx-calendar+.mx-calendar {
+  border-left: none !important
+}
+table.mx-table.mx-table-month > tr > td.cell.active{
+  border-radius: 0;
+}
+table.mx-table.mx-table-month > tr > td:hover{
+  border-radius: 0;
+}
+table.mx-table.mx-table-year > tr > td.cell.active {
+  border-radius: 0;
+}
+table.mx-table.mx-table-year > tr > td:hover{
+  border-radius: 0;
+}
