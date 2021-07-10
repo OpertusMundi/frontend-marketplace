@@ -13,15 +13,16 @@
         <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
         <modal :show="modalToShow == 'mobileNumber'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your mobile number'" :modalId="'mobile'" :inputs="[{id: 'mobile', name: 'Mobile number', value: userData.profile.mobile, type: 'text'}]"></modal>
 
-        <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: userData.profile.provider.draft? userData.profile.provider.draft.companyNumber : userData.profile.provider.current.companyNumber, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: userData.profile.provider.draft? userData.profile.provider.draft.companyType : userData.profile.provider.current.companyType, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', value: userData.profile.provider.draft? userData.profile.provider.draft.email : userData.profile.provider.current.email, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'website'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your website'" :modalId="'siteUrl'" :inputs="[{id: 'siteUrl', name: 'Site URL', value: userData.profile.provider.draft? userData.profile.provider.draft.siteUrl : userData.profile.provider.current.siteUrl, type: 'text'}]"></modal>
+        <!-- <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name, type: 'text'}]"></modal> -->
+        <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: getCurrentOrDraftValue('companyNumber'), type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: getCurrentOrDraftValue('companyType'), type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', value: getCurrentOrDraftValue('email'), type: 'text'}]"></modal>
+        <modal :show="modalToShow == 'website'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your website'" :modalId="'siteUrl'" :inputs="[{id: 'siteUrl', name: 'Site URL', value: getCurrentOrDraftValue('siteUrl'), type: 'text'}]"></modal>
 
-        <modal :show="modalToShow == 'bankAccountOwnerName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change account owner\'s name'" :modalId="'bankAccountOwnerName'" :inputs="[{id: 'bankAccountOwnerName', name: 'Full Name', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerName : userData.profile.provider.current.bankAccount.ownerName, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'bankAccountIban'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change IBAN'" :modalId="'bankAccountIban'" :inputs="[{id: 'bankAccountIban', name: 'IBAN', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.iban : userData.profile.provider.current.bankAccount.iban, type: 'text'}]"></modal>
-        <modal :show="modalToShow == 'bankAccountBic'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change BIC'" :modalId="'bankAccountBic'" :inputs="[{id: 'bankAccountBic', name: 'BIC', value: userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.bic : userData.profile.provider.current.bankAccount.bic, type: 'text'}]"></modal>
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountOwnerName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change account owner\'s name'" :modalId="'bankAccountOwnerName'" :inputs="[{id: 'bankAccountOwnerName', name: 'Full Name', value: getCurrentOrDraftValue('bankAccount.ownerName'), type: 'text'}]"></modal>
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountIban'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change IBAN'" :modalId="'bankAccountIban'" :inputs="[{id: 'bankAccountIban', name: 'IBAN', value: getCurrentOrDraftValue('bankAccount.iban'), type: 'text'}]"></modal>
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountBic'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change BIC'" :modalId="'bankAccountBic'" :inputs="[{id: 'bankAccountBic', name: 'BIC', value: getCurrentOrDraftValue('bankAccount.bic'), type: 'text'}]"></modal>
 
         <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="onPasswordModalDismiss" :modalId="'password'" :showCancelButton="false">
           <template v-slot:body>
@@ -53,29 +54,29 @@
           </template>
         </modal>
 
-        <modal :withSlots="true" :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" :modalId="'bankAccountOwnerAddress'">
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :withSlots="true" :show="modalToShow == 'bankAccountOwnerAddress'" @dismiss="modalToShow = ''" :modalId="'bankAccountOwnerAddress'">
           <template v-slot:body>
             <h1 class="mb-xs-20">Change Owner Address</h1>
 
             <div class="form-group">
               <label for="bankAccountOwnerAddressLine1">Line 1</label>
-              <input ref="bankAccountOwnerAddressLine1" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line1 : userData.profile.provider.current.bankAccount.ownerAddress.line1" class="form-group__text" type="text" id="bankAccountOwnerAddressLine1">
+              <input ref="bankAccountOwnerAddressLine1" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.line1')" class="form-group__text" type="text" id="bankAccountOwnerAddressLine1">
             </div>
             <div class="form-group">
               <label for="bankAccountOwnerAddressLine2">Line 2</label>
-              <input ref="bankAccountOwnerAddressLine2" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.line2 : userData.profile.provider.current.bankAccount.ownerAddress.line2" class="form-group__text" type="text" id="bankAccountOwnerAddressLine2">
+              <input ref="bankAccountOwnerAddressLine2" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.line2')" class="form-group__text" type="text" id="bankAccountOwnerAddressLine2">
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="bankAccountOwnerAddressCity">City</label>
-                  <input ref="bankAccountOwnerAddressCity" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.city : userData.profile.provider.current.bankAccount.ownerAddress.city" class="form-group__text" type="text" id="bankAccountOwnerAddressCity">
+                  <input ref="bankAccountOwnerAddressCity" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.city')" class="form-group__text" type="text" id="bankAccountOwnerAddressCity">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="bankAccountOwnerAddressRegion">Region</label>
-                  <input ref="bankAccountOwnerAddressRegion" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.region : userData.profile.provider.current.bankAccount.ownerAddress.region" class="form-group__text" type="text" id="bankAccountOwnerAddressRegion">
+                  <input ref="bankAccountOwnerAddressRegion" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.region')" class="form-group__text" type="text" id="bankAccountOwnerAddressRegion">
                 </div>
               </div>
             </div>
@@ -83,13 +84,13 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="bankAccountOwnerAddressPostalCode">Postal Code</label>
-                  <input ref="bankAccountOwnerAddressPostalCode" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.postalCode : userData.profile.provider.current.bankAccount.ownerAddress.postalCode" class="form-group__text" type="text" id="bankAccountOwnerAddressPostalCode">
+                  <input ref="bankAccountOwnerAddressPostalCode" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.postalCode')" class="form-group__text" type="text" id="bankAccountOwnerAddressPostalCode">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="bankAccountOwnerAddressCountry">Country</label>
-                  <input ref="bankAccountOwnerAddressCountry" :value="userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerAddress.country : userData.profile.provider.current.bankAccount.ownerAddress.country" class="form-group__text" type="text" id="bankAccountOwnerAddressCountry">
+                  <input ref="bankAccountOwnerAddressCountry" :value="getCurrentOrDraftValue('bankAccount.ownerAddress.country')" class="form-group__text" type="text" id="bankAccountOwnerAddressCountry">
                 </div>
               </div>
             </div>
@@ -99,29 +100,29 @@
           </template>
         </modal>
 
-        <modal :withSlots="true" :show="modalToShow == 'headquartersAddress'" @dismiss="modalToShow = ''" :modalId="'headquartersAddress'">
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :withSlots="true" :show="modalToShow == 'headquartersAddress'" @dismiss="modalToShow = ''" :modalId="'headquartersAddress'">
           <template v-slot:body>
             <h1 class="mb-xs-20">Change Headquarters Address</h1>
 
             <div class="form-group">
               <label for="headquartersAddressLine1">Line 1</label>
-              <input ref="headquartersAddressLine1" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.line1 : userData.profile.provider.current.headquartersAddress.line1" class="form-group__text" type="text" id="headquartersAddressLine1">
+              <input ref="headquartersAddressLine1" :value="getCurrentOrDraftValue('headquartersAddress.line1')" class="form-group__text" type="text" id="headquartersAddressLine1">
             </div>
             <div class="form-group">
               <label for="headquartersAddressLine2">Line 2</label>
-              <input ref="headquartersAddressLine2" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.line2 : userData.profile.provider.current.headquartersAddress.line2" class="form-group__text" type="text" id="headquartersAddressLine2">
+              <input ref="headquartersAddressLine2" :value="getCurrentOrDraftValue('headquartersAddress.line2')" class="form-group__text" type="text" id="headquartersAddressLine2">
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="headquartersAddressCity">City</label>
-                  <input ref="headquartersAddressCity" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.city : userData.profile.provider.current.headquartersAddress.city" class="form-group__text" type="text" id="headquartersAddressCity">
+                  <input ref="headquartersAddressCity" :value="getCurrentOrDraftValue('headquartersAddress.city')" class="form-group__text" type="text" id="headquartersAddressCity">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="headquartersAddressRegion">Region</label>
-                  <input ref="headquartersAddressRegion" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.region : userData.profile.provider.current.headquartersAddress.region" class="form-group__text" type="text" id="headquartersAddressRegion">
+                  <input ref="headquartersAddressRegion" :value="getCurrentOrDraftValue('headquartersAddress.region')" class="form-group__text" type="text" id="headquartersAddressRegion">
                 </div>
               </div>
             </div>
@@ -129,13 +130,13 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="headquartersAddressPostalCode">Postal Code</label>
-                  <input ref="headquartersAddressPostalCode" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.postalCode : userData.profile.provider.current.headquartersAddress.postalCode" class="form-group__text" type="text" id="headquartersAddressPostalCode">
+                  <input ref="headquartersAddressPostalCode" :value="getCurrentOrDraftValue('headquartersAddress.postalCode')" class="form-group__text" type="text" id="headquartersAddressPostalCode">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="headquartersAddressCountry">Country</label>
-                  <input ref="headquartersAddressCountry" :value="userData.profile.provider.draft? userData.profile.provider.draft.headquartersAddress.country : userData.profile.provider.current.headquartersAddress.country" class="form-group__text" type="text" id="headquartersAddressCountry">
+                  <input ref="headquartersAddressCountry" :value="getCurrentOrDraftValue('headquartersAddress.country')" class="form-group__text" type="text" id="headquartersAddressCountry">
                 </div>
               </div>
             </div>
@@ -145,29 +146,29 @@
           </template>
         </modal>
 
-        <modal :withSlots="true" :show="modalToShow == 'representativeAddress'" @dismiss="modalToShow = ''" :modalId="'representativeAddress'">
+        <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :withSlots="true" :show="modalToShow == 'representativeAddress'" @dismiss="modalToShow = ''" :modalId="'representativeAddress'">
           <template v-slot:body>
             <h1 class="mb-xs-20">Change Legal Representative's Address</h1>
 
             <div class="form-group">
               <label for="representativeAddressLine1">Line 1</label>
-              <input ref="representativeAddressLine1" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.line1 : userData.profile.provider.current.representative.address.line1" class="form-group__text" type="text" id="representativeAddressLine1">
+              <input ref="representativeAddressLine1" :value="getCurrentOrDraftValue('representative.address.line1')" class="form-group__text" type="text" id="representativeAddressLine1">
             </div>
             <div class="form-group">
               <label for="representativeAddressLine2">Line 2</label>
-              <input ref="representativeAddressLine2" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.line2 : userData.profile.provider.current.representative.address.line2" class="form-group__text" type="text" id="representativeAddressLine2">
+              <input ref="representativeAddressLine2" :value="getCurrentOrDraftValue('representative.address.line2')" class="form-group__text" type="text" id="representativeAddressLine2">
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="representativeAddressCity">City</label>
-                  <input ref="representativeAddressCity" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.city : userData.profile.provider.current.representative.address.city" class="form-group__text" type="text" id="representativeAddressCity">
+                  <input ref="representativeAddressCity" :value="getCurrentOrDraftValue('representative.address.city')" class="form-group__text" type="text" id="representativeAddressCity">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="representativeAddressRegion">Region</label>
-                  <input ref="representativeAddressRegion" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.region : userData.profile.provider.current.representative.address.region" class="form-group__text" type="text" id="representativeAddressRegion">
+                  <input ref="representativeAddressRegion" :value="getCurrentOrDraftValue('representative.address.region')" class="form-group__text" type="text" id="representativeAddressRegion">
                 </div>
               </div>
             </div>
@@ -175,19 +176,65 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="representativeAddressPostalCode">Postal Code</label>
-                  <input ref="representativeAddressPostalCode" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.postalCode : userData.profile.provider.current.representative.address.postalCode" class="form-group__text" type="text" id="representativeAddressPostalCode">
+                  <input ref="representativeAddressPostalCode" :value="getCurrentOrDraftValue('representative.address.postalCode')" class="form-group__text" type="text" id="representativeAddressPostalCode">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="representativeAddressCountry">Country</label>
-                  <input ref="representativeAddressCountry" :value="userData.profile.provider.draft? userData.profile.provider.draft.representative.address.country : userData.profile.provider.current.representative.address.country" class="form-group__text" type="text" id="representativeAddressCountry">
+                  <input ref="representativeAddressCountry" :value="getCurrentOrDraftValue('representative.address.country')" class="form-group__text" type="text" id="representativeAddressCountry">
                 </div>
               </div>
             </div>
           </template>
           <template v-slot:footer>
             <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'representativeAddress'})">CONFIRM</button>
+          </template>
+        </modal>
+
+        <modal v-if="getCurrentOrDraftValue('type') === 'INDIVIDUAL'" :withSlots="true" :show="modalToShow == 'individualAddress'" @dismiss="modalToShow = ''" :modalId="'individualAddress'">
+          <template v-slot:body>
+            <h1 class="mb-xs-20">Change Address</h1>
+
+            <div class="form-group">
+              <label for="individualAddressLine1">Line 1</label>
+              <input ref="individualAddressLine1" :value="getCurrentOrDraftValue('address.line1')" class="form-group__text" type="text" id="individualAddressLine1">
+            </div>
+            <div class="form-group">
+              <label for="individualAddressLine2">Line 2</label>
+              <input ref="individualAddressLine2" :value="getCurrentOrDraftValue('address.line2')" class="form-group__text" type="text" id="individualAddressLine2">
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="individualAddressCity">City</label>
+                  <input ref="individualAddressCity" :value="getCurrentOrDraftValue('address.city')" class="form-group__text" type="text" id="individualAddressCity">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="individualAddressRegion">Region</label>
+                  <input ref="individualAddressRegion" :value="getCurrentOrDraftValue('address.region')" class="form-group__text" type="text" id="individualAddressRegion">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="individualAddressPostalCode">Postal Code</label>
+                  <input ref="individualAddressPostalCode" :value="getCurrentOrDraftValue('address.postalCode')" class="form-group__text" type="text" id="individualAddressPostalCode">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="individualAddressCountry">Country</label>
+                  <input ref="individualAddressCountry" :value="getCurrentOrDraftValue('address.country')" class="form-group__text" type="text" id="individualAddressCountry">
+                </div>
+              </div>
+            </div>
+          </template>
+          <template v-slot:footer>
+            <button class="btn--std btn--blue ml-xs-20" @click="onSubmitMangoPayField({modalId: 'individualAddress'})">CONFIRM</button>
           </template>
         </modal>
 
@@ -225,8 +272,8 @@
           <ul>
             <li @click="selectTab('general')" :class="{ 'active': selectedTab=='general' }"><a href="#" @click.prevent="">General</a></li>
             <li @click="selectTab('loginAndSecurity')" :class="{ 'active': selectedTab=='loginAndSecurity' }"><a href="#" @click.prevent="">Login & Security</a></li>
-            <li @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
-            <li @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
+            <li v-if="!isLoading() && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
+            <li v-if="!isLoading() && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
             <li @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
             <li v-if="includeTabDueToRole('ROLE_CONSUMER')" @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
             <li @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
@@ -289,27 +336,27 @@
               <div class="tabs__tab tabs__tab__company_information">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Company name</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('name') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'companyName'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>VAT number</strong></div>
-                  <div class="tabs__tab__list__item right"> {{ userData.profile.provider.draft? userData.profile.provider.draft.companyNumber : userData.profile.provider.current.companyNumber }} </div>
+                  <div class="tabs__tab__list__item right"> {{ getCurrentOrDraftValue('companyNumber') }} </div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'vatNumber'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Domain</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.companyType : userData.profile.provider.current.companyType }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('companyType') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'domain'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Company email</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.email : userData.profile.provider.current.email }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('email') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'companyEmail'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Website</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.siteUrl : userData.profile.provider.current.siteUrl }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('siteUrl') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'website'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -328,29 +375,29 @@
               <div class="tabs__tab tabs__tab__payout_options">
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Bank Account Owner Name</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.ownerName : userData.profile.provider.current.bankAccount.ownerName }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('bankAccount.ownerName') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'bankAccountOwnerName'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
 
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>IBAN</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.iban : userData.profile.provider.current.bankAccount.iban }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('bankAccount.iban') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'bankAccountIban'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
 
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>BIC</strong></div>
-                  <div class="tabs__tab__list__item right">{{ userData.profile.provider.draft? userData.profile.provider.draft.bankAccount.bic : userData.profile.provider.current.bankAccount.bic }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('bankAccount.bic') }}</div>
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'bankAccountBic'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
 
                 <div class="tabs__tab__list">
                   <div class="tabs__tab__list__item"><strong>Address</strong></div>
-                  <div v-if="!userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.current.bankAccount.ownerAddress.line1 }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.line2? userData.profile.provider.current.bankAccount.ownerAddress.line2 + ', ': '' }} {{ userData.profile.provider.current.bankAccount.ownerAddress.postalCode }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.city }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.region }}, {{ userData.profile.provider.current.bankAccount.ownerAddress.country }}</div>
-                  <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.bankAccount.ownerAddress.line1 }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.line2? userData.profile.provider.draft.bankAccount.ownerAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.bankAccount.ownerAddress.postalCode }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.city }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.region }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.country }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('bankAccount.ownerAddress.line1') }}, {{ getCurrentOrDraftValue('bankAccount.ownerAddress.line2') ? getCurrentOrDraftValue('bankAccount.ownerAddress.line2') + ', ': '' }} {{ getCurrentOrDraftValue('bankAccount.ownerAddress.postalCode') }}, {{ getCurrentOrDraftValue('bankAccount.ownerAddress.city') }}, {{ getCurrentOrDraftValue('bankAccount.ownerAddress.region') }}, {{ getCurrentOrDraftValue('bankAccount.ownerAddress.country') }}</div>
+                  <!-- <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.bankAccount.ownerAddress.line1 }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.line2? userData.profile.provider.draft.bankAccount.ownerAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.bankAccount.ownerAddress.postalCode }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.city }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.region }}, {{ userData.profile.provider.draft.bankAccount.ownerAddress.country }}</div> -->
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'bankAccountOwnerAddress'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
@@ -367,17 +414,25 @@
               </div>
 
               <div class="tabs__tab tabs__tab__addresses">
-                <div class="tabs__tab__list">
+                <div class="tabs__tab__list" v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'">
                   <div class="tabs__tab__list__item"><strong>Headquarters address</strong></div>
-                  <div v-if="!userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.current.headquartersAddress.line1 }}, {{ userData.profile.provider.current.headquartersAddress.line2? userData.profile.provider.current.headquartersAddress.line2 + ', ': '' }} {{ userData.profile.provider.current.headquartersAddress.postalCode }}, {{ userData.profile.provider.current.headquartersAddress.city }}, {{ userData.profile.provider.current.headquartersAddress.region }}, {{ userData.profile.provider.current.headquartersAddress.country }}</div>
-                  <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.headquartersAddress.line1 }}, {{ userData.profile.provider.draft.headquartersAddress.line2? userData.profile.provider.draft.headquartersAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.headquartersAddress.postalCode }}, {{ userData.profile.provider.draft.headquartersAddress.city }}, {{ userData.profile.provider.draft.headquartersAddress.region }}, {{ userData.profile.provider.draft.headquartersAddress.country }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('headquartersAddress.line1') }}, {{ getCurrentOrDraftValue('headquartersAddress.line2') ? getCurrentOrDraftValue('headquartersAddress.line2') + ', ': '' }} {{ getCurrentOrDraftValue('headquartersAddress.postalCode') }}, {{ getCurrentOrDraftValue('headquartersAddress.city') }}, {{ getCurrentOrDraftValue('headquartersAddress.region') }}, {{ getCurrentOrDraftValue('headquartersAddress.country') }}</div>
+                  <!-- <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.headquartersAddress.line1 }}, {{ userData.profile.provider.draft.headquartersAddress.line2? userData.profile.provider.draft.headquartersAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.headquartersAddress.postalCode }}, {{ userData.profile.provider.draft.headquartersAddress.city }}, {{ userData.profile.provider.draft.headquartersAddress.region }}, {{ userData.profile.provider.draft.headquartersAddress.country }}</div> -->
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'headquartersAddress'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
 
                   <div class="tabs__tab__list__item"><strong>Legal Representative's address</strong></div>
-                  <div v-if="!userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.current.representative.address.line1 }}, {{ userData.profile.provider.current.representative.address.line2? userData.profile.provider.current.representative.address.line2 + ', ': '' }} {{ userData.profile.provider.current.representative.address.postalCode }}, {{ userData.profile.provider.current.representative.address.city }}, {{ userData.profile.provider.current.representative.address.region }}, {{ userData.profile.provider.current.representative.address.country }}</div>
-                  <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.representative.address.line1 }}, {{ userData.profile.provider.draft.representative.address.line2? userData.profile.provider.draft.representative.address.line2 + ', ': '' }} {{ userData.profile.provider.draft.representative.address.postalCode }}, {{ userData.profile.provider.draft.representative.address.city }}, {{ userData.profile.provider.draft.representative.address.region }}, {{ userData.profile.provider.draft.representative.address.country }}</div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('representative.address.line1') }}, {{ getCurrentOrDraftValue('representative.address.line2') ? getCurrentOrDraftValue('representative.address.line2') + ', ': '' }} {{ getCurrentOrDraftValue('representative.address.postalCode') }}, {{ getCurrentOrDraftValue('representative.address.city') }}, {{ getCurrentOrDraftValue('representative.address.region') }}, {{ getCurrentOrDraftValue('representative.address.country') }}</div>
+                  <!-- <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.representative.address.line1 }}, {{ userData.profile.provider.draft.representative.address.line2? userData.profile.provider.draft.representative.address.line2 + ', ': '' }} {{ userData.profile.provider.draft.representative.address.postalCode }}, {{ userData.profile.provider.draft.representative.address.city }}, {{ userData.profile.provider.draft.representative.address.region }}, {{ userData.profile.provider.draft.representative.address.country }}</div> -->
                   <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'representativeAddress'" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                  <div class="tabs__tab__list__line"></div>
+                </div>
+
+                <div class="tabs__tab__list" v-if="getCurrentOrDraftValue('type') === 'INDIVIDUAL'">
+                  <div class="tabs__tab__list__item"><strong>Address</strong></div>
+                  <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('address.line1') }}, {{ getCurrentOrDraftValue('address.line2') ? getCurrentOrDraftValue('address.line2') + ', ': '' }} {{ getCurrentOrDraftValue('address.postalCode') }}, {{ getCurrentOrDraftValue('address.city') }}, {{ getCurrentOrDraftValue('address.region') }}, {{ getCurrentOrDraftValue('address.country') }}</div>
+                  <!-- <div v-if="userData.profile.provider.draft" class="tabs__tab__list__item right">{{ userData.profile.provider.draft.headquartersAddress.line1 }}, {{ userData.profile.provider.draft.headquartersAddress.line2? userData.profile.provider.draft.headquartersAddress.line2 + ', ': '' }} {{ userData.profile.provider.draft.headquartersAddress.postalCode }}, {{ userData.profile.provider.draft.headquartersAddress.city }}, {{ userData.profile.provider.draft.headquartersAddress.region }}, {{ userData.profile.provider.draft.headquartersAddress.country }}</div> -->
+                  <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'individualAddress'" class="btn btn--std btn--outlinedark">EDIT</button></div>
                   <div class="tabs__tab__list__line"></div>
                 </div>
               </div>
@@ -397,13 +452,16 @@
                 <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
                   <div class="tabs__tab__list">
                     <div class="tabs__tab__list__item"><strong>CARD {{ i + 1 }}</strong></div>
-                    <div class="tabs__tab__list__item right">{{ card }} (dummy)</div>
+                    <div class="tabs__tab__list__item right">
+                      {{ card.alias }}
+                      <div class="tabs__tab__list__item__active-indicator" :class="card.active ? 'tabs__tab__list__item__active-indicator--active' : 'tabs__tab__list__item__active-indicator--inactive'"></div>
+                    </div>
                     <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">REMOVE</button></div>
                     <div class="tabs__tab__list__line"></div>
                   </div>
                 </div>
 
-                <div v-if="cards.length" class="d-flex justify-content-end">
+                <div v-if="cards.length" class="d-flex justify-content-end mt-xs-30">
                   <button @click="addCard" class="btn btn--std btn--outlineblue">ADD CARD</button>
                 </div>
                 <h4 v-else class="mt-xs-30">There are no cards submitted. <button @click="addCard" class="btn btn--std btn--blue ml-xs-20">ADD CARD</button></h4>
@@ -712,7 +770,13 @@ import en from 'vee-validate/dist/locale/en.json';
 import store from '@/store';
 // eslint-disable-next-line
 import EnumRole from '@/model/role';
-import { EnumCustomerType } from '@/model/account';
+import {
+  CustomerDraftIndividual,
+  CustomerDraftProfessional,
+  CustomerIndividual,
+  CustomerProfessional,
+  EnumCustomerType,
+} from '@/model/account';
 import { Card } from '@/model/payin';
 import {
   EnumKycDocumentType,
@@ -874,10 +938,18 @@ export default class DashboardHome extends Vue {
 
     this.profileApi.getProfile().then((response: ServerResponse<Account>) => {
       this.userData = response.result;
-      this.isUserDraft = !!this.userData.profile.provider.draft;
 
-      if (this.isUserDraft && this.userData.profile.provider.draft?.status) {
-        this.draftStatus = this.userData.profile.provider.draft?.status;
+      // todo: handle case with both roles
+      if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+        this.isUserDraft = !!this.userData.profile.provider.draft;
+        if (this.isUserDraft && this.userData.profile.provider.draft?.status) {
+          this.draftStatus = this.userData.profile.provider.draft?.status;
+        }
+      } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+        this.isUserDraft = !!this.userData.profile.consumer.draft;
+        if (this.isUserDraft && this.userData.profile.consumer.draft?.status) {
+          this.draftStatus = this.userData.profile.consumer.draft?.status;
+        }
       }
 
       this.isUserDataLoaded = true;
@@ -957,6 +1029,23 @@ export default class DashboardHome extends Vue {
   /*
     MODAL SUBMISSION & CHANGING FIELDS
   */
+
+  getCurrentOrDraftValue(propertyPath: string): string {
+    let obj: CustomerDraftProfessional | CustomerProfessional | CustomerDraftIndividual | CustomerIndividual | null;
+    // todo: handle role better (?)
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+      obj = this.userData.profile.provider.draft ? this.userData.profile.provider.draft : this.userData.profile.provider.current;
+    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      obj = this.userData.profile.consumer.draft ? this.userData.profile.consumer.draft : this.userData.profile.consumer.current;
+    } else {
+      obj = null;
+    }
+
+    // const obj = this.userData.profile.provider.draft ? this.userData.profile.provider.draft : this.userData.profile.provider.current;
+    // eslint-disable-next-line
+    const res = propertyPath.split('.').reduce((previous, current) => previous![current], obj) as any;
+    return res;
+  }
 
   canEditMangoPayRelatedField(): boolean {
     if (!this.isUserDraft || (this.isUserDraft && this.draftStatus === 'DRAFT')) {
@@ -1039,11 +1128,12 @@ export default class DashboardHome extends Vue {
   // eslint-disable-next-line
   onSubmitMangoPayField(modalData): void {
     let draft;
+    console.log('is user draft: ', this.isUserDraft);
     if (this.isUserDraft) { // if draft exists, update existing draft
       draft = this.userData.profile.provider.draft;
     } else { // if draft is null, copy current profile as draft
       draft = {};
-      const propertiesToKeep = ['additionalInfo', 'bankAccount', 'companyNumber', 'companyType', 'email', 'headquartersAddress', 'legalPersonType', 'representative', 'logoImage', 'logoImageMimeType', 'name', 'phone', 'siteUrl', 'type'];
+      const propertiesToKeep = ['additionalInfo', 'bankAccount', 'companyNumber', 'companyType', 'email', 'headquartersAddress', 'address', 'legalPersonType', 'representative', 'logoImage', 'logoImageMimeType', 'name', 'phone', 'siteUrl', 'type'];
       // eslint-disable-next-line
       Object.keys(this.userData.profile.provider.current!).forEach((x) => {
         if (propertiesToKeep.includes(x)) {
@@ -1113,6 +1203,15 @@ export default class DashboardHome extends Vue {
         draft.representative.address.country = (this.$refs.representativeAddressCountry as HTMLInputElement).value;
         break;
       }
+      case 'individualAddress': {
+        draft.address.line1 = (this.$refs.individualAddressLine1 as HTMLInputElement).value;
+        draft.address.line2 = (this.$refs.individualAddressLine2 as HTMLInputElement).value;
+        draft.address.city = (this.$refs.individualAddressCity as HTMLInputElement).value;
+        draft.address.region = (this.$refs.individualAddressRegion as HTMLInputElement).value;
+        draft.address.postalCode = (this.$refs.individualAddressPostalCode as HTMLInputElement).value;
+        draft.address.country = (this.$refs.individualAddressCountry as HTMLInputElement).value;
+        break;
+      }
       case 'iban': {
         draft.bankAccount.iban = modalData.inputValues[0].value;
         break;
@@ -1154,9 +1253,9 @@ export default class DashboardHome extends Vue {
     this.paymentApi.createCardRegistration().then((createCardResponse) => {
       if (createCardResponse.success) {
         // submit card registration
-        console.log('TODO: submit card registration');
+        console.log('TODO: submit card registration', createCardResponse.result);
       } else {
-        console.log('error initializing card creation');
+        console.log('error initializing card creation', createCardResponse);
       }
     });
   }
