@@ -296,7 +296,7 @@ export interface CardRegistrationCommand {
 }
 
 /**
- * Card registration data required by the tokenization server
+ * Card registration data returned with initialization
  *
  * {@see https://docs.mangopay.com/endpoints/v2.01/cards#e1042_post-card-info}
  */
@@ -317,4 +317,32 @@ export interface CardRegistration {
    * Value required for property `data` of tokenization server request
    */
   preRegistrationData: string;
+}
+
+/**
+ * Card registration data required by the tokenization server
+ *
+ * {@see https://docs.mangopay.com/endpoints/v2.01/cards#e1042_post-card-info}
+ */
+export interface CardDetailsCommand {
+  /**
+   * AccessKey value, retrieved from the previous "Create Card registration" JSON response
+   */
+  accessKeyRef: string;
+  /**
+   * PreregistrationData value, retrieved from the previous "Create Card registration" JSON response
+   */
+  data: string;
+  /**
+   * Card details number.
+   */
+  cardNumber: string;
+  /**
+   * Card expiration date. For all cards, the expiry date can be any month/year in the future.
+   */
+  cardExpirationDate: string;
+  /**
+   * CSV (the three numbers on the back of the card).
+   */
+  cardCvx: string;
 }

@@ -24,6 +24,8 @@
         <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountIban'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change IBAN'" :modalId="'bankAccountIban'" :inputs="[{id: 'bankAccountIban', name: 'IBAN', value: getCurrentOrDraftValue('bankAccount.iban'), type: 'text'}]"></modal>
         <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountBic'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change BIC'" :modalId="'bankAccountBic'" :inputs="[{id: 'bankAccountBic', name: 'BIC', value: getCurrentOrDraftValue('bankAccount.bic'), type: 'text'}]"></modal>
 
+        <modal :show="modalToShow == 'newCard'" @dismiss="modalToShow = ''" @submit="onSubmitNewCard" :title="'Add new card'" :modalId="'newCard'" :inputs="[{id: 'cardNumber', name: 'Card Number', type: 'text'}, {id: 'cardExpirationDate', name: 'Expiration Date', type: 'text'}, {id: 'cardCvx', name: 'CVX (3-digit number)', type: 'text'}]"></modal>
+
         <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="onPasswordModalDismiss" :modalId="'password'" :showCancelButton="false">
           <template v-slot:body>
             <div v-if="!passwordChanged">
@@ -446,7 +448,6 @@
               <!-- <div v-if="isUserDraft && draftStatus=='SUBMITTED'" class="mt-xs-20 mb-xs-20">
                 <h3 class="settings__alert--blue">You have submitted changes and are pending approval.</h3>
               </div> -->
-              <h3 style="background: yellow;">[dev msg] this tab is for customers and is WIP state</h3>
 
               <div class="tabs__tab tabs__tab__payment_methods">
                 <div v-for="(card, i) in cards" :key="i" class="tabs__tab__ignore-grid-wrapper">
@@ -777,7 +778,7 @@ import {
   CustomerProfessional,
   EnumCustomerType,
 } from '@/model/account';
-import { Card } from '@/model/payin';
+import { Card, CardRegistration } from '@/model/payin';
 import {
   EnumKycDocumentType,
   KycDocument,
@@ -860,6 +861,8 @@ export default class DashboardHome extends Vue {
 
   cards: Card[];
 
+  cardInitialization: CardRegistration;
+
   kycViewAsRole: EnumCustomerType;
 
   kycDocuments: KycDocument[] | null;
@@ -909,6 +912,7 @@ export default class DashboardHome extends Vue {
     this.passwordCurrentError = false;
 
     this.cards = [];
+    this.cardInitialization = {} as CardRegistration;
 
     this.kycViewAsRole = {} as EnumCustomerType;
     this.kycDocuments = null;
@@ -1250,13 +1254,49 @@ export default class DashboardHome extends Vue {
   */
 
   addCard(): void {
+    // todo: add loader here
     this.paymentApi.createCardRegistration().then((createCardResponse) => {
       if (createCardResponse.success) {
         // submit card registration
-        console.log('TODO: submit card registration', createCardResponse.result);
+        this.cardInitialization = createCardResponse.result;
+        this.modalToShow = 'newCard';
       } else {
         console.log('error initializing card creation', createCardResponse);
       }
+    });
+  }
+
+  // eslint-disable-next-line
+  onSubmitNewCard(e: any): void {
+    const url = this.cardInitialization.cardRegistrationUrl;
+
+    const cardData = {
+      accessKeyRef: this.cardInitialization.accessKey,
+      data: this.cardInitialization.preRegistrationData,
+      cardNumber: e.inputValues.find((x) => x.id === 'cardNumber').value,
+      cardExpirationDate: e.inputValues.find((x) => x.id === 'cardExpirationDate').value,
+      cardCvx: e.inputValues.find((x) => x.id === 'cardCvx').value,
+    };
+
+    this.paymentApi.postCardInfoToTokenizationServer(url, cardData).then((postCardResponse) => {
+      if (postCardResponse && postCardResponse.startsWith('data=')) {
+        const completeRegistrationData = {
+          registrationData: postCardResponse,
+          registrationId: this.cardInitialization.registrationId,
+        };
+
+        this.paymentApi.completeCardRegistration(completeRegistrationData).then((completeRegistrationResponse) => {
+          if (completeRegistrationResponse.success) {
+            console.log('successfully added card!', completeRegistrationResponse);
+          } else {
+            console.log('error adding card', completeRegistrationResponse);
+          }
+        });
+      } else {
+        console.log('error posting card details to token server', postCardResponse);
+      }
+    }).catch((err) => {
+      console.log('err', err);
     });
   }
 

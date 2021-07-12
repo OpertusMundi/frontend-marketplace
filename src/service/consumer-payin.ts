@@ -9,10 +9,11 @@ import {
 } from '@/model/order';
 import {
   BankwirePayIn,
-  Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand,
+  Card, CardDirectPayIn, CardDirectPayInCommand, CardRegistration, CardRegistrationCommand, CardDetailsCommand,
   EnumPayInSortField,
   EnumTransactionStatus,
 } from '@/model/payin';
+import { AxiosRequestConfig } from 'axios';
 
 /**
  * All service methods require user to have role ROLE_CONSUMER unless otherwise noted
@@ -78,6 +79,53 @@ export default class ConsumerPayInApi extends Api {
 
         return data;
       });
+  }
+
+  /**
+   * Post card info to MangoPay tokenization server.
+   *
+   * For details on integration of the platform with MANGOPAY see:
+   * https://docs.mangopay.com/endpoints/v2.01/cards#e1042_post-card-info
+   *
+   * It is imperative to inform users, that we are registering their card.
+   */
+  // public async postCardInfoToTokenizationServer(url: string, command: CardDetailsCommand, config?: AxiosRequestConfig): Promise<ServerResponse<string>> {
+  //   const form = new URLSearchParams();
+
+  //   form.append('data', command.data);
+  //   form.append('accessKeyRef', command.accessKeyRef);
+  //   form.append('returnURL', '');
+  //   form.append('cardNumber', command.cardNumber);
+  //   form.append('cardExpirationDate', command.cardExpirationDate);
+  //   form.append('cardCvx', command.cardCvx);
+
+  //   return this.post<FormData, ServerResponse<string>>(url, form, {
+  //     ...config,
+  //     headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/x-www-form-urlencoded' },
+  //     withCredentials: false,
+  //   }).then((response: AxiosServerResponse<string>) => {
+  //     const { data } = response;
+  //     return data;
+  //   });
+  // }
+  public async postCardInfoToTokenizationServer(url: string, command: CardDetailsCommand, config?: AxiosRequestConfig): Promise<string> {
+    const form = new URLSearchParams();
+
+    form.append('data', command.data);
+    form.append('accessKeyRef', command.accessKeyRef);
+    form.append('returnURL', '');
+    form.append('cardNumber', command.cardNumber);
+    form.append('cardExpirationDate', command.cardExpirationDate);
+    form.append('cardCvx', command.cardCvx);
+
+    return this.post<FormData, string>(url, form, {
+      ...config,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/x-www-form-urlencoded' },
+      withCredentials: false,
+    }).then((response) => {
+      const { data } = response;
+      return data;
+    });
   }
 
   /**
