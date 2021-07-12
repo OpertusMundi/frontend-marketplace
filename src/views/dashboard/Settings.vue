@@ -457,10 +457,14 @@
                       {{ card.alias }}
                       <div class="tabs__tab__list__item__active-indicator" :class="card.active ? 'tabs__tab__list__item__active-indicator--active' : 'tabs__tab__list__item__active-indicator--inactive'"></div>
                     </div>
-                    <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">REMOVE</button></div>
+                    <!-- TODO: remove card (currently not available in API) -->
+                    <!-- <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" class="btn btn--std btn--outlinedark">REMOVE</button></div> -->
                     <div class="tabs__tab__list__line"></div>
                   </div>
                 </div>
+
+                <!-- TODO: fix itemsTotal. MangoPay API seems to not support total items field. we've set it to 50 (no pagination as cards per page is set to 100) -->
+                <pagination class="mt-xs-30" :currentPage="cardsCurrentPage" :itemsPerPage="cardsPerPage" :itemsTotal="50" @pageSelection="loadCards($event)"></pagination>
 
                 <div v-if="cards.length" class="d-flex justify-content-end mt-xs-30">
                   <button @click="addCard" class="btn btn--std btn--outlineblue">ADD CARD</button>
@@ -788,13 +792,14 @@ import {
 import {
   UboDeclaration, UboCommand,
 } from '@/model/ubo-declaration';
+import Modal from '@/components/Modal.vue';
+import Pagination from '@/components/Pagination.vue';
 import AccountApi from '../../service/account';
 import ProfileApi from '../../service/profile';
 import ProviderApi from '../../service/provider';
 import PaymentApi from '../../service/consumer-payin';
 import KycDocumentApi from '../../service/kyc-document';
 import UboDeclarationApi from '../../service/ubo-declaration';
-import Modal from '../../components/Modal.vue';
 
 extend('required', required);
 extend('email', email);
@@ -810,6 +815,7 @@ localize({
     ValidationProvider,
     ValidationObserver,
     Modal,
+    Pagination,
   },
 })
 export default class DashboardHome extends Vue {
@@ -863,6 +869,10 @@ export default class DashboardHome extends Vue {
 
   cardInitialization: CardRegistration;
 
+  cardsPerPage: number;
+
+  cardsCurrentPage: number;
+
   kycViewAsRole: EnumCustomerType;
 
   kycDocuments: KycDocument[] | null;
@@ -913,6 +923,8 @@ export default class DashboardHome extends Vue {
 
     this.cards = [];
     this.cardInitialization = {} as CardRegistration;
+    this.cardsPerPage = 100;
+    this.cardsCurrentPage = 0;
 
     this.kycViewAsRole = {} as EnumCustomerType;
     this.kycDocuments = null;
@@ -960,7 +972,7 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  loadCards(): void {
+  loadCards(page = 0): void {
     // if not consumer, do not load cards
     if (!store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
       this.isCardsLoaded = true;
@@ -968,7 +980,8 @@ export default class DashboardHome extends Vue {
     }
 
     this.isCardsLoaded = false;
-    this.paymentApi.getCards().then((cardsResponse) => {
+    this.paymentApi.getCards(page, this.cardsPerPage).then((cardsResponse) => {
+      this.cardsCurrentPage = page;
       if (cardsResponse.success) {
         this.cards = cardsResponse.result;
         this.isCardsLoaded = true;
