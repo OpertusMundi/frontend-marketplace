@@ -7,7 +7,7 @@ import { Sorting } from '@/model/request';
 import {
   EnumOrderStatus,
   EnumOrderSortField,
-  Order,
+  ProviderOrder,
 } from '@/model/order';
 
 /**
@@ -26,11 +26,11 @@ export default class ProviderOrderApi extends Api {
    * @param orderKey A unique Order key
    * @returns
    */
-  public async getOrder(orderKey: string): Promise<ServerResponse<Order>> {
+  public async getOrder(orderKey: string): Promise<ServerResponse<ProviderOrder>> {
     const url = `/action/provider/orders/${orderKey}`;
 
-    return this.get<ServerResponse<Order>>(url)
-      .then((response: AxiosServerResponse<Order>) => {
+    return this.get<ServerResponse<ProviderOrder>>(url)
+      .then((response: AxiosServerResponse<ProviderOrder>) => {
         const { data } = response;
 
         return data;
@@ -49,7 +49,7 @@ export default class ProviderOrderApi extends Api {
   public async findOrders(
     status: EnumOrderStatus[] | null = null, referenceNumber: string | null = null,
     page = 0, size = 10, sorting: Sorting<EnumOrderSortField>,
-  ): Promise<AxiosPageResponse<Order>> {
+  ): Promise<AxiosPageResponse<ProviderOrder>> {
     const { id: field, order } = sorting;
 
     const endpoint = '/action/provider/orders';
@@ -58,6 +58,6 @@ export default class ProviderOrderApi extends Api {
     // const url = endpoint + '?' + filters + '&' + pagination;
     const url = `${endpoint}?${filters}&${pagination}`;
 
-    return this.get<ServerResponse<PageResult<Order>>>(url);
+    return this.get<ServerResponse<PageResult<ProviderOrder>>>(url);
   }
 }

@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConsumerOrderApi from '@/service/consumer-order';
-import { EnumOrderSortField, EnumOrderStatus, Order } from '@/model/order';
+import { EnumOrderSortField, EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import { Sorting } from '@/model/request';
 import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import Pagination from '@/components/Pagination.vue';

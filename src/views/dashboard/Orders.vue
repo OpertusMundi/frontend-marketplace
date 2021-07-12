@@ -34,7 +34,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 // import ConsumerOrderApi from '@/service/consumer-order';
 import ProviderOrderApi from '@/service/provider-order';
-import { EnumOrderSortField, EnumOrderStatus, Order } from '@/model/order';
+import { EnumOrderSortField, EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
 import { Sorting } from '@/model/request';
 // import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import OrderCard from '@/components/Orders/OrderCard.vue';

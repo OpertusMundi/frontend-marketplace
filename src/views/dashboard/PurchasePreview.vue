@@ -32,7 +32,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import moment from 'moment';
 import ConsumerOrderApi from '@/service/consumer-order';
-import { EnumOrderStatus, Order } from '@/model/order';
+import { EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
 
 @Component({
