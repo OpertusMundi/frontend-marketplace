@@ -1,5 +1,6 @@
 import { ServerResponse } from '@/model/response';
-import { CatalogueItemCommand, Publisher } from '@/model/catalogue';
+import { Provider } from '@/model/account';
+import { CatalogueItemCommand } from '@/model/catalogue';
 
 export enum EnumDraftStatus {
   /**
@@ -93,7 +94,7 @@ export interface AssetDraft {
   /**
    * Publisher details
    */
-  publisher: Publisher,
+  publisher: Provider,
   /**
    * Draft status
    */

@@ -4,7 +4,7 @@ import { EnumAssetType } from '@/model/enum';
 import { Sorting } from '@/model/request';
 import { AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse } from '@/model/response';
 import { ConsumerIndividualCommand, ConsumerProfessionalCommand, Profile } from '@/model/account';
-import { AccountAsset, EnumConsumerAssetSortField } from '@/model/consumer';
+import { AccountAsset, EnumConsumerAssetSortField } from '@/model/account-asset';
 
 export default class ConsumerApi extends Api {
   constructor() {

@@ -7,7 +7,7 @@ import { Sorting } from '@/model/request';
 import {
   EnumPayInItemSortField,
   EnumTransactionStatus,
-  PayInItem,
+  ProviderPayInItem,
 } from '@/model/payin';
 
 /**
@@ -30,11 +30,11 @@ export default class ProviderPayInItemApi extends Api {
    * @param index PayIn item index (Index is 1-based)
    * @returns
    */
-  public async getPayInItem(payInKey: string, index: number): Promise<ServerResponse<PayInItem>> {
+  public async getPayInItem(payInKey: string, index: number): Promise<ServerResponse<ProviderPayInItem>> {
     const url = `/action/provider/payins/${payInKey}/${index}`;
 
-    return this.get<ServerResponse<PayInItem>>(url)
-      .then((response: AxiosServerResponse<PayInItem>) => {
+    return this.get<ServerResponse<ProviderPayInItem>>(url)
+      .then((response: AxiosServerResponse<ProviderPayInItem>) => {
         const { data } = response;
 
         return data;
@@ -52,11 +52,11 @@ export default class ProviderPayInItemApi extends Api {
    */
   public async findPayIns(
     status: EnumTransactionStatus | null = null, page = 0, size = 10, sorting: Sorting<EnumPayInItemSortField>,
-  ): Promise<AxiosPageResponse<PayInItem>> {
+  ): Promise<AxiosPageResponse<ProviderPayInItem>> {
     const { id: field, order } = sorting;
 
     const url = `/action/provider/payins?page=${page}&size=${size}&status=${status || ''}&orderBy=${field}&order=${order}`;
 
-    return this.get<ServerResponse<PageResult<PayInItem>>>(url);
+    return this.get<ServerResponse<PageResult<ProviderPayInItem>>>(url);
   }
 }

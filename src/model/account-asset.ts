@@ -1,4 +1,5 @@
-import { CatalogueItem } from './catalogue';
+import { Consumer, Provider } from './account';
+import { CatalogueItem, EnumTopicCategory } from './catalogue';
 
 export enum EnumConsumerAssetSortField {
   ADDED_ON = 'ADDED_ON',
@@ -41,4 +42,35 @@ export interface AccountAsset {
    * Catalogue item
    */
   item: CatalogueItem;
+}
+
+export interface AccountSubscription {
+  /**
+   * Service PID
+   */
+  service: string;
+  /**
+   * When the subscription was registered to the user account
+   */
+  addedOn: string;
+  /**
+   * Date of last update
+   */
+  updatedOn: string;
+  /**
+   * Operation that registered the subscription
+   */
+  source: EnumAccountAssetSource;
+  /**
+   * First asset topic category if any exist
+   */
+  segment: EnumTopicCategory;
+}
+
+export interface ConsumerAccountSubscription extends AccountSubscription {
+  provider: Provider;
+}
+
+export interface ProviderAccountSubscription extends AccountSubscription {
+  consumer: Consumer;
 }

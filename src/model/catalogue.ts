@@ -1,6 +1,7 @@
 import { Order, PageRequest, QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
+import { Provider } from '@/model/account';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
 
@@ -370,47 +371,6 @@ interface BaseCatalogueItem {
    * Version of the resource
    */
   version: string;
-}
-
-export interface Publisher {
-  /*
-   * Company location (city)
-   */
-  city: string;
-  /*
-   * Company country
-   */
-  country: string;
-  /**
-   * Company contact email. This is the email address from the
-   * provider's profile. The email is returned only if it has been
-   * verified.
-   */
-  email: string | null;
-  /*
-   * Provider registration date in ISO format e.g. 2020-06-10T16:01:04.991+03:00
-   */
-  joinedAt: string;
-  /*
-   * Publisher unique id
-   */
-  id: string;
-  /*
-   * Base64 encoded company logo image
-   */
-  logoImage: string;
-  /*
-   * Company logo image mime type (used with image property to create a data URL)
-   */
-  logoImageMimeType: string;
-  /*
-   * Company name
-   */
-  name: string;
-  /*
-   * Average rating. If no user ratings exist, null is returned
-   */
-  rating: number | null;
 }
 
 export interface CatalogueItemStatistics {
@@ -792,7 +752,7 @@ export interface CatalogueItem extends BaseCatalogueItem {
   /*
    * Publisher details
    */
-  publisher?: Publisher;
+  publisher?: Provider;
   /*
    * Id of an entity responsible for making the resource available
    */

@@ -1,6 +1,7 @@
 import { EnumPaymentMethod } from '@/model/enum';
 import { EnumDeliveryMethod } from '@/model/catalogue';
 import { EffectivePricingModel } from '@/model/pricing-model';
+import { Consumer, Provider } from './account';
 
 export enum EnumOrderItemType {
   ASSET = 'ASSET',
@@ -44,7 +45,7 @@ export enum EnumOrderStatus {
   SUCCEEDED = 'SUCCEEDED',
 }
 
-export interface OrderItem {
+interface OrderItem {
   /**
    * Index of the specific item in the order
    */
@@ -83,15 +84,29 @@ export interface OrderItem {
   discountCode: string | null;
 }
 
-export interface Order {
+export interface ConsumerOrderItem extends OrderItem {
+  /**
+   * Asset provider
+   */
+  provider: Provider;
+}
+
+export interface ProviderOrderItem extends OrderItem {
+  /**
+   * Asset contract template identifier
+   */
+  contractTemplateId: number | null;
+  /**
+   * Asset contract template version
+   */
+  contractTemplateVersion: string;
+}
+
+interface Order {
   /**
    * Order unique key
    */
   key: string;
-  /**
-   * Order items. Currently only a single item is allowed per order
-   */
-  items: OrderItem[];
   /**
    * The total price of all PayIn items (the debited funds of the PayIn)
    */
@@ -132,4 +147,22 @@ export interface Order {
    * User friendly reference code for support
    */
   referenceNumber: string;
+}
+
+export interface ConsumerOrder extends Order {
+  /**
+   * Order items. Currently only a single item is allowed per order
+   */
+  items: ConsumerOrderItem[];
+}
+
+export interface ProviderOrder extends Order {
+  /**
+   * Order consumer customer
+   */
+  consumer: Consumer;
+  /**
+   * Order items. Currently only a single item is allowed per order
+   */
+  items: ProviderOrderItem[];
 }

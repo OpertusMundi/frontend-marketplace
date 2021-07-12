@@ -27,7 +27,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Order } from '@/model/order';
+import { ConsumerOrder as Order } from '@/model/order';
 import moment from 'moment';
 
 @Component

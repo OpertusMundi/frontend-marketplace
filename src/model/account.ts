@@ -537,3 +537,65 @@ export interface PasswordChangeCommand {
    */
   verifyNewPassword: string;
 }
+
+/**
+ * Provider summary interface
+ */
+export interface Provider {
+  /*
+   * Company location (city)
+   */
+  city: string;
+  /*
+   * Company country
+   */
+  country: string;
+  /**
+   * Company contact email. This is the email address from the
+   * provider's profile. The email is returned only if it has been
+   * verified.
+   */
+  email: string | null;
+  /*
+   * Provider registration date in ISO format e.g. 2020-06-10T16:01:04.991+03:00
+   */
+  joinedAt: string;
+  /*
+   * Publisher unique id
+   */
+  id: string;
+  /*
+   * Base64 encoded company logo image
+   */
+  logoImage: string;
+  /*
+   * Company logo image mime type (used with image property to create a data URL)
+   */
+  logoImageMimeType: string;
+  /*
+   * Company name
+   */
+  name: string;
+  /*
+   * Average rating. If no user ratings exist, null is returned
+   */
+  rating: number | null;
+}
+
+/**
+ * Consumer summary interface
+ */
+export interface Consumer {
+  /**
+   * Consumer unique key
+   */
+  id: string;
+  /**
+   * Consumer name
+   */
+  name: string;
+  /**
+   * Consumer country
+   */
+  country: string;
+}
