@@ -180,6 +180,7 @@
             <li @click="toggleMobileMenu"><router-link to="/vas">Use</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/about">About</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/faq">FAQ</router-link></li>
+            <li @click="toggleMobileMenu"><router-link to="/catalogue">Explore Assets</router-link></li>
           </ul>
         </nav>
         <div class="header__menu__btn">
