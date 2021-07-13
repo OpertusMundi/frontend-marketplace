@@ -135,6 +135,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'topiomaps',
+        name: 'TopioMaps',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardtopiomaps" */ '../views/dashboard/TopioMaps.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
         path: 'orders',
         name: 'Orders',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardorders" */ '../views/dashboard/Orders.vue'),
@@ -185,7 +191,7 @@ const routes: RouteConfig[] = [
       {
         path: 'analytics',
         name: 'Analytics',
-        component: () => import(/* webpackChunkName: "dashboardfanalytics" */ '../views/dashboard/Analytics/Analytics.vue'),
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardfanalytics" */ '../views/dashboard/Analytics/Analytics.vue'),
         meta: { requiresRole: '', layout: 'dashboard' },
       },
     ],
