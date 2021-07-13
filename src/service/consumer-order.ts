@@ -53,7 +53,7 @@ export default class ConsumerOrderApi extends Api {
     const endpoint = '/action/consumer/orders';
     const pagination = `page=${page}&size=${size}&orderBy=${field}&order=${order}`;
     const filters = `status=${status ? status.join(',') : ''}&referenceNumber=${referenceNumber || ''}`;
-    const url = endpoint + '?' + filters + '&' + pagination;
+    const url = `${endpoint}?${filters}&${pagination}`;
 
     return this.get<ServerResponse<PageResult<ConsumerOrder>>>(url);
   }
