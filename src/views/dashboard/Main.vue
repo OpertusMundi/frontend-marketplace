@@ -51,6 +51,12 @@
                 <span>Profile</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('TopioMaps')">
+              <router-link to="/dashboard/topiomaps" data-name="TopioMaps">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23.892" height="24"><g data-name="Group 6109" fill="#333"><path data-name="Path 13503" d="m23.312 22.101-6.978-3.2a.99.99 0 0 0-.786-.018l-7.563 3.042-5.995-2.757V4.889a.995.995 0 0 0-1.99 0v14.917a1 1 0 0 0 .579.9l6.964 3.2a.992.992 0 0 0 .787.019l7.563-3.043 6.589 3.025a1 1 0 0 0 .83-1.809z"/><path data-name="Path 13504" d="M23.25 2.709 16.271.065a1 1 0 0 0-.666-.014L7.974 2.586 1.335.169a.995.995 0 0 0-.681 1.869l6.965 2.536a.991.991 0 0 0 .654.01l7.624-2.533 6.005 2.276v14.566a.995.995 0 0 0 1.99 0V3.64a1 1 0 0 0-.642-.931z"/><path data-name="Path 13505" d="M8.954 18.604V8.09a.995.995 0 1 0-1.99 0v10.514a.995.995 0 0 0 1.99 0z"/><path data-name="Path 13506" d="M16.914 15.824V5.503a1 1 0 0 0-1.99 0v10.321a1 1 0 0 0 1.99 0z"/></g></svg>
+                <span>t&#176;Maps</span>
+              </router-link>
+            </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Purchases')">
               <router-link to="/dashboard/purchases" data-name="Purchases">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.605"><g data-name="Group 2648" fill="#333"><path data-name="Path 9494" d="M23.971 21.303 21.483 6.939a.985.985 0 1 0-1.941.337l2.488 14.363H1.97L4.488 7.274a.986.986 0 0 0-1.942-.34L.028 21.303a1.972 1.972 0 0 0 1.943 2.3H22.03a1.972 1.972 0 0 0 1.941-2.307z"/><path data-name="Path 9495" d="M7.061 10.208a.985.985 0 0 0 .985-.985v-3.3a3.954 3.954 0 1 1 7.908 0v3.3a.985.985 0 1 0 1.97 0v-3.3a5.924 5.924 0 1 0-11.848 0v3.3a.984.984 0 0 0 .985.985z"/><path data-name="Path 9496" d="M10.362 6.116a.985.985 0 1 0 0 1.97h3.285a.985.985 0 1 0 0-1.97z"/></g></svg>
