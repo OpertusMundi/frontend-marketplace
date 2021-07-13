@@ -5,8 +5,9 @@ import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
 } from '@/model';
 import { AxiosResponse } from 'axios';
+import { Provider } from '@/model/account';
 import {
-  CatalogueHarvestCommand, CatalogueHarvestImportCommand, CatalogueItemDetails, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField, Publisher,
+  CatalogueHarvestCommand, CatalogueHarvestImportCommand, CatalogueItemDetails, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField,
 } from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 // eslint-disable-next-line
@@ -17,7 +18,7 @@ interface CatalogueQueryResponseInternal extends ServerResponse<QueryResultPage<
   /*
    * Map with all publishers for all items in the response
    */
-  publishers: { [key: string]: Publisher };
+  publishers: { [key: string]: Provider };
 }
 
 export default class CatalogueApi extends Api {

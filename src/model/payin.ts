@@ -1,6 +1,7 @@
 import { EnumPaymentMethod } from '@/model/enum';
-import { BankAccount } from '@/model/account';
-import { Order } from '@/model/order';
+import { BankAccount, Consumer } from '@/model/account';
+import { ConsumerOrder, ProviderOrder } from '@/model/order';
+import { ConsumerAccountSubscription, ProviderAccountSubscription } from '@/model/account-asset';
 
 export enum EnumCardType {
   CB_VISA_MASTERCARD = 'CB_VISA_MASTERCARD',
@@ -78,7 +79,7 @@ export interface Transfer {
   executedOn: string;
 }
 
-export interface SubscriptionBilling {
+interface SubscriptionBilling {
   /**
    * Service unique PID
    */
@@ -111,9 +112,35 @@ export interface SubscriptionBilling {
    * Total calls used by purchased SKUs. This field is exclusive with field `skuTotalRows`
    */
   skuTotalCalls: number;
+  /**
+   * Item total price
+   */
+  totalPrice: number;
+  /**
+   * Item price excluding tax
+   */
+  totalPriceExcludingTax: number;
+  /**
+   * Item tax
+   */
+  totalTax: number;
 }
 
-export interface PayInItem {
+export interface ConsumerSubscriptionBilling extends SubscriptionBilling {
+  /**
+   * Consumer subscription
+   */
+  subscription: ConsumerAccountSubscription;
+}
+
+export interface ProviderSubscriptionBilling extends SubscriptionBilling {
+  /**
+   * Consumer subscription
+   */
+  subscription: ProviderAccountSubscription;
+}
+
+interface PayInItem {
   /**
    * Invoice line number
    */
@@ -126,35 +153,48 @@ export interface PayInItem {
    * Payment item type
    */
   type: EnumPaymentItemType;
+}
+
+export interface ProviderPayInItem {
   /**
    * Transfer of funds from the buyer's to the seller's wallet
    */
   transfer?: Transfer;
 }
 
-export interface OrderPayInItem extends PayInItem {
+export interface ConsumerOrderPayInItem extends PayInItem {
   /**
-   * PayIn order
+   * Order
    */
-  order: Order;
+  order: ConsumerOrder;
 }
 
-export interface SubscriptionBillingPayInItem extends PayInItem {
+export interface ConsumerSubscriptionBillingPayInItem extends PayInItem {
   /**
    * PayIn subscription billing record
    */
-  subscriptionBilling: SubscriptionBilling;
+  subscriptionBilling: ConsumerSubscriptionBilling;
 }
 
-export interface PayIn {
+export interface ProviderOrderPayInItem extends ProviderPayInItem {
+  /**
+   * Order
+   */
+  order: ProviderOrder;
+}
+
+export interface ProviderSubscriptionBillingPayInItem extends ProviderPayInItem {
+  /**
+   * PayIn subscription billing record
+   */
+  subscriptionBilling: ProviderSubscriptionBilling;
+}
+
+interface PayIn {
   /**
    * PayIn unique key
    */
   key: string;
-  /**
-   * PayIn payments. A PayIn may include a single order or multiple subscription billing records
-   */
-  items?: PayInItem[];
   /**
    * The total price of all PayIn items (the debited funds of the PayIn)
    */
@@ -197,6 +237,24 @@ export interface PayIn {
   referenceNumber: string;
 }
 
+export interface ConsumerPayIn extends PayIn {
+  /**
+   * PayIn payments. A PayIn may include a single order or multiple subscription billing records
+   */
+  items?: (ConsumerOrderPayInItem | ConsumerSubscriptionBillingPayInItem)[];
+}
+
+export interface ProviderPayIn extends PayIn {
+  /**
+   * Consumer
+   */
+  consumer: Consumer;
+  /**
+   * PayIn payments. A PayIn may include a single order or multiple subscription billing records
+   */
+  items?: (ProviderOrderPayInItem | ProviderSubscriptionBillingPayInItem)[];
+}
+
 export interface PayInStatus {
   /**
    * Transaction status
@@ -208,7 +266,7 @@ export interface PayInStatus {
   updatedOn: string;
 }
 
-export interface BankwirePayIn extends PayIn {
+export interface ConsumerBankwirePayIn extends ConsumerPayIn {
   /**
    * The user has to proceed a Bank wire with this reference
    */
@@ -219,7 +277,18 @@ export interface BankwirePayIn extends PayIn {
   bankAccount?: BankAccount;
 }
 
-export interface CardDirectPayIn extends PayIn {
+export interface ProviderBankwirePayIn extends ProviderPayIn {
+  /**
+   * The user has to proceed a Bank wire with this reference
+   */
+  wireReference: string;
+  /**
+   * The user has to proceed a Bank wire to this bank account
+   */
+  bankAccount?: BankAccount;
+}
+
+export interface ConsumerCardDirectPayIn extends ConsumerPayIn {
   /**
    * A partially obfuscated version of the credit card number
    */
@@ -233,6 +302,17 @@ export interface CardDirectPayIn extends PayIn {
    * must initiate the 3-D Secure validation process.
    */
   secureModeRedirectURL?: string;
+}
+
+export interface ProviderCardDirectPayIn extends ProviderPayIn {
+  /**
+   * A partially obfuscated version of the credit card number
+   */
+  alias?: string;
+  /**
+   * A custom description to appear on the user's bank statement
+   */
+  statementDescriptor: string;
 }
 
 export interface CardDirectPayInCommand {
@@ -300,7 +380,7 @@ export interface CardRegistrationCommand {
  *
  * {@see https://docs.mangopay.com/endpoints/v2.01/cards#e1042_post-card-info}
  */
-export interface CardRegistration {
+ export interface CardRegistration {
   /**
    * Registration identifier required for submitting the tokenization server response
    */

@@ -7,7 +7,7 @@ import { Sorting } from '@/model/request';
 import {
   EnumOrderStatus,
   EnumOrderSortField,
-  Order,
+  ConsumerOrder,
 } from '@/model/order';
 
 /**
@@ -24,11 +24,11 @@ export default class ConsumerOrderApi extends Api {
    * @param orderKey A unique Order key
    * @returns
    */
-  public async getOrder(orderKey: string): Promise<ServerResponse<Order>> {
+  public async getOrder(orderKey: string): Promise<ServerResponse<ConsumerOrder>> {
     const url = `/action/consumer/orders/${orderKey}`;
 
-    return this.get<ServerResponse<Order>>(url)
-      .then((response: AxiosServerResponse<Order>) => {
+    return this.get<ServerResponse<ConsumerOrder>>(url)
+      .then((response: AxiosServerResponse<ConsumerOrder>) => {
         const { data } = response;
 
         return data;
@@ -47,7 +47,7 @@ export default class ConsumerOrderApi extends Api {
   public async findOrders(
     status: EnumOrderStatus[] | null = null, referenceNumber: string | null = null,
     page = 0, size = 10, sorting: Sorting<EnumOrderSortField>,
-  ): Promise<AxiosPageResponse<Order>> {
+  ): Promise<AxiosPageResponse<ConsumerOrder>> {
     const { id: field, order } = sorting;
 
     const endpoint = '/action/consumer/orders';
@@ -55,6 +55,6 @@ export default class ConsumerOrderApi extends Api {
     const filters = `status=${status ? status.join(',') : ''}&referenceNumber=${referenceNumber || ''}`;
     const url = endpoint + '?' + filters + '&' + pagination;
 
-    return this.get<ServerResponse<PageResult<Order>>>(url);
+    return this.get<ServerResponse<PageResult<ConsumerOrder>>>(url);
   }
 }
