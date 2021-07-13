@@ -162,6 +162,7 @@
               </div>
               </transition>
             </li>
+            <li @click="toggleMobileMenu"><router-link to="">Use</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/about">About</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/faq">FAQ</router-link></li>
           </ul>
