@@ -25,7 +25,7 @@
 
     <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalOrders" @pageSelection="getOrders(null, $event, true)"></pagination>
 
-    <div v-if="isLoading" class="dummy-loader" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 9999;"><h1>LOADER</h1></div>
+    <loader v-if="isLoading"></loader>
 
   </div>
 </template>
@@ -39,11 +39,13 @@ import { Sorting } from '@/model/request';
 // import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import OrderCard from '@/components/Orders/OrderCard.vue';
 import Pagination from '@/components/Pagination.vue';
+import Loader from '@/components/Loader.vue';
 
 @Component({
   components: {
     OrderCard,
     Pagination,
+    Loader,
   },
 })
 export default class DashboardOrders extends Vue {

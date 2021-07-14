@@ -28,8 +28,7 @@
       <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span>
     </div>
 
-    <div v-if="isLoading" class="dummy-loader" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 9999;"><h1>LOADER</h1></div>
-
+    <loader v-if="isLoading"></loader>
   </div>
 </template>
 
@@ -39,10 +38,12 @@ import moment from 'moment';
 import ProviderOrderApi from '@/service/provider-order';
 import { EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
+import Loader from '@/components/Loader.vue';
 
 @Component({
   components: {
     StepProgressBar,
+    Loader,
   },
 })
 export default class DashboardPurchases extends Vue {
