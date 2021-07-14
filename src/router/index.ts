@@ -91,6 +91,7 @@ const routes: RouteConfig[] = [
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardassets" */ '../views/dashboard/Assets.vue'),
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
+      // TODO: delete assets/preview/:id and AssetPreview.vue if not in use
       {
         path: 'assets/preview/:id',
         name: 'AssetPreview',

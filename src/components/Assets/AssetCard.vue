@@ -1,6 +1,4 @@
 <template>
-  <!-- <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="asset_card"> -->
-  <!-- <router-link :to="asset.status === 'DRAFT' ? `/dashboard/assets/create/${asset.key}` : `/dashboard/assets/preview/${asset.key}`" class="asset_card"> -->
   <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card">
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
@@ -54,9 +52,15 @@ export default class AssetCard extends Vue {
   getRouterLink(assetStatus: string, assetKey: string, assetPublished: string): string {
     const links = {
       DRAFT: `/dashboard/assets/create/${assetKey}`,
+      SUBMITTED: '',
+      PENDING_HELPDESK_REVIEW: '',
+      HELPDESK_REJECTED: '',
       PENDING_PROVIDER_REVIEW: `/review/${assetKey}`,
+      PROVIDER_REJECTED: '',
+      POST_PROCESSING: '',
+      PUBLISHED: `/catalogue/${assetPublished}`,
     };
-    return links[assetStatus] ? links[assetStatus] : `/catalogue/${assetPublished}`;
+    return links[assetStatus];
   }
 }
 </script>
