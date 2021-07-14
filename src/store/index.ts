@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createPersistedState from "vuex-persistedstate";
 
 import User from './modules/user.module';
 import Config from './modules/config.module';
@@ -15,6 +16,7 @@ const store = new Vuex.Store({
     config: Config,
     shop: Shop,
   },
+  plugins: [ createPersistedState() ],
   strict: debug,
 });
 
