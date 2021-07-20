@@ -462,6 +462,7 @@ import {
 } from '@/model';
 import { EnumAssetType } from '@/model/enum';
 import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import store from '@/store';
 import moment from 'moment';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
@@ -700,6 +701,7 @@ export default class Catalogue extends Vue {
           this.queryResults = queryResponse.result.items;
         }
         this.isLoading = false;
+        store.commit('setLoading', false);
       })
       .catch((error: AxiosError) => {
         console.log(error);

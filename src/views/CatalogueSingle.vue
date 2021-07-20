@@ -42,6 +42,8 @@ import { CatalogueItemCommand, CatalogueItemDetails } from '@/model/catalogue';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 
+import store from '@/store';
+
 import AssetHead from '../components/CatalogueSingle/AssetHead.vue';
 import AssetHeadMap from '../components/CatalogueSingle/AssetHeadMap.vue';
 import Overview from '../components/CatalogueSingle/Overview.vue';
@@ -121,6 +123,7 @@ export default class CatalogueSingle extends Vue {
           this.catalogueItem = queryResponse.result;
           console.log('catalog item', this.catalogueItem);
           this.isItemLoaded = true;
+          store.commit('setLoading', false);
         });
     } else if (mode === 'review') {
       console.log('review mode!');
@@ -132,6 +135,7 @@ export default class CatalogueSingle extends Vue {
         this.catalogueItem = queryResponse.result.command;
         console.log('catalog item', this.catalogueItem);
         this.isItemLoaded = true;
+        store.commit('setLoading', false);
       });
     } else {
       console.log('wrong mode');

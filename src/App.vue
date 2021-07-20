@@ -4,15 +4,14 @@
       <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu"></app-header>
     </transition>
     <transition name="fade" mode="out-in">
-      <router-view :showMenuMobile="showMenuMobile" v-if="!$store.getters.isLoading" @showHideMobileMenu="toggleMobileMenu" />
+      <router-view :showMenuMobile="showMenuMobile" @showHideMobileMenu="toggleMobileMenu" />
     </transition>
     <transition name="fade" mode="out-in">
-      <app-footer v-if="showFooter"></app-footer>
+      <app-footer v-if="!$store.getters.isLoading && showFooter"></app-footer>
     </transition>
     <!-- <transition name="fade" mode="out-in">
       <div class="loader" v-if="$store.getters.isLoading"></div>
     </transition> -->
-    <loader v-if="$store.getters.isLoading"></loader>
   </div>
 </template>
 
@@ -33,10 +32,9 @@ import { AxiosError } from 'axios';
 
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
-import Loader from '@/components/Loader.vue';
 
 @Component({
-  components: { AppHeader, AppFooter, Loader },
+  components: { AppHeader, AppFooter },
 })
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
@@ -63,6 +61,8 @@ export default class App extends Vue {
 
   constructor() {
     super();
+
+    store.commit('setLoading', true); // even if initialState has loading: true, we need this line due to persisted-state vuex plugin
 
     this.showHeader = true;
     this.showFooter = true;
@@ -130,17 +130,17 @@ export default class App extends Vue {
             if (profileResponse.success) {
               store.commit('setUserData', profileResponse.result);
             }
-            store.commit('setLoading', false);
+            // store.commit('setLoading', false);
           })
           .catch((error: AxiosError) => {
             // TODO: Handle error
             console.log(error);
-            store.commit('setLoading', false);
+            // store.commit('setLoading', false);
           });
       })
       .catch((err) => {
         console.log('getConfiguration error', err);
-        store.commit('setLoading', false);
+        // store.commit('setLoading', false);
       });
 
     this.getCartItems();
