@@ -11,19 +11,17 @@
 
         <asset-card v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-60 asset_card__published--first': i==0}"></asset-card>
         <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
-
-        <loader v-if="isLoading()"></loader>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import store from '@/store';
 import DraftAssetApi from '@/service/draft';
 import AssetCard from '@/components/Assets/AssetCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import Loader from '@/components/Loader.vue';
 import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
 import { Order } from '@/model/request';
 
@@ -31,7 +29,6 @@ import { Order } from '@/model/request';
   components: {
     AssetCard,
     Pagination,
-    Loader,
   },
 })
 export default class DashboardHome extends Vue {
@@ -145,11 +142,16 @@ export default class DashboardHome extends Vue {
     this.searchAssets(published, page, true);
   }
 
-  isLoading(): boolean {
+  get isLoading(): boolean {
     if (this.isLoadingUnpublished || this.isLoadingPublished) {
       return true;
     }
     return false;
+  }
+
+  @Watch('isLoading')
+  onLoadingStatusChange(): void {
+    store.commit('setLoading', this.isLoading);
   }
 }
 </script>

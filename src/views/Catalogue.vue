@@ -446,8 +446,6 @@
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
       </div>
-
-      <loader v-if="isLoading"></loader>
     </div>
   </div>
 </template>
@@ -455,7 +453,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
-import Loader from '@/components/Loader.vue';
 import CatalogueApi from '@/service/catalogue';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
@@ -493,7 +490,6 @@ interface crs {
 @Component({
   components: {
     CatalogueCard,
-    Loader,
     Datepicker,
     VueTimepicker,
     VueSlider,
@@ -507,8 +503,6 @@ export default class Catalogue extends Vue {
   queryResults: CatalogueItem[];
 
   query:string;
-
-  isLoading = false;
 
   // --- FILTERS ---
 
@@ -692,7 +686,6 @@ export default class Catalogue extends Vue {
   }
 
   searchAssets(): void {
-    this.isLoading = true;
     this.queryResults = [];
     this.catalogQuery.query = this.query;
     this.catalogueApi.find(this.query)
@@ -700,12 +693,11 @@ export default class Catalogue extends Vue {
         if (queryResponse.success) {
           this.queryResults = queryResponse.result.items;
         }
-        this.isLoading = false;
         store.commit('setLoading', false);
       })
       .catch((error: AxiosError) => {
         console.log(error);
-        this.isLoading = false;
+        store.commit('setLoading', false);
       });
   }
 
@@ -1037,7 +1029,7 @@ export default class Catalogue extends Vue {
 
   applyFilters(): void {
     this.closeFilters();
-    this.isLoading = true;
+    store.commit('setLoading', true);
 
     // const filters: string[] = [];
     const filters: Partial<ElasticCatalogueQuery> = {};
@@ -1151,7 +1143,7 @@ export default class Catalogue extends Vue {
     console.log(filters);
     this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
       this.queryResults = advancedQueryResponse.result.items;
-      this.isLoading = false;
+      store.commit('setLoading', false);
     });
   }
 }

@@ -202,7 +202,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Shape from '@/components/Shape.vue';
 import Search from '@/components/Search.vue';
 import AOS from 'aos';
@@ -211,6 +211,7 @@ import $ from '@/assets/scripts/jquery_cs';
 import slider from '@/assets/scripts/slider';
 import axios from 'axios';
 import store from '@/store';
+import { Configuration } from '@/model';
 
 @Component({
   components: { Shape, Search },
@@ -236,10 +237,31 @@ export default class Header extends Vue {
   }
 
   created(): void {
-    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
+    console.log('created');
+    // this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
   }
 
-  mounted(): void {
+  get config(): Configuration | null {
+    return this.$store.getters.getConfig;
+  }
+
+  @Watch('config', { immediate: true })
+  onConfigStateChange(): void {
+    if (this.config) {
+      this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
+      this.loadPage();
+    }
+  }
+
+  // mounted(): void {
+  //   this.getPageData();
+  //   this.carouselLeftOffset();
+  //   slider.init();
+  //   window.addEventListener('resize', this.carouselLeftOffset);
+  //   document.documentElement.style.setProperty('overflow-y', 'scroll');
+  // }
+
+  loadPage(): void {
     this.getPageData();
     this.carouselLeftOffset();
     slider.init();

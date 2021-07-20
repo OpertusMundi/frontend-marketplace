@@ -12,6 +12,9 @@
     <!-- <transition name="fade" mode="out-in">
       <div class="loader" v-if="$store.getters.isLoading"></div>
     </transition> -->
+    <transition name="fade" mode="out-in">
+      <loader v-if="$store.getters.isLoading && !noLoaderRoutes.includes($route.name)"></loader>
+    </transition>
   </div>
 </template>
 
@@ -32,9 +35,10 @@ import { AxiosError } from 'axios';
 
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
+import Loader from '@/components/Loader.vue';
 
 @Component({
-  components: { AppHeader, AppFooter },
+  components: { AppHeader, AppFooter, Loader },
 })
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
@@ -59,6 +63,8 @@ export default class App extends Vue {
 
   noHeader: Array<string | null | undefined>;
 
+  noLoaderRoutes: Array<string>;
+
   constructor() {
     super();
 
@@ -75,6 +81,7 @@ export default class App extends Vue {
 
     this.noHeader = ['Login', 'Register'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
+    this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
   }
 
   @Watch('$route', { immediate: true, deep: true })

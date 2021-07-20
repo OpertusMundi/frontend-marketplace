@@ -6,7 +6,7 @@
       </div>
     </div>
 
-    <div class="filters" v-if="!isLoading">
+    <div class="filters" v-if="!$store.getters.isLoading">
       <div class="filters__block">
         <p class="filters__title">{{ totalPurchases }} PURCHASES</p>
       </div>
@@ -23,31 +23,26 @@
     <purchase-card v-for="purchase in purchases" :key="purchase.key" :purchase="purchase"></purchase-card>
 
     <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalPurchases" @pageSelection="getOrders(null, $event, true)"></pagination>
-
-    <loader v-if="isLoading"></loader>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import store from '@/store';
 import ConsumerOrderApi from '@/service/consumer-order';
 import { EnumOrderSortField, EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import { Sorting } from '@/model/request';
 import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import Loader from '@/components/Loader.vue';
 
 @Component({
   components: {
     PurchaseCard,
     Pagination,
-    Loader,
   },
 })
 export default class DashboardPurchases extends Vue {
   consumerOrderApi: ConsumerOrderApi;
-
-  isLoading: boolean;
 
   purchases: Order[];
 
@@ -64,7 +59,6 @@ export default class DashboardPurchases extends Vue {
 
     this.consumerOrderApi = new ConsumerOrderApi();
 
-    this.isLoading = true;
     this.purchases = [];
     this.totalPurchases = null;
     this.currentPage = 0;
@@ -92,7 +86,7 @@ export default class DashboardPurchases extends Vue {
   }
 
   getOrders(status: EnumOrderStatus[] | null, page: number, scrollBehavior = false): void {
-    this.isLoading = true;
+    store.commit('setLoading', true);
     const referenceNumber = null;
     const size = 5;
     const order: Sorting<EnumOrderSortField> = {
@@ -103,7 +97,7 @@ export default class DashboardPurchases extends Vue {
       const { data } = ordersResponse;
 
       if (data.success) {
-        this.isLoading = false;
+        store.commit('setLoading', false);
         this.purchases = data.result.items;
         this.totalPurchases = data.result.count;
         this.currentPage = data.result.pageRequest.page;

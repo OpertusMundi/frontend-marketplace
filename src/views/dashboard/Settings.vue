@@ -8,7 +8,7 @@
 
     <!-- MODALS -->
     <!-- IMPORTANT: Pass as input ID the exact name of API Gateway POST parameter in order to be passed on submit -->
-    <div v-if="!isLoading()">
+    <div v-if="!isLoading">
       <modal :show="modalToShow == 'image'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your image'" :modalId="'image'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
       <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
       <modal :show="modalToShow == 'mobileNumber'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your mobile number'" :modalId="'mobile'" :inputs="[{id: 'mobile', name: 'Mobile number', value: userData.profile.mobile, type: 'text'}]"></modal>
@@ -274,8 +274,8 @@
         <ul>
           <li @click="selectTab('general')" :class="{ 'active': selectedTab=='general' }"><a href="#" @click.prevent="">General</a></li>
           <li @click="selectTab('loginAndSecurity')" :class="{ 'active': selectedTab=='loginAndSecurity' }"><a href="#" @click.prevent="">Login & Security</a></li>
-          <li v-if="!isLoading() && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
-          <li v-if="!isLoading() && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
+          <li v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
+          <li v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
           <li @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
           <li v-if="includeTabDueToRole('ROLE_CONSUMER')" @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
           <li @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
@@ -283,7 +283,7 @@
         </ul>
       </div>
 
-      <div v-if="!isLoading()" class="tabs__outter-wrapper">
+      <div v-if="!isLoading" class="tabs__outter-wrapper">
         <!-- GENERAL -->
         <transition name="fade" mode="out-in">
           <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'general'">
@@ -749,12 +749,11 @@
       </div>
     </div>
 
-    <loader v-if="isLoading()"></loader>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   Account, ServerResponse,
 } from '@/model';
@@ -794,7 +793,6 @@ import {
 } from '@/model/ubo-declaration';
 import Modal from '@/components/Modal.vue';
 import Pagination from '@/components/Pagination.vue';
-import Loader from '@/components/Loader.vue';
 import AccountApi from '../../service/account';
 import ProfileApi from '../../service/profile';
 import ProviderApi from '../../service/provider';
@@ -817,7 +815,6 @@ localize({
     ValidationObserver,
     Modal,
     Pagination,
-    Loader,
   },
 })
 export default class DashboardHome extends Vue {
@@ -1023,11 +1020,16 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  isLoading(): boolean {
+  get isLoading(): boolean {
     if (!this.isUserDataLoaded || !this.isCardsLoaded || !this.isKycDocumentsLoaded || !this.isUboDeclarationsLoaded) {
       return true;
     }
     return false;
+  }
+
+  @Watch('isLoading')
+  onLoadingStateChange(): void {
+    store.commit('setLoading', this.isLoading);
   }
 
   /*

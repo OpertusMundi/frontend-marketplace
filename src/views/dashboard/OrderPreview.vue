@@ -7,43 +7,43 @@
       </div>
     </div>
 
-    <step-progress-bar v-if="!isLoading" :currentStep="getCurrentStep(order.status)"></step-progress-bar>
+    <div v-if="!$store.getters.isLoading">
+      <step-progress-bar :currentStep="getCurrentStep(order.status)"></step-progress-bar>
 
-    <h3 v-if="!isLoading">{{ getStatusDescription(order.status) }}</h3>
+      <h3>{{ getStatusDescription(order.status) }}</h3>
 
-    <!--
-      TODO: if step 1, ask provider to accept/reject request (implemented in wireframe, not yet in API)
-      also, we should consider having 1 view for order/purchase preview instead of 2 if template differences are few/minor
-    -->
+      <!--
+        TODO: if step 1, ask provider to accept/reject request (implemented in wireframe, not yet in API)
+        also, we should consider having 1 view for order/purchase preview instead of 2 if template differences are few/minor
+      -->
 
-    <hr>
+      <hr>
 
-    <div class="info-table" v-if="!isLoading">
-      <span class="info-table__field info-table__field--large">Asset</span><span class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
-      <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
-      <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span>
-      <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
-      <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ order.totalPrice }}</span>
-      <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span>
-      <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span>
+      <div class="info-table">
+        <span class="info-table__field info-table__field--large">Asset</span><span class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
+        <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
+        <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span>
+        <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
+        <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ order.totalPrice }}</span>
+        <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span>
+        <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span>
+      </div>
+
     </div>
-
-    <loader v-if="isLoading"></loader>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import store from '@/store';
 import moment from 'moment';
 import ProviderOrderApi from '@/service/provider-order';
 import { EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
-import Loader from '@/components/Loader.vue';
 
 @Component({
   components: {
     StepProgressBar,
-    Loader,
   },
 })
 export default class DashboardPurchases extends Vue {
@@ -51,15 +51,12 @@ export default class DashboardPurchases extends Vue {
 
   order: Order;
 
-  isLoading: boolean;
-
   constructor() {
     super();
 
     this.providerOrderApi = new ProviderOrderApi();
 
     this.order = {} as Order;
-    this.isLoading = true;
   }
 
   mounted(): void {
@@ -74,7 +71,7 @@ export default class DashboardPurchases extends Vue {
       if (orderResponse.success) {
         this.order = orderResponse.result;
         console.log(this.order);
-        this.isLoading = false;
+        store.commit('setLoading', false);
       } else {
         // todo: handle
         console.log('error fetching order', orderResponse);

@@ -288,9 +288,8 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // set loading to TRUE before visiting these routes so that footer does not "jump" (weird footer loading before content loading)
-  // loading must be set to FALSE from inside the component, after content loaded
-  const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle'];
+  // Set loading to TRUE before visiting these routes. Loading must be set to FALSE from inside the component, after content loaded
+  const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle', 'Assets', 'Settings', 'Orders', 'OrderPreview', 'Purchases', 'PurchasePreview'];
   if (to.name && routesWithInitialLoading.includes(to.name)) {
     store.commit('setLoading', true);
   }
