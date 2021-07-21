@@ -3,8 +3,7 @@
     <section class="page__hero page__hero--white">
       <div class="page__hero__inner">
         <h1>{{ page[0].title.rendered }}</h1>
-        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html=" page[0].excerpt.rendered">
-        </div>
+        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html="page[0].excerpt.rendered"></div>
       </div>
     </section>
 
@@ -16,11 +15,10 @@
             <div class="services-carts__item__inner">
               <div class="services-carts__item__top">
                 <img src="@/assets/images/t-icon.svg" alt="" />
-                <span>{{service.title.rendered}}</span>
+                <span>{{ service.title.rendered }}</span>
               </div>
               <div class="services-carts__item__main">
-                <div class="services-carts__item__main__text" v-html="service.excerpt.rendered">
-                </div>
+                <div class="services-carts__item__main__text" v-html="service.excerpt.rendered"></div>
               </div>
             </div>
           </router-link>
@@ -45,32 +43,40 @@ export default class VAS extends Vue {
 
   services: any;
 
+  wpUrl: string;
+
   constructor() {
     super();
 
     this.page = [];
     this.services = [];
+
+    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
   }
 
-  mounted():void {
-    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=vas`).then((response) => {
-      this.page = response.data;
-      console.log(this.page);
-    }).catch((error) => {
-      console.log(error);
-    });
+  mounted(): void {
+    axios
+      .get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=vas`)
+      .then((response) => {
+        this.page = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/vas`).then((response) => {
-      this.services = response.data;
-      console.log(this.services);
-    }).catch((error) => {
-      console.log(error);
-    });
+    axios
+      .get(`${this.wpUrl}/wp-json/wp/v2/vas`)
+      .then((response) => {
+        this.services = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 }
 </script>
 <style lang="scss">
-@import "@/assets/styles/_page.scss";
-@import "@/assets/styles/_services-carts.scss";
-@import "@/assets/styles/_documentation-items.scss";
+@import '@/assets/styles/_page.scss';
+@import '@/assets/styles/_services-carts.scss';
+@import '@/assets/styles/_documentation-items.scss';
 </style>
