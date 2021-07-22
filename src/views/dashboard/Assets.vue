@@ -11,15 +11,14 @@
 
         <asset-card v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-60 asset_card__published--first': i==0}"></asset-card>
         <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
-
-        <div v-if="isLoading()" class="dummy-loader" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 9999;"><h1>LOADER</h1></div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import store from '@/store';
 import DraftAssetApi from '@/service/draft';
 import AssetCard from '@/components/Assets/AssetCard.vue';
 import Pagination from '@/components/Pagination.vue';
@@ -143,11 +142,16 @@ export default class DashboardHome extends Vue {
     this.searchAssets(published, page, true);
   }
 
-  isLoading(): boolean {
+  get isLoading(): boolean {
     if (this.isLoadingUnpublished || this.isLoadingPublished) {
       return true;
     }
     return false;
+  }
+
+  @Watch('isLoading')
+  onLoadingStatusChange(): void {
+    store.commit('setLoading', this.isLoading);
   }
 }
 </script>

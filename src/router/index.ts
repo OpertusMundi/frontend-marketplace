@@ -91,6 +91,7 @@ const routes: RouteConfig[] = [
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardassets" */ '../views/dashboard/Assets.vue'),
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
+      // TODO: delete assets/preview/:id and AssetPreview.vue if not in use
       {
         path: 'assets/preview/:id',
         name: 'AssetPreview',
@@ -287,6 +288,12 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  // Set loading to TRUE before visiting these routes. Loading must be set to FALSE from inside the component, after content loaded
+  const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle', 'Assets', 'Settings', 'Orders', 'OrderPreview', 'Purchases', 'PurchasePreview'];
+  if (to.name && routesWithInitialLoading.includes(to.name)) {
+    store.commit('setLoading', true);
+  }
+
   const role = to.meta?.requiresRole;
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {

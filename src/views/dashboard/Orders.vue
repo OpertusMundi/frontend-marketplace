@@ -6,7 +6,7 @@
       </div>
     </div>
 
-    <div class="filters" v-if="!isLoading">
+    <div class="filters" v-if="!$store.getters.isLoading">
       <div class="filters__block">
         <p class="filters__title">{{ totalOrders }} ORDERS</p>
       </div>
@@ -25,13 +25,12 @@
 
     <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalOrders" @pageSelection="getOrders(null, $event, true)"></pagination>
 
-    <div v-if="isLoading" class="dummy-loader" style="position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; z-index: 9999;"><h1>LOADER</h1></div>
-
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import store from '@/store';
 // import ConsumerOrderApi from '@/service/consumer-order';
 import ProviderOrderApi from '@/service/provider-order';
 import { EnumOrderSortField, EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
@@ -49,8 +48,6 @@ import Pagination from '@/components/Pagination.vue';
 export default class DashboardOrders extends Vue {
   providerOrderApi: ProviderOrderApi;
 
-  isLoading: boolean;
-
   orders: Order[];
 
   totalOrders: number | null;
@@ -66,7 +63,6 @@ export default class DashboardOrders extends Vue {
 
     this.providerOrderApi = new ProviderOrderApi();
 
-    this.isLoading = true;
     this.orders = [];
     this.totalOrders = null;
     this.currentPage = 0;
@@ -94,7 +90,7 @@ export default class DashboardOrders extends Vue {
   }
 
   getOrders(status: EnumOrderStatus[] | null, page: number, scrollBehavior = false): void {
-    this.isLoading = true;
+    store.commit('setLoading', true);
     const referenceNumber = null;
     const size = 5;
     const order: Sorting<EnumOrderSortField> = {
@@ -105,7 +101,7 @@ export default class DashboardOrders extends Vue {
       const { data } = ordersResponse;
 
       if (data.success) {
-        this.isLoading = false;
+        store.commit('setLoading', false);
         this.orders = data.result.items;
         this.totalOrders = data.result.count;
         this.currentPage = data.result.pageRequest.page;

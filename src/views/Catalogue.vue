@@ -435,7 +435,7 @@
             </div>
           </div>
           <div class="filter-side-menu-bottom">
-            <button class="btn--std btn--outlineblue" @click="cancelFilters()">CANCEL</button>
+            <button class="btn--std btn--outlineblue" @click="closeFilters()">CANCEL</button>
             <button @click="applyFilters" class="btn--std btn--blue">APPLY FILTERS</button>
           </div>
         </div>
@@ -459,6 +459,7 @@ import {
 } from '@/model';
 import { EnumAssetType } from '@/model/enum';
 import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import store from '@/store';
 import moment from 'moment';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
@@ -502,8 +503,6 @@ export default class Catalogue extends Vue {
   queryResults: CatalogueItem[];
 
   query:string;
-
-  loading = false;
 
   // --- FILTERS ---
 
@@ -687,7 +686,6 @@ export default class Catalogue extends Vue {
   }
 
   searchAssets(): void {
-    this.loading = true;
     this.queryResults = [];
     this.catalogQuery.query = this.query;
     this.catalogueApi.find(this.query)
@@ -695,11 +693,11 @@ export default class Catalogue extends Vue {
         if (queryResponse.success) {
           this.queryResults = queryResponse.result.items;
         }
-        this.loading = false;
+        store.commit('setLoading', false);
       })
       .catch((error: AxiosError) => {
         console.log(error);
-        this.loading = false;
+        store.commit('setLoading', false);
       });
   }
 
@@ -801,7 +799,7 @@ export default class Catalogue extends Vue {
     }
   }
 
-  cancelFilters(): void {
+  closeFilters(): void {
     this.filterMenuItemSelected = '';
   }
 
@@ -1030,6 +1028,9 @@ export default class Catalogue extends Vue {
   }
 
   applyFilters(): void {
+    this.closeFilters();
+    store.commit('setLoading', true);
+
     // const filters: string[] = [];
     const filters: Partial<ElasticCatalogueQuery> = {};
 
@@ -1142,6 +1143,7 @@ export default class Catalogue extends Vue {
     console.log(filters);
     this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
       this.queryResults = advancedQueryResponse.result.items;
+      store.commit('setLoading', false);
     });
   }
 }
