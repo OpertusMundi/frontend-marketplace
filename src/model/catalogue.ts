@@ -788,6 +788,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * A list of all item versions
    */
   versions: string[];
+  /**
+   * The list of hidden automated metadata properties
+   */
+  visibility:string[];
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {
