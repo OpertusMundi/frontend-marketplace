@@ -6,6 +6,7 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
+  CatalogueItemProviderCommand,
 } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
@@ -139,6 +140,18 @@ export default class DraftAssetApi extends Api {
 
         return data;
       });
+  }
+
+  /**
+   * Set provider updates to draft. The draft status
+   * must be `PENDING_PROVIDER_REVIEW`
+   *
+   * @param key
+   */
+  public async setProviderReviewUpdates(key: string, command: CatalogueItemProviderCommand): Promise<AxiosServerResponse<void>> {
+    const url = `/action/drafts/${key}/review"`;
+
+    return this.post<CatalogueItemProviderCommand, ServerResponse<void>>(url, command);
   }
 
   /**

@@ -888,3 +888,14 @@ export interface CatalogueHarvestImportCommand {
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
+
+export interface CatalogueItemProviderCommand {
+  /**
+   * Resource key
+   */
+  resourceKey: string;
+  /**
+   * Controls automated metadata property visibility. Selected properties are hidden.
+   */
+  visibility: string[];
+}
