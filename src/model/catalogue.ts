@@ -791,7 +791,7 @@ export interface CatalogueItemDetails extends CatalogueItem {
   /**
    * The list of hidden automated metadata properties
    */
-  visibility:string[];
+  visibility: string[];
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {
@@ -821,6 +821,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * A list of resources of the dataset
    */
   resources: Resource[];
+  /**
+   * Contract template key
+   */
+  contractTemplateKey: String;
 }
 
 export enum EnumDraftCommandType {
