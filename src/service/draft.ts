@@ -6,6 +6,7 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
+  CatalogueItemProviderCommand,
 } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
@@ -142,12 +143,24 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
+   * Set provider updates to draft. The draft status
+   * must be `PENDING_PROVIDER_REVIEW`
+   *
+   * @param key
+   */
+  public async setProviderReviewUpdates(key: string, command: CatalogueItemProviderCommand): Promise<AxiosServerResponse<void>> {
+    const url = `/action/drafts/${key}/review`;
+
+    return this.post<CatalogueItemProviderCommand, ServerResponse<void>>(url, command);
+  }
+
+  /**
    * Accept draft
    *
    * @param key
    */
   public async acceptDraft(key: string): Promise<AxiosServerResponse<void>> {
-    const url = `/action/drafts/${key}/review"`;
+    const url = `/action/drafts/${key}/review`;
 
     const command: AssetDraftReviewCommand = {
       rejected: false,
@@ -164,7 +177,7 @@ export default class DraftAssetApi extends Api {
    * @param reason
    */
   public async rejectDraft(key: string, reason: string): Promise<AxiosServerResponse<void>> {
-    const url = `/action/drafts/${key}/review"`;
+    const url = `/action/drafts/${key}/review`;
 
     const command: AssetDraftReviewCommand = {
       rejected: true,
