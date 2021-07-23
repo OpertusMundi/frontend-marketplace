@@ -45,7 +45,7 @@
 
             <!-- CONTRACT -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <contract ref="step3" :contract.sync="contract" v-if="currentStep == 3"></contract>
+              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep == 3"></contract>
             <!-- </transition> -->
 
             <!-- PRICING -->
@@ -179,7 +179,7 @@ export default class CreateAsset extends Vue {
 
   selectedPricingModelForEditing: number | null;
 
-  contract: string;
+  // contract: string;
 
   totalSteps = 7;
 
@@ -212,7 +212,7 @@ export default class CreateAsset extends Vue {
 
     this.isEditingExistingDraft = false;
 
-    this.contract = '';
+    // this.contract = '';
 
     this.uploading = {
       status: false,
@@ -234,6 +234,7 @@ export default class CreateAsset extends Vue {
       abstract: '',
       additionalResources: [],
       conformity: EnumConformity.NOT_EVALUATED,
+      contractTemplateKey: '',
       creationDate: '2020-06-02',
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
@@ -250,6 +251,7 @@ export default class CreateAsset extends Vue {
       metadataPointOfContactName: '',
       openDataset: false,
       parentId: '',
+      pricingModels: [],
       publicAccessLimitations: '',
       publicationDate: '2020-06-02',
       publisherEmail: '',
@@ -271,7 +273,6 @@ export default class CreateAsset extends Vue {
       type: '' as EnumAssetType,
       userOnlyForVas: false,
       version: '',
-      pricingModels: [],
       geometry: {
         type: 'Polygon',
         coordinates: [
