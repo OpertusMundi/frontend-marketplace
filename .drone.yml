@@ -1,0 +1,31 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+#
+# Steps
+#
+
+steps:
+
+- name: npm-build
+  image: node:10.16.3-buster
+  when:
+    event:
+    - push
+    - tag
+  environment:
+    NPM_CONFIG_PROGRESS: 'false'
+    NPM_CONFIG_SPIN: 'false'
+    HUSKY_SKIP_INSTALL: 'true'
+    JQ_DOWNLOAD_URL: |-
+      https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux32-no-oniguruma
+  commands:
+  - npm version
+  - wget -q $${JQ_DOWNLOAD_URL} -O /usr/local/bin/jq && chmod +x /usr/local/bin/jq
+  - package_json_file=$(mktemp -p . -t package-XXXXXX.json)
+  - jq -f ./filter-deps-for-prod.jq package.json | tee $${package_json_file} | diff -s - package.json || echo -n
+  - mv -v $${package_json_file} package.json
+  - npm install
+  - npm run build
