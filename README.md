@@ -1,5 +1,7 @@
 # Vue.js Client for OpertusMundi
 
+[![Build Status](https://ci.dev-1.opertusmundi.eu:9443/api/badges/OpertusMundi/frontend-marketplace/status.svg?ref=refs/heads/master)](https://ci.dev-1.opertusmundi.eu:9443/OpertusMundi/frontend-marketplace)
+
 ## Vue CLI
 
 Node Version Requirement:
