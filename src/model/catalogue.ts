@@ -824,7 +824,7 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
   /**
    * Contract template key
    */
-  contractTemplateKey: String;
+  contractTemplateKey: string;
 }
 
 export enum EnumDraftCommandType {

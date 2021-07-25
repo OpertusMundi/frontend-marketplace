@@ -234,6 +234,7 @@ export default class CreateAsset extends Vue {
       abstract: '',
       additionalResources: [],
       conformity: EnumConformity.NOT_EVALUATED,
+      contractTemplateKey: '',
       creationDate: '2020-06-02',
       dateEnd: '2020-06-02',
       dateStart: '2020-06-02',
