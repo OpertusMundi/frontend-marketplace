@@ -69,7 +69,7 @@ export default class ContractApi extends Api {
    * @returns
    */
   public async findAllDrafts(
-    title: string | null = null, page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>,
+    page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>,
   ): Promise<AxiosPageResponse<ProviderTemplateContract>> {
     const { id: field, order } = sorting;
 

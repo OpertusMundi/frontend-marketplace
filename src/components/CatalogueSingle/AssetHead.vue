@@ -102,10 +102,11 @@ export default class AssetHead extends Vue {
 
   acceptDraft(): void {
     const { key } = this.$route.params;
+    console.log('key', key);
     this.draftAssetApi.acceptDraft(key).then(() => {
       console.log('accepted!!');
       // todo
-      this.$router.push('/darhboard');
+      this.$router.push('/dashboard');
     });
   }
 
