@@ -788,6 +788,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * A list of all item versions
    */
   versions: string[];
+  /**
+   * The list of hidden automated metadata properties
+   */
+  visibility: string[];
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {
@@ -817,6 +821,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * A list of resources of the dataset
    */
   resources: Resource[];
+  /**
+   * Contract template key
+   */
+  contractTemplateKey: string;
 }
 
 export enum EnumDraftCommandType {
@@ -888,3 +896,14 @@ export interface CatalogueHarvestImportCommand {
 }
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
+
+export interface CatalogueItemProviderCommand {
+  /**
+   * Resource key
+   */
+  resourceKey: string;
+  /**
+   * Controls automated metadata property visibility. Selected properties are hidden.
+   */
+  visibility: string[];
+}

@@ -253,6 +253,10 @@
                 }
             }
         }
+
+        &--full-width {
+            max-width: 100%;
+        }
     }
 
     &__navbuttons {

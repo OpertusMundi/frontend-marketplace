@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-3">
               <div v-if="selectedPricingModelForEditingLocal !== null">
-                <validation-provider v-slot="{ errors }" name="Asset Type" rules="required">
+                <validation-provider v-slot="{ errors }" name="Pricing model" rules="required">
                 <div class="form-group">
                   <form>
                     <div v-for="model in pricingModelTypes" :key="model.priceModel">
@@ -202,7 +202,7 @@
                 <validation-provider v-slot="{ errors }" name="pricing models" rules="required">
                   <div class="form-group mt-xs-20">
                     <input type="text" hidden>
-                    <div class="errors" v-if="errors.length"><span class="mt-xs-20">Set or discard pricing model to continue</span></div>
+                    <div class="errors" v-if="errors.length"><span class="mt-xs-20">Set or discard pricing model to continue.</span></div>
                   </div>
                 </validation-provider>
               </div>

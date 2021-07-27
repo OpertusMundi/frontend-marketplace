@@ -1,10 +1,9 @@
 <template>
-  <div class="page" v-if="terms.length && page.length  > 0">
+  <div class="page" v-if="terms.length && page.length > 0">
     <section class="page__hero page__hero--white">
       <div class="page__hero__inner">
-          <h1>{{ page[0].title.rendered }}</h1>
-        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html=" page[0].excerpt.rendered">
-        </div>
+        <h1>{{ page[0].title.rendered }}</h1>
+        <div class="page__hero__text" v-if="page[0].excerpt.rendered" v-html="page[0].excerpt.rendered"></div>
       </div>
     </section>
     <div class="documentation-items" v-for="(term, index) in terms" v-bind:key="`${index}_cat`">
@@ -12,7 +11,7 @@
         <div class="documentation-items__title">{{ term.cat_name }}</div>
         <div class="documentation-items__subtitle">{{ term.category_description }}</div>
         <div class="documentation-items__holder">
-        <documentation-card :item=post :index=index  v-for="(post, index) in term.posts" v-bind:key="`${index}_post`"></documentation-card>
+          <documentation-card :item="post" :index="index" v-for="(post, index) in term.posts" v-bind:key="`${index}_post`"></documentation-card>
         </div>
       </div>
     </div>
@@ -49,30 +48,39 @@ export default class VAS extends Vue {
 
   terms: any;
 
+  wpUrl: string;
+
   constructor() {
     super();
 
     this.page = [];
     this.terms = [];
+    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
   }
 
-  mounted():void {
-    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/pages?slug=documentation`).then((response) => {
-      this.page = response.data;
-    }).catch((error) => {
-      console.log(error);
-    });
+  mounted(): void {
+    axios
+      .get(`${this.wpUrl}/wp-json/wp/v2/pages?slug=documentation`)
+      .then((response) => {
+        this.page = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-    axios.get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/om/v1/documentation-posts`).then((response) => {
-      this.terms = response.data;
-    }).catch((error) => {
-      console.log(error);
-    });
+    axios
+      .get(`${this.wpUrl}/wp-json/om/v1/documentation-posts`)
+      .then((response) => {
+        this.terms = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 }
 </script>
 <style lang="scss">
-@import "@/assets/styles/_page.scss";
-@import "@/assets/styles/_services-carts.scss";
-@import "@/assets/styles/_documentation-items.scss";
+@import '@/assets/styles/_page.scss';
+@import '@/assets/styles/_services-carts.scss';
+@import '@/assets/styles/_documentation-items.scss';
 </style>

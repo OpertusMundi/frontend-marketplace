@@ -1,21 +1,21 @@
 <template>
   <div class="page terms" v-if="page.length > 0">
     <div class="faq__header">
-          <div class="m_container">
-    <div class="faq__dreadcrumb">
+      <div class="m_container">
+        <div class="faq__dreadcrumb">
           <router-link :to="`/faq/`" class="faq__dreadcrumb__item">
             FAQ
           </router-link>
-        <span> > </span>
-             <router-link :to="`/faq/${$route.params.category}`" class="faq__dreadcrumb__item">
-          {{ $route.params.category | slugToName }}
+          <span> > </span>
+          <router-link :to="`/faq/${$route.params.category}`" class="faq__dreadcrumb__item">
+            {{ $route.params.category | slugToName }}
           </router-link>
           <span> > </span>
-        <div class="faq__dreadcrumb__item">
-        {{ page[0].title.rendered }}
+          <div class="faq__dreadcrumb__item">
+            {{ page[0].title.rendered }}
+          </div>
         </div>
       </div>
-    </div>
     </div>
     <div class="m_container">
       <div class="terms__inner">
@@ -24,13 +24,7 @@
           <div class="terms__sidebar__menu">
             <ul v-if="page[0].acf.faq.length > 0">
               <li v-for="(item_title, index) in page[0].acf.faq" v-bind:key="`${index}_title`">
-                <a
-                  :id="'side' + index"
-                  :class="{ active: activeMenuItem == index }"
-                  href="#"
-                  @click.prevent="scrollToSection(index)"
-                  >{{ item_title.title }}</a
-                >
+                <a :id="'side' + index" :class="{ active: activeMenuItem == index }" href="#" @click.prevent="scrollToSection(index)">{{ item_title.title }}</a>
               </li>
             </ul>
           </div>
@@ -67,24 +61,29 @@ export default class Faq extends Vue {
 
   page: any;
 
+  wpUrl: string;
+
   constructor() {
     super();
     this.page = [];
+    this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
   }
 
-  mounted():void {
+  mounted(): void {
     this.initAOS();
     window.addEventListener('scroll', this.changeActiveSideItem);
     axios
-      .get(`${process.env.VUE_APP_API_WORDPRESS_URL}/wp-json/wp/v2/faq?slug=${this.$route.params.slug}`).then((response) => {
+      .get(`${this.wpUrl}/wp-json/wp/v2/faq?slug=${this.$route.params.slug}`)
+      .then((response) => {
         this.page = response.data;
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.log(error);
       });
   }
 
-  changeActiveSideItem():void {
-    const titles:any = document.getElementsByClassName('terms__main__title');
+  changeActiveSideItem(): void {
+    const titles: any = document.getElementsByClassName('terms__main__title');
     for (let i = 0; i <= titles.length; i += 1) {
       if (titles[i]) {
         if (document.documentElement.scrollTop + 245 >= titles[i].offsetTop) {
@@ -99,9 +98,9 @@ export default class Faq extends Vue {
       duration: 600,
       easing: 'ease-in-out-cubic',
     });
-  }
+  };
 
-  scrollToSection(section:number):void {
+  scrollToSection(section: number): void {
     this.activeMenuItem = section;
     const MainID = `main${section}`;
     const MainEl = document.getElementById(MainID);
@@ -113,7 +112,7 @@ export default class Faq extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_page.scss";
-  @import "@/assets/styles/_terms.scss";
-  @import "@/assets/styles/faq/_faq.scss";
+@import '@/assets/styles/_page.scss';
+@import '@/assets/styles/_terms.scss';
+@import '@/assets/styles/faq/_faq.scss';
 </style>
