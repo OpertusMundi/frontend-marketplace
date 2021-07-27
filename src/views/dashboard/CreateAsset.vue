@@ -359,7 +359,10 @@ export default class CreateAsset extends Vue {
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
       console.log('file is selected');
-      const acceptedExtensions = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase()).extensions;
+      const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
+      const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
+      console.log('accepted extensions:', acceptedExtensions);
+
       if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
         // TODO: make it a modal
         // eslint-disable-next-line
