@@ -68,7 +68,7 @@ export default class App extends Vue {
   constructor() {
     super();
 
-    store.commit('setLoading', true); // even if initialState has loading: true, we need this line due to persisted-state vuex plugin
+    // store.commit('setLoading', true);
 
     this.showHeader = true;
     this.showFooter = true;
