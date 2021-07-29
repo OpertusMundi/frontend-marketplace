@@ -132,6 +132,7 @@ export default class CatalogueSingle extends Vue {
         if (queryResponse.success === false && queryResponse.messages[0].code === 'BasicMessageCode.NotFound') {
           this.$router.push('/errors/404');
         }
+        console.log('draft: ', queryResponse.result.command);
         this.catalogueItem = queryResponse.result.command;
         console.log('catalog item', this.catalogueItem);
         this.isItemLoaded = true;
