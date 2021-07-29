@@ -20,14 +20,62 @@
       </div>
       <div class="asset__section__content__inner" v-else>
         <ul class="asset__section__tabs">
+
+          <!-- ATTRIBUTES -->
           <li v-if="activeTab == 1">
-            <p>Attributes content (DUMMY)</p>
-          </li>
-          <li v-if="activeTab == 2">
-            <div v-if="!isUserAuthenticated">
-              <h2 style="background: yellow">[dev msg] user is not authenticated, maps are not shown</h2>
+            <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
+              <h4 class="mb-xs-20">[<small>{{ metadata.datatypes[attribute] }}</small>] {{ attribute }}</h4>
+
+              <div class="asset__section__tabs__attribute-info">
+                <strong>Values in total:</strong> <span>{{ metadata.count[attribute] }}</span>
+
+                <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
+                  <strong>Most frequent values</strong>
+                  <div>
+                    <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                      <span>{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small>]</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
+                  <strong>Distinct values</strong>
+                  <div>
+                    <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
+                  </div>
+                </div>
+
+                <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
+                  <strong>Statistics</strong>
+                  <div class="asset__section__tabs__attribute-info__statistics">
+                    <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span>
+                    <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span>
+                    <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span>
+                    <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span>
+                    <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span>
+                    <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                  </div>
+                </div>
+
+                <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
+                  <strong>Quantiles</strong>
+                  <div class="asset__section__tabs__attribute-info__quantiles">
+                    <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span>
+                    <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span>
+                    <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span>
+                    <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span>
+                    <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <hr v-if="i !== metadata.attributes.length - 1">
             </div>
-            <div v-else>
+          </li>
+
+          <!-- MAPS -->
+          <li v-if="activeTab == 2">
+            <div>
               <p>Contains map images with the geometry of the dataset</p>
               <hr>
               <p style="background: yellow">[dev msg] MAPS NOT SHOWN CORRECTLY, AS THEY ARE NOT FETCHED IN EPSG:4326.</p>
@@ -125,12 +173,15 @@
               </div>
             </div>
           </li>
+
           <li v-if="activeTab == 3">
             <p>Sample 1 content (DUMMY)</p>
           </li>
+
           <li v-if="activeTab == 4">
             <p>Sample 2 content (DUMMY)</p>
           </li>
+
         </ul>
       </div>
     </div>
@@ -202,6 +253,12 @@ export default class DataProfilingAndSamples extends Vue {
     if (activeTab === 2 && this.isUserAuthenticated) {
       this.setMinMaxZoomLevels();
     }
+  }
+
+  getMostFrequentValues(distribution: Record<string, number>): {attribute: string, amount: number}[] {
+    return Object.keys(distribution)
+      .map((x) => ({ attribute: x, amount: distribution[x] }))
+      .sort((a, b) => b.amount - a.amount);
   }
 
   setMinMaxZoomLevels(): void {
