@@ -26,46 +26,56 @@
             <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
               <h4 class="mb-xs-20">[<small>{{ metadata.datatypes[attribute] }}</small>] {{ attribute }}</h4>
 
-              <div class="asset__section__tabs__attribute-info">
-                <strong>Values in total:</strong> <span>{{ metadata.count[attribute] }}</span>
+              <div class="row">
+                <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
 
-                <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
-                  <strong>Most frequent values</strong>
-                  <div>
-                    <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
-                      <span>{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small>]</span>
+                  <div class="asset__section__tabs__attribute-info">
+                    <strong>Values in total:</strong> <span>{{ metadata.count[attribute] }}</span>
+
+                    <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
+                      <strong>Most frequent values</strong>
+                      <div>
+                        <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                          <span>{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small>]</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
+                      <strong>Distinct values</strong>
+                      <div>
+                        <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
+                      </div>
+                    </div>
+
+                    <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
+                      <strong>Statistics</strong>
+                      <div class="asset__section__tabs__attribute-info__statistics">
+                        <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span>
+                        <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span>
+                        <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span>
+                        <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span>
+                        <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span>
+                        <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                      </div>
+                    </div>
+
+                    <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
+                      <strong>Quantiles</strong>
+                      <div class="asset__section__tabs__attribute-info__quantiles">
+                        <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span>
+                        <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span>
+                        <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span>
+                        <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span>
+                        <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
-                  <strong>Distinct values</strong>
-                  <div>
-                    <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
-                  </div>
                 </div>
-
-                <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
-                  <strong>Statistics</strong>
-                  <div class="asset__section__tabs__attribute-info__statistics">
-                    <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span>
-                    <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span>
-                    <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span>
-                    <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span>
-                    <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span>
-                    <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
-                  </div>
-                </div>
-
-                <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
-                  <strong>Quantiles</strong>
-                  <div class="asset__section__tabs__attribute-info__quantiles">
-                    <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span>
-                    <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span>
-                    <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span>
-                    <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span>
-                    <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
-                  </div>
+                <div class="col-sm-6 asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
+                  <p><strong>Distribution</strong></p>
+                  <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
                 </div>
               </div>
 
@@ -196,6 +206,7 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import store from '@/store';
+import { Chart } from 'highcharts-vue';
 import L from 'leaflet';
 import {
   LMap, LTileLayer, LPolygon, LGeoJson,
@@ -205,6 +216,7 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 
 @Component({
   components: {
+    Chart,
     LMap,
     LTileLayer,
     LPolygon,
@@ -255,6 +267,123 @@ export default class DataProfilingAndSamples extends Vue {
     }
   }
 
+  showDistributionPieChart(attribute: string): boolean {
+    if (attribute in this.metadata.distribution && this.getMostFrequentValues(this.metadata.distribution[attribute]).length > 1) {
+      return true;
+    }
+    return false;
+  }
+
+  getChartOptions(total: number, distribution: Record<string, number>): any {
+    const chartOptions = {
+      chart: {
+        type: 'pie',
+        backgroundColor: 'transparent',
+      },
+      colorByPoint: true,
+      credits: {
+        enabled: false,
+      },
+      navigation: {
+        buttonOptions: {
+          enabled: false,
+        },
+      },
+      // colors: this.pieColor,
+      title: {
+        text: '',
+      },
+      subtitle: {
+        text: '',
+      },
+
+      accessibility: {
+        announceNewData: {
+          enabled: true,
+        },
+        point: {
+          valueSuffix: '%',
+        },
+      },
+
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true,
+            // format: '{point.name}: {point.y:.1f}%',
+            format: '{point.name}',
+          },
+        },
+      },
+
+      tooltip: {
+        // headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        headerFormat: '',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>',
+      },
+
+      series: [
+        {
+          // name: 'Browsers',
+          colorByPoint: true,
+          dataLabels: {
+            connectorShape: 'straight',
+            style: {
+              fontSize: 8,
+            },
+          },
+          // data: [
+          //   {
+          //     name: 'BIOTA',
+          //     y: 45.74,
+          //   },
+          //   {
+          //     name: 'ECONOMY',
+          //     y: 10.57,
+          //   },
+          //   {
+          //     name: 'ELEVATION',
+          //     y: 7.23,
+          //   },
+          //   {
+          //     name: 'PLANNING_CADASTRE',
+          //     y: 5.58,
+          //   },
+          //   {
+          //     name: 'STRUCTURE',
+          //     y: 22.02,
+          //   },
+          //   {
+          //     name: 'TRANSPORTATION',
+          //     y: 3.92,
+          //     drilldown: 'Opera',
+          //   },
+          //   {
+          //     name: 'BOUNDARIES',
+          //     y: 7.62,
+          //     drilldown: null,
+          //   },
+          //   {
+          //     name: 'CLIMA',
+          //     y: 2.62,
+          //     drilldown: null,
+          //   },
+          // ],
+          data: this.formatDistributionForChart(total, distribution),
+        },
+      ],
+    };
+
+    return chartOptions;
+  }
+
+  formatDistributionForChart(total: number, distribution: Record<string, number>): any {
+    const vals = Object.keys(distribution).map((x) => ({ name: x, y: (distribution[x] / total) * 100 }));
+    const remainingPercentageTo100 = 100 - vals.reduce((sum, obj) => obj.y + sum, 0);
+    if (Math.round(remainingPercentageTo100 * 100) / 100) vals.push({ name: 'other', y: remainingPercentageTo100 }); // add 'other' in pie chart if remaining percentage is at least 0.01 (2 decimals)
+    return vals;
+  }
+
   getMostFrequentValues(distribution: Record<string, number>): {attribute: string, amount: number}[] {
     return Object.keys(distribution)
       .map((x) => ({ attribute: x, amount: distribution[x] }))
@@ -290,4 +419,5 @@ export default class DataProfilingAndSamples extends Vue {
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>

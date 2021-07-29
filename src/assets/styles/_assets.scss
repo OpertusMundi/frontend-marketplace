@@ -398,18 +398,18 @@
                 &:first-child {
                     display: block;
                 }
-                p {
-
-                }
             }
             &__attribute-info {
                 display: grid;
                 grid-template-columns: min-content 1fr;
                 column-gap: 10px;
                 row-gap: 15px;
-                white-space: nowrap;
                 font-size: em(15);
                 color: $mainFontColor;
+
+                strong {
+                    white-space: nowrap;
+                }
 
                 &__statistics, &__quantiles {
                     display: grid;
@@ -426,6 +426,11 @@
 
                 &__quantiles {
                     column-gap: 20px;
+                }
+            }
+            &__pie-chart-container {
+                p {
+                    margin-bottom: 0 !important;
                 }
             }
         }
