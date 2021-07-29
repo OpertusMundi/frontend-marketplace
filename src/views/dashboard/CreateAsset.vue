@@ -410,7 +410,6 @@ export default class CreateAsset extends Vue {
       // todo: catch error
       const uploadResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
       this.asset = uploadResponse.result.command;
-      // assetWithUploadedFile = command;
 
       if (uploadResponse.success) {
         console.log('uploaded resource!');

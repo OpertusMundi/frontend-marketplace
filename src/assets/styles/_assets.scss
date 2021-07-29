@@ -398,8 +398,39 @@
                 &:first-child {
                     display: block;
                 }
-                p {
+            }
+            &__attribute-info {
+                display: grid;
+                grid-template-columns: min-content 1fr;
+                column-gap: 10px;
+                row-gap: 15px;
+                font-size: em(15);
+                color: $mainFontColor;
 
+                strong {
+                    white-space: nowrap;
+                }
+
+                &__statistics, &__quantiles {
+                    display: grid;
+                    grid-template-columns: min-content 1fr;
+
+                    span:nth-child(odd) {
+                        color: $labelColor;
+                    }
+                }
+
+                &__statistics {
+                    column-gap: 10px;
+                }
+
+                &__quantiles {
+                    column-gap: 20px;
+                }
+            }
+            &__pie-chart-container {
+                p {
+                    margin-bottom: 0 !important;
                 }
             }
         }
@@ -924,4 +955,8 @@
 .tab_maps-map-thumbnail img {
     height: 100%;
     width: 100%;
+}
+
+.grid-ignore-wrapper {
+    display: contents;
 }
