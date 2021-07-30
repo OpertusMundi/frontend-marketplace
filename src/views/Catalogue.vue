@@ -216,11 +216,11 @@
           <div class="tab tab-price" v-show="filterMenuItemSelected == 'price'">
             <div class="min-max-container">
               <div class="min-max-input-item">
-                <label for="priceSelectedMin">Minimum Price</label>
+                <label for="priceSelectedMin">Minimum Price €</label>
                 <input type="number" :min="0" v-model="priceMin" placeholder="Free" class="form-group__text">
               </div>
               <div class="min-max-input-item ml-xs-20">
-                <label for="priceSelectedMax">Maximum Price</label>
+                <label for="priceSelectedMax">Maximum Price €</label>
                 <input type="number" :min="0" v-model="priceMax" placeholder="No Limit" class="form-group__text">
               </div>
             </div>
