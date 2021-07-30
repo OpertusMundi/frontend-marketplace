@@ -4,6 +4,7 @@ export enum EnumRole {
   ROLE_PROVIDER = 'ROLE_PROVIDER',
   ROLE_CONSUMER = 'ROLE_CONSUMER',
   ROLE_DEVELOPER = 'ROLE_DEVELOPER',
+  ROLE_HELPDESK = 'ROLE_HELPDESK',
 }
 
 export default EnumRole;
