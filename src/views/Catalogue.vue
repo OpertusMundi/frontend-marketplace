@@ -458,7 +458,7 @@ import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
 import { EnumAssetType } from '@/model/enum';
-import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import { CatalogueItemDetails, ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
 import store from '@/store';
 import moment from 'moment';
 import { AxiosError } from 'axios';
@@ -500,7 +500,7 @@ export default class Catalogue extends Vue {
 
   catalogueApi: CatalogueApi;
 
-  queryResults: CatalogueItem[];
+  queryResults: CatalogueItem[] | CatalogueItemDetails[];
 
   queryResultsCount: number | null;
 
