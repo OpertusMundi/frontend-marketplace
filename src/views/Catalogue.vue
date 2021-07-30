@@ -4,8 +4,9 @@
       <div class="assets__head">
         <h1>Assets</h1>
       </div>
-      <div class="form-group">
+      <div class="form-group catalogue_search">
         <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
+        <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
       </div>
 
       <!-- FILTERS MENU TAB-BAR -->
@@ -215,11 +216,11 @@
           <div class="tab tab-price" v-show="filterMenuItemSelected == 'price'">
             <div class="min-max-container">
               <div class="min-max-input-item">
-                <label for="priceSelectedMin">Minimum Price</label>
+                <label for="priceSelectedMin">Minimum Price €</label>
                 <input type="number" :min="0" v-model="priceMin" placeholder="Free" class="form-group__text">
               </div>
               <div class="min-max-input-item ml-xs-20">
-                <label for="priceSelectedMax">Maximum Price</label>
+                <label for="priceSelectedMax">Maximum Price €</label>
                 <input type="number" :min="0" v-model="priceMax" placeholder="No Limit" class="form-group__text">
               </div>
             </div>
@@ -441,7 +442,7 @@
         </div>
       </div>
 
-      <h6 class="mt-xs-50">9999 ASSETS</h6>
+      <h6 class="mt-xs-30 mb-xs-30 ml-xs-20" v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6>
 
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
@@ -458,7 +459,7 @@ import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
 import { EnumAssetType } from '@/model/enum';
-import { ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import { CatalogueItemDetails, ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
 import store from '@/store';
 import moment from 'moment';
 import { AxiosError } from 'axios';
@@ -500,9 +501,11 @@ export default class Catalogue extends Vue {
 
   catalogueApi: CatalogueApi;
 
-  queryResults: CatalogueItem[];
+  queryResults: CatalogueItem[] | CatalogueItemDetails[];
 
-  query:string;
+  queryResultsCount: number | null;
+
+  // query:string;
 
   // --- FILTERS ---
 
@@ -576,12 +579,13 @@ export default class Catalogue extends Vue {
     this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
     this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Vendor' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
 
-    this.query = '';
+    // this.query = '';
     this.queryResults = [];
+    this.queryResultsCount = null;
     this.catalogQuery = {
       page: 0,
       size: 6,
-      query: this.query,
+      query: '',
     };
     this.catalogueApi = new CatalogueApi();
 
@@ -687,11 +691,13 @@ export default class Catalogue extends Vue {
 
   searchAssets(): void {
     this.queryResults = [];
-    this.catalogQuery.query = this.query;
-    this.catalogueApi.find(this.query)
+    // this.catalogQuery.query = this.query;
+    // this.catalogueApi.find(this.query)
+    this.catalogueApi.find(this.catalogQuery)
       .then((queryResponse: CatalogueQueryResponse) => {
         if (queryResponse.success) {
           this.queryResults = queryResponse.result.items;
+          this.queryResultsCount = queryResponse.result.count;
         }
         store.commit('setLoading', false);
       })
@@ -1023,6 +1029,12 @@ export default class Catalogue extends Vue {
     return label;
   }
 
+  searchTextOnly(): void {
+    this.closeFilters();
+    store.commit('setLoading', true);
+    this.searchAssets();
+  }
+
   formatMoment(date: string, time: string): string {
     return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
   }
@@ -1143,6 +1155,7 @@ export default class Catalogue extends Vue {
     console.log(filters);
     this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
       this.queryResults = advancedQueryResponse.result.items;
+      this.queryResultsCount = advancedQueryResponse.result.count;
       store.commit('setLoading', false);
     });
   }

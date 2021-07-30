@@ -30,7 +30,7 @@
                 <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
 
                   <div class="asset__section__tabs__attribute-info">
-                    <strong>Values in total:</strong> <span>{{ metadata.count[attribute] }}</span>
+                    <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
 
                     <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
                       <strong>Most frequent values</strong>

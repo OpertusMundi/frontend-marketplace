@@ -1,11 +1,36 @@
 <template>
-<div class="dashboard__inner">
+  <div class="dashboard__inner">
+    <!-- MODALS -->
+    <modal :withSlots="true" :show="modalToShow === 'saveDraftFileAlert'" @dismiss="modalToShow = ''" :modalId="'saveDraftFileAlert'">
+      <template v-slot:body>
+        <h1>Save draft?</h1>
+
+        <p class="mb-xs-10">Selected file will not be saved. You will need to specify it again when completing draft creation.</p>
+        <p><strong>Everything else will be saved as draft.</strong></p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="submitForm(true)">Save Draft</button>
+      </template>
+    </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'exitCreateAssetAlert'" @dismiss="modalToShow = ''" :modalId="'exitCreateAssetAlert'">
+      <template v-slot:body>
+        <h1>Exit asset creation?</h1>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="onCancelDraft">Exit</button>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
+
     <div class="dashboard__inner__steps" v-if="!uploading.status">
       <div class="dashboard__head">
         <h1>Add an asset</h1>
         <div class="dashboard__head__helpers">
-          <button href="#" class="btn btn--outlineblue" @click="submitForm(true)" v-if="isButtonSaveDraftShown()">SAVE DRAFT</button>
-          <a href="#" class="btn btn--outlineblue">EXIT</a>
+          <button href="#" class="btn btn--outlineblue" @click="onSaveDraft" v-if="isButtonSaveDraftShown()">SAVE DRAFT</button>
+          <a href="#" class="btn btn--outlineblue" @click="modalToShow = 'exitCreateAssetAlert'">EXIT</a>
         </div>
       </div>
 
@@ -128,6 +153,7 @@ import Pricing from '@/components/Assets/Create/Pricing.vue';
 import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
+import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
 
@@ -152,6 +178,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     Delivery,
     Payout,
     Review,
+    Modal,
   },
 })
 export default class CreateAsset extends Vue {
@@ -168,6 +195,8 @@ export default class CreateAsset extends Vue {
   catalogueApi: CatalogueApi;
 
   draftAssetApi: DraftAssetApi;
+
+  modalToShow: string;
 
   isEditingExistingDraft: boolean;
 
@@ -194,6 +223,8 @@ export default class CreateAsset extends Vue {
 
     // TODO: do validation of filetype<->format before uploading file
     console.log('config', store.getters.getConfig);
+
+    this.modalToShow = '';
 
     this.fileToUpload = {
       isFileSelected: false,
@@ -351,12 +382,26 @@ export default class CreateAsset extends Vue {
     return true;
   }
 
+  onSaveDraft(): void {
+    if (this.fileToUpload.isFileSelected) {
+      this.modalToShow = 'saveDraftFileAlert';
+      return;
+    }
+    this.submitForm(true);
+  }
+
+  onCancelDraft(): void {
+    this.$router.push('/dashboard/assets');
+  }
+
   fixDataForSubmitting(): void {
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
   }
 
   async submitForm(isDraft = false): Promise<void> {
+    this.modalToShow = '';
+
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
       console.log('file is selected');

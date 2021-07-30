@@ -90,6 +90,7 @@ export default class CatalogueSingle extends Vue {
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
 
+    // todo: enum
     this.mode = '';
 
     this.isItemLoaded = false;

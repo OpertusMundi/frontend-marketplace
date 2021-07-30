@@ -28,8 +28,23 @@ input[type="checkbox"]:checked {
     background: $secondColor;
 }
 
-#search_assets {
+.catalogue_search {
     width: 50%;
+    position: relative;
+    margin: 10px 0 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    input {
+        margin: 0;
+    }
+    &__button {
+        z-index: 10;
+        position: absolute;
+        right: 0;
+        margin: 5px 20px 0 0;
+        cursor: pointer;
+    }
 }
 
 .menu-select-style__wrapper {

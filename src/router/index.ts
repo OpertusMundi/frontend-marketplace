@@ -25,6 +25,12 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
+    path: '/helpdesk-review/:key',
+    name: 'HelpdeskReview',
+    component: (): Promise<any> => import(/* webpackChunkName: "helpdeskreview" */ '../views/CatalogueSingle.vue'),
+    meta: { requiresRole: [EnumRole.ROLE_HELPDESK] },
+  },
+  {
     path: '/review/:key',
     name: 'ReviewAsset',
     component: (): Promise<any> => import(/* webpackChunkName: "reviewasset" */ '../views/CatalogueSingle.vue'),
