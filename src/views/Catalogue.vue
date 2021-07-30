@@ -4,8 +4,9 @@
       <div class="assets__head">
         <h1>Assets</h1>
       </div>
-      <div class="form-group">
+      <div class="form-group catalogue_search">
         <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
+        <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
       </div>
 
       <!-- FILTERS MENU TAB-BAR -->
@@ -504,7 +505,7 @@ export default class Catalogue extends Vue {
 
   queryResultsCount: number | null;
 
-  query:string;
+  // query:string;
 
   // --- FILTERS ---
 
@@ -578,13 +579,13 @@ export default class Catalogue extends Vue {
     this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
     this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Vendor' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
 
-    this.query = '';
+    // this.query = '';
     this.queryResults = [];
     this.queryResultsCount = null;
     this.catalogQuery = {
       page: 0,
       size: 6,
-      query: this.query,
+      query: '',
     };
     this.catalogueApi = new CatalogueApi();
 
@@ -690,8 +691,9 @@ export default class Catalogue extends Vue {
 
   searchAssets(): void {
     this.queryResults = [];
-    this.catalogQuery.query = this.query;
-    this.catalogueApi.find(this.query)
+    // this.catalogQuery.query = this.query;
+    // this.catalogueApi.find(this.query)
+    this.catalogueApi.find(this.catalogQuery)
       .then((queryResponse: CatalogueQueryResponse) => {
         if (queryResponse.success) {
           this.queryResults = queryResponse.result.items;
@@ -1025,6 +1027,12 @@ export default class Catalogue extends Vue {
     });
     label = label.substring(1);
     return label;
+  }
+
+  searchTextOnly(): void {
+    this.closeFilters();
+    store.commit('setLoading', true);
+    this.searchAssets();
   }
 
   formatMoment(date: string, time: string): string {
