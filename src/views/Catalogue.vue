@@ -341,98 +341,10 @@
             <div>
               <h3 class="m-xs-10">Selections</h3>
 
-              <!-- TYPE -->
-              <div class="pill" v-for="filter in getFiltersChecked('type')" :key="filter.name">
-                {{ filter.pillLabel }}
-                <div class="close-button" @click="removeFilter('type', filter.id)"><font-awesome-icon icon="times" /></div>
+              <div class="pill" v-for="filter in getAppliedFilters()" :key="filter.label">
+                {{ filter.label }}
+                <div class="close-button" @click="removeFilter(filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
               </div>
-
-              <!-- UPDATED -->
-              <div v-if="updated.dateFrom && !updated.dateTo" class="pill">
-                After {{ dateFormatter(updated.dateFrom) }}{{ updated.timeFrom != '00:00 AM' ? ', ' + updated.timeFrom : '' }}
-                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <div v-if="!updated.dateFrom && updated.dateTo" class="pill">
-                Before {{ dateFormatter(updated.dateTo) }}{{ updated.timeTo != '23:59 PM' ? ', ' + updated.timeTo : '' }}
-                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <div v-if="updated.dateFrom && updated.dateTo" class="pill">
-                {{ dateFormatter(updated.dateFrom) }}{{ updated.timeFrom != '00:00 AM' ? ', ' + updated.timeFrom : '' }} - {{ dateFormatter(updated.dateTo) }}{{ updated.timeTo != '23:59 PM' ? ', ' + updated.timeTo : '' }}
-                <div class="close-button" @click="removeFilter('update', '')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- TOPIC -->
-              <div class="pill" v-for="filter in getFiltersChecked('topic')" :key="filter.name">
-                <span>{{filter.pillLabel}}</span>
-                <div class="close-button" @click="removeFilter('topic', filter.id)"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- FORMAT -->
-              <div class="pill" v-for="filter in getFiltersChecked('format')" :key="filter.name">
-                <span>{{filter.name}}</span>
-                <div class="close-button" @click="removeFilter('format', filter.id)"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- SCALE -->
-              <div class="pill" v-if="scaleValues[0] != scaleMin || scaleValues[1] != scaleMax">
-                1:{{scaleValues[1]}} - 1:{{scaleValues[0]}}
-                <div class="close-button" @click="removeFilter('scale')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- CRS -->
-              <div class="pill" v-for="filter in getFiltersChecked('crs')" :key="filter.code">
-                EPSG:{{filter.code}}
-                <div class="close-button" @click="removeFilter('crs', filter.code)"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- COVERAGE -->
-              <div class="pill" v-if="mapCoverageSelectionBBox">
-                Area selection
-                <div class="close-button" @click="removeFilter('coverage')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- PRICE -->
-              <div v-if="priceMin && !priceMax" class="pill">
-                &gt;{{ priceMin }}€
-                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
-              </div>
-              <div v-if="!priceMin && priceMax" class="pill">
-                &lt;{{ priceMax }}€
-                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
-              </div>
-              <div v-if="priceMin && priceMax" class="pill">
-                {{ priceMin }}€ - {{ priceMax }}€
-                <div class="close-button" @click="removeFilter('price')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- NUMBER OF FEATURES -->
-              <div class="pill" v-if="numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Small <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Medium <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && !numberOfFeatures.isLargeChecked">Small & Medium <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="numberOfFeatures.isSmallChecked && !numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Small & Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-              <div class="pill" v-if="!numberOfFeatures.isSmallChecked && numberOfFeatures.isMediumChecked && numberOfFeatures.isLargeChecked">Medium & Large <div class="close-button" @click="removeFilter('numberOfFeatures')"><font-awesome-icon icon="times" /></div></div>
-
-              <!-- ATTRIBUTES -->
-              <div v-if="attributes.some((x) => {return x !== ''})" class="pill">
-                Attributes: {{ getInputsAsOneLabel(attributes) }}
-                <div class="close-button" @click="removeFilter('attributes')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- VENDOR -->
-              <div v-if="vendors.some((x) => {return x !== ''})" class="pill">
-                Vendors: {{ getInputsAsOneLabel(vendors) }}
-                <div class="close-button" @click="removeFilter('vendor')"><font-awesome-icon icon="times" /></div>
-              </div>
-
-              <!-- LICENSES -->
-              <div v-if="licenses.some((x) => x.isChecked)" class="pill">
-                Licenses: {{ getInputsAsOneLabel(licenses.filter(x => x.isChecked).map(x => x.pillLabel)) }}
-                <div class="close-button" @click="removeFilter('license')"><font-awesome-icon icon="times" /></div>
-              </div>
-
             </div>
           </div>
           <div class="filter-side-menu-bottom">
@@ -715,7 +627,7 @@ export default class Catalogue extends Vue {
     this.filterMoreSubmenuItemSelected = filterItem;
   }
 
-  removeFilter(category: string, filterName: string): void {
+  removeFilter(category: string, filterName?: string): void {
     switch (category) {
       case 'type':
         // eslint-disable-next-line
@@ -809,34 +721,118 @@ export default class Catalogue extends Vue {
     this.filterMenuItemSelected = '';
   }
 
-  getFiltersChecked(category: string): filterOption[] | crs[] {
-    let result;
-    switch (category) {
-      case 'type':
-        result = this.types.filter((x) => x.isChecked);
-        break;
+  getAppliedFilters(): { label: string, category: string, filterName?: string }[] {
+    let result = [] as { label: string, category: string, filterName?: string }[];
 
-      case 'topic':
-        result = this.topics.filter((x) => x.isChecked);
-        break;
+    // TYPE
+    result = result.concat(
+      this.types.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'type', filterName: x.id })),
+    );
 
-      case 'format':
-        result = Object.values(this.formats)
-          .flat()
-          .filter((x) => x.isChecked);
-        break;
+    // UPDATED
+    if (this.updated.dateFrom && !this.updated.dateTo) {
+      result.push({
+        // eslint-disable-next-line
+        label: `After ${this.dateFormatter(this.updated.dateFrom)}${this.updated.timeFrom !== '00:00 AM' ? ', ' + this.updated.timeFrom : ''}`,
+        category: 'update',
+      });
+    }
+    if (!this.updated.dateFrom && this.updated.dateTo) {
+      result.push({
+        // eslint-disable-next-line
+        label: `Before ${this.dateFormatter(this.updated.dateTo)}${this.updated.timeTo !== '23:59 PM' ? ', ' + this.updated.timeTo : ''}`,
+        category: 'update',
+      });
+    }
+    if (this.updated.dateFrom && this.updated.dateTo) {
+      result.push({
+        // eslint-disable-next-line
+        label: `${this.dateFormatter(this.updated.dateFrom)}${this.updated.timeFrom !== '00:00 AM' ? ', ' + this.updated.timeFrom : ''} - ${this.dateFormatter(this.updated.dateTo)}${this.updated.timeTo !== '23:59 PM' ? ', ' + this.updated.timeTo : ''}`,
+        category: 'update',
+      });
+    }
 
-      case 'crs':
-        result = this.crsList
-          .filter((x) => x.isChecked);
-        break;
+    // TOPIC
+    result = result.concat(
+      this.topics.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'topic', filterName: x.id })),
+    );
 
-      case 'license':
-        result = this.licenses
-          .filter((x) => x.isChecked);
-        break;
+    // FORMAT
+    result = result.concat(
+      Object.values(this.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
+    );
 
-      default:
+    // SCALE
+    if (this.scaleValues[0] !== this.scaleMin || this.scaleValues[1] !== this.scaleMax) {
+      result.push({
+        label: `1:${this.scaleValues[1]} - 1:${this.scaleValues[0]}`,
+        category: 'scale',
+      });
+    }
+
+    // CRS
+    result = result.concat(
+      this.crsList.filter((x) => x.isChecked).map((x) => ({ label: `EPSG:${x.code}`, category: 'crs', filterName: x.code })),
+    );
+
+    // COVERAGE
+    if (this.mapCoverageSelectionBBox) {
+      result.push({
+        label: 'Area selection',
+        category: 'coverage',
+      });
+    }
+
+    // PRICE
+    if (this.priceMin && !this.priceMax) {
+      result.push({
+        label: `>${this.priceMin}€`,
+        category: 'price',
+      });
+    }
+    if (!this.priceMin && this.priceMax) {
+      result.push({
+        label: `<${this.priceMax}€`,
+        category: 'price',
+      });
+    }
+    if (this.priceMin && this.priceMax) {
+      result.push({
+        label: `${this.priceMin}€ - ${this.priceMax}€`,
+        category: 'price',
+      });
+    }
+
+    // NUMBER OF FEATURES
+    if (this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small', category: 'numberOfFeatures' });
+    if (!this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium', category: 'numberOfFeatures' });
+    if (!this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Large', category: 'numberOfFeatures' });
+    if (this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Medium', category: 'numberOfFeatures' });
+    if (this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Large', category: 'numberOfFeatures' });
+    if (!this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium & Large', category: 'numberOfFeatures' });
+
+    // ATTRIBUTES
+    if (this.attributes.some((x) => (x !== ''))) {
+      result.push({
+        label: `Attributes: ${this.getInputsAsOneLabel(this.attributes)}`,
+        category: 'attributes',
+      });
+    }
+
+    // VENDOR
+    if (this.vendors.some((x) => (x !== ''))) {
+      result.push({
+        label: `Vendors: ${this.getInputsAsOneLabel(this.vendors)}`,
+        category: 'vendor',
+      });
+    }
+
+    // LICENSES
+    if (this.licenses.some((x) => (x.isChecked))) {
+      result.push({
+        label: `Licenses: ${this.getInputsAsOneLabel(this.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
+        category: 'license',
+      });
     }
 
     return result;
@@ -1054,12 +1050,12 @@ export default class Catalogue extends Vue {
     filters.size = this.catalogQuery.size;
 
     // TYPE
-    if (this.getFiltersChecked('type').length) {
-      filters.type = [];
-      this.getFiltersChecked('type').forEach((x) => {
-        // eslint-disable-next-line
-        filters.type!.push(x.id as EnumAssetType);
-      });
+    if (this.types.some((x) => x.isChecked)) {
+      filters.type = this.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
+    }
+
+    if (this.getAppliedFilters().some((x) => x.category === 'type')) {
+      filters.type = this.getAppliedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
     }
 
     // UPDATED
@@ -1072,30 +1068,18 @@ export default class Catalogue extends Vue {
     }
 
     // TOPIC
-    if (this.getFiltersChecked('topic').length) {
-      filters.topic = [];
-      this.getFiltersChecked('topic').forEach((x) => {
-        // eslint-disable-next-line
-        filters.topic!.push(x.id as EnumTopicCategory);
-      });
+    if (this.topics.some((x) => x.isChecked)) {
+      filters.topic = this.topics.filter((x) => x.isChecked).map((x) => x.id as EnumTopicCategory);
     }
 
     // FORMAT
-    if (this.getFiltersChecked('format').length) {
-      filters.format = [];
-      this.getFiltersChecked('format').forEach((x) => {
-        // eslint-disable-next-line
-        filters.format!.push(x.id);
-      });
+    if (Object.values(this.formats).flat().some((x) => x.isChecked)) {
+      filters.format = Object.values(this.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
     }
 
     // CRS
-    if (this.getFiltersChecked('crs').length) {
-      filters.crs = [];
-      this.getFiltersChecked('crs').forEach((x) => {
-        // eslint-disable-next-line
-        filters.crs!.push((x as crs).code);
-      });
+    if (this.crsList.some((x) => x.isChecked)) {
+      filters.crs = this.crsList.filter((x) => x.isChecked).map((x) => x.code);
     }
 
     // SCALE
@@ -1127,29 +1111,17 @@ export default class Catalogue extends Vue {
 
     // ATTRIBUTES
     if (this.attributes.length && this.attributes.some((x) => x.length)) {
-      filters.attribute = [];
-      this.attributes.filter((x) => x.length).forEach((x) => {
-        // eslint-disable-next-line
-        filters.attribute!.push(x);
-      });
+      filters.attribute = this.attributes.filter((x) => x.length);
     }
 
     // VENDORS
     if (this.vendors.length && this.vendors.some((x) => x.length)) {
-      filters.publisher = [];
-      this.vendors.filter((x) => x.length).forEach((x) => {
-        // eslint-disable-next-line
-        filters.publisher!.push(x);
-      });
+      filters.publisher = this.vendors.filter((x) => x.length);
     }
 
     // LICENSE
-    if (this.getFiltersChecked('license').length) {
-      filters.license = [];
-      this.getFiltersChecked('license').forEach((x) => {
-        // eslint-disable-next-line
-        filters.license!.push(x.id);
-      });
+    if (this.licenses.some((x) => x.isChecked)) {
+      filters.license = this.licenses.filter((x) => x.isChecked).map((x) => x.id);
     }
 
     console.log(filters);
@@ -1157,6 +1129,8 @@ export default class Catalogue extends Vue {
       this.queryResults = advancedQueryResponse.result.items;
       this.queryResultsCount = advancedQueryResponse.result.count;
       store.commit('setLoading', false);
+    }).catch((err) => {
+      console.log('err', err);
     });
   }
 }
