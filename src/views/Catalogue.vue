@@ -1045,8 +1045,11 @@ export default class Catalogue extends Vue {
     this.searchAssets();
   }
 
+  // eslint-disable-next-line
   formatMoment(date: string, time: string): string {
-    return `${moment(date).format('YYYYMMDD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
+    // return `${moment(date).format('YYYY-MM-DD')}_${moment(time, 'HH:mm a').format('HHmm')}`;
+    // TODO: include time
+    return moment(date).format('YYYY-MM-DD');
   }
 
   applyFilters(): void {
@@ -1140,6 +1143,7 @@ export default class Catalogue extends Vue {
 
     console.log(filters);
     this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
+      console.log('aqr', advancedQueryResponse);
       this.queryResults = advancedQueryResponse.result.items;
       this.queryResultsCount = advancedQueryResponse.result.count;
       store.commit('setLoading', false);
