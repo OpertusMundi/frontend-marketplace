@@ -39,7 +39,7 @@
                 <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">From date</small>
                   <div class="flex align-items-center">
-                    <button v-if="updated.dateFrom" @click="removeFilter('update', 'date_from')"><font-awesome-icon icon="times" /></button>
+                    <button v-if="updated.dateFrom" @click="removeFilter(false, 'update', 'date_from')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
                 <datepicker :inline="true" v-model="updated.dateFrom" placeholder="select date"></datepicker>
@@ -47,7 +47,7 @@
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">From time</small>
                     <div class="flex align-items-center">
-                      <button v-if="updated.timeFrom != '00:00 AM'" @click="removeFilter('update', 'time_from')"><font-awesome-icon icon="times" /></button>
+                      <button v-if="updated.timeFrom != '00:00 AM'" @click="removeFilter(false, 'update', 'time_from')"><font-awesome-icon icon="times" /></button>
                     </div>
                   </div>
                   <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="updated.timeFrom" placeholder="select time"></vue-timepicker>
@@ -57,7 +57,7 @@
                 <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">To date</small>
                   <div class="flex align-items-center">
-                    <button v-if="updated.dateTo" @click="removeFilter('update', 'date_to')"><font-awesome-icon icon="times" /></button>
+                    <button v-if="updated.dateTo" @click="removeFilter(false, 'update', 'date_to')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
                 <datepicker :inline="true" v-model="updated.dateTo" placeholder="select date"></datepicker>
@@ -65,7 +65,7 @@
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">To time</small>
                     <div class="flex align-items-center">
-                      <button v-if="updated.timeTo != '23:59 PM'" @click="removeFilter('update', 'time_to')"><font-awesome-icon icon="times" /></button>
+                      <button v-if="updated.timeTo != '23:59 PM'" @click="removeFilter(false, 'update', 'time_to')"><font-awesome-icon icon="times" /></button>
                     </div>
                   </div>
                   <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="updated.timeTo" placeholder="select time"></vue-timepicker>
@@ -343,7 +343,7 @@
 
               <div class="pill" v-for="filter in getAppliedFilters()" :key="filter.label">
                 {{ filter.label }}
-                <div class="close-button" @click="removeFilter(filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
+                <div class="close-button" @click="removeFilter(false, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
               </div>
             </div>
           </div>
@@ -354,7 +354,13 @@
         </div>
       </div>
 
-      <h6 class="mt-xs-30 mb-xs-30 ml-xs-20" v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6>
+      <div class="assets__top-info">
+        <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6>
+        <div class="pill" v-for="filter in getAppliedFilters()" :key="filter.label">
+          {{ filter.label }}
+          <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
+        </div>
+      </div>
 
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
@@ -627,7 +633,7 @@ export default class Catalogue extends Vue {
     this.filterMoreSubmenuItemSelected = filterItem;
   }
 
-  removeFilter(category: string, filterName?: string): void {
+  removeFilter(withCatalogRefresh: boolean, category: string, filterName?: string): void {
     switch (category) {
       case 'type':
         // eslint-disable-next-line
@@ -715,6 +721,8 @@ export default class Catalogue extends Vue {
       }
       default:
     }
+
+    if (withCatalogRefresh) this.applyFilters();
   }
 
   closeFilters(): void {
