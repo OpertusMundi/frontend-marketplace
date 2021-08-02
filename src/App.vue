@@ -110,6 +110,14 @@ export default class App extends Vue {
     }
   }
 
+  @Watch('$store.getters.isAuthenticated', { immediate: false })
+  handleAuthenticationChanges(isNowAuthenticated, wasPreviouslyAuthenticated): void {
+    if (wasPreviouslyAuthenticated && !isNowAuthenticated) {
+      const name = 'Home';
+      if (this.$route.name !== name) this.$router.push({ name });
+    }
+  }
+
   get routeName(): string | null | undefined {
     return this.$route.name;
   }
