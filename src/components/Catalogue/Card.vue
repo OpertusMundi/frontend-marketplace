@@ -49,12 +49,6 @@ import { EnumPricingModel } from '@/model/pricing-model';
 export default class CatalogueCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;
 
-  constructor() {
-    super();
-
-    console.log('asd asset:', this.asset);
-  }
-
   getColor(): string {
     let color = '#358F8B';
     if (this.asset.type === 'VECTOR') {

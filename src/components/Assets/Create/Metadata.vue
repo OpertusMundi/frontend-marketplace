@@ -69,13 +69,6 @@
           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
         </div>
       </validation-provider>
-      <!-- <validation-provider v-slot="{ errors }" name="Asset title" rules="required">
-        <div class="form-group">
-          <label for="">Asset title</label>
-          <input type="text" class="form-group__text" id="" name="title" v-model="assetLocal.title">
-          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-        </div>
-      </validation-provider> -->
       <validation-provider v-slot="{ errors }" name="Asset short description">
         <div class="form-group">
           <label for="">Asset short description</label>
@@ -88,6 +81,49 @@
           <label for="">Metadata language</label>
           <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="assetLocal.metadataLanguage">
           <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+        </div>
+      </validation-provider>
+
+      <validation-provider name="Date start">
+        <div class="form-group">
+          <label for="">Date start (of resource temporal extent)</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.dateStart" @input="assetLocal.dateStart = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Date end">
+        <div class="form-group">
+          <label for="">Date end (of resource temporal extent)</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.dateEnd" @input="assetLocal.dateEnd = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Creation date">
+        <div class="form-group">
+          <label for="">Creation date</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.creationDate" @input="assetLocal.creationDate = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Publication date">
+        <div class="form-group">
+          <label for="">Publication date</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.publicationDate" @input="assetLocal.publicationDate = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Revision date">
+        <div class="form-group">
+          <label for="">Revision date</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.revisionDate" @input="assetLocal.revisionDate = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Metadata date">
+        <div class="form-group">
+          <label for="">Metadata date</label>
+          <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)"></datepicker>
+        </div>
+      </validation-provider>
+      <validation-provider name="Abstract">
+        <div class="form-group">
+          <label for="">Abstract</label>
+          <textarea v-model="assetLocal.abstract" placeholder="Short asset description"></textarea>
         </div>
       </validation-provider>
       <!-- <validation-provider v-slot="{ errors }" name="Metadata date" rules="required">
@@ -117,8 +153,10 @@ import {
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
+import Datepicker from 'vuejs-datepicker';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
+import moment from 'moment';
 
 extend('required', required);
 
@@ -127,6 +165,7 @@ extend('required', required);
     ValidationObserver,
     ValidationProvider,
     Multiselect,
+    Datepicker,
   },
 })
 export default class Metadata extends Vue {
@@ -167,6 +206,10 @@ export default class Metadata extends Vue {
   populateAvailableFormatsForSelectedType(): void {
     const selectedType = this.asset.type;
     this.menusData.availableFormats = store.getters.getConfig.configuration.asset.fileTypes.filter((x) => x.category === selectedType?.toUpperCase()).map((x) => x.format);
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('YYYY-MM-DD');
   }
 }
 </script>

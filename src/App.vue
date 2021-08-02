@@ -110,6 +110,14 @@ export default class App extends Vue {
     }
   }
 
+  @Watch('$store.getters.isAuthenticated', { immediate: false })
+  handleAuthenticationChanges(isNowAuthenticated, wasPreviouslyAuthenticated): void {
+    if (wasPreviouslyAuthenticated && !isNowAuthenticated) {
+      const name = 'Home';
+      if (this.$route.name !== name) this.$router.push({ name });
+    }
+  }
+
   get routeName(): string | null | undefined {
     return this.$route.name;
   }
@@ -136,13 +144,14 @@ export default class App extends Vue {
           .then((profileResponse: ServerResponse<Account>) => {
             if (profileResponse.success) {
               store.commit('setUserData', profileResponse.result);
+            } else {
+              console.log('unsuccessful profile fetching');
+              this.logout();
             }
-            // store.commit('setLoading', false);
           })
           .catch((error: AxiosError) => {
-            // TODO: Handle error
-            console.log(error);
-            // store.commit('setLoading', false);
+            console.log('getProfile error', error);
+            this.logout();
           });
       })
       .catch((err) => {

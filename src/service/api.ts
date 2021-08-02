@@ -1,12 +1,16 @@
 import axios, {
   AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError,
 } from 'axios';
+import store from '@/store';
 
 import authRequestInterceptor from '@/service/interceptors/auth';
 import csrfRequestInterceptor from '@/service/interceptors/csrf';
 
 export function handleError<T>(error: AxiosError): Promise<AxiosResponse<T>> {
   if (error.response) {
+    if (error.response.status === 403) {
+      store.commit('logout');
+    }
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     console.log(error.response);
