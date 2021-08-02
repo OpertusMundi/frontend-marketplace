@@ -136,13 +136,14 @@ export default class App extends Vue {
           .then((profileResponse: ServerResponse<Account>) => {
             if (profileResponse.success) {
               store.commit('setUserData', profileResponse.result);
+            } else {
+              console.log('unsuccessful profile fetching');
+              this.logout();
             }
-            // store.commit('setLoading', false);
           })
           .catch((error: AxiosError) => {
-            // TODO: Handle error
-            console.log(error);
-            // store.commit('setLoading', false);
+            console.log('getProfile error', error);
+            this.logout();
           });
       })
       .catch((err) => {
