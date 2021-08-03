@@ -19,8 +19,11 @@
         <div class="asset__section__overview__right">
           <h5>Asset Info</h5>
           <p><strong>Language:</strong> {{ catalogueItem.language }} <br>
-            <strong>Temporal extent:</strong>  Nov. 2019 - Oct. 2020 (DUMMY)<br>
+          <strong>Temporal extent:</strong>  {{ formatDate(catalogueItem.dateStart) }} - {{ formatDate(catalogueItem.dateEnd) }}<br>
           <h5>Tags</h5>
+          <p>
+            <span v-for="(keyword, i) in catalogueItem.keywords" :key="keyword">{{ keyword }}<span v-if="i !== catalogueItem.keywords.length">, </span></span>
+          </p>
           <!-- <div v-if="catalogueItemType == 'api'">
             <p>
               <span v-for="(tag, index) in catalogueItemDummyMetadata.distinct.feat_desc" :key="index">
@@ -38,10 +41,15 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { CatalogueItem } from '@/model';
+import moment from 'moment';
 
 @Component
 export default class Overview extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
+
+  formatDate(date: string): string {
+    return moment(date).format('DD MMM. YYYY');
+  }
 }
 </script>
 <style lang="scss">
