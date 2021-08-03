@@ -197,7 +197,7 @@
                       </label>
                     </div>
                     <button v-if="mapCoverageSelectionIsDrawn && !filters.mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
-                    <button v-if="mapCoverageSelectionRectangle && filters.mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
+                    <button v-if="mapCoverageSelectionRectangle && filters.mapCoverageSelectionBBox" @click="onClearArea(false)" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
                 </div>
               </div>
@@ -341,7 +341,7 @@
             <div>
               <h3 class="m-xs-10">Selections</h3>
 
-              <div class="pill" v-for="filter in getAppliedFilters()" :key="filter.label">
+              <div class="pill" v-for="filter in getSelectedFilters(false)" :key="filter.label">
                 {{ filter.label }}
                 <div class="close-button" @click="removeFilter(false, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
               </div>
@@ -349,14 +349,14 @@
           </div>
           <div class="filter-side-menu-bottom">
             <button class="btn--std btn--outlineblue" @click="closeFilters()">CANCEL</button>
-            <button @click="applyFilters" class="btn--std btn--blue">APPLY FILTERS</button>
+            <button @click="searchUsingFilters(false)" class="btn--std btn--blue">APPLY FILTERS</button>
           </div>
         </div>
       </div>
 
       <div class="assets__top-info">
         <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6>
-        <div class="pill" v-for="filter in getAppliedFilters()" :key="filter.label">
+        <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
           {{ filter.label }}
           <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
         </div>
@@ -380,6 +380,7 @@ import { EnumAssetType } from '@/model/enum';
 import { CatalogueItemDetails, ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
 import store from '@/store';
 import moment from 'moment';
+import { cloneDeep } from 'lodash';
 import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
@@ -490,6 +491,8 @@ export default class Catalogue extends Vue {
   filterMoreSubmenuItemSelected: string;
 
   filters: Filters;
+
+  filtersApplied: Filters;
 
   // filters: filterCategory[];
 
@@ -651,6 +654,8 @@ export default class Catalogue extends Vue {
       // eslint-disable-next-line
       { id: 'web_gis', name: 'Web-GIS applications', pillLabel: 'web-GIS', isChecked: false },
     ];
+
+    this.filtersApplied = cloneDeep(this.filters);
   }
 
   @Watch('filterMenuItemSelected')
@@ -697,53 +702,55 @@ export default class Catalogue extends Vue {
     this.filterMoreSubmenuItemSelected = filterItem;
   }
 
-  removeFilter(withCatalogRefresh: boolean, category: string, filterName?: string): void {
+  removeFilter(fromAppliedFilters: boolean, category: string, filterName?: string): void {
+    const filters = fromAppliedFilters ? this.filtersApplied : this.filters;
+
     switch (category) {
       case 'type':
         // eslint-disable-next-line
-        this.filters.types.find((x) => x.id === filterName)!.isChecked = false;
+        filters.types.find((x) => x.id === filterName)!.isChecked = false;
         break;
       case 'topic': {
         // eslint-disable-next-line
-        this.filters.topics.find((x) => x.id === filterName)!.isChecked = false;
+        filters.topics.find((x) => x.id === filterName)!.isChecked = false;
         break;
       }
       case 'crs': {
         // eslint-disable-next-line
-        this.filters.crsList.find((x) => x.code === filterName)!.isChecked = false;
+        filters.crsList.find((x) => x.code === filterName)!.isChecked = false;
         break;
       }
       case 'update': {
         switch (filterName) {
           case 'date_from': {
-            this.filters.updated.dateFrom = '';
-            this.filters.updated.timeFrom = '00:00 AM';
+            filters.updated.dateFrom = '';
+            filters.updated.timeFrom = '00:00 AM';
             break;
           }
           case 'date_to': {
-            this.filters.updated.dateTo = '';
-            this.filters.updated.timeTo = '23:59 PM';
+            filters.updated.dateTo = '';
+            filters.updated.timeTo = '23:59 PM';
             break;
           }
           case 'time_from': {
-            this.filters.updated.timeFrom = '00:00 AM';
+            filters.updated.timeFrom = '00:00 AM';
             break;
           }
           case 'time_to': {
-            this.filters.updated.timeTo = '23:59 PM';
+            filters.updated.timeTo = '23:59 PM';
             break;
           }
           default: {
-            this.filters.updated.dateFrom = '';
-            this.filters.updated.dateTo = '';
-            this.filters.updated.timeFrom = '00:00 AM';
-            this.filters.updated.timeTo = '23:59 PM';
+            filters.updated.dateFrom = '';
+            filters.updated.dateTo = '';
+            filters.updated.timeFrom = '00:00 AM';
+            filters.updated.timeTo = '23:59 PM';
           }
         }
         break;
       }
       case 'format': {
-        const option = Object.values(this.filters.formats)
+        const option = Object.values(filters.formats)
           .flat()
           .find((x) => x.id === filterName);
         // eslint-disable-next-line
@@ -752,32 +759,32 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'coverage': {
-        this.onClearArea();
+        this.onClearArea(fromAppliedFilters);
         break;
       }
       case 'price': {
-        this.filters.priceMin = null;
-        this.filters.priceMax = null;
+        filters.priceMin = null;
+        filters.priceMax = null;
         break;
       }
       case 'scale': {
-        this.filters.scaleValues = [this.scaleMin, this.scaleMax];
+        filters.scaleValues = [this.scaleMin, this.scaleMax];
         break;
       }
       case 'numberOfFeatures': {
-        this.filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
+        filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
         break;
       }
       case 'attributes': {
-        this.filters.attributes = this.filters.attributes.map(() => '');
+        filters.attributes = filters.attributes.map(() => '');
         break;
       }
       case 'vendor': {
-        this.filters.vendors = this.filters.vendors.map(() => '');
+        filters.vendors = filters.vendors.map(() => '');
         break;
       }
       case 'license': {
-        this.filters.licenses.forEach((x) => {
+        filters.licenses.forEach((x) => {
           // eslint-disable-next-line
           x.isChecked = false;
         });
@@ -786,69 +793,74 @@ export default class Catalogue extends Vue {
       default:
     }
 
-    if (withCatalogRefresh) this.applyFilters();
+    if (fromAppliedFilters) {
+      this.searchUsingFilters(true);
+      this.removeFilter(false, category, filterName);
+    }
   }
 
   closeFilters(): void {
     this.filterMenuItemSelected = '';
   }
 
-  getAppliedFilters(): { label: string, category: string, filterName?: string }[] {
+  getSelectedFilters(onAppliedFilters: boolean): { label: string, category: string, filterName?: string }[] {
+    const filters = onAppliedFilters ? this.filtersApplied : this.filters;
+
     let result = [] as { label: string, category: string, filterName?: string }[];
 
     // TYPE
     result = result.concat(
-      this.filters.types.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'type', filterName: x.id })),
+      filters.types.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'type', filterName: x.id })),
     );
 
     // UPDATED
-    if (this.filters.updated.dateFrom && !this.filters.updated.dateTo) {
+    if (filters.updated.dateFrom && !filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `After ${this.dateFormatter(this.filters.updated.dateFrom)}${this.filters.updated.timeFrom !== '00:00 AM' ? ', ' + this.filters.updated.timeFrom : ''}`,
+        label: `After ${this.dateFormatter(filters.updated.dateFrom)}${filters.updated.timeFrom !== '00:00 AM' ? ', ' + filters.updated.timeFrom : ''}`,
         category: 'update',
       });
     }
-    if (!this.filters.updated.dateFrom && this.filters.updated.dateTo) {
+    if (!filters.updated.dateFrom && filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `Before ${this.dateFormatter(this.filters.updated.dateTo)}${this.filters.updated.timeTo !== '23:59 PM' ? ', ' + this.filters.updated.timeTo : ''}`,
+        label: `Before ${this.dateFormatter(filters.updated.dateTo)}${filters.updated.timeTo !== '23:59 PM' ? ', ' + filters.updated.timeTo : ''}`,
         category: 'update',
       });
     }
-    if (this.filters.updated.dateFrom && this.filters.updated.dateTo) {
+    if (filters.updated.dateFrom && filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `${this.dateFormatter(this.filters.updated.dateFrom)}${this.filters.updated.timeFrom !== '00:00 AM' ? ', ' + this.filters.updated.timeFrom : ''} - ${this.dateFormatter(this.filters.updated.dateTo)}${this.filters.updated.timeTo !== '23:59 PM' ? ', ' + this.filters.updated.timeTo : ''}`,
+        label: `${this.dateFormatter(filters.updated.dateFrom)}${filters.updated.timeFrom !== '00:00 AM' ? ', ' + filters.updated.timeFrom : ''} - ${this.dateFormatter(filters.updated.dateTo)}${filters.updated.timeTo !== '23:59 PM' ? ', ' + filters.updated.timeTo : ''}`,
         category: 'update',
       });
     }
 
     // TOPIC
     result = result.concat(
-      this.filters.topics.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'topic', filterName: x.id })),
+      filters.topics.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'topic', filterName: x.id })),
     );
 
     // FORMAT
     result = result.concat(
-      Object.values(this.filters.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
+      Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
     );
 
     // SCALE
-    if (this.filters.scaleValues[0] !== this.scaleMin || this.filters.scaleValues[1] !== this.scaleMax) {
+    if (filters.scaleValues[0] !== this.scaleMin || filters.scaleValues[1] !== this.scaleMax) {
       result.push({
-        label: `1:${this.filters.scaleValues[1]} - 1:${this.filters.scaleValues[0]}`,
+        label: `1:${filters.scaleValues[1]} - 1:${filters.scaleValues[0]}`,
         category: 'scale',
       });
     }
 
     // CRS
     result = result.concat(
-      this.filters.crsList.filter((x) => x.isChecked).map((x) => ({ label: `EPSG:${x.code}`, category: 'crs', filterName: x.code })),
+      filters.crsList.filter((x) => x.isChecked).map((x) => ({ label: `EPSG:${x.code}`, category: 'crs', filterName: x.code })),
     );
 
     // COVERAGE
-    if (this.filters.mapCoverageSelectionBBox) {
+    if (filters.mapCoverageSelectionBBox) {
       result.push({
         label: 'Area selection',
         category: 'coverage',
@@ -856,53 +868,53 @@ export default class Catalogue extends Vue {
     }
 
     // PRICE
-    if (this.filters.priceMin && !this.filters.priceMax) {
+    if (filters.priceMin && !filters.priceMax) {
       result.push({
-        label: `>${this.filters.priceMin}€`,
+        label: `>${filters.priceMin}€`,
         category: 'price',
       });
     }
-    if (!this.filters.priceMin && this.filters.priceMax) {
+    if (!filters.priceMin && filters.priceMax) {
       result.push({
-        label: `<${this.filters.priceMax}€`,
+        label: `<${filters.priceMax}€`,
         category: 'price',
       });
     }
-    if (this.filters.priceMin && this.filters.priceMax) {
+    if (filters.priceMin && filters.priceMax) {
       result.push({
-        label: `${this.filters.priceMin}€ - ${this.filters.priceMax}€`,
+        label: `${filters.priceMin}€ - ${filters.priceMax}€`,
         category: 'price',
       });
     }
 
     // NUMBER OF FEATURES
-    if (this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small', category: 'numberOfFeatures' });
-    if (!this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium', category: 'numberOfFeatures' });
-    if (!this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Large', category: 'numberOfFeatures' });
-    if (this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Medium', category: 'numberOfFeatures' });
-    if (this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Large', category: 'numberOfFeatures' });
-    if (!this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium & Large', category: 'numberOfFeatures' });
+    if (filters.numberOfFeatures.isSmallChecked && !filters.numberOfFeatures.isMediumChecked && !filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small', category: 'numberOfFeatures' });
+    if (!filters.numberOfFeatures.isSmallChecked && filters.numberOfFeatures.isMediumChecked && !filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium', category: 'numberOfFeatures' });
+    if (!filters.numberOfFeatures.isSmallChecked && !filters.numberOfFeatures.isMediumChecked && filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Large', category: 'numberOfFeatures' });
+    if (filters.numberOfFeatures.isSmallChecked && filters.numberOfFeatures.isMediumChecked && !filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Medium', category: 'numberOfFeatures' });
+    if (filters.numberOfFeatures.isSmallChecked && !filters.numberOfFeatures.isMediumChecked && filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Large', category: 'numberOfFeatures' });
+    if (!filters.numberOfFeatures.isSmallChecked && filters.numberOfFeatures.isMediumChecked && filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium & Large', category: 'numberOfFeatures' });
 
     // ATTRIBUTES
-    if (this.filters.attributes.some((x) => (x !== ''))) {
+    if (filters.attributes.some((x) => (x !== ''))) {
       result.push({
-        label: `Attributes: ${this.getInputsAsOneLabel(this.filters.attributes)}`,
+        label: `Attributes: ${this.getInputsAsOneLabel(filters.attributes)}`,
         category: 'attributes',
       });
     }
 
     // VENDOR
-    if (this.filters.vendors.some((x) => (x !== ''))) {
+    if (filters.vendors.some((x) => (x !== ''))) {
       result.push({
-        label: `Vendors: ${this.getInputsAsOneLabel(this.filters.vendors)}`,
+        label: `Vendors: ${this.getInputsAsOneLabel(filters.vendors)}`,
         category: 'vendor',
       });
     }
 
     // LICENSES
-    if (this.filters.licenses.some((x) => (x.isChecked))) {
+    if (filters.licenses.some((x) => (x.isChecked))) {
       result.push({
-        label: `Licenses: ${this.getInputsAsOneLabel(this.filters.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
+        label: `Licenses: ${this.getInputsAsOneLabel(filters.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
         category: 'license',
       });
     }
@@ -1017,7 +1029,7 @@ export default class Catalogue extends Vue {
     this.mapCoverageSelectionRectangle.disableEdit();
   }
 
-  onClearArea(): void {
+  onClearArea(onAppliedFilters: boolean): void {
     if (this.mapShades) {
       this.mapShades.onRemove(this.mapCoverage);
     }
@@ -1027,7 +1039,12 @@ export default class Catalogue extends Vue {
     this.mapCoverageSelectionRectangle = null;
     this.mapShades = null;
     this.mapCoverageSelectionIsDrawn = false;
+
+    if (onAppliedFilters) {
+      this.filtersApplied.mapCoverageSelectionBBox = '';
+    }
     this.filters.mapCoverageSelectionBBox = '';
+
     this.countrySelected = '';
   }
 
@@ -1110,100 +1127,103 @@ export default class Catalogue extends Vue {
     return moment(date).format('YYYY-MM-DD');
   }
 
-  applyFilters(): void {
+  searchUsingFilters(byRemovingAppliedFilter: boolean): void {
     this.closeFilters();
     store.commit('setLoading', true);
 
+    const filters = byRemovingAppliedFilter ? this.filtersApplied : this.filters;
+
     // const filters: string[] = [];
-    const filters: Partial<ElasticCatalogueQuery> = {};
+    const filterSet: Partial<ElasticCatalogueQuery> = {};
 
     // TEXT-SEARCH
-    filters.text = this.catalogQuery.query;
+    filterSet.text = this.catalogQuery.query;
 
     // PAGE PARAMS
-    filters.page = this.catalogQuery.page;
-    filters.size = this.catalogQuery.size;
+    filterSet.page = this.catalogQuery.page;
+    filterSet.size = this.catalogQuery.size;
 
     // TYPE
-    if (this.filters.types.some((x) => x.isChecked)) {
-      filters.type = this.filters.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
+    if (filters.types.some((x) => x.isChecked)) {
+      filterSet.type = filters.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
     }
 
-    // if (this.getAppliedFilters().some((x) => x.category === 'type')) {
-    //   filters.type = this.getAppliedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
+    // if (this.getSelectedFilters().some((x) => x.category === 'type')) {
+    //   filters.type = this.getSelectedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
     // }
 
     // UPDATED
     // TODO: check format
-    if (this.filters.updated.dateFrom) {
-      filters.fromDate = this.formatMoment(this.filters.updated.dateFrom, this.filters.updated.timeFrom);
+    if (filters.updated.dateFrom) {
+      filterSet.fromDate = this.formatMoment(filters.updated.dateFrom, filters.updated.timeFrom);
     }
-    if (this.filters.updated.dateTo) {
-      filters.toDate = this.formatMoment(this.filters.updated.dateTo, this.filters.updated.timeTo);
+    if (filters.updated.dateTo) {
+      filterSet.toDate = this.formatMoment(filters.updated.dateTo, filters.updated.timeTo);
     }
 
     // TOPIC
-    if (this.filters.topics.some((x) => x.isChecked)) {
-      filters.topic = this.filters.topics.filter((x) => x.isChecked).map((x) => x.id as EnumTopicCategory);
+    if (filters.topics.some((x) => x.isChecked)) {
+      filterSet.topic = filters.topics.filter((x) => x.isChecked).map((x) => x.id as EnumTopicCategory);
     }
 
     // FORMAT
-    if (Object.values(this.filters.formats).flat().some((x) => x.isChecked)) {
-      filters.format = Object.values(this.filters.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
+    if (Object.values(filters.formats).flat().some((x) => x.isChecked)) {
+      filterSet.format = Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
     }
 
     // CRS
-    if (this.filters.crsList.some((x) => x.isChecked)) {
-      filters.crs = this.filters.crsList.filter((x) => x.isChecked).map((x) => x.code);
+    if (filters.crsList.some((x) => x.isChecked)) {
+      filterSet.crs = filters.crsList.filter((x) => x.isChecked).map((x) => x.code);
     }
 
     // SCALE
     // TODO: check if should be changed so that max scale is bigger integer than min scale (as denominator)
-    const [selectedMinScale, selectedMaxScale] = this.filters.scaleValues;
+    const [selectedMinScale, selectedMaxScale] = filters.scaleValues;
     if (selectedMinScale !== this.scaleMin) {
-      filters.minScale = selectedMinScale;
+      filterSet.minScale = selectedMinScale;
     }
     if (selectedMaxScale !== this.scaleMax) {
-      filters.maxScale = selectedMaxScale;
+      filterSet.maxScale = selectedMaxScale;
     }
 
     // COVERAGE
-    if (this.filters.mapCoverageSelectionBBox) {
-      const [minX, minY, maxX, maxY] = this.filters.mapCoverageSelectionBBox.split(',');
-      filters.topLeftX = parseFloat(minX);
-      filters.topLeftY = parseFloat(maxY);
-      filters.bottomRightX = parseFloat(maxX);
-      filters.bottomRightY = parseFloat(minY);
+    if (filters.mapCoverageSelectionBBox) {
+      const [minX, minY, maxX, maxY] = filters.mapCoverageSelectionBBox.split(',');
+      filterSet.topLeftX = parseFloat(minX);
+      filterSet.topLeftY = parseFloat(maxY);
+      filterSet.bottomRightX = parseFloat(maxX);
+      filterSet.bottomRightY = parseFloat(minY);
     }
 
     // PRICE
-    if (this.filters.priceMin) {
-      filters.minPrice = Number(this.filters.priceMin);
+    if (filters.priceMin) {
+      filterSet.minPrice = Number(filters.priceMin);
     }
-    if (this.filters.priceMax !== null) {
-      filters.maxPrice = Number(this.filters.priceMax);
+    if (filters.priceMax !== null) {
+      filterSet.maxPrice = Number(filters.priceMax);
     }
 
     // ATTRIBUTES
-    if (this.filters.attributes.length && this.filters.attributes.some((x) => x.length)) {
-      filters.attribute = this.filters.attributes.filter((x) => x.length);
+    if (filters.attributes.length && filters.attributes.some((x) => x.length)) {
+      filterSet.attribute = filters.attributes.filter((x) => x.length);
     }
 
     // VENDORS
-    if (this.filters.vendors.length && this.filters.vendors.some((x) => x.length)) {
-      filters.publisher = this.filters.vendors.filter((x) => x.length);
+    if (filters.vendors.length && filters.vendors.some((x) => x.length)) {
+      filterSet.publisher = filters.vendors.filter((x) => x.length);
     }
 
     // LICENSE
-    if (this.filters.licenses.some((x) => x.isChecked)) {
-      filters.license = this.filters.licenses.filter((x) => x.isChecked).map((x) => x.id);
+    if (filters.licenses.some((x) => x.isChecked)) {
+      filterSet.license = filters.licenses.filter((x) => x.isChecked).map((x) => x.id);
     }
 
-    console.log(filters);
-    this.catalogueApi.findAdvanced(filters).then((advancedQueryResponse: CatalogueQueryResponse) => {
+    console.log(filterSet);
+    this.catalogueApi.findAdvanced(filterSet).then((advancedQueryResponse: CatalogueQueryResponse) => {
       console.log('aqr', advancedQueryResponse);
       this.queryResults = advancedQueryResponse.result.items;
       this.queryResultsCount = advancedQueryResponse.result.count;
+      if (!byRemovingAppliedFilter) this.filtersApplied = cloneDeep(this.filters);
       store.commit('setLoading', false);
     }).catch((err) => {
       console.log('err', err);
