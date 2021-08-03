@@ -25,7 +25,7 @@
 
           <!-- TYPE -->
           <div class="tab tab-type" v-show="filterMenuItemSelected == 'type'">
-            <div class="checkbox-group mt-xs-10" v-for="type in types" :key="type.name">
+            <div class="checkbox-group mt-xs-10" v-for="type in filters.types" :key="type.name">
               <input type="checkbox" class="mr-xs-10" :id="`type_${type.name}`" v-model="type.isChecked">
               <label :for="`type_${type.name}`"> {{type.name}} </label>
             </div>
@@ -39,36 +39,36 @@
                 <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">From date</small>
                   <div class="flex align-items-center">
-                    <button v-if="updated.dateFrom" @click="removeFilter(false, 'update', 'date_from')"><font-awesome-icon icon="times" /></button>
+                    <button v-if="filters.updated.dateFrom" @click="removeFilter(false, 'update', 'date_from')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
-                <datepicker :inline="true" v-model="updated.dateFrom" placeholder="select date"></datepicker>
-                <div class="mt-xs-30" v-if="updated.dateFrom">
+                <datepicker :inline="true" v-model="filters.updated.dateFrom" placeholder="select date"></datepicker>
+                <div class="mt-xs-30" v-if="filters.updated.dateFrom">
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">From time</small>
                     <div class="flex align-items-center">
-                      <button v-if="updated.timeFrom != '00:00 AM'" @click="removeFilter(false, 'update', 'time_from')"><font-awesome-icon icon="times" /></button>
+                      <button v-if="filters.updated.timeFrom != '00:00 AM'" @click="removeFilter(false, 'update', 'time_from')"><font-awesome-icon icon="times" /></button>
                     </div>
                   </div>
-                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="updated.timeFrom" placeholder="select time"></vue-timepicker>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.updated.timeFrom" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
               <div class="d-flex flex-column ml-xs-15">
                 <div class="d-flex space-between mb-xs-5">
                   <small class="date-labels">To date</small>
                   <div class="flex align-items-center">
-                    <button v-if="updated.dateTo" @click="removeFilter(false, 'update', 'date_to')"><font-awesome-icon icon="times" /></button>
+                    <button v-if="filters.updated.dateTo" @click="removeFilter(false, 'update', 'date_to')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
-                <datepicker :inline="true" v-model="updated.dateTo" placeholder="select date"></datepicker>
-                <div class="mt-xs-30" v-if="updated.dateTo">
+                <datepicker :inline="true" v-model="filters.updated.dateTo" placeholder="select date"></datepicker>
+                <div class="mt-xs-30" v-if="filters.updated.dateTo">
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">To time</small>
                     <div class="flex align-items-center">
-                      <button v-if="updated.timeTo != '23:59 PM'" @click="removeFilter(false, 'update', 'time_to')"><font-awesome-icon icon="times" /></button>
+                      <button v-if="filters.updated.timeTo != '23:59 PM'" @click="removeFilter(false, 'update', 'time_to')"><font-awesome-icon icon="times" /></button>
                     </div>
                   </div>
-                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="updated.timeTo" placeholder="select time"></vue-timepicker>
+                  <vue-timepicker :input-width="'100%'" :hide-clear-button="true" format="HH:mm A" v-model="filters.updated.timeTo" placeholder="select time"></vue-timepicker>
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@
 
           <!-- TOPIC -->
           <div class="tab tab-topic" v-show="filterMenuItemSelected == 'topic'">
-            <div class="checkbox-group mb-xs-2" v-for="topic in topics" :key="topic.name">
+            <div class="checkbox-group mb-xs-2" v-for="topic in filters.topics" :key="topic.name">
               <input type="checkbox" class="mr-xs-10" :id="`topic_${topic.name}`" v-model="topic.isChecked">
               <label :for="`topic_${topic.name}`"> {{topic.name}} </label>
             </div>
@@ -87,7 +87,7 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('vector') }" class="flex-grow-1">
               <h3 class="format-category-title">Vector</h3>
-              <div class="checkbox-group mb-xs-5" v-for="format in formats.vector" :key="format.id">
+              <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.vector" :key="format.id">
                 <input :disabled="!shownFormatCategories().includes('vector')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
@@ -95,7 +95,7 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('raster') }" class="flex-grow-1">
               <h3 class="format-category-title">Raster</h3>
-              <div class="checkbox-group mb-xs-5" v-for="format in formats.raster" :key="format.id">
+              <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.raster" :key="format.id">
                 <input :disabled="!shownFormatCategories().includes('raster')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
@@ -103,7 +103,7 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <div class="checkbox-group mb-xs-5" v-for="format in formats.api" :key="format.id">
+              <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
                 <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
               </div>
@@ -115,7 +115,7 @@
           <div class="tab tab-crs" v-show="filterMenuItemSelected == 'crs'">
             <small>Popular CRS</small>
             <div class="mt-xs-10">
-              <div v-for="crs in crsList" :key="crs.code" class="checkbox-group mb-xs-5">
+              <div v-for="crs in filters.crsList" :key="crs.code" class="checkbox-group mb-xs-5">
                 <input type="checkbox" class="mr-xs-10" :id="'EPSG_' + crs.code" v-model="crs.isChecked">
                 <label :for="'EPSG_' + crs.code"> {{ crs.description }} </label>
               </div>
@@ -136,7 +136,7 @@
           <!-- SCALE -->
           <div class="tab tab-scale" v-show="filterMenuItemSelected == 'scale'">
             <div class="ml-xs-20 mr-xs-20" @click="onScaleSliderClick">
-              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
+              <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="filters.scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
             </div>
 
             <div class="mt-xs-40 min-max-container">
@@ -144,14 +144,14 @@
                 <label for="scaleSelectedMin">Minimum Scale</label>
                 <div>
                   <span>1 : </span>
-                  <input :min="scaleMax" :value="scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
+                  <input :min="scaleMax" :value="filters.scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
                 </div>
               </div>
               <div class="min-max-input-item ml-xs-20">
                 <label for="scaleSelectedMax">Maximum Scale</label>
                 <div>
                   <span>1 : </span>
-                  <input :max="scaleMin" :value="scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
+                  <input :max="scaleMin" :value="filters.scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
                 </div>
               </div>
             </div>
@@ -165,7 +165,7 @@
                 <div class="d-flex align-items-center mb-xs-20">
                   <span><strong>1</strong></span>
                   <div class="mr-xs-10">
-                    <select @change="onCountrySelected($event.target.value)" :disabled="mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
+                    <select @change="onCountrySelected($event.target.value)" :disabled="filters.mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
                     </select>
@@ -196,8 +196,8 @@
                         <div class="control_indicator"></div>
                       </label>
                     </div>
-                    <button v-if="mapCoverageSelectionIsDrawn && !mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
-                    <button v-if="mapCoverageSelectionRectangle && mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
+                    <button v-if="mapCoverageSelectionIsDrawn && !filters.mapCoverageSelectionBBox" @click="onSetArea" style="float: right" class="btn--std btn--blue">Set Area</button>
+                    <button v-if="mapCoverageSelectionRectangle && filters.mapCoverageSelectionBBox" @click="onClearArea" style="float: right" class="btn--std btn--outlineblue">Clear Selection</button>
                   </div>
                 </div>
               </div>
@@ -217,11 +217,11 @@
             <div class="min-max-container">
               <div class="min-max-input-item">
                 <label for="priceSelectedMin">Minimum Price €</label>
-                <input type="number" :min="0" v-model="priceMin" placeholder="Free" class="form-group__text">
+                <input type="number" :min="0" v-model="filters.priceMin" placeholder="Free" class="form-group__text">
               </div>
               <div class="min-max-input-item ml-xs-20">
                 <label for="priceSelectedMax">Maximum Price €</label>
-                <input type="number" :min="0" v-model="priceMax" placeholder="No Limit" class="form-group__text">
+                <input type="number" :min="0" v-model="filters.priceMax" placeholder="No Limit" class="form-group__text">
               </div>
             </div>
           </div>
@@ -243,15 +243,15 @@
               <div class="ml-xs-20" v-show="filterMoreSubmenuItemSelected == 'numberOfFeatures'">
                 <h4>Dataset size</h4>
                 <div class="checkbox-group mt-xs-10">
-                  <input v-model="numberOfFeatures.isSmallChecked" type="checkbox" class="mr-xs-10" id="dataset_small">
+                  <input v-model="filters.numberOfFeatures.isSmallChecked" type="checkbox" class="mr-xs-10" id="dataset_small">
                   <label for="dataset_small"> Small <small class="grayed ml-xs-20">&lt; 1000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-xs-10">
-                  <input v-model="numberOfFeatures.isMediumChecked" type="checkbox" class="mr-xs-10" id="dataset_medium">
+                  <input v-model="filters.numberOfFeatures.isMediumChecked" type="checkbox" class="mr-xs-10" id="dataset_medium">
                   <label for="dataset_medium"> Medium <small class="grayed ml-xs-20">1000 - 100.000 features</small></label>
                 </div>
                 <div class="checkbox-group mt-xs-10">
-                  <input v-model="numberOfFeatures.isLargeChecked" type="checkbox" class="mr-xs-10" id="dataset_large">
+                  <input v-model="filters.numberOfFeatures.isLargeChecked" type="checkbox" class="mr-xs-10" id="dataset_large">
                   <label for="dataset_large"> Large <small class="grayed ml-xs-20">&gt; 100.000 features</small></label>
                 </div>
               </div>
@@ -268,7 +268,7 @@
                   <label>Fields that must be contained in dataset</label>
                   <div class="d-flex">
                     <div>
-                      <input v-for="(attribute, i) in attributes" :key="i" v-model="attributes[i]" type="text" class="form-group__text" :name="'search_attribute_' + i" :id="'search_attribute_' + i" placeholder="attribute name">
+                      <input v-for="(attribute, i) in filters.attributes" :key="i" v-model="filters.attributes[i]" type="text" class="form-group__text" :name="'search_attribute_' + i" :id="'search_attribute_' + i" placeholder="attribute name">
                     </div>
                     <button @click="addAttribute" class="fab-button align-self-end ml-xs-15 mb-xs-10">+</button>
                   </div>
@@ -281,7 +281,7 @@
                   <label>Search by Vendor</label>
                   <div class="d-flex">
                     <div>
-                      <input v-for="(vendor, i) in vendors" :key="i" v-model="vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
+                      <input v-for="(vendor, i) in filters.vendors" :key="i" v-model="filters.vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
                     </div>
                     <button @click="addVendor" class="fab-button align-self-end ml-xs-15 mb-xs-10">+</button>
                   </div>
@@ -311,7 +311,7 @@
               <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
                 <span style="color: orange">more to be added</span>
-                <div v-for="license in licenses" :key="license.id">
+                <div v-for="license in filters.licenses" :key="license.id">
                   <div class="checkbox-group mt-xs-10">
                     <input v-model="license.isChecked" type="checkbox" class="mr-xs-10" :id="`license_${license.id}`">
                     <label :for="`license_${license.id}`"> {{ license.name }}</label>
@@ -392,18 +392,72 @@ import epsgList from '../service/lists/epsg';
 import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
 
-interface filterOption {
-  id: string | EnumAssetType | EnumTopicCategory,
+interface FilterType {
+  id: EnumAssetType,
   name: string,
-  isChecked?: boolean
-  value?: string | number
-  pillLabel?: string
+  pillLabel: string,
+  isChecked: boolean,
 }
 
-interface crs {
+interface FilterTopic {
+  id: EnumTopicCategory,
+  name: string,
+  pillLabel: string,
+  isChecked: boolean,
+}
+
+interface FilterUpdated {
+  dateFrom: string,
+  dateTo: string,
+  timeFrom: string,
+  timeTo: string,
+}
+
+interface FilterFormats {
+  api: { id: string, name: string, isChecked: boolean }[],
+  vector: { id: string, name: string, isChecked: boolean }[],
+  raster: { id: string, name: string, isChecked: boolean }[],
+}
+
+interface FilterCRS {
   code: string,
   description: string,
-  isChecked?: boolean
+  isChecked?: boolean,
+}
+
+interface FilterNumberOfFeatures {
+  isSmallChecked: boolean,
+  isMediumChecked: boolean,
+  isLargeChecked: boolean,
+}
+
+interface FilterLicense {
+  id: string,
+  name: string,
+  pillLabel: string,
+  isChecked: boolean,
+}
+
+// interface crs {
+//   code: string,
+//   description: string,
+//   isChecked?: boolean
+// }
+
+interface Filters {
+  types: FilterType[],
+  formats: FilterFormats,
+  updated: FilterUpdated,
+  topics: FilterTopic[],
+  scaleValues: number[],
+  crsList: FilterCRS[],
+  mapCoverageSelectionBBox: string,
+  priceMin: number | null,
+  priceMax: number | null,
+  numberOfFeatures: FilterNumberOfFeatures,
+  attributes: string[],
+  vendors: string[],
+  licenses: FilterLicense[],
 }
 
 @Component({
@@ -435,15 +489,17 @@ export default class Catalogue extends Vue {
 
   filterMoreSubmenuItemSelected: string;
 
+  filters: Filters;
+
   // filters: filterCategory[];
 
-  types: { id: EnumAssetType, name: string, pillLabel: string, isChecked: boolean }[];
+  // types: FilterType[];
 
-  topics: { id: EnumTopicCategory, name: string, pillLabel: string, isChecked: boolean }[];
+  // topics: FilterTopic[];
 
-  updated: {dateFrom: string, dateTo: string, timeFrom: string, timeTo: string};
+  // updated: FilterUpdated;
 
-  formats: {api: { id: string, name: string, isChecked: boolean }[], vector: { id: string, name: string, isChecked: boolean }[], raster: { id: string, name: string, isChecked: boolean }[], };
+  // formats: FilterFormats;
 
   mapCoverage: any;
 
@@ -453,11 +509,11 @@ export default class Catalogue extends Vue {
 
   mapCoverageSelectionIsDrawn: boolean;
 
-  mapCoverageSelectionBBox: string;
+  // mapCoverageSelectionBBox: string;
 
   mapShades: any;
 
-  scaleValues: number[];
+  // scaleValues: number[];
 
   scaleSliderOptions: {id: number, name: string}[];
 
@@ -465,17 +521,17 @@ export default class Catalogue extends Vue {
 
   scaleMax: number;
 
-  priceMin: number|null;
+  // priceMin: number|null;
 
-  priceMax: number|null;
+  // priceMax: number|null;
 
-  epsgAll: crs[];
+  epsgAll: FilterCRS[];
 
-  crsList: crs[];
+  // crsList: FilterCRS[];
 
   crsSearchString: string;
 
-  crsSearchList: crs[];
+  crsSearchList: FilterCRS[];
 
   countries: { code: string, name: string, bbox: number[] }[];
 
@@ -483,13 +539,13 @@ export default class Catalogue extends Vue {
 
   countrySelected: string;
 
-  numberOfFeatures: { isSmallChecked: boolean, isMediumChecked: boolean, isLargeChecked: boolean };
+  // numberOfFeatures: { isSmallChecked: boolean, isMediumChecked: boolean, isLargeChecked: boolean };
 
-  vendors: string[];
+  // vendors: string[];
 
-  attributes: string[];
+  // attributes: string[];
 
-  licenses: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
+  // licenses: { id: string, name: string, pillLabel: string, isChecked: boolean }[];
 
   constructor() {
     super();
@@ -511,7 +567,9 @@ export default class Catalogue extends Vue {
 
     this.filterMoreSubmenuItemSelected = 'numberOfFeatures';
 
-    this.types = [
+    this.filters = {} as Filters;
+
+    this.filters.types = [
       {
         id: EnumAssetType.VECTOR,
         name: 'Vector dataset',
@@ -533,23 +591,23 @@ export default class Catalogue extends Vue {
     ];
 
     // eslint-disable-next-line
-    this.topics = [{ id: EnumTopicCategory.BIOTA, name: 'Biota', pillLabel: 'Biota', isChecked: false }, { id: EnumTopicCategory.BOUNDARIES, name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { id: EnumTopicCategory.CLIMA, name: 'Clima', pillLabel: 'Clima', isChecked: false }, { id: EnumTopicCategory.ECONOMY, name: 'Economy', pillLabel: 'Economy', isChecked: false }, { id: EnumTopicCategory.ELEVATION, name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { id: EnumTopicCategory.ENVIRONMENT, name: 'Environment', pillLabel: 'Environment', isChecked: false }, { id: EnumTopicCategory.FARMING, name: 'Farming', pillLabel: 'Farming', isChecked: false }, { id: EnumTopicCategory.GEO_SCIENTIFIC, name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { id: EnumTopicCategory.HEALTH, name: 'Health', pillLabel: 'Health', isChecked: false }, { id: EnumTopicCategory.IMAGERY, name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { id: EnumTopicCategory.INLAND_WATERS, name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { id: EnumTopicCategory.INTELLIGENCE_MILITARY, name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { id: EnumTopicCategory.LOCATION, name: 'Location', pillLabel: 'Location', isChecked: false }, { id: EnumTopicCategory.OCEANS, name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { id: EnumTopicCategory.PLANNING_CADASTRE, name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { id: EnumTopicCategory.SOCIETY, name: 'Society', pillLabel: 'Society', isChecked: false }, { id: EnumTopicCategory.STRUCTURE, name: 'Structure', pillLabel: 'Structure', isChecked: false }, { id: EnumTopicCategory.TRANSPORTATION, name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { id: EnumTopicCategory.UTILITIES_COMMUNICATION, name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
+    this.filters.topics = [{ id: EnumTopicCategory.BIOTA, name: 'Biota', pillLabel: 'Biota', isChecked: false }, { id: EnumTopicCategory.BOUNDARIES, name: 'Boundaries', pillLabel: 'Boundaries', isChecked: false }, { id: EnumTopicCategory.CLIMA, name: 'Clima', pillLabel: 'Clima', isChecked: false }, { id: EnumTopicCategory.ECONOMY, name: 'Economy', pillLabel: 'Economy', isChecked: false }, { id: EnumTopicCategory.ELEVATION, name: 'Elevation', pillLabel: 'Elevation', isChecked: false }, { id: EnumTopicCategory.ENVIRONMENT, name: 'Environment', pillLabel: 'Environment', isChecked: false }, { id: EnumTopicCategory.FARMING, name: 'Farming', pillLabel: 'Farming', isChecked: false }, { id: EnumTopicCategory.GEO_SCIENTIFIC, name: 'Geo-Scientific', pillLabel: 'Geo-Scientific', isChecked: false }, { id: EnumTopicCategory.HEALTH, name: 'Health', pillLabel: 'Health', isChecked: false }, { id: EnumTopicCategory.IMAGERY, name: 'Imagery', pillLabel: 'Imagery', isChecked: false }, { id: EnumTopicCategory.INLAND_WATERS, name: 'Inland Waters', pillLabel: 'Inland Waters', isChecked: false }, { id: EnumTopicCategory.INTELLIGENCE_MILITARY, name: 'Military Intelligence', pillLabel: 'Military Intelligence', isChecked: false }, { id: EnumTopicCategory.LOCATION, name: 'Location', pillLabel: 'Location', isChecked: false }, { id: EnumTopicCategory.OCEANS, name: 'Oceans', pillLabel: 'Oceans', isChecked: false }, { id: EnumTopicCategory.PLANNING_CADASTRE, name: 'Planning Cadastre', pillLabel: 'Planning Cadastre', isChecked: false }, { id: EnumTopicCategory.SOCIETY, name: 'Society', pillLabel: 'Society', isChecked: false }, { id: EnumTopicCategory.STRUCTURE, name: 'Structure', pillLabel: 'Structure', isChecked: false }, { id: EnumTopicCategory.TRANSPORTATION, name: 'Transportation', pillLabel: 'Transportation', isChecked: false }, { id: EnumTopicCategory.UTILITIES_COMMUNICATION, name: 'Utilities Communication', pillLabel: 'Utilities Communication', isChecked: false }];
 
-    this.updated = {
+    this.filters.updated = {
       dateFrom: '',
       dateTo: '',
       timeFrom: '00:00 AM',
       timeTo: '23:59 PM',
     };
 
-    this.formats = { vector: [], raster: [], api: [] };
+    this.filters.formats = { vector: [], raster: [], api: [] };
     // this.formats = {
     //   vector: [{ id: 'shp', name: 'Shapefile', isChecked: false }, { id: 'geoPackage', name: 'GeoPackage', isChecked: false }, { id: 'geoJson', name: 'GeoJSON', isChecked: false }],
     //   raster: [{ id: 'png', name: 'PNG', isChecked: false }, { id: 'jpeg', name: 'JPEG', isChecked: false }, { id: 'tiff', name: 'Tiff', isChecked: false }],
     //   api: [{ id: 'wms', name: 'WMS', isChecked: false }, { id: 'wfs', name: 'WFS', isChecked: false }, { id: 'wcs', name: 'WCS', isChecked: false }, { id: 'wmts', name: 'WMTS', isChecked: false }, { id: 'wps', name: 'WPS', isChecked: false }, { id: 'wcps', name: 'WCPS', isChecked: false }],
     // };
 
-    this.mapCoverageSelectionBBox = '';
+    this.filters.mapCoverageSelectionBBox = '';
 
     this.mapCoverageDrawMode = false;
 
@@ -559,7 +617,7 @@ export default class Catalogue extends Vue {
 
     this.scaleMin = 10;
     this.scaleMax = 10000000;
-    this.scaleValues = [this.scaleMin, this.scaleMax];
+    this.filters.scaleValues = [this.scaleMin, this.scaleMax];
     this.scaleSliderOptions = [
       { id: 10, name: '1 : 10' },
       { id: 100, name: '1 : 100' },
@@ -570,11 +628,11 @@ export default class Catalogue extends Vue {
       { id: 10000000, name: '1 : 10.000.000' },
     ];
 
-    this.priceMin = null;
-    this.priceMax = null;
+    this.filters.priceMin = null;
+    this.filters.priceMax = null;
 
     this.epsgAll = epsgList;
-    this.crsList = [{ code: '4326', description: 'EPSG:4326, WGS84', isChecked: false }, { code: '3857', description: 'EPSG:3857, Pseudo-Mercator WGS84', isChecked: false }];
+    this.filters.crsList = [{ code: '4326', description: 'EPSG:4326, WGS84', isChecked: false }, { code: '3857', description: 'EPSG:3857, Pseudo-Mercator WGS84', isChecked: false }];
     this.crsSearchString = '';
     this.crsSearchList = [];
 
@@ -582,10 +640,10 @@ export default class Catalogue extends Vue {
     this.areas = nuts;
     this.countrySelected = '';
 
-    this.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
-    this.vendors = [''];
-    this.attributes = [''];
-    this.licenses = [
+    this.filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
+    this.filters.vendors = [''];
+    this.filters.attributes = [''];
+    this.filters.licenses = [
       // eslint-disable-next-line
       { id: 'open', name: 'Open license', pillLabel: 'open', isChecked: false },
       // eslint-disable-next-line
@@ -608,9 +666,9 @@ export default class Catalogue extends Vue {
     this.searchAssets();
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
-    this.formats.api = availableFormats.filter((x) => x.category === EnumAssetType.SERVICE).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
-    this.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
-    this.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
+    this.filters.formats.api = availableFormats.filter((x) => x.category === EnumAssetType.SERVICE).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
+    this.filters.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
+    this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
   }
 
   searchAssets(): void {
@@ -643,49 +701,49 @@ export default class Catalogue extends Vue {
     switch (category) {
       case 'type':
         // eslint-disable-next-line
-        this.types.find((x) => x.id === filterName)!.isChecked = false;
+        this.filters.types.find((x) => x.id === filterName)!.isChecked = false;
         break;
       case 'topic': {
         // eslint-disable-next-line
-        this.topics.find((x) => x.id === filterName)!.isChecked = false;
+        this.filters.topics.find((x) => x.id === filterName)!.isChecked = false;
         break;
       }
       case 'crs': {
         // eslint-disable-next-line
-        this.crsList.find((x) => x.code === filterName)!.isChecked = false;
+        this.filters.crsList.find((x) => x.code === filterName)!.isChecked = false;
         break;
       }
       case 'update': {
         switch (filterName) {
           case 'date_from': {
-            this.updated.dateFrom = '';
-            this.updated.timeFrom = '00:00 AM';
+            this.filters.updated.dateFrom = '';
+            this.filters.updated.timeFrom = '00:00 AM';
             break;
           }
           case 'date_to': {
-            this.updated.dateTo = '';
-            this.updated.timeTo = '23:59 PM';
+            this.filters.updated.dateTo = '';
+            this.filters.updated.timeTo = '23:59 PM';
             break;
           }
           case 'time_from': {
-            this.updated.timeFrom = '00:00 AM';
+            this.filters.updated.timeFrom = '00:00 AM';
             break;
           }
           case 'time_to': {
-            this.updated.timeTo = '23:59 PM';
+            this.filters.updated.timeTo = '23:59 PM';
             break;
           }
           default: {
-            this.updated.dateFrom = '';
-            this.updated.dateTo = '';
-            this.updated.timeFrom = '00:00 AM';
-            this.updated.timeTo = '23:59 PM';
+            this.filters.updated.dateFrom = '';
+            this.filters.updated.dateTo = '';
+            this.filters.updated.timeFrom = '00:00 AM';
+            this.filters.updated.timeTo = '23:59 PM';
           }
         }
         break;
       }
       case 'format': {
-        const option = Object.values(this.formats)
+        const option = Object.values(this.filters.formats)
           .flat()
           .find((x) => x.id === filterName);
         // eslint-disable-next-line
@@ -698,28 +756,28 @@ export default class Catalogue extends Vue {
         break;
       }
       case 'price': {
-        this.priceMin = null;
-        this.priceMax = null;
+        this.filters.priceMin = null;
+        this.filters.priceMax = null;
         break;
       }
       case 'scale': {
-        this.scaleValues = [this.scaleMin, this.scaleMax];
+        this.filters.scaleValues = [this.scaleMin, this.scaleMax];
         break;
       }
       case 'numberOfFeatures': {
-        this.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
+        this.filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
         break;
       }
       case 'attributes': {
-        this.attributes = this.attributes.map(() => '');
+        this.filters.attributes = this.filters.attributes.map(() => '');
         break;
       }
       case 'vendor': {
-        this.vendors = this.vendors.map(() => '');
+        this.filters.vendors = this.filters.vendors.map(() => '');
         break;
       }
       case 'license': {
-        this.licenses.forEach((x) => {
+        this.filters.licenses.forEach((x) => {
           // eslint-disable-next-line
           x.isChecked = false;
         });
@@ -740,57 +798,57 @@ export default class Catalogue extends Vue {
 
     // TYPE
     result = result.concat(
-      this.types.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'type', filterName: x.id })),
+      this.filters.types.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'type', filterName: x.id })),
     );
 
     // UPDATED
-    if (this.updated.dateFrom && !this.updated.dateTo) {
+    if (this.filters.updated.dateFrom && !this.filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `After ${this.dateFormatter(this.updated.dateFrom)}${this.updated.timeFrom !== '00:00 AM' ? ', ' + this.updated.timeFrom : ''}`,
+        label: `After ${this.dateFormatter(this.filters.updated.dateFrom)}${this.filters.updated.timeFrom !== '00:00 AM' ? ', ' + this.filters.updated.timeFrom : ''}`,
         category: 'update',
       });
     }
-    if (!this.updated.dateFrom && this.updated.dateTo) {
+    if (!this.filters.updated.dateFrom && this.filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `Before ${this.dateFormatter(this.updated.dateTo)}${this.updated.timeTo !== '23:59 PM' ? ', ' + this.updated.timeTo : ''}`,
+        label: `Before ${this.dateFormatter(this.filters.updated.dateTo)}${this.filters.updated.timeTo !== '23:59 PM' ? ', ' + this.filters.updated.timeTo : ''}`,
         category: 'update',
       });
     }
-    if (this.updated.dateFrom && this.updated.dateTo) {
+    if (this.filters.updated.dateFrom && this.filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `${this.dateFormatter(this.updated.dateFrom)}${this.updated.timeFrom !== '00:00 AM' ? ', ' + this.updated.timeFrom : ''} - ${this.dateFormatter(this.updated.dateTo)}${this.updated.timeTo !== '23:59 PM' ? ', ' + this.updated.timeTo : ''}`,
+        label: `${this.dateFormatter(this.filters.updated.dateFrom)}${this.filters.updated.timeFrom !== '00:00 AM' ? ', ' + this.filters.updated.timeFrom : ''} - ${this.dateFormatter(this.filters.updated.dateTo)}${this.filters.updated.timeTo !== '23:59 PM' ? ', ' + this.filters.updated.timeTo : ''}`,
         category: 'update',
       });
     }
 
     // TOPIC
     result = result.concat(
-      this.topics.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'topic', filterName: x.id })),
+      this.filters.topics.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'topic', filterName: x.id })),
     );
 
     // FORMAT
     result = result.concat(
-      Object.values(this.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
+      Object.values(this.filters.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
     );
 
     // SCALE
-    if (this.scaleValues[0] !== this.scaleMin || this.scaleValues[1] !== this.scaleMax) {
+    if (this.filters.scaleValues[0] !== this.scaleMin || this.filters.scaleValues[1] !== this.scaleMax) {
       result.push({
-        label: `1:${this.scaleValues[1]} - 1:${this.scaleValues[0]}`,
+        label: `1:${this.filters.scaleValues[1]} - 1:${this.filters.scaleValues[0]}`,
         category: 'scale',
       });
     }
 
     // CRS
     result = result.concat(
-      this.crsList.filter((x) => x.isChecked).map((x) => ({ label: `EPSG:${x.code}`, category: 'crs', filterName: x.code })),
+      this.filters.crsList.filter((x) => x.isChecked).map((x) => ({ label: `EPSG:${x.code}`, category: 'crs', filterName: x.code })),
     );
 
     // COVERAGE
-    if (this.mapCoverageSelectionBBox) {
+    if (this.filters.mapCoverageSelectionBBox) {
       result.push({
         label: 'Area selection',
         category: 'coverage',
@@ -798,53 +856,53 @@ export default class Catalogue extends Vue {
     }
 
     // PRICE
-    if (this.priceMin && !this.priceMax) {
+    if (this.filters.priceMin && !this.filters.priceMax) {
       result.push({
-        label: `>${this.priceMin}€`,
+        label: `>${this.filters.priceMin}€`,
         category: 'price',
       });
     }
-    if (!this.priceMin && this.priceMax) {
+    if (!this.filters.priceMin && this.filters.priceMax) {
       result.push({
-        label: `<${this.priceMax}€`,
+        label: `<${this.filters.priceMax}€`,
         category: 'price',
       });
     }
-    if (this.priceMin && this.priceMax) {
+    if (this.filters.priceMin && this.filters.priceMax) {
       result.push({
-        label: `${this.priceMin}€ - ${this.priceMax}€`,
+        label: `${this.filters.priceMin}€ - ${this.filters.priceMax}€`,
         category: 'price',
       });
     }
 
     // NUMBER OF FEATURES
-    if (this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small', category: 'numberOfFeatures' });
-    if (!this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium', category: 'numberOfFeatures' });
-    if (!this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Large', category: 'numberOfFeatures' });
-    if (this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && !this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Medium', category: 'numberOfFeatures' });
-    if (this.numberOfFeatures.isSmallChecked && !this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Large', category: 'numberOfFeatures' });
-    if (!this.numberOfFeatures.isSmallChecked && this.numberOfFeatures.isMediumChecked && this.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium & Large', category: 'numberOfFeatures' });
+    if (this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small', category: 'numberOfFeatures' });
+    if (!this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium', category: 'numberOfFeatures' });
+    if (!this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Large', category: 'numberOfFeatures' });
+    if (this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && !this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Medium', category: 'numberOfFeatures' });
+    if (this.filters.numberOfFeatures.isSmallChecked && !this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Small & Large', category: 'numberOfFeatures' });
+    if (!this.filters.numberOfFeatures.isSmallChecked && this.filters.numberOfFeatures.isMediumChecked && this.filters.numberOfFeatures.isLargeChecked) result.push({ label: 'Medium & Large', category: 'numberOfFeatures' });
 
     // ATTRIBUTES
-    if (this.attributes.some((x) => (x !== ''))) {
+    if (this.filters.attributes.some((x) => (x !== ''))) {
       result.push({
-        label: `Attributes: ${this.getInputsAsOneLabel(this.attributes)}`,
+        label: `Attributes: ${this.getInputsAsOneLabel(this.filters.attributes)}`,
         category: 'attributes',
       });
     }
 
     // VENDOR
-    if (this.vendors.some((x) => (x !== ''))) {
+    if (this.filters.vendors.some((x) => (x !== ''))) {
       result.push({
-        label: `Vendors: ${this.getInputsAsOneLabel(this.vendors)}`,
+        label: `Vendors: ${this.getInputsAsOneLabel(this.filters.vendors)}`,
         category: 'vendor',
       });
     }
 
     // LICENSES
-    if (this.licenses.some((x) => (x.isChecked))) {
+    if (this.filters.licenses.some((x) => (x.isChecked))) {
       result.push({
-        label: `Licenses: ${this.getInputsAsOneLabel(this.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
+        label: `Licenses: ${this.getInputsAsOneLabel(this.filters.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
         category: 'license',
       });
     }
@@ -854,11 +912,11 @@ export default class Catalogue extends Vue {
 
   shownFormatCategories(): string[] {
     // eslint-disable-next-line
-    const isVectorChecked = this.types.find((x) => x.name === 'Vector dataset')!.isChecked;
+    const isVectorChecked = this.filters.types.find((x) => x.name === 'Vector dataset')!.isChecked;
     // eslint-disable-next-line
-    const isRasterChecked = this.types.find((x) => x.name === 'Raster dataset')!.isChecked;
+    const isRasterChecked = this.filters.types.find((x) => x.name === 'Raster dataset')!.isChecked;
     // eslint-disable-next-line
-    const isApiChecked = this.types.find((x) => x.name === 'API')!.isChecked;
+    const isApiChecked = this.filters.types.find((x) => x.name === 'API')!.isChecked;
 
     let res: string[] = [];
 
@@ -881,7 +939,7 @@ export default class Catalogue extends Vue {
   }
 
   isScaleSliderDisabled(): boolean {
-    if (this.scaleSliderOptions.map((x) => x.id).includes(this.scaleValues[0]) && this.scaleSliderOptions.map((x) => x.id).includes(this.scaleValues[1])) {
+    if (this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[0]) && this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[1])) {
       return false;
     }
     return true;
@@ -889,7 +947,7 @@ export default class Catalogue extends Vue {
 
   onScaleSliderClick(): void {
     if (this.isScaleSliderDisabled()) {
-      this.scaleValues = [this.scaleMin, this.scaleMax];
+      this.filters.scaleValues = [this.scaleMin, this.scaleMax];
     }
   }
 
@@ -953,7 +1011,7 @@ export default class Catalogue extends Vue {
   }
 
   onSetArea(): void {
-    this.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
+    this.filters.mapCoverageSelectionBBox = this.mapCoverageSelectionRectangle.getBounds().toBBoxString();
     this.mapShades = new (L as any).LeafletShades({ bounds: this.mapCoverageSelectionRectangle.getBounds() });
     this.mapShades.addTo(this.mapCoverage);
     this.mapCoverageSelectionRectangle.disableEdit();
@@ -969,7 +1027,7 @@ export default class Catalogue extends Vue {
     this.mapCoverageSelectionRectangle = null;
     this.mapShades = null;
     this.mapCoverageSelectionIsDrawn = false;
-    this.mapCoverageSelectionBBox = '';
+    this.filters.mapCoverageSelectionBBox = '';
     this.countrySelected = '';
   }
 
@@ -994,33 +1052,33 @@ export default class Catalogue extends Vue {
     this.crsSearchList = filtered;
   }
 
-  addCrsToList(crs: crs): void {
+  addCrsToList(crs: FilterCRS): void {
     // eslint-disable-next-line
     crs.isChecked = true;
-    this.crsList.push(crs);
+    this.filters.crsList.push(crs);
     this.crsSearchString = '';
-    this.crsList = JSON.parse(JSON.stringify(this.crsList));
+    this.filters.crsList = JSON.parse(JSON.stringify(this.filters.crsList));
     this.epsgAll = this.epsgAll.filter((x) => x.code !== crs.code);
   }
 
   addVendor(): void {
-    this.vendors.push('');
+    this.filters.vendors.push('');
   }
 
   addAttribute(): void {
-    this.attributes.push('');
+    this.filters.attributes.push('');
   }
 
   validateMinMaxInput(input: string, value: number): void {
     switch (input) {
       case 'minScale': {
         const minScale = Number(value);
-        this.scaleValues = [minScale > this.scaleValues[1] ? this.scaleValues[1] : minScale, this.scaleValues[1]];
+        this.filters.scaleValues = [minScale > this.filters.scaleValues[1] ? this.filters.scaleValues[1] : minScale, this.filters.scaleValues[1]];
         break;
       }
       case 'maxScale': {
         const maxScale = Number(value);
-        this.scaleValues = [this.scaleValues[0], maxScale < this.scaleValues[0] ? this.scaleValues[0] : maxScale];
+        this.filters.scaleValues = [this.filters.scaleValues[0], maxScale < this.filters.scaleValues[0] ? this.filters.scaleValues[0] : maxScale];
         break;
       }
       default:
@@ -1067,41 +1125,41 @@ export default class Catalogue extends Vue {
     filters.size = this.catalogQuery.size;
 
     // TYPE
-    if (this.types.some((x) => x.isChecked)) {
-      filters.type = this.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
+    if (this.filters.types.some((x) => x.isChecked)) {
+      filters.type = this.filters.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
     }
 
-    if (this.getAppliedFilters().some((x) => x.category === 'type')) {
-      filters.type = this.getAppliedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
-    }
+    // if (this.getAppliedFilters().some((x) => x.category === 'type')) {
+    //   filters.type = this.getAppliedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
+    // }
 
     // UPDATED
     // TODO: check format
-    if (this.updated.dateFrom) {
-      filters.fromDate = this.formatMoment(this.updated.dateFrom, this.updated.timeFrom);
+    if (this.filters.updated.dateFrom) {
+      filters.fromDate = this.formatMoment(this.filters.updated.dateFrom, this.filters.updated.timeFrom);
     }
-    if (this.updated.dateTo) {
-      filters.toDate = this.formatMoment(this.updated.dateTo, this.updated.timeTo);
+    if (this.filters.updated.dateTo) {
+      filters.toDate = this.formatMoment(this.filters.updated.dateTo, this.filters.updated.timeTo);
     }
 
     // TOPIC
-    if (this.topics.some((x) => x.isChecked)) {
-      filters.topic = this.topics.filter((x) => x.isChecked).map((x) => x.id as EnumTopicCategory);
+    if (this.filters.topics.some((x) => x.isChecked)) {
+      filters.topic = this.filters.topics.filter((x) => x.isChecked).map((x) => x.id as EnumTopicCategory);
     }
 
     // FORMAT
-    if (Object.values(this.formats).flat().some((x) => x.isChecked)) {
-      filters.format = Object.values(this.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
+    if (Object.values(this.filters.formats).flat().some((x) => x.isChecked)) {
+      filters.format = Object.values(this.filters.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
     }
 
     // CRS
-    if (this.crsList.some((x) => x.isChecked)) {
-      filters.crs = this.crsList.filter((x) => x.isChecked).map((x) => x.code);
+    if (this.filters.crsList.some((x) => x.isChecked)) {
+      filters.crs = this.filters.crsList.filter((x) => x.isChecked).map((x) => x.code);
     }
 
     // SCALE
     // TODO: check if should be changed so that max scale is bigger integer than min scale (as denominator)
-    const [selectedMinScale, selectedMaxScale] = this.scaleValues;
+    const [selectedMinScale, selectedMaxScale] = this.filters.scaleValues;
     if (selectedMinScale !== this.scaleMin) {
       filters.minScale = selectedMinScale;
     }
@@ -1110,8 +1168,8 @@ export default class Catalogue extends Vue {
     }
 
     // COVERAGE
-    if (this.mapCoverageSelectionBBox) {
-      const [minX, minY, maxX, maxY] = this.mapCoverageSelectionBBox.split(',');
+    if (this.filters.mapCoverageSelectionBBox) {
+      const [minX, minY, maxX, maxY] = this.filters.mapCoverageSelectionBBox.split(',');
       filters.topLeftX = parseFloat(minX);
       filters.topLeftY = parseFloat(maxY);
       filters.bottomRightX = parseFloat(maxX);
@@ -1119,26 +1177,26 @@ export default class Catalogue extends Vue {
     }
 
     // PRICE
-    if (this.priceMin) {
-      filters.minPrice = Number(this.priceMin);
+    if (this.filters.priceMin) {
+      filters.minPrice = Number(this.filters.priceMin);
     }
-    if (this.priceMax) {
-      filters.maxPrice = Number(this.priceMax);
+    if (this.filters.priceMax !== null) {
+      filters.maxPrice = Number(this.filters.priceMax);
     }
 
     // ATTRIBUTES
-    if (this.attributes.length && this.attributes.some((x) => x.length)) {
-      filters.attribute = this.attributes.filter((x) => x.length);
+    if (this.filters.attributes.length && this.filters.attributes.some((x) => x.length)) {
+      filters.attribute = this.filters.attributes.filter((x) => x.length);
     }
 
     // VENDORS
-    if (this.vendors.length && this.vendors.some((x) => x.length)) {
-      filters.publisher = this.vendors.filter((x) => x.length);
+    if (this.filters.vendors.length && this.filters.vendors.some((x) => x.length)) {
+      filters.publisher = this.filters.vendors.filter((x) => x.length);
     }
 
     // LICENSE
-    if (this.licenses.some((x) => x.isChecked)) {
-      filters.license = this.licenses.filter((x) => x.isChecked).map((x) => x.id);
+    if (this.filters.licenses.some((x) => x.isChecked)) {
+      filters.license = this.filters.licenses.filter((x) => x.isChecked).map((x) => x.id);
     }
 
     console.log(filters);
