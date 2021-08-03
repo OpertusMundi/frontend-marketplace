@@ -97,13 +97,6 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Asset short description">
-            <div class="form-group">
-              <label for="">Asset short description</label>
-              <input type="text" class="form-group__text" id="" name="abstractText" v-model="assetLocal.abstract">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
           <validation-provider v-slot="{ errors }" name="Metadata language">
             <div class="form-group">
               <label for="">Metadata language</label>
@@ -158,24 +151,28 @@
           <validation-provider v-slot="{ errors }" name="Suitable For">
             <div class="form-group">
               <label for="multiselect_suitablefor">Suitable for</label>
-              <multiselect id="multiselect_suitablefor" v-model="assetLocal.suitableFor" :options="assetLocal.suitableFor" :multiple="true" :taggable="true" :close-on-select="false" :show-labels="true" placeholder="Add categories"></multiselect>
+              <multiselect id="multiselect_suitablefor" v-model="assetLocal.suitableFor" tag-placeholder="Press enter to add a category" :options="assetLocal.suitableFor" :multiple="true" :taggable="true" @tag="(x) => assetLocal.suitableFor.push(x)" :close-on-select="false" :show-labels="false" placeholder="Type a category"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <!-- <validation-provider v-slot="{ errors }" name="Metadata date" rules="required">
+          <validation-provider v-slot="{ errors }" name="Keywords">
             <div class="form-group">
-              <label for="">Metadata date</label>
-              <datepicker v-model="assetLocal.metadataDate" name="metadataDate" format="dd/MM/yyyy" input-class="form-group__text"></datepicker>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+              <label for="multiselect_keywords">Keywords</label>
+              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
-          </validation-provider> -->
-          <!-- <validation-provider v-slot="{ errors }" name="Scale" rules="required">
+          </validation-provider>
+          <validation-provider v-slot="{ errors }" name="Scales">
             <div class="form-group">
-              <label for="">Scale</label>
-              <input type="text" class="form-group__text" id="" name="scale" v-model="assetLocal.scale">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+              <label for="multiselect_scales">Scales</label>
+              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
-          </validation-provider> -->
+          </validation-provider>
+          <div class="d-flex align-items-center form-group" v-if="assetLocal.type === 'VECTOR'">
+            <input type="checkbox" id="ingested" v-model="assetLocal.ingested" class="mr-xs-10 mb-xs-10">
+            <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
+          </div>
         </div>
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
@@ -253,6 +250,10 @@ export default class Metadata extends Vue {
 
   additionalResourcesOption: string;
 
+  scalesForDisplay: string[];
+
+  keywordsForDisplay: string[];
+
   menusData: {
     assetTypes: string[],
     availableFormats: string[],
@@ -270,6 +271,10 @@ export default class Metadata extends Vue {
     this.numberOfAdditionalResourcesFiles = 1;
 
     this.additionalResourcesOption = '';
+
+    this.scalesForDisplay = this.assetLocal.scales.map((x) => x.description);
+
+    this.keywordsForDisplay = this.assetLocal.keywords.map((x) => x.keyword);
 
     this.menusData = { assetTypes: [], availableFormats: [] };
 
@@ -307,6 +312,28 @@ export default class Metadata extends Vue {
 
   getTopicCategories(): string[] {
     return Object.values(EnumTopicCategory);
+  }
+
+  onAddScale(scale: string): void {
+    const description = `1:${scale}`;
+    this.assetLocal.scales.push({ scale: Number(scale), description });
+    this.scalesForDisplay.push(description);
+  }
+
+  onRemoveScale(scale: string): void {
+    this.scalesForDisplay = this.scalesForDisplay.filter((x) => x !== scale);
+    this.assetLocal.scales = this.assetLocal.scales.filter((x) => x.description !== scale);
+  }
+
+  onAddKeyword(keyword: string): void {
+    // TODO: add theme
+    this.assetLocal.keywords.push({ keyword, theme: '' });
+    this.keywordsForDisplay.push(keyword);
+  }
+
+  onRemoveKeyword(keyword: string): void {
+    this.keywordsForDisplay = this.keywordsForDisplay.filter((x) => x !== keyword);
+    this.assetLocal.keywords = this.assetLocal.keywords.filter((x) => x.keyword !== keyword);
   }
 
   onSubmitAdditionalResourcesFiles(): void {
