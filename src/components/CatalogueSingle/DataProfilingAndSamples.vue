@@ -88,7 +88,6 @@
             <div>
               <p>Contains map images with the geometry of the dataset</p>
               <hr>
-              <p style="background: yellow">[dev msg] MAPS NOT SHOWN CORRECTLY, AS THEY ARE NOT FETCHED IN EPSG:4326.</p>
               <!-- MBR -->
               <span class="map-type">MBR</span>
               <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>

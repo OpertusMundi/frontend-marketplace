@@ -21,7 +21,7 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
+          <shop-card v-if="isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
 
           <other-available-options :catalogueItem="catalogueItem"></other-available-options>
         </div>
