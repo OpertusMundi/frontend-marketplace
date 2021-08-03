@@ -65,7 +65,7 @@
 
             <!-- METADATA -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <metadata ref="step2" :asset.sync="asset" v-if="currentStep == 2"></metadata>
+              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep == 2"></metadata>
             <!-- </transition> -->
 
             <!-- CONTRACT -->
@@ -145,6 +145,7 @@ import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
 import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
 import { EnumAssetType } from '@/model/enum';
+import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
 import Metadata from '@/components/Assets/Create/Metadata.vue';
@@ -214,6 +215,8 @@ export default class CreateAsset extends Vue {
 
   currentStep = 1;
 
+  additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
+
   fileToUpload: {isFileSelected: boolean, file: File, fileName: string, fileExtension: string};
 
   uploading:any;
@@ -225,6 +228,8 @@ export default class CreateAsset extends Vue {
     console.log('config', store.getters.getConfig);
 
     this.modalToShow = '';
+
+    this.additionalResourcesToUpload = [];
 
     this.fileToUpload = {
       isFileSelected: false,
@@ -353,6 +358,7 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep():void {
+    console.log('a', this.asset);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
@@ -402,6 +408,8 @@ export default class CreateAsset extends Vue {
   async submitForm(isDraft = false): Promise<void> {
     this.modalToShow = '';
 
+    console.log('rtu', this.additionalResourcesToUpload);
+
     // if user has selected file to upload, check if format is compatible with file extension
     if (this.fileToUpload.isFileSelected) {
       console.log('file is selected');
@@ -434,8 +442,6 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    // const draftAssetResponse: ServerResponse<AssetDraft> | void = isDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
-    // const draftAssetResponse: ServerResponse<AssetDraft> | void = await this.draftAssetApi.create(this.asset, config)
     const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
       .catch((err: AxiosError) => { console.log('eeeee', err); });
     const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
@@ -445,6 +451,21 @@ export default class CreateAsset extends Vue {
     if (!isDraftCreated && draftAssetResponse) {
       console.log('error creating draft', draftAssetResponse);
       this.onError(draftAssetResponse);
+    }
+
+    if (this.additionalResourcesToUpload.length) {
+      console.log('upload additional resources');
+      this.uploading.status = true;
+      this.uploading.errors = [];
+      this.uploading.completed = false;
+      this.uploading.title = 'Your additional metadata resources are being uploaded';
+
+      for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
+        // eslint-disable-next-line
+        const uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
+        this.asset = uploadAdditionalResourceResponse.result.command;
+        if (uploadAdditionalResourceResponse.success) console.log('successfully uploaded additional resource!');
+      }
     }
 
     if (this.fileToUpload.isFileSelected) {

@@ -1,40 +1,73 @@
 <template>
   <div class="asset__shopcard">
-    <!-- <button @click="toggleSelectAreaModal" class="mb-xs-20">show 'select areas' dummy button</button> -->
     <div class="asset__shopcard__variations">
       <!-- <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
         <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
         <label :for="`p_variation_${pr_model.id}`">{{ pr_model.totalPrice === 0 ? 'FREE' : pr_model.totalPrice + prModelCurrencyFormat(pr_model.currency) }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
       </div> -->
+      <div class="asset__shopcard__price">
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FREE'" class="asset__shopcard__price">FREE</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'">{{ selectedPricingModel.totalPriceExcludingTax }}</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">{{ selectedPricingModel.price }}</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">{{ selectedPricingModel.price }}</span>
+      </div>
 
-      <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
-        <input type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
-        <label :for="`p_variation_${pr_model.model.key}`">{{ pr_model.model.type }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
+      <div v-if="catalogueItem.pricingModels.length === 1" class="asset__shopcard__variations__row">
+        <label v-if="catalogueItem.pricingModels[0].model.type !== 'FREE'">{{ catalogueItem.pricingModels[0].model.type }}</label>
+      </div>
+      <div v-else>
+        <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
+          <input type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
+          <label :for="`p_variation_${pr_model.model.key}`">{{ pr_model.model.type }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
+        </div>
+        <ul class="asset__shopcard__priceoptions">
+          <li>+ 24% VAT (DUMMY)</li>
+          <li>+ 5,99€ delivery to Poland (DUMMY)</li>
+        </ul>
       </div>
     </div>
-    <ul class="asset__shopcard__priceoptions">
-      <li>+ 24% VAT (DUMMY)</li>
-      <li>+ 5,99€ delivery to Poland (DUMMY)</li>
-    </ul>
-    <ul class="asset__shopcard__buyinfo pt-sm-10">
-      <li><strong>Asset application restrictions</strong></li>
-      <li><strong>Domain: </strong> Geomarketing (DUMMY)</li>
-      <li><strong>Coverage: </strong> Albania, Algeria (DUMMY)</li>
-    </ul>
 
     <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="openSelectAreaModal" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="addToCart" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
+    <ul v-if="selectedPricingModel" class="asset__shopcard__buyinfo pt-sm-10">
+      <li><strong>Asset application restrictions</strong></li>
+      <li>
+        <strong>Use restricted for: </strong>
+        <span v-if="getDomainRestrictions().length">
+          <span v-for="(domain, i) in getDomainRestrictions()" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions().length - 1">, </span></span>
+        </span>
+        <span v-else>Any domain</span>
+      </li>
+      <li>
+        <strong>Coverage: </strong>
+        <span v-if="getCoverageRestrictions().length">
+          <span v-for="(area, i) in getCoverageRestrictions()" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions().length - 1">, </span></span>
+        </span>
+        <span v-else>Worldwide</span>
+      </li>
+      <li>
+        <strong>Consumers: </strong>
+        <span v-if="getConsumerRestrictions().length">
+          <span v-for="(area, i) in getConsumerRestrictions()" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions().length - 1">, </span></span>
+        </span>
+        <span v-else>Worldwide</span>
+      </li>
+    </ul>
+
+    <hr>
+
     <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
     <ul class="asset__shopcard__buyinfo">
-      <li><strong>Delivery type: </strong> From topio / vendor (DUMMY)</li>
-      <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li>
-      <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li>
+      <li><strong>Delivery type: </strong> {{ catalogueItem.deliveryMethod }}</li>
+      <!-- <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li> -->
+      <!-- <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li> -->
+      <li><strong>Delivered from: </strong>{{ catalogueItem.publisher.name }}</li>
     </ul>
     <div class="asset-owner">
       <div class="asset-owner__inner">
-        <div class="asset-owner__inner__logo">
-          <!-- <img :src="catalogueItem.logoImage" :alt="catalogueItem.publisher.name"> -->
+        <div class="asset-owner__inner__logo" v-if="catalogueItem.publisher.logoImageMimeType && catalogueItem.publisher.logoImage">
+          <img :src="'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage" :alt="`image for ${catalogueItem.publisher.name}`">
         </div>
         <div class="asset-owner__inner__info">
           <div class="asset-owner__inner__info__name">
@@ -56,9 +89,6 @@
         </div>
       </div>
     </div>
-
-    <!-- MODALS -->
-    <!-- <select-areas v-if="isSelectAreasModalOn" @close="toggleSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModel.key"></select-areas> -->
   </div>
 </template>
 <script lang="ts">
@@ -92,6 +122,7 @@ export default class ShopCard extends Vue {
     this.selectedPricingModel = null;
     this.isSelectAreasModalOn = false;
     this.cartErrors = '';
+    this.selectedPricingModel = this.catalogueItem.pricingModels[0].model;
   }
 
   @Watch('selectedPricingModel')
@@ -142,6 +173,18 @@ export default class ShopCard extends Vue {
   openSelectAreaModal(): void {
     // eslint-disable-next-line
     this.$emit('openSelectAreaModal', this.selectedPricingModel!.key);
+  }
+
+  getDomainRestrictions(): string[] {
+    return this.selectedPricingModel?.domainRestrictions as string[];
+  }
+
+  getCoverageRestrictions(): string[] {
+    return (this.selectedPricingModel?.coverageRestrictionContinents as string[]).concat(this.selectedPricingModel?.coverageRestrictionCountries as string[]);
+  }
+
+  getConsumerRestrictions(): string[] {
+    return (this.selectedPricingModel?.consumerRestrictionContinents as string[]).concat(this.selectedPricingModel?.consumerRestrictionCountries as string[]);
   }
 }
 </script>
