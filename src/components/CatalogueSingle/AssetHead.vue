@@ -1,6 +1,6 @@
 <template>
   <div class="asset__head">
-    <a href="#" class="asset__head__breadcrumps"><img src="@/assets/images/icons/back_icon.svg" alt="">BACK</a>
+    <a href="" @click.prevent="$router.go(-1)" class="asset__head__breadcrumps"><img src="@/assets/images/icons/back_icon.svg" alt="">BACK</a>
     <topic-category-icon v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat_icon`" :category="category"/>
     <div class="asset__head__title">
       <h1>{{ catalogueItem.title }}</h1>
@@ -16,17 +16,17 @@
         <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">reject</button>
       </div>
     </div>
-    <div class="asset__head__version">
-      <div class="custom-select">
+    <!-- <div class="asset__head__version"> -->
+      <!-- <div class="custom-select">
         <select name="version" v-model="selectedVersion">
           <option :value="version" v-for="version in catalogueItem.versions" v-bind:key="`${version}_version`">VERSION {{ version }}</option>
         </select>
-      </div>
+      </div> -->
       <!-- <div class="asset__head__rating rating">
         <span v-for="index in 5" v-bind:key="`${index}_rating`" :class="{ 'active' : index <= catalogueItem.statistics.rating }">★</span>
         <i>{{catalogueItem.statistics.rating ? catalogueItem.statistics.rating : '- '}}/5</i>
       </div> -->
-    </div>
+    <!-- </div> -->
     <!-- <div class="asset__head__data" v-if="catalogueItemType == 'api'">
       <ul>
         <li><strong>Last updated:</strong>{{ catalogueItem.revisionDate | format_date }}</li>
@@ -37,13 +37,14 @@
     </div> -->
     <div class="asset__head__data">
       <ul>
+        <li><strong>Version:</strong>{{ catalogueItem.version }}</li>
         <li><strong>Last updated:</strong>{{ catalogueItem.revisionDate | format_date }}</li>
         <li><strong>Created:</strong>{{ catalogueItem.publicationDate | format_date }}</li>
-        <li><strong>Topic:</strong><span v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}</span></li>
+        <li><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
         <li><strong>Format:</strong>{{ catalogueItem.format }}</li>
         <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem }}</li>
-        <li><strong>Scale:</strong><span v-for="scale in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.theme }}</span></li>
-        <li><strong>Coverage:</strong>97% of Greece (DUMMY)</li>
+        <li><strong>Scale:</strong><span v-for="(scale, i) in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.description }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
+        <!-- <li><strong>Coverage:</strong>97% of Greece (DUMMY)</li> -->
       </ul>
     </div>
     <!-- MODALS -->
@@ -55,7 +56,6 @@ import {
   Vue,
   Prop,
   Component,
-  Watch,
 } from 'vue-property-decorator';
 import moment from 'moment';
 import DraftAssetApi from '@/service/draft';
@@ -81,7 +81,7 @@ export default class AssetHead extends Vue {
 
   draftAssetApi: DraftAssetApi
 
-  selectedVersion: string;
+  // selectedVersion: string;
 
   modalToShow: string;
 
@@ -90,15 +90,15 @@ export default class AssetHead extends Vue {
 
     this.draftAssetApi = new DraftAssetApi();
 
-    this.selectedVersion = '';
+    // this.selectedVersion = '';
 
     this.modalToShow = '';
   }
 
-  @Watch('catalogueItem', { deep: true, immediate: true })
-  onCatalogueItemLoaded(): void {
-    this.selectedVersion = this.catalogueItem.version;
-  }
+  // @Watch('catalogueItem', { deep: true, immediate: true })
+  // onCatalogueItemLoaded(): void {
+  //   this.selectedVersion = this.catalogueItem.version;
+  // }
 
   acceptDraft(): void {
     const { key } = this.$route.params;
