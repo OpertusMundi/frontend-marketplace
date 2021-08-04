@@ -91,6 +91,17 @@ export default class CatalogueApi extends Api {
       });
   }
 
+  public async findOneHistory(id: string, version: string): Promise<ServerResponse<CatalogueItem | CatalogueItemDetails>> {
+    const url = `/action/catalogue/history/items/${id}?version=${version}`;
+
+    return this.get<ServerResponse<CatalogueItem | CatalogueItemDetails>>(url)
+      .then((response: AxiosServerResponse<CatalogueItem | CatalogueItemDetails>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
   /**
    * Find related assets for the given identifier
    * @param id
