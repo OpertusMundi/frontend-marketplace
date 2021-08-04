@@ -85,100 +85,112 @@
 
           <!-- MAPS -->
           <li v-if="activeTab == 2">
-            <div>
+            <div v-if="!metadata.mbr && !metadata.convexHull && !metadata.thumbnail && !metadata.heatmap && (!metadata.clusters || !metadata.clusters.features.length)">
+              <h5>No maps to show.</h5>
+            </div>
+            <div v-else>
               <p>Contains map images with the geometry of the dataset</p>
               <hr>
               <!-- MBR -->
-              <span class="map-type">MBR</span>
-              <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigMbr"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="wktToGeoJson(metadata.mbr)"
-                    :optionsStyle="{color: 'orange'}"
+              <div v-if="metadata.mbr">
+                <span class="map-type">MBR</span>
+                <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigMbr"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
-              </div>
-              <!-- CONVEX HULL -->
-              <span class="map-type">Convex Hull</span>
-              <p>Convex polygon enclosing all features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigConvexHull"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="wktToGeoJson(metadata.convexHull)"
-                    :optionsStyle="{color: 'orange'}"
-                  >
-                  </l-geo-json>
-                </l-map>
-              </div>
-              <!-- THUMBNAIL -->
-              <span class="map-type">Thumbnail</span>
-              <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-              <div class="tab_maps-map tab_maps-map-thumbnail">
-                <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
-              </div>
-              <!-- HEATMAP -->
-
-              <!-- ATTENTION -->
-              <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
-              <span class="map-type">Heatmap</span>
-              <p>Colormap with varying intensity according to the density of features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigHeatmap"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
+                    <l-tile-layer
                     :url="mapConfig.tilesUrl"
                     :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="heatmapGeoJson"
-                    :optionsStyle="mapConfig.styleHeatmap"
-                    :smoothFactor="0.2"
-                    :opacity="0.1"
-                    :options="{smoothFactor: 0.2}"
+                    <l-geo-json
+                      :geojson="wktToGeoJson(metadata.mbr)"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
+              </div>
+              <!-- CONVEX HULL -->
+              <div v-if="metadata.convexHull">
+                <span class="map-type">Convex Hull</span>
+                <p>Convex polygon enclosing all features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigConvexHull"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
+                    <l-tile-layer
+                    :url="mapConfig.tilesUrl"
+                    :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="wktToGeoJson(metadata.convexHull)"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
+              </div>
+              <!-- THUMBNAIL -->
+              <div v-if="metadata.thumbnail">
+                <span class="map-type">Thumbnail</span>
+                <p>Thumbnail image depicting the spatial coverage of the dataset</p>
+                <div class="tab_maps-map tab_maps-map-thumbnail">
+                  <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
+                </div>
+              </div>
+              <!-- HEATMAP -->
+              <!-- ATTENTION -->
+              <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
+              <div v-if="metadata.heatmap">
+                <span class="map-type">Heatmap</span>
+                <p>Colormap with varying intensity according to the density of features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigHeatmap"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
+                  >
+                    <l-tile-layer
+                      :url="mapConfig.tilesUrl"
+                      :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="heatmapGeoJson"
+                      :optionsStyle="mapConfig.styleHeatmap"
+                      :smoothFactor="0.2"
+                      :opacity="0.1"
+                      :options="{smoothFactor: 0.2}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
               </div>
               <!-- CLUSTERS -->
-              <span class="map-type">Clusters</span>
-              <p>Density-based spatial clusters of features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapClusters"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="metadata.clusters"
-                    :optionsStyle="{color: 'orange'}"
+              <div v-if="metadata.clusters && metadata.clusters.features.length">
+                <span class="map-type">Clusters</span>
+                <p>Density-based spatial clusters of features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapClusters"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
+                    <l-tile-layer
+                    :url="mapConfig.tilesUrl"
+                    :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="metadata.clusters"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
               </div>
             </div>
           </li>
