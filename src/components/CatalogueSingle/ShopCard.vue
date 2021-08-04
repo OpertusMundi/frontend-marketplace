@@ -7,9 +7,9 @@
       </div> -->
       <div class="asset__shopcard__price">
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FREE'" class="asset__shopcard__price">FREE</span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'">{{ selectedPricingModel.totalPriceExcludingTax }}</span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">{{ selectedPricingModel.price }}</span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">{{ selectedPricingModel.price }}</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'"><span>{{ selectedPricingModel.totalPriceExcludingTax }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">{{ selectedPricingModel.price }} <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">{{ selectedPricingModel.price }} <span>€</span></span>
       </div>
 
       <div v-if="catalogueItem.pricingModels.length === 1" class="asset__shopcard__variations__row">
