@@ -14,7 +14,7 @@
       <div class="asset__section__content__inner">
         <ul class="asset__section__tabs">
           <li v-if="activeTab == 1">
-            <p>{{ catalogueItem.license }}</p>
+            <p>{{ catalogueItem.license ? catalogueItem.license : 'Not provided' }}</p>
           </li>
           <li v-if="activeTab == 2">
             <p>Countries content (DUMMY)</p>

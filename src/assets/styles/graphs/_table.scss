@@ -28,3 +28,57 @@
     }
   }
 }
+
+.samples_table{
+  width: 100%;
+  display: block;
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 750px;
+    overflow-x: scroll;
+  }
+  &__header{
+    font-size: em(14);
+    border:1px solid $lightBgColor;
+    padding:10px 5px;
+    text-align: left;
+    &:first-child{
+      background-color: white;
+      position:sticky;
+      left:0;
+    }
+    th {
+      padding: 0 10px 0 10px;
+    }
+  }
+  &__data{
+    border: 1px solid $lightBgColor;
+    font-size: em(12);
+    padding: 10px 5px;
+    min-width: 100px;
+    &:first-child{
+      width: 100%;
+      min-width: 200px;
+      font-weight: 500;
+      position: sticky;
+      left: 0;
+      background-color: white;
+    }
+    td {
+      padding: 0 10px 0 10px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: all .2s ease-in-out;
+    }
+    td:hover {
+      overflow: visible;
+      text-overflow: initial;
+      background: #fff;
+      max-width: 5000px;
+    }
+  }
+}

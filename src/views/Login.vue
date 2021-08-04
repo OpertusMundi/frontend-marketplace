@@ -87,6 +87,7 @@ export default class Login extends Vue {
         .login(this.email, this.password)
         .then((loginResponse: ServerResponse<LoginResult>) => {
           if (loginResponse.success) {
+            console.log('successfull login', loginResponse);
             // Set CSRF Token
             const { csrfToken: token, csrfHeader: header } = loginResponse.result;
             store.commit('setCsrfToken', { token, header });
@@ -104,6 +105,7 @@ export default class Login extends Vue {
                 }
               });
           } else {
+            console.log('error loggin in', loginResponse);
             // TODO: Hanlde error
             this.loading = false;
           }

@@ -6,8 +6,9 @@
       <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Attributes</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">Maps</a></li>
-        <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li>
-        <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li>
+        <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
+        <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
+        <li v-for="(sample, i) in metadata.samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
       </ul>
     </div>
     <div class="asset__section__content">
@@ -85,110 +86,140 @@
 
           <!-- MAPS -->
           <li v-if="activeTab == 2">
-            <div>
+            <div v-if="!metadata.mbr && !metadata.convexHull && !metadata.thumbnail && !metadata.heatmap && (!metadata.clusters || !metadata.clusters.features.length)">
+              <h5>No maps to show</h5>
+            </div>
+            <div v-else>
               <p>Contains map images with the geometry of the dataset</p>
               <hr>
               <!-- MBR -->
-              <span class="map-type">MBR</span>
-              <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigMbr"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="wktToGeoJson(metadata.mbr)"
-                    :optionsStyle="{color: 'orange'}"
+              <div v-if="metadata.mbr">
+                <span class="map-type">MBR</span>
+                <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigMbr"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
-              </div>
-              <!-- CONVEX HULL -->
-              <span class="map-type">Convex Hull</span>
-              <p>Convex polygon enclosing all features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigConvexHull"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="wktToGeoJson(metadata.convexHull)"
-                    :optionsStyle="{color: 'orange'}"
-                  >
-                  </l-geo-json>
-                </l-map>
-              </div>
-              <!-- THUMBNAIL -->
-              <span class="map-type">Thumbnail</span>
-              <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-              <div class="tab_maps-map tab_maps-map-thumbnail">
-                <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
-              </div>
-              <!-- HEATMAP -->
-
-              <!-- ATTENTION -->
-              <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
-              <span class="map-type">Heatmap</span>
-              <p>Colormap with varying intensity according to the density of features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapConfigHeatmap"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
+                    <l-tile-layer
                     :url="mapConfig.tilesUrl"
                     :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="metadata.heatmapGeoJson"
-                    :optionsStyle="mapConfig.styleHeatmap"
-                    :smoothFactor="0.2"
-                    :opacity="0.1"
-                    :options="{smoothFactor: 0.2}"
+                    <l-geo-json
+                      :geojson="wktToGeoJson(metadata.mbr)"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
+              </div>
+              <!-- CONVEX HULL -->
+              <div v-if="metadata.convexHull">
+                <span class="map-type">Convex Hull</span>
+                <p>Convex polygon enclosing all features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigConvexHull"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
+                    <l-tile-layer
+                    :url="mapConfig.tilesUrl"
+                    :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="wktToGeoJson(metadata.convexHull)"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
+              </div>
+              <!-- THUMBNAIL -->
+              <div v-if="metadata.thumbnail">
+                <span class="map-type">Thumbnail</span>
+                <p>Thumbnail image depicting the spatial coverage of the dataset</p>
+                <div class="tab_maps-map tab_maps-map-thumbnail">
+                  <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
+                </div>
+              </div>
+              <!-- HEATMAP -->
+              <!-- ATTENTION -->
+              <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
+              <div v-if="metadata.heatmap">
+                <span class="map-type">Heatmap</span>
+                <p>Colormap with varying intensity according to the density of features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapConfigHeatmap"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
+                  >
+                    <l-tile-layer
+                      :url="mapConfig.tilesUrl"
+                      :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="heatmapGeoJson"
+                      :optionsStyle="mapConfig.styleHeatmap"
+                      :smoothFactor="0.2"
+                      :opacity="0.1"
+                      :options="{smoothFactor: 0.2}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
               </div>
               <!-- CLUSTERS -->
-              <span class="map-type">Clusters</span>
-              <p>Density-based spatial clusters of features</p>
-              <div class="tab_maps-map">
-                <l-map
-                  ref="mapClusters"
-                  :bounds="mbrToLeafletBounds(metadata.mbr)"
-                  :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                  :options="mapConfig.options"
-                >
-                  <l-tile-layer
-                  :url="mapConfig.tilesUrl"
-                  :attribution="mapConfig.attribution"/>
-                  <l-geo-json
-                    :geojson="metadata.clusters"
-                    :optionsStyle="{color: 'orange'}"
+              <div v-if="metadata.clusters && metadata.clusters.features.length">
+                <span class="map-type">Clusters</span>
+                <p>Density-based spatial clusters of features</p>
+                <div class="tab_maps-map">
+                  <l-map
+                    ref="mapClusters"
+                    :bounds="mbrToLeafletBounds(metadata.mbr)"
+                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
                   >
-                  </l-geo-json>
-                </l-map>
+                    <l-tile-layer
+                    :url="mapConfig.tilesUrl"
+                    :attribution="mapConfig.attribution"/>
+                    <l-geo-json
+                      :geojson="metadata.clusters"
+                      :optionsStyle="{color: 'orange'}"
+                    >
+                    </l-geo-json>
+                  </l-map>
+                </div>
               </div>
             </div>
           </li>
 
-          <li v-if="activeTab == 3">
+          <!-- <li v-if="activeTab == 3">
             <p>Sample 1 content (DUMMY)</p>
           </li>
 
           <li v-if="activeTab == 4">
             <p>Sample 2 content (DUMMY)</p>
+          </li> -->
+
+          <li v-if="activeTab > 2">
+            <div v-for="(sampleTab, i) in metadata.samples" :key="i">
+              <!-- <div v-if="activeTab === i + 3" style="overflow-x: scroll; width: 750px;"> -->
+              <div v-if="activeTab === i + 3" class="samples_table__wrapper">
+                <table class="samples_table">
+                  <tr class="samples_table__header">
+                    <th v-for="(attribute, j) in Object.keys(metadata.samples[i])" :key="j">{{ attribute }}</th>
+                  </tr>
+                  <tr class="samples_table__data" v-for="(value, j) in Object.values(metadata.samples[i])[0]" :key="j">
+                    <td v-for="(attribute, k) in Object.keys(metadata.samples[i])" :key="k">
+                      {{ metadata.samples[i][attribute][j] ? metadata.samples[i][attribute][j] : '-' }}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </li>
 
         </ul>
@@ -212,6 +243,9 @@ import {
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { parse as wktToGeojsonParser } from 'wellknown';
+import CatalogueApi from '@/service/catalogue';
+// eslint-disable-next-line
+import { GeoJsonObject } from 'geojson';
 
 @Component({
   components: {
@@ -225,20 +259,28 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 export default class DataProfilingAndSamples extends Vue {
   @Prop({ required: true }) private metadata: any;
 
+  catalogueApi: CatalogueApi;
+
   activeTab: number;
 
   isUserAuthenticated: boolean;
 
   mapConfig: any;
 
+  heatmapGeoJson: GeoJsonObject | null;
+
   constructor() {
     super();
+
+    this.catalogueApi = new CatalogueApi();
 
     console.log('met', this.metadata);
 
     this.activeTab = 1;
 
     this.isUserAuthenticated = store.getters.isAuthenticated;
+
+    this.heatmapGeoJson = null;
 
     this.mapConfig = {
       options: {
@@ -256,6 +298,13 @@ export default class DataProfilingAndSamples extends Vue {
       tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
+  }
+
+  mounted(): void {
+    console.log('heatmap link', this.metadata.heatmap);
+    this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
+      this.heatmapGeoJson = heatmapResponse;
+    });
   }
 
   @Watch('activeTab')
@@ -331,43 +380,6 @@ export default class DataProfilingAndSamples extends Vue {
               fontSize: 8,
             },
           },
-          // data: [
-          //   {
-          //     name: 'BIOTA',
-          //     y: 45.74,
-          //   },
-          //   {
-          //     name: 'ECONOMY',
-          //     y: 10.57,
-          //   },
-          //   {
-          //     name: 'ELEVATION',
-          //     y: 7.23,
-          //   },
-          //   {
-          //     name: 'PLANNING_CADASTRE',
-          //     y: 5.58,
-          //   },
-          //   {
-          //     name: 'STRUCTURE',
-          //     y: 22.02,
-          //   },
-          //   {
-          //     name: 'TRANSPORTATION',
-          //     y: 3.92,
-          //     drilldown: 'Opera',
-          //   },
-          //   {
-          //     name: 'BOUNDARIES',
-          //     y: 7.62,
-          //     drilldown: null,
-          //   },
-          //   {
-          //     name: 'CLIMA',
-          //     y: 2.62,
-          //     drilldown: null,
-          //   },
-          // ],
           data: this.formatDistributionForChart(total, distribution),
         },
       ],
@@ -417,6 +429,7 @@ export default class DataProfilingAndSamples extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "@/assets/styles/graphs/_table.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>
