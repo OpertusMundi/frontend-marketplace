@@ -196,7 +196,9 @@
               </label>
               <div v-if="additionalResourcesOption === 'external_link'" class="form-group ml-xs-40">
                 <label for="additional_resources_link">Add a link</label>
-                <input id="additional_resources_link" type="text" class="form-group__text" placeholder="https://">
+                <input id="additional_resources_link" type="text" class="form-group__text" placeholder="https://" v-model="additionalUriResource.uri">
+                <label for="additional_resources_link_text">Displayed text for URI</label>
+                <textarea id="additional_resources_link_text" type="text" class="form-group__text" :disabled="!additionalUriResource.uri" v-model="additionalUriResource.text"></textarea>
               </div>
             </div>
           </div>
@@ -221,7 +223,7 @@ import Modal from '@/components/Modal.vue';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
 import { EnumTopicCategory } from '@/model/catalogue';
-import { AssetFileAdditionalResourceCommand } from '@/model/asset';
+import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
 
 extend('required', required);
@@ -250,6 +252,8 @@ export default class Metadata extends Vue {
 
   additionalResourcesOption: string;
 
+  additionalUriResource: AssetUriAdditionalResource;
+
   scalesForDisplay: string[];
 
   keywordsForDisplay: string[];
@@ -258,6 +262,8 @@ export default class Metadata extends Vue {
     assetTypes: string[],
     availableFormats: string[],
   }
+
+  // TODO: currently, URIs are stored in asset.additionalResources and FILES are uploaded as additional resources on asset submit
 
   constructor() {
     super();
@@ -271,6 +277,17 @@ export default class Metadata extends Vue {
     this.numberOfAdditionalResourcesFiles = 1;
 
     this.additionalResourcesOption = '';
+
+    if (this.assetLocal.additionalResources.length && this.assetLocal.additionalResources[0].type === EnumAssetAdditionalResource.URI) {
+      const [uriResource] = this.assetLocal.additionalResources;
+      this.additionalUriResource = uriResource;
+    } else {
+      this.additionalUriResource = {
+        uri: '',
+        text: '',
+        type: EnumAssetAdditionalResource.URI,
+      };
+    }
 
     this.scalesForDisplay = this.assetLocal.scales.map((x) => x.description);
 
@@ -297,8 +314,30 @@ export default class Metadata extends Vue {
   }
 
   @Watch('additionalResourcesToUploadLocal', { deep: true })
-  onadditionalResourcesToUploadChange(): void {
+  onAdditionalResourcesToUploadChange(): void {
     this.$emit('update:additionalResourcesToUpload', this.additionalResourcesToUploadLocal);
+  }
+
+  @Watch('additionalUriResource', { deep: true })
+  onAdditionalUriResourceChange(): void {
+    Vue.set(this.assetLocal, 'additionalResources', [this.additionalUriResource]);
+
+    if (!this.additionalUriResource.uri) {
+      this.additionalUriResource.text = '';
+    }
+  }
+
+  @Watch('additionalResourcesOption', { deep: false })
+  onAdditionalResourcesOptionChange(): void {
+    console.log('artu', this.additionalResourcesOption);
+    if (this.additionalResourcesOption === 'upload_files') {
+      this.assetLocal.additionalResources = [];
+      this.additionalUriResource = { uri: '', text: '', type: EnumAssetAdditionalResource.URI };
+    }
+    if (this.additionalResourcesOption === 'external_link') {
+      this.additionalResourcesToUploadLocal = [];
+      this.numberOfAdditionalResourcesFiles = 1;
+    }
   }
 
   populateAvailableFormatsForSelectedType(): void {
