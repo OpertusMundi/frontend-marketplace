@@ -1,7 +1,9 @@
 <template>
   <div class="asset__head">
     <a href="" @click.prevent="$router.go(-1)" class="asset__head__breadcrumps"><img src="@/assets/images/icons/back_icon.svg" alt="">BACK</a>
-    <topic-category-icon v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat_icon`" :category="category"/>
+    <div class="d-inline-flex">
+      <topic-category-icon class="mr-xs-30" v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat_icon`" :category="category"/>
+    </div>
     <div class="asset__head__title">
       <h1>{{ catalogueItem.title }}</h1>
       <a v-if="mode === 'catalogue'" href="#" class="asset__head__favorites">
@@ -126,4 +128,5 @@ export default class AssetHead extends Vue {
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
 </style>

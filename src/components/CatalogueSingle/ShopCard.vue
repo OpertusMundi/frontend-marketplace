@@ -99,8 +99,11 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
+import CartApi from '@/service/cart';
 import { CatalogueItem } from '@/model';
 import { BasePricingModelCommand } from '@/model/pricing-model';
+import { CartAddItemCommand } from '@/model/cart';
+import store from '@/store';
 
 @Component({
   components: {
@@ -110,6 +113,8 @@ import { BasePricingModelCommand } from '@/model/pricing-model';
 export default class ShopCard extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
+  cartApi: CartApi;
+
   selectedPricingModel: BasePricingModelCommand | null;
 
   isSelectAreasModalOn: boolean;
@@ -118,6 +123,8 @@ export default class ShopCard extends Vue {
 
   constructor() {
     super();
+
+    this.cartApi = new CartApi();
 
     this.selectedPricingModel = null;
     this.isSelectAreasModalOn = false;
@@ -141,20 +148,23 @@ export default class ShopCard extends Vue {
     console.log('TODO: add to cart');
     // TODO: add to cart functions
 
-    // const cartItem:CartAddItemCommand = {
-    //   assetId: this.catalogueItem.id,
-    //   pricingModelKey: this.selectedPricingModel.key,
-    //   parameters: {},
-    // };
-    // this.cartApi.addItem(cartItem)
-    //   .then((cartResponse: ServerResponse<Cart>) => {
-    //     if (cartResponse.success) {
-    //       store.commit('setCartItems', cartResponse.result);
-    //     } else {
-    //       // TODO: Handle error
-    //       console.error('cannot add item to cart!');
-    //     }
-    //   });
+    const cartItem:CartAddItemCommand = {
+      assetId: this.catalogueItem.id,
+      // eslint-disable-next-line
+      pricingModelKey: this.selectedPricingModel.key!,
+      parameters: {},
+    };
+    this.cartApi.addItem(cartItem)
+      // .then((cartResponse: ServerResponse<Cart>) => {
+      .then((cartResponse) => {
+        if (cartResponse.success) {
+          console.log('successfully added item to cart');
+          store.commit('setCartItems', cartResponse.result);
+        } else {
+          // TODO: Handle error
+          console.error('cannot add item to cart!');
+        }
+      });
   }
 
   // todo: not used currently
@@ -176,14 +186,21 @@ export default class ShopCard extends Vue {
   }
 
   getDomainRestrictions(): string[] {
+    if (!this.selectedPricingModel?.domainRestrictions) return [];
     return this.selectedPricingModel?.domainRestrictions as string[];
   }
 
   getCoverageRestrictions(): string[] {
+    if (!this.selectedPricingModel?.coverageRestrictionContinents && !this.selectedPricingModel?.coverageRestrictionCountries) return [];
+    if (!this.selectedPricingModel.coverageRestrictionContinents) return this.selectedPricingModel.coverageRestrictionCountries;
+    if (!this.selectedPricingModel.coverageRestrictionCountries) return this.selectedPricingModel.coverageRestrictionContinents;
     return (this.selectedPricingModel?.coverageRestrictionContinents as string[]).concat(this.selectedPricingModel?.coverageRestrictionCountries as string[]);
   }
 
   getConsumerRestrictions(): string[] {
+    if (!this.selectedPricingModel?.consumerRestrictionContinents && !this.selectedPricingModel?.consumerRestrictionCountries) return [];
+    if (!this.selectedPricingModel.consumerRestrictionContinents) return this.selectedPricingModel.consumerRestrictionCountries;
+    if (!this.selectedPricingModel.consumerRestrictionCountries) return this.selectedPricingModel.consumerRestrictionContinents;
     return (this.selectedPricingModel?.consumerRestrictionContinents as string[]).concat(this.selectedPricingModel?.consumerRestrictionCountries as string[]);
   }
 }
