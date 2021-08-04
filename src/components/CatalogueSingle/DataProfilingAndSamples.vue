@@ -6,8 +6,9 @@
       <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Attributes</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">Maps</a></li>
-        <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li>
-        <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li>
+        <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
+        <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
+        <li v-for="(sample, i) in metadata.samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
       </ul>
     </div>
     <div class="asset__section__content">
@@ -86,7 +87,7 @@
           <!-- MAPS -->
           <li v-if="activeTab == 2">
             <div v-if="!metadata.mbr && !metadata.convexHull && !metadata.thumbnail && !metadata.heatmap && (!metadata.clusters || !metadata.clusters.features.length)">
-              <h5>No maps to show.</h5>
+              <h5>No maps to show</h5>
             </div>
             <div v-else>
               <p>Contains map images with the geometry of the dataset</p>
@@ -195,12 +196,30 @@
             </div>
           </li>
 
-          <li v-if="activeTab == 3">
+          <!-- <li v-if="activeTab == 3">
             <p>Sample 1 content (DUMMY)</p>
           </li>
 
           <li v-if="activeTab == 4">
             <p>Sample 2 content (DUMMY)</p>
+          </li> -->
+
+          <li v-if="activeTab > 2">
+            <div v-for="(sampleTab, i) in metadata.samples" :key="i">
+              <!-- <div v-if="activeTab === i + 3" style="overflow-x: scroll; width: 750px;"> -->
+              <div v-if="activeTab === i + 3" class="samples_table__wrapper">
+                <table class="samples_table">
+                  <tr class="samples_table__header">
+                    <th v-for="(attribute, j) in Object.keys(metadata.samples[i])" :key="j">{{ attribute }}</th>
+                  </tr>
+                  <tr class="samples_table__data" v-for="(value, j) in Object.values(metadata.samples[i])[0]" :key="j">
+                    <td v-for="(attribute, k) in Object.keys(metadata.samples[i])" :key="k">
+                      {{ metadata.samples[i][attribute][j] ? metadata.samples[i][attribute][j] : '-' }}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </li>
 
         </ul>
@@ -410,6 +429,7 @@ export default class DataProfilingAndSamples extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "@/assets/styles/graphs/_table.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>
