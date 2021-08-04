@@ -151,7 +151,7 @@ export default class CatalogueApi extends Api {
       });
   }
 
-  public async getAssetHeatmap(url: string): Promise<AxiosResponse<GeoJsonObject>> {
+  public async getAssetHeatmap(url: string): Promise<GeoJsonObject> {
     return this.get(url).then((response: AxiosResponse) => {
       const { data } = response;
 

@@ -151,7 +151,7 @@
                     :url="mapConfig.tilesUrl"
                     :attribution="mapConfig.attribution"/>
                   <l-geo-json
-                    :geojson="metadata.heatmapGeoJson"
+                    :geojson="heatmapGeoJson"
                     :optionsStyle="mapConfig.styleHeatmap"
                     :smoothFactor="0.2"
                     :opacity="0.1"
@@ -212,6 +212,9 @@ import {
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { parse as wktToGeojsonParser } from 'wellknown';
+import CatalogueApi from '@/service/catalogue';
+// eslint-disable-next-line
+import { GeoJsonObject } from 'geojson';
 
 @Component({
   components: {
@@ -225,20 +228,28 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 export default class DataProfilingAndSamples extends Vue {
   @Prop({ required: true }) private metadata: any;
 
+  catalogueApi: CatalogueApi;
+
   activeTab: number;
 
   isUserAuthenticated: boolean;
 
   mapConfig: any;
 
+  heatmapGeoJson: GeoJsonObject | null;
+
   constructor() {
     super();
+
+    this.catalogueApi = new CatalogueApi();
 
     console.log('met', this.metadata);
 
     this.activeTab = 1;
 
     this.isUserAuthenticated = store.getters.isAuthenticated;
+
+    this.heatmapGeoJson = null;
 
     this.mapConfig = {
       options: {
@@ -256,6 +267,13 @@ export default class DataProfilingAndSamples extends Vue {
       tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
+  }
+
+  mounted(): void {
+    console.log('heatmap link', this.metadata.heatmap);
+    this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
+      this.heatmapGeoJson = heatmapResponse;
+    });
   }
 
   @Watch('activeTab')
@@ -331,43 +349,6 @@ export default class DataProfilingAndSamples extends Vue {
               fontSize: 8,
             },
           },
-          // data: [
-          //   {
-          //     name: 'BIOTA',
-          //     y: 45.74,
-          //   },
-          //   {
-          //     name: 'ECONOMY',
-          //     y: 10.57,
-          //   },
-          //   {
-          //     name: 'ELEVATION',
-          //     y: 7.23,
-          //   },
-          //   {
-          //     name: 'PLANNING_CADASTRE',
-          //     y: 5.58,
-          //   },
-          //   {
-          //     name: 'STRUCTURE',
-          //     y: 22.02,
-          //   },
-          //   {
-          //     name: 'TRANSPORTATION',
-          //     y: 3.92,
-          //     drilldown: 'Opera',
-          //   },
-          //   {
-          //     name: 'BOUNDARIES',
-          //     y: 7.62,
-          //     drilldown: null,
-          //   },
-          //   {
-          //     name: 'CLIMA',
-          //     y: 2.62,
-          //     drilldown: null,
-          //   },
-          // ],
           data: this.formatDistributionForChart(total, distribution),
         },
       ],
