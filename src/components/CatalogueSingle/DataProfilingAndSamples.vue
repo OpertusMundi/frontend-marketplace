@@ -246,6 +246,7 @@ import {
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { parse as wktToGeojsonParser } from 'wellknown';
+import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -336,11 +337,31 @@ export default class DataProfilingAndSamples extends Vue {
   }
 
   onDownloadSample(): void {
-    console.log('download sample');
-
     // eslint-disable-next-line
     const index = parseInt(this.sampleToDownload.split('_')!.pop()!.split('.')[0]) - 1;
-    console.log(index);
+
+    const csvArr: Record<string, string>[] = [];
+    Object.values<Array<any>>(this.metadata.samples[index])[0].forEach((v, i) => {
+      const obj: Record<string, string> = {};
+      Object.keys(this.metadata.samples[index]).forEach((x) => {
+        obj[x] = this.metadata.samples[index][x][i];
+      });
+      csvArr.push(obj);
+    });
+
+    const options = {
+      filename: this.sampleToDownload.split('.csv')[0],
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(csvArr);
   }
 
   getChartOptions(total: number, distribution: Record<string, number>): any {
