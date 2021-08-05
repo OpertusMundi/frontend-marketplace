@@ -21,7 +21,8 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card v-if="isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
+          <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
+          <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
 
           <other-available-options :catalogueItem="catalogueItem"></other-available-options>
         </div>
@@ -50,6 +51,7 @@ import Overview from '../components/CatalogueSingle/Overview.vue';
 import TermsAndRestrictions from '../components/CatalogueSingle/TermsAndRestrictions.vue';
 import DataProfilingAndSamples from '../components/CatalogueSingle/DataProfilingAndSamples.vue';
 import ShopCard from '../components/CatalogueSingle/ShopCard.vue';
+import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProviderReview.vue';
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
@@ -63,6 +65,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     TermsAndRestrictions,
     DataProfilingAndSamples,
     ShopCard,
+    ShopCardProviderReview,
     OtherAvailableOptions,
     RelatedAssets,
     ApiUsageExample,
