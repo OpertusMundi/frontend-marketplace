@@ -103,7 +103,7 @@
           </transition>
         </div>
         <div class="dashboard__form__navbuttons">
-          <button class="btn btn--std btn--blue" @click.prevent="previousStep()">PREVIOUS</button>
+          <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
           <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
@@ -352,9 +352,8 @@ export default class CreateAsset extends Vue {
   }
 
   previousStep():void {
-    if (this.currentStep >= 1) {
-      this.currentStep -= 1;
-    }
+    if (this.currentStep <= 1) return;
+    this.currentStep -= 1;
   }
 
   nextStep():void {
