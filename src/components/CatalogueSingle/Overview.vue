@@ -19,7 +19,11 @@
         <div class="asset__section__overview__right">
           <h5>Asset Info</h5>
           <p><strong>Language:</strong> {{ catalogueItem.language }} <br>
-          <strong>Temporal extent:</strong> <span v-if="catalogueItem.dateStart && catalogueItem.dateEnd">{{ formatDate(catalogueItem.dateStart) }} - {{ formatDate(catalogueItem.dateEnd) }}</span>
+          <strong>Temporal extent:</strong>
+          <span v-if="catalogueItem.dateStart && catalogueItem.dateEnd">{{ formatDate(catalogueItem.dateStart) }} - {{ formatDate(catalogueItem.dateEnd) }}</span>
+          <span v-if="catalogueItem.dateStart && !catalogueItem.dateEnd">From {{ formatDate(catalogueItem.dateStart) }}</span>
+          <span v-if="!catalogueItem.dateStart && catalogueItem.dateEnd">Up to {{ formatDate(catalogueItem.dateEnd) }}</span>
+          <span v-if="!catalogueItem.dateStart && !catalogueItem.dateEnd">Not specified</span>
           <h5>Tags</h5>
           <p>
             <span v-for="(keyword, i) in catalogueItem.keywords" :key="keyword.keyword">{{ keyword.keyword }}<span v-if="i !== catalogueItem.keywords.length - 1">, </span></span>

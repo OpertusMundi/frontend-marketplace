@@ -132,6 +132,9 @@
             img {
                 display: block;
             }
+            div {
+                white-space: nowrap;
+            }
         }
 
         &__favorites {
@@ -248,7 +251,7 @@
                     margin-left: 10px;
                     font-style: em(20);
                     font-weight: 700;
-                    span {
+                    span, > div {
                         font-weight: 400;
                         font-size: em(13);
                     }
@@ -258,6 +261,20 @@
                 }
                 input:checked + label {
                     color: $secondColor;
+                }
+                &__discounts {
+                    display: flex;
+                    &__table {
+                        margin-left: 20px;
+                        flex-grow: 1;
+                        display: grid;
+                        grid-template-columns: min-content 1fr;
+                        column-gap: 10px;
+                        span {
+                            font-size: 13px !important;
+                            white-space: nowrap;
+                        }
+                    }
                 }
             }
         }
@@ -928,6 +945,10 @@
         letter-spacing: 0.02em;
         @media(max-width: 576px) {   
             font-size: em(20);
+        }
+
+        div {
+            margin-top: 20px;
         }
 
         small {
