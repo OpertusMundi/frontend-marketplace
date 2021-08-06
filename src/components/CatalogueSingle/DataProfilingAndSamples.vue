@@ -4,9 +4,9 @@
       <h4>Data Profiling and Samples</h4>
 
       <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples && metadata.samples.length">
-        <span><strong>Select file:</strong></span>
-        <multiselect v-model="sampleToDownload" :options="getSampleDownloadOptions()" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
-        <div v-if="sampleToDownload" class="asset__section__head__sample_download__btn" @click="onDownloadSample"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
+        <span><strong>Download metadata:</strong></span>
+        <multiselect v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
+        <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
       </div>
 
       <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
@@ -209,6 +209,8 @@
 
           <li v-if="activeTab > 2">
             <div v-for="(sampleTab, i) in metadata.samples" :key="i">
+              <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
+              <div v-if="activeTab === i + 3" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
               <div v-if="activeTab === i + 3" class="samples_table__wrapper">
                 <table class="samples_table">
                   <tr class="samples_table__header">
@@ -246,6 +248,7 @@ import {
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { parse as wktToGeojsonParser } from 'wellknown';
+import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 // eslint-disable-next-line
@@ -274,7 +277,8 @@ export default class DataProfilingAndSamples extends Vue {
 
   heatmapGeoJson: GeoJsonObject | null;
 
-  sampleToDownload: string;
+  // currently, just a dummy property (todo)
+  metadataDownloadFileSelection: string;
 
   constructor() {
     super();
@@ -289,8 +293,8 @@ export default class DataProfilingAndSamples extends Vue {
 
     this.heatmapGeoJson = null;
 
-    // this.sampleToDownload = 'sample 1';
-    this.sampleToDownload = '';
+    // this.metadataDownloadFileSelection = 'sample 1';
+    this.metadataDownloadFileSelection = '';
 
     this.mapConfig = {
       options: {
@@ -332,13 +336,17 @@ export default class DataProfilingAndSamples extends Vue {
     return false;
   }
 
-  getSampleDownloadOptions(): string[] {
-    return this.metadata.samples.map((x, i) => `sample_${i + 1}.csv`);
+  // getSampleDownloadOptions(): string[] {
+  //   return this.metadata.samples.map((x, i) => `sample_${i + 1}.csv`);
+  // }
+
+  onDownloadAutomatedMetadata(): void {
+    fileDownload(JSON.stringify(this.metadata), 'metadata.txt');
   }
 
-  onDownloadSample(): void {
+  onDownloadSample(index: number): void {
     // eslint-disable-next-line
-    const index = parseInt(this.sampleToDownload.split('_')!.pop()!.split('.')[0]) - 1;
+    // const index = parseInt(this.metadataDownloadFileSelection.split('_')!.pop()!.split('.')[0]) - 1;
 
     const csvArr: Record<string, string>[] = [];
     Object.values<Array<any>>(this.metadata.samples[index])[0].forEach((v, i) => {
@@ -350,7 +358,7 @@ export default class DataProfilingAndSamples extends Vue {
     });
 
     const options = {
-      filename: this.sampleToDownload.split('.csv')[0],
+      filename: `sample_${index + 1}`,
       fieldSeparator: ',',
       quoteStrings: '"',
       decimalSeparator: '.',

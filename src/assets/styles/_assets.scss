@@ -371,6 +371,10 @@
                     margin-left: 10px;
                 }
 
+                &__btn.float-right {
+                    float: right;
+                }
+
                 > span:nth-child(1) {
                     font-size: em(14);
                     line-height: 1.5em;
