@@ -281,6 +281,7 @@ export default class Metadata extends Vue {
     if (this.assetLocal.additionalResources.length && this.assetLocal.additionalResources[0].type === EnumAssetAdditionalResource.URI) {
       const [uriResource] = this.assetLocal.additionalResources;
       this.additionalUriResource = uriResource;
+      this.additionalResourcesOption = 'external_link';
     } else {
       this.additionalUriResource = {
         uri: '',

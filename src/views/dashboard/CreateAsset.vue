@@ -399,31 +399,35 @@ export default class CreateAsset extends Vue {
     this.$router.push('/dashboard/assets');
   }
 
+  // TODO: check if this method can be removed (not required)
   fixDataForSubmitting(): void {
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
   }
 
+  // needs refactoring
   async submitForm(isDraft = false): Promise<void> {
     this.modalToShow = '';
 
     console.log('rtu', this.additionalResourcesToUpload);
 
     // if user has selected file to upload, check if format is compatible with file extension
-    if (this.fileToUpload.isFileSelected) {
-      console.log('file is selected');
-      const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
-      const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
-      console.log('accepted extensions:', acceptedExtensions);
+    if (!isDraft) {
+      if (this.fileToUpload.isFileSelected) {
+        console.log('file is selected');
+        const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
+        const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
+        console.log('accepted extensions:', acceptedExtensions);
 
-      if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
-        // TODO: make it a modal
-        // eslint-disable-next-line
-        alert('format-extension mismatch (not compatible)');
-        return;
+        if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
+          // TODO: make it a modal
+          // eslint-disable-next-line
+          alert('format-extension mismatch (not compatible)');
+          return;
+        }
+      } else {
+        console.log('no file selected');
       }
-    } else {
-      console.log('no file selected');
     }
 
     // this.uploading.status = true;
@@ -452,7 +456,7 @@ export default class CreateAsset extends Vue {
       this.onError(draftAssetResponse);
     }
 
-    if (this.additionalResourcesToUpload.length) {
+    if (!isDraft && this.additionalResourcesToUpload.length) {
       console.log('upload additional resources');
       this.uploading.status = true;
       this.uploading.errors = [];
@@ -467,7 +471,7 @@ export default class CreateAsset extends Vue {
       }
     }
 
-    if (this.fileToUpload.isFileSelected) {
+    if (!isDraft && this.fileToUpload.isFileSelected) {
       this.uploading.status = true;
       this.uploading.errors = [];
       this.uploading.completed = false;
