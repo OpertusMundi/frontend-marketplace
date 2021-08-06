@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card">
+  <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
