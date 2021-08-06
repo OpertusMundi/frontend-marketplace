@@ -372,7 +372,7 @@
         </div>
         <div class="filters__block">
           <div class="filters__block__select">
-            <label for="filter">STATUS: </label>
+            <label for="filter">&uarr;&darr;</label>
             <select v-model="selectedOrderOption" name="filter" id="filter">
               <option v-for="orderOption in ['NAME ASCENDING', 'NAME DESCENDING', 'DATE ASCENDING', 'DATE DESCENDING', 'SCORE ASCENDING', 'SCORE DESCENDING']" :key="orderOption">{{ orderOption }}</option>
             </select>

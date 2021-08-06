@@ -21,19 +21,45 @@
             <option v-for="status in statusFilterOptions" :key="status" :value="status">{{ status }}</option>
           </select>
         </div>
+        <div class="filters__block__select">
+          <label for="filter">&uarr;&darr;</label>
+          <select v-model="selectedOrderOptionUnpublished" name="filter" id="filter">
+            <option v-for="orderOption in ['CREATED ASCENDING', 'CREATED DESCENDING', 'MODIFIED ASCENDING', 'MODIFIED DESCENDING', 'TITLE ASCENDING', 'TITLE DESCENDING', 'VERSION ASCENDING', 'VERSION DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <asset-card v-for="asset, i in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-20': i==0}"></asset-card>
     <pagination :currentPage="unpublishedCurrentPage" :itemsPerPage="unpublishedItemsPerPage" :itemsTotal="unpublishedItemsTotal" @pageSelection="onPageSelect(false, $event)"></pagination>
 
-    <div class="filters mt-xs-60">
+    <hr class="mt-xs-50 mb-xs-50">
+
+    <!-- <div class="filters">
       <div class="filters__block">
         <p class="filters__title">
           <template v-if="!$store.getters.isLoading">
             {{ publishedItemsTotal }} PUBLISHED ASSETS
           </template>
         </p>
+      </div>
+    </div> -->
+
+    <div class="filters mt-xs-30">
+      <div class="filters__block">
+        <p class="filters__title">
+          <template v-if="!$store.getters.isLoading">
+            {{ publishedItemsTotal }} PUBLISHED ASSETS
+          </template>
+        </p>
+      </div>
+      <div class="filters__block">
+        <div class="filters__block__select">
+          <label for="filter">&uarr;&darr;</label>
+          <select v-model="selectedOrderOptionPublished" name="filter" id="filter">
+            <option v-for="orderOption in ['CREATED ASCENDING', 'CREATED DESCENDING', 'MODIFIED ASCENDING', 'MODIFIED DESCENDING', 'TITLE ASCENDING', 'TITLE DESCENDING', 'VERSION ASCENDING', 'VERSION DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -85,6 +111,10 @@ export default class DashboardHome extends Vue {
 
   isLoadingPublished: boolean;
 
+  selectedOrderOptionPublished: string;
+
+  selectedOrderOptionUnpublished: string;
+
   constructor() {
     super();
 
@@ -116,10 +146,23 @@ export default class DashboardHome extends Vue {
     ];
     const [selectedStatus] = this.statusFilterOptions;
     this.selectedStatus = selectedStatus;
+
+    this.selectedOrderOptionPublished = 'MODIFIED DESCENDING';
+    this.selectedOrderOptionUnpublished = 'MODIFIED DESCENDING';
   }
 
   @Watch('selectedStatus')
   onSelectedStatusChange(): void {
+    this.searchAssets(false, 0);
+  }
+
+  @Watch('selectedOrderOptionPublished')
+  onSelectedOrderOptionPublished(): void {
+    this.searchAssets(true, 0);
+  }
+
+  @Watch('selectedOrderOptionUnpublished')
+  onSelectedOrderOptionUnpublished(): void {
     this.searchAssets(false, 0);
   }
 
@@ -149,28 +192,32 @@ export default class DashboardHome extends Vue {
       ];
     }
 
-    // const query = {
-    //   status: published ? [
-    //     EnumDraftStatus.PUBLISHED,
-    //   ] : [
-    //     EnumDraftStatus.DRAFT,
-    //     EnumDraftStatus.SUBMITTED,
-    //     EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-    //     EnumDraftStatus.HELPDESK_REJECTED,
-    //     EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-    //     EnumDraftStatus.PROVIDER_REJECTED,
-    //     EnumDraftStatus.POST_PROCESSING,
-    //   ],
-    // };
-
     const pageRequest = {
       page,
       size: published ? this.publishedItemsPerPage : this.unpublishedItemsPerPage,
     };
+    // const sort = {
+    //   id: EnumSortField.CREATED_ON,
+    //   order: 'ASC' as Order,
+    // };
+    const orderOptions = [
+      { option: 'CREATED ASCENDING', orderBy: EnumSortField.CREATED_ON, order: 'ASC' },
+      { option: 'CREATED DESCENDING', orderBy: EnumSortField.CREATED_ON, order: 'DESC' },
+      { option: 'MODIFIED ASCENDING', orderBy: EnumSortField.MODIFIED_ON, order: 'ASC' },
+      { option: 'MODIFIED DESCENDING', orderBy: EnumSortField.MODIFIED_ON, order: 'DESC' },
+      { option: 'TITLE ASCENDING', orderBy: EnumSortField.TITLE, order: 'ASC' },
+      { option: 'TITLE DESCENDING', orderBy: EnumSortField.TITLE, order: 'DESC' },
+      { option: 'VERSION ASCENDING', orderBy: EnumSortField.VERSION, order: 'ASC' },
+      { option: 'VERSION DESCENDING', orderBy: EnumSortField.VERSION, order: 'DESC' },
+    ];
+
     const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
+      // eslint-disable-next-line
+      id: published ? orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy : orderOptions.find((x) => x.option === this.selectedOrderOptionUnpublished)!.orderBy,
+      // eslint-disable-next-line
+      order: published ? orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order : orderOptions.find((x) => x.option === this.selectedOrderOptionUnpublished)!.order as Order,
     };
+
     this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
       if (resp.data.success) {
         if (published) {
