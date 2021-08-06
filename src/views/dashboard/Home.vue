@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard__inner">
     <div class="dashboard__head">
-      <h1>Hello, vendor!</h1>
+      <h1>Hello, {{ fullName }}!</h1>
     </div>
     <div class="stats-cards">
       <div class="stats-cards__cont stats-cards__cont--double">
@@ -77,6 +77,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import BarChart from '@/components/Charts/BarChart.vue';
 import LineChart from '@/components/Charts/LineChart.vue';
+import store from '@/store';
 
 @Component({
   components: {
@@ -85,6 +86,18 @@ import LineChart from '@/components/Charts/LineChart.vue';
   },
 })
 export default class DashboardHome extends Vue {
+  fullName: string;
+
+  constructor() {
+    super();
+
+    this.fullName = '';
+  }
+
+  created() {
+    const profile = store.getters.getProfile;
+    this.fullName = `${profile.firstName} ${profile.lastName}`;
+  }
 }
 </script>
 <style lang="scss">

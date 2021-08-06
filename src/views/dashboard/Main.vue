@@ -21,6 +21,12 @@
                 <span>Assets</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Profile')">
+              <router-link to="/dashboard/profile" data-name="Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g id="Group_556" data-name="Group 556" transform="translate(0 -0.259)"><path id="Union_1" data-name="Union 1" d="M0 24V21c0-3.3 5.4-6 12-6s12 2.7 12 6v3zM6 6a6 6 0 1 1 6 6A6 6 0 0 1 6 6z" transform="translate(0 0.259)" fill="#333"/></g></svg>
+                <span>Profile</span>
+              </router-link>
+            </li>
             <li @click="toggleMobileMenu">
               <router-link to="/dashboard/analytics" data-name="Analytics">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23.954" height="23.953" viewBox="0 0 23.954 23.953"><g id="Group_3586" data-name="Group 3586" transform="translate(-1396.997 -950.237)"><path id="Path_9719" data-name="Path 9719" d="M1419.882,964.082a1.006,1.006,0,0,0-1.224.707,10,10,0,1,1-12.325-12.24,1,1,0,1,0-.531-1.928,12,12,0,1,0,14.787,14.685A1,1,0,0,0,1419.882,964.082Z" fill="#333"/><path id="Path_9720" data-name="Path 9720" d="M1417.993,954.247a11.972,11.972,0,0,0-7.884-4.006,1.011,1.011,0,0,0-1.111,1v9.449a1.5,1.5,0,0,0,1.5,1.5h9.449a1.012,1.012,0,0,0,1-1.113A11.956,11.956,0,0,0,1417.993,954.247ZM1411,960.19v-7.8a10,10,0,0,1,7.8,7.8Z" fill="#333"/></g></svg>
@@ -36,19 +42,13 @@
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Storage')">
               <router-link to="/dashboard/storage" data-name="Storage">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.9" viewBox="0 0 24 23.9"><g id="Group_2758" data-name="Group 2758" transform="translate(-8.26 -339.4)"><path id="Path_9490" data-name="Path 9490" d="M30.36,348.2c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8a1.012,1.012,0,1,0-1.7-1.1Z" fill="#333"/><path id="Path_9491" data-name="Path 9491" d="M31.76,353a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,353Z" fill="#333"/><path id="Path_9492" data-name="Path 9492" d="M31.76,358.1a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,0,0-1.5,1.3c1.6,1.8,5.9,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,358.1Z" fill="#333"/><path id="Path_9493" data-name="Path 9493" d="M20.26,348c5.8,0,12-1.4,12-4.3,0-3-6.2-4.3-12-4.3s-12,1.4-12,4.3S14.46,348,20.26,348Zm0-6.7c6.5,0,10,1.7,10,2.3s-3.5,2.3-10,2.3-10-1.7-10-2.3S13.76,341.3,20.26,341.3Z" fill="#333"/></g></svg>
-                <span>Storage</span>
+                <span>t&#176;Drive</span>
               </router-link>
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Notebooks')">
               <router-link to="/dashboard/notebooks" data-name="Notebooks">
                 <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-509.43 -974.84)" fill="#333" data-name="Group 3652"><path d="M531.338,974.841H514.511a2.047,2.047,0,0,0-2.092,2v2.674a1,1,0,1,0,1.993,0l-.009-2.638a.142.142,0,0,1,.108-.037h16.827c.06,0,.094.025.1.006l.009,19.967a.138.138,0,0,1-.106.037H514.511c-.062,0-.095-.022-.1-.008v-2.811a1,1,0,1,0-1.993,0v2.818a2.047,2.047,0,0,0,2.092,2h16.828a2.047,2.047,0,0,0,2.09-1.995V976.837A2.047,2.047,0,0,0,531.338,974.841Z" data-name="Path 9748"/><path d="m510.48 984.15h4.211a1 1 0 0 0 0-1.995h-4.211a1 1 0 0 0 0 1.995z" data-name="Path 9749"/><path d="m510.48 987.72h4.211a1 1 0 0 0 0-1.994h-4.211a1 1 0 0 0 0 1.994z" data-name="Path 9750"/><path d="m515.68 990.57a1 1 0 0 0-1-1h-4.262a1 1 0 0 0 0 2h4.262a1 1 0 0 0 1-1z" data-name="Path 9751"/><path d="m527.56 985.8a2 2 0 0 0 2-2v-2.952a2 2 0 0 0-2-2h-7.555a2 2 0 0 0-2 2v2.952a2 2 0 0 0 2 2zm-7.555-4.953h7.559v2.955h-7.56z" data-name="Path 9752"/></g></svg>
-                <span>Notebooks</span>
-              </router-link>
-            </li>
-            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Profile')">
-              <router-link to="/dashboard/profile" data-name="Profile">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g id="Group_556" data-name="Group 556" transform="translate(0 -0.259)"><path id="Union_1" data-name="Union 1" d="M0 24V21c0-3.3 5.4-6 12-6s12 2.7 12 6v3zM6 6a6 6 0 1 1 6 6A6 6 0 0 1 6 6z" transform="translate(0 0.259)" fill="#333"/></g></svg>
-                <span>Profile</span>
+                <span>t&#176;Notebooks</span>
               </router-link>
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('TopioMaps')">
