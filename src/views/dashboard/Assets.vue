@@ -24,7 +24,7 @@
         <div class="filters__block__select">
           <label for="filter">&uarr;&darr;</label>
           <select v-model="selectedOrderOptionUnpublished" name="filter" id="filter">
-            <option v-for="orderOption in ['CREATED ASCENDING', 'CREATED DESCENDING', 'MODIFIED ASCENDING', 'MODIFIED DESCENDING', 'TITLE ASCENDING', 'TITLE DESCENDING', 'VERSION ASCENDING', 'VERSION DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+            <option v-for="orderOption in ['CREATED ASCENDING', 'CREATED DESCENDING', 'MODIFIED ASCENDING', 'MODIFIED DESCENDING', 'TITLE ASCENDING', 'TITLE DESCENDING', 'VERSION ASCENDING', 'VERSION DESCENDING', 'STATUS ASCENDING', 'STATUS DESCENDING']" :key="orderOption">{{ orderOption }}</option>
           </select>
         </div>
       </div>
@@ -209,6 +209,8 @@ export default class DashboardHome extends Vue {
       { option: 'TITLE DESCENDING', orderBy: EnumSortField.TITLE, order: 'DESC' },
       { option: 'VERSION ASCENDING', orderBy: EnumSortField.VERSION, order: 'ASC' },
       { option: 'VERSION DESCENDING', orderBy: EnumSortField.VERSION, order: 'DESC' },
+      { option: 'STATUS ASCENDING', orderBy: EnumSortField.STATUS, order: 'ASC' },
+      { option: 'STATUS DESCENDING', orderBy: EnumSortField.STATUS, order: 'DESC' },
     ];
 
     const sort = {
