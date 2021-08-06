@@ -188,6 +188,7 @@
 
     &__content {
         flex: 1;
+        max-width: calc(100% - 330px);
         padding-right: 20px;
         @media(max-width: 576px) { 
             padding-right: 0px;
@@ -373,6 +374,7 @@
 
                 &__btn.float-right {
                     float: right;
+                    margin-left: 25px;
                 }
 
                 > span:nth-child(1) {
