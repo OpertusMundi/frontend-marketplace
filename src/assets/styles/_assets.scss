@@ -914,6 +914,10 @@
         img {
             width: 25px;
         }
+        &__left {
+            display: flex;
+            align-items: center;
+        }
         // span {
             // margin-left: 20px;
             // @media(max-width: 576px) {

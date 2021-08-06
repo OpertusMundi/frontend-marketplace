@@ -4,7 +4,9 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/vector_icon.svg" alt="">
+          <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.type === 'VECTOR'">
+          <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.type === 'RASTER'">
+          <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.type === 'API'">
           <span class="asset_card__type">{{asset.type}}</span>
           <span v-for="(category, i) in asset.topicCategory" :key="category">
             {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.topicCategory.length - 1">, </span>
