@@ -2,6 +2,19 @@
   <section class="asset__section">
     <div class="asset__section__head">
       <h4>Data Profiling and Samples</h4>
+
+      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples && metadata.samples.length">
+        <span><strong>Select file:</strong></span>
+        <multiselect v-model="sampleToDownload" :options="getSampleDownloadOptions()" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
+        <div v-if="sampleToDownload" class="asset__section__head__sample_download__btn" @click="onDownloadSample"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
+      </div>
+
+      <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
+        <p><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
+        <p><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
+        <p><strong>ATTRIBUTE NAMES:</strong> <span v-for="(attribute, i) in metadata.attributes" :key="attribute">{{ attribute }}<span v-if="i !== metadata.attributes.length - 1">, </span></span></p>
+      </div>
+
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
       <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Attributes</a></li>
@@ -145,8 +158,6 @@
                 </div>
               </div>
               <!-- HEATMAP -->
-              <!-- ATTENTION -->
-              <!-- PROP :bounds CURRENTLY CAUSES PROBLEM RENDERING HEATMAP, DUE TO INCORRECT COORDINATES (NON 4326) -->
               <div v-if="metadata.heatmap">
                 <span class="map-type">Heatmap</span>
                 <p>Colormap with varying intensity according to the density of features</p>
@@ -196,17 +207,8 @@
             </div>
           </li>
 
-          <!-- <li v-if="activeTab == 3">
-            <p>Sample 1 content (DUMMY)</p>
-          </li>
-
-          <li v-if="activeTab == 4">
-            <p>Sample 2 content (DUMMY)</p>
-          </li> -->
-
           <li v-if="activeTab > 2">
             <div v-for="(sampleTab, i) in metadata.samples" :key="i">
-              <!-- <div v-if="activeTab === i + 3" style="overflow-x: scroll; width: 750px;"> -->
               <div v-if="activeTab === i + 3" class="samples_table__wrapper">
                 <table class="samples_table">
                   <tr class="samples_table__header">
@@ -237,12 +239,14 @@ import {
 } from 'vue-property-decorator';
 import store from '@/store';
 import { Chart } from 'highcharts-vue';
+import Multiselect from 'vue-multiselect';
 import L from 'leaflet';
 import {
   LMap, LTileLayer, LPolygon, LGeoJson,
 } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { parse as wktToGeojsonParser } from 'wellknown';
+import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -250,6 +254,7 @@ import { GeoJsonObject } from 'geojson';
 @Component({
   components: {
     Chart,
+    Multiselect,
     LMap,
     LTileLayer,
     LPolygon,
@@ -269,6 +274,8 @@ export default class DataProfilingAndSamples extends Vue {
 
   heatmapGeoJson: GeoJsonObject | null;
 
+  sampleToDownload: string;
+
   constructor() {
     super();
 
@@ -281,6 +288,9 @@ export default class DataProfilingAndSamples extends Vue {
     this.isUserAuthenticated = store.getters.isAuthenticated;
 
     this.heatmapGeoJson = null;
+
+    // this.sampleToDownload = 'sample 1';
+    this.sampleToDownload = '';
 
     this.mapConfig = {
       options: {
@@ -320,6 +330,38 @@ export default class DataProfilingAndSamples extends Vue {
       return true;
     }
     return false;
+  }
+
+  getSampleDownloadOptions(): string[] {
+    return this.metadata.samples.map((x, i) => `sample_${i + 1}.csv`);
+  }
+
+  onDownloadSample(): void {
+    // eslint-disable-next-line
+    const index = parseInt(this.sampleToDownload.split('_')!.pop()!.split('.')[0]) - 1;
+
+    const csvArr: Record<string, string>[] = [];
+    Object.values<Array<any>>(this.metadata.samples[index])[0].forEach((v, i) => {
+      const obj: Record<string, string> = {};
+      Object.keys(this.metadata.samples[index]).forEach((x) => {
+        obj[x] = this.metadata.samples[index][x][i];
+      });
+      csvArr.push(obj);
+    });
+
+    const options = {
+      filename: this.sampleToDownload.split('.csv')[0],
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(csvArr);
   }
 
   getChartOptions(total: number, distribution: Record<string, number>): any {
@@ -429,6 +471,7 @@ export default class DataProfilingAndSamples extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "~vue-multiselect/dist/vue-multiselect.min.css";
   @import "@/assets/styles/graphs/_table.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";

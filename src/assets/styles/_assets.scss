@@ -361,6 +361,58 @@
                 font-size: em(16);
             }
 
+            &__sample_download {
+                margin-top: 15px;
+                display: flex;
+                align-items: center;
+
+                &__btn {
+                    cursor: pointer;
+                    margin-left: 10px;
+                }
+
+                > span:nth-child(1) {
+                    font-size: em(14);
+                    line-height: 1.5em;
+                    margin: 10px 0 10px 15px;
+                    color: $darkColor;
+                }
+
+                span {
+                    white-space: nowrap;
+                }
+
+                .multiselect {
+                    width: fit-content;
+                    border: none;
+
+                    &__tags {
+                        color: $secondColor;
+                        border-color: transparent;
+                    }
+                    &__option {
+                        &--selected {
+                            background-color: transparent;
+                            color: $darkColor;
+                        }
+                        &--highlight {
+                            background-color: $lightBgColor;
+                            color: $secondColor;
+                        }
+                    }
+                }
+            }
+
+            &__main_information {
+                margin: 15px 0 30px 0;
+                p {
+                    font-size: em(14);
+                    line-height: 1.5em;
+                    margin: 10px 0 10px 15px;
+                    color: $darkColor;
+                }
+            }
+
             &__toggle {
                 position: absolute;
                 right: 15px;
