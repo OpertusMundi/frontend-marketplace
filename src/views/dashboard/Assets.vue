@@ -29,7 +29,11 @@
 
     <div class="filters mt-xs-60">
       <div class="filters__block">
-        <p class="filters__title">{{ publishedItemsTotal }} PUBLISHED ASSETS</p>
+        <p class="filters__title">
+          <template v-if="!$store.getters.isLoading">
+            {{ publishedItemsTotal }} PUBLISHED ASSETS
+          </template>
+        </p>
       </div>
     </div>
 

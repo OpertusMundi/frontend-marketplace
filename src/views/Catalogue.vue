@@ -355,16 +355,35 @@
       </div>
 
       <div class="assets__top-info">
-        <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6>
+        <!-- <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6> -->
         <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
           {{ filter.label }}
           <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
         </div>
       </div>
 
+      <div class="filters mt-xs-30">
+        <div class="filters__block">
+          <p class="filters__title">
+            <template v-if="!$store.getters.isLoading">
+              {{ queryResultsCount }} ASSETS
+            </template>
+          </p>
+        </div>
+        <div class="filters__block">
+          <div class="filters__block__select">
+            <label for="filter">STATUS: </label>
+            <select v-model="selectedOrderOption" name="filter" id="filter">
+              <option v-for="orderOption in ['NAME ASCENDING', 'NAME DESCENDING', 'DATE ASCENDING', 'DATE DESCENDING', 'SCORE ASCENDING', 'SCORE DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="assets__items">
         <catalogue-card v-for="asset in queryResults" v-bind:key="asset.id" :asset="asset"></catalogue-card>
       </div>
+      <pagination :currentPage="queryCurrentPage" :itemsPerPage="catalogQuery.size" :itemsTotal="queryResultsCount" @pageSelection="onSelectPage" class="mt-xs-30"></pagination>
     </div>
   </div>
 </template>
@@ -372,16 +391,23 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
+import Pagination from '@/components/Pagination.vue';
 import CatalogueApi from '@/service/catalogue';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
 import { EnumAssetType } from '@/model/enum';
-import { CatalogueItemDetails, ElasticCatalogueQuery, EnumTopicCategory } from '@/model/catalogue';
+import {
+  CatalogueItemDetails,
+  ElasticCatalogueQuery,
+  EnumTopicCategory,
+  EnumElasticSearchSortField,
+} from '@/model/catalogue';
+import { Order } from '@/model/request';
 import store from '@/store';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
 import * as L from 'leaflet';
@@ -464,6 +490,7 @@ interface Filters {
 @Component({
   components: {
     CatalogueCard,
+    Pagination,
     Datepicker,
     VueTimepicker,
     VueSlider,
@@ -477,6 +504,10 @@ export default class Catalogue extends Vue {
   queryResults: CatalogueItem[] | CatalogueItemDetails[];
 
   queryResultsCount: number | null;
+
+  queryCurrentPage: number | null;
+
+  selectedOrderOption: string;
 
   // query:string;
 
@@ -559,11 +590,14 @@ export default class Catalogue extends Vue {
     // this.query = '';
     this.queryResults = [];
     this.queryResultsCount = null;
+    this.queryCurrentPage = null;
     this.catalogQuery = {
       page: 0,
-      size: 6,
+      size: 5,
       query: '',
     };
+    this.selectedOrderOption = 'DATE DESCENDING';
+
     this.catalogueApi = new CatalogueApi();
 
     this.filterMenuItemSelected = '';
@@ -667,8 +701,15 @@ export default class Catalogue extends Vue {
     }
   }
 
+  @Watch('selectedOrderOption')
+  onSelectedOrderOptionChange(): void {
+    this.searchUsingFilters(true);
+  }
+
   mounted(): void {
-    this.searchAssets();
+    // this.searchAssets();
+    this.searchUsingFilters(true);
+
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
     this.filters.formats.api = availableFormats.filter((x) => x.category === EnumAssetType.SERVICE).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
@@ -676,22 +717,30 @@ export default class Catalogue extends Vue {
     this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
   }
 
-  searchAssets(): void {
-    this.queryResults = [];
-    // this.catalogQuery.query = this.query;
-    // this.catalogueApi.find(this.query)
-    this.catalogueApi.find(this.catalogQuery)
-      .then((queryResponse: CatalogueQueryResponse) => {
-        if (queryResponse.success) {
-          this.queryResults = queryResponse.result.items;
-          this.queryResultsCount = queryResponse.result.count;
-        }
-        store.commit('setLoading', false);
-      })
-      .catch((error: AxiosError) => {
-        console.log(error);
-        store.commit('setLoading', false);
-      });
+  // searchAssets(): void {
+  //   this.queryResults = [];
+  //   // this.catalogQuery.query = this.query;
+  //   // this.catalogueApi.find(this.query)
+  //   this.catalogueApi.find(this.catalogQuery)
+  //     .then((queryResponse: CatalogueQueryResponse) => {
+  //       if (queryResponse.success) {
+  //         this.queryResults = queryResponse.result.items;
+  //         this.queryResultsCount = queryResponse.result.count;
+  //         this.queryCurrentPage = queryResponse.result.pageRequest.page;
+  //       }
+  //       store.commit('setLoading', false);
+  //     })
+  //     .catch((error: AxiosError) => {
+  //       console.log(error);
+  //       store.commit('setLoading', false);
+  //     });
+  // }
+
+  onSelectPage(i: number): void {
+    console.log('page', i);
+    this.catalogQuery.page = i;
+    this.searchUsingFilters(true);
+    // this.searchAssets();
   }
 
   selectfilterMenuItem(filterItem: string): void {
@@ -1117,7 +1166,8 @@ export default class Catalogue extends Vue {
   searchTextOnly(): void {
     this.closeFilters();
     store.commit('setLoading', true);
-    this.searchAssets();
+    // this.searchAssets();
+    this.searchUsingFilters(true);
   }
 
   // eslint-disable-next-line
@@ -1127,11 +1177,11 @@ export default class Catalogue extends Vue {
     return moment(date).format('YYYY-MM-DD');
   }
 
-  searchUsingFilters(byRemovingAppliedFilter: boolean): void {
+  searchUsingFilters(byAlteringCurrentFilterState: boolean): void {
     this.closeFilters();
     store.commit('setLoading', true);
 
-    const filters = byRemovingAppliedFilter ? this.filtersApplied : this.filters;
+    const filters = byAlteringCurrentFilterState ? this.filtersApplied : this.filters;
 
     // const filters: string[] = [];
     const filterSet: Partial<ElasticCatalogueQuery> = {};
@@ -1142,6 +1192,19 @@ export default class Catalogue extends Vue {
     // PAGE PARAMS
     filterSet.page = this.catalogQuery.page;
     filterSet.size = this.catalogQuery.size;
+
+    const orderOptions = [
+      { option: 'NAME ASCENDING', orderBy: EnumElasticSearchSortField.TITLE, order: 'ASC' },
+      { option: 'NAME DESCENDING', orderBy: EnumElasticSearchSortField.TITLE, order: 'DESC' },
+      { option: 'DATE ASCENDING', orderBy: EnumElasticSearchSortField.REVISION_DATE, order: 'ASC' },
+      { option: 'DATE DESCENDING', orderBy: EnumElasticSearchSortField.REVISION_DATE, order: 'DESC' },
+      { option: 'SCORE ASCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'ASC' },
+      { option: 'SCORE DESCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'DESC' },
+    ];
+    // eslint-disable-next-line
+    filterSet.orderBy = orderOptions.find((x) => x.option === this.selectedOrderOption)!.orderBy;
+    // eslint-disable-next-line
+    filterSet.order = orderOptions.find((x) => x.option === this.selectedOrderOption)!.order as Order;
 
     // TYPE
     if (filters.types.some((x) => x.isChecked)) {
@@ -1219,11 +1282,18 @@ export default class Catalogue extends Vue {
     }
 
     console.log(filterSet);
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+
     this.catalogueApi.findAdvanced(filterSet).then((advancedQueryResponse: CatalogueQueryResponse) => {
       console.log('aqr', advancedQueryResponse);
       this.queryResults = advancedQueryResponse.result.items;
       this.queryResultsCount = advancedQueryResponse.result.count;
-      if (!byRemovingAppliedFilter) this.filtersApplied = cloneDeep(this.filters);
+      this.queryCurrentPage = advancedQueryResponse.result.pageRequest.page;
+      if (!byAlteringCurrentFilterState) this.filtersApplied = cloneDeep(this.filters);
       store.commit('setLoading', false);
     }).catch((err) => {
       console.log('err', err);
@@ -1234,6 +1304,7 @@ export default class Catalogue extends Vue {
 <style lang="scss">
   @import "@/assets/styles/_errorpage.scss";
   @import "@/assets/styles/_forms.scss";
+  @import "@/assets/styles/_filters.scss";
   @import "@/assets/styles/_btns.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
