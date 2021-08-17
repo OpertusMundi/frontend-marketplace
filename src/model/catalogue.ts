@@ -46,6 +46,18 @@ export enum EnumElasticSearchSortField {
   SCORE = 'SCORE',
 }
 
+export enum EnumDatasetSize {
+  SMALL = 'SMALL',
+  MEDIUM = 'MEDIUM',
+  LARGE = 'LARGE',
+}
+
+export enum EnumSpatialOperation {
+  INTERSECTS = 'INTERSECTS',
+  WITHIN = 'WITHIN',
+  CONTAINS = 'CONTAINS',
+}
+
 export interface CatalogueQuery extends PageRequest {
   /*
    * Query string used for full text search operation
@@ -143,6 +155,18 @@ export interface ElasticCatalogueQuery {
    * Bounding box bottom right latitude
    */
   bottomRightY: number;
+  /**
+   * Mode of coverage search
+   */
+  spatialOperation?: EnumSpatialOperation;
+  /**
+   * Language of asset (ISO 639-1 two-letter codes)
+   */
+  language: string[];
+  /**
+   * Size of dataset
+   */
+  sizeOfDataset: EnumDatasetSize[];
 }
 
 interface Keyword {
