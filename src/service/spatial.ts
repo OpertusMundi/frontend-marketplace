@@ -16,8 +16,8 @@ export default class SpatialApi extends Api {
   /**
    * Get all EPSG codes supported by the platform
    */
-  public async getEpsgCodes(): Promise<ServerResponse<EpsgCode[]>> {
-    const url = '/action/spatial/epsg';
+  public async getEpsgCodes(code = '', name = ''): Promise<ServerResponse<EpsgCode[]>> {
+    const url = `/action/spatial/epsg?code=${code}&name=${name}`;
 
     return this.get<ServerResponse<EpsgCode[]>>(url)
       .then((response: AxiosServerResponse<EpsgCode[]>) => {
