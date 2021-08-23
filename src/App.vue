@@ -68,8 +68,6 @@ export default class App extends Vue {
   constructor() {
     super();
 
-    // store.commit('setLoading', true);
-
     this.showHeader = true;
     this.showFooter = true;
     this.showMenuMobile = false;

@@ -17,7 +17,7 @@ const store = new Vuex.Store({
     shop: Shop,
   },
   plugins: [createPersistedState({
-    paths: ['user'],
+    // paths: ['user'],
   })],
   strict: debug,
 });

@@ -307,6 +307,7 @@ router.beforeEach((to, from, next) => {
   // Set loading to TRUE before visiting these routes. Loading must be set to FALSE from inside the component, after content loaded
   const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle', 'Assets', 'Settings', 'Orders', 'OrderPreview', 'Purchases', 'PurchasePreview'];
   if (to.name && routesWithInitialLoading.includes(to.name)) {
+    console.log('init loader', to.name);
     store.commit('setLoading', true);
   }
 
