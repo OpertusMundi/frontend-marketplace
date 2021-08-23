@@ -67,9 +67,17 @@ interface Language {
   name: string;
 }
 
+interface BuildInformation {
+  commitId: string;
+  commitComment: string;
+  commitIdDescription: string;
+  buildTimestamp: string;
+}
+
 export interface Configuration {
   asset: AssetConfiguration;
   authProviders: EnumAuthProvider[];
+  buildInfo: BuildInformation;
   countries: Country[];
   europeCountries: CountryWithGeometry[];
   europeLanguages: Language[];
