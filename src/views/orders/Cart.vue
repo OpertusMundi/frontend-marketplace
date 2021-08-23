@@ -17,7 +17,7 @@
       </div>
       <div class="cart_items__bottom_btns" v-if="cart">
         <button class="btn--std btn--blue" @click="goToCataloguePage">{{ cart.items.length ? 'add more assets' : 'add assets' }}</button>
-        <button v-if="cart.items.length" class="btn--std btn--blue">proceed to checkout</button>
+        <button v-if="cart.items.length" class="btn--std btn--blue" @click="goToCheckout">proceed to checkout</button>
       </div>
     </div>
   </div>
@@ -47,7 +47,7 @@ export default class Cart extends Vue {
     this.cart = null;
   }
 
-  mounted():void {
+  mounted(): void {
     console.log('cart mounted');
 
     this.cartApi.getCart().then((cartResponse) => {
@@ -68,6 +68,10 @@ export default class Cart extends Vue {
 
   goToCataloguePage(): void {
     this.$router.push('/catalogue');
+  }
+
+  goToCheckout(): void {
+    this.$router.push('/checkout');
   }
 }
 </script>

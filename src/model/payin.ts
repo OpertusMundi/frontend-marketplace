@@ -380,7 +380,7 @@ export interface CardRegistrationCommand {
  *
  * {@see https://docs.mangopay.com/endpoints/v2.01/cards#e1042_post-card-info}
  */
- export interface CardRegistration {
+export interface CardRegistration {
   /**
    * Registration identifier required for submitting the tokenization server response
    */
