@@ -204,6 +204,11 @@ const routes: RouteConfig[] = [
     ],
   },
   {
+    path: '/cart',
+    name: 'Cart',
+    component: (): Promise<any> => import(/* webpackChunkName: "cart" */ '../views/orders/Cart.vue'),
+  },
+  {
     path: '/order-thankyou',
     name: 'OrderThankYou',
     component: (): Promise<any> => import(/* webpackChunkName: "thankyou" */ '../views/orders/Thankyou.vue'),

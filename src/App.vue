@@ -98,6 +98,9 @@ export default class App extends Vue {
     } else if (this.routeName === 'DashboardHome') {
       this.showFooter = false;
       this.headerClass = 'header--dark';
+    // } else if (this.routeName === 'Cart') {
+    //   this.showHeader = true;
+    //   this.showFooter = false;
     } else if (this.noHeaderBgArray.includes(this.routeName)) {
       this.headerClass = 'header--nobg';
       this.showHeader = true;
@@ -111,7 +114,7 @@ export default class App extends Vue {
   }
 
   @Watch('$store.getters.isAuthenticated', { immediate: false })
-  handleAuthenticationChanges(isNowAuthenticated, wasPreviouslyAuthenticated): void {
+  handleAuthenticationChanges(isNowAuthenticated: boolean, wasPreviouslyAuthenticated: boolean): void {
     if (wasPreviouslyAuthenticated && !isNowAuthenticated) {
       const name = 'Home';
       if (this.$route.name !== name) this.$router.push({ name });
