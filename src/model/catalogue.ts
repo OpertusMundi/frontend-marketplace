@@ -420,6 +420,8 @@ export interface Metadata {
   assetType: 'NetCDF' | 'vector' | 'raster';
 }
 
+export type Sample = { [prop: string]: (string | number)[] };
+
 export interface VectorMetadata extends Metadata {
   /**
    * A list with the names of all attributes of the dataset.
@@ -492,6 +494,10 @@ export interface VectorMetadata extends Metadata {
    * The most frequent values for each of the attributes in the dataset.
    */
   recurring: { [attribute: string]: (string | number)[] };
+  /**
+   * Collection of samples
+   */
+  samples: Sample[];
   /**
    * Descriptive statistics (min, max, mean, median, std, sum) for the numerical attributes in the dataset.
    */
@@ -921,7 +927,7 @@ export interface CatalogueHarvestImportCommand {
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
 
-export interface CatalogueItemProviderCommand {
+export interface CatalogueItemVisibilityCommand {
   /**
    * Resource key
    */
@@ -930,4 +936,15 @@ export interface CatalogueItemProviderCommand {
    * Controls automated metadata property visibility. Selected properties are hidden.
    */
   visibility: string[];
+}
+
+export interface CatalogueItemSamplesCommand {
+  /**
+   * Resource key
+   */
+  resourceKey: string;
+  /**
+   * Sample data
+   */
+  data: Sample[];
 }

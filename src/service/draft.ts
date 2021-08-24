@@ -6,7 +6,7 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
-  CatalogueItemProviderCommand,
+  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand, Sample,
 } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
@@ -143,15 +143,26 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
-   * Set provider updates to draft. The draft status
+   * Update draft metadata property visibility. The draft status
    * must be `PENDING_PROVIDER_REVIEW`
    *
    * @param key
    */
-  public async setProviderReviewUpdates(key: string, command: CatalogueItemProviderCommand): Promise<AxiosServerResponse<void>> {
-    const url = `/action/drafts/${key}/review`;
+  public async updateDraftMetadataVisibility(key: string, command: CatalogueItemVisibilityCommand): Promise<AxiosServerResponse<void>> {
+    const url = `/action/drafts/${key}/metadata/visibility`;
 
-    return this.post<CatalogueItemProviderCommand, ServerResponse<void>>(url, command);
+    return this.post<CatalogueItemVisibilityCommand, ServerResponse<void>>(url, command);
+  }
+
+  /**
+   * Update draft samples. The draft status must be `PENDING_PROVIDER_REVIEW`
+   *
+   * @param key
+   */
+  public async updateDraftSamples(key: string, command: CatalogueItemSamplesCommand): Promise<AxiosServerResponse<void>> {
+    const url = `/action/drafts/${key}/metadata/samples`;
+
+    return this.post<CatalogueItemSamplesCommand, ServerResponse<void>>(url, command);
   }
 
   /**
