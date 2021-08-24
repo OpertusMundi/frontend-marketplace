@@ -6,6 +6,7 @@ interface State {
       profile: Profile | null;
       roles: EnumRole[];
       username: string | null;
+      email: string | null;
     };
     auth: {
       token: string | null;
@@ -21,6 +22,7 @@ const initialState: State = {
     profile: null,
     roles: [],
     username: null,
+    email: null,
   },
   auth: {
     token: null,
@@ -38,6 +40,7 @@ const getters = {
   hasRole: (state: State) => (role: EnumRole[]): boolean => role.some((x) => state.account.roles.includes(x)),
   isAuthenticated: (state: State): boolean => !!state.auth.token || !!state.account.profile,
   getProfile: (state: State): Profile | null => state.account.profile,
+  getEmail: (state: State): string | null => state.account.email,
 };
 
 const actions = {
@@ -77,12 +80,14 @@ const mutations = {
     state.account.username = data.username;
     state.account.roles = data.roles;
     state.account.profile = data.profile;
+    state.account.email = data.email;
   },
   logout(state: State): void {
     state.auth.token = null;
     state.account.username = null;
     state.account.roles = [];
     state.account.profile = null;
+    state.account.email = null;
     // Uncomment for using global axios default instance
     /*
     axios.defaults.headers = null;
