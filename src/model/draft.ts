@@ -1,3 +1,4 @@
+import { EnumSpatialDataServiceType, EnumAssetType } from '@/model/enum';
 import { ServerResponse } from '@/model/response';
 import { Provider } from '@/model/account';
 import { CatalogueItemCommand } from '@/model/catalogue';
@@ -42,13 +43,17 @@ export enum EnumSortField {
   CREATED_ON = 'CREATED_ON',
   MODIFIED_ON = 'MODIFIED_ON',
   PROVIDER = 'PROVIDER',
+  SERVICE_TYPE = 'SERVICE_TYPE',
   STATUS = 'STATUS',
   TITLE = 'TITLE',
+  TYPE = 'TYPE',
   VERSION = 'VERSION',
 }
 
 export interface AssetDraftQuery {
+  serviceType: EnumSpatialDataServiceType[];
   status: EnumDraftStatus[];
+  type: EnumAssetType[];
 }
 
 
@@ -96,6 +101,10 @@ export interface AssetDraft {
    */
   publisher: Provider,
   /**
+   * Service type (only applicable if type = SERVICE)
+   */
+  serviceType: EnumSpatialDataServiceType;
+  /**
    * Draft status
    */
   status: EnumDraftStatus;
@@ -103,6 +112,10 @@ export interface AssetDraft {
    * Asset title
    */
   title: string;
+  /**
+   * Asset type
+   */
+  type: EnumAssetType;
   /**
    * Asset version
    */

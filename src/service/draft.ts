@@ -35,8 +35,8 @@ export default class DraftAssetApi extends Api {
     const { id: field, order } = sorting;
 
     const queryString = (Object.keys(query) as Array<keyof AssetDraftQuery>)
-      .reduce((result: string[], key: keyof AssetDraftQuery) => {
-        const value = query[key] !== null ? [...result, `${key}=${query[key]}`] : result;
+      .reduce((result: string[], k: keyof AssetDraftQuery) => {
+        const value = query[k] ? [...result, `${k}=${Array.isArray(query[k]) ? query[k]!.join(',') : query[k]}`] : result;
         return value;
       }, []);
 
