@@ -402,6 +402,7 @@ import {
   ElasticCatalogueQuery,
   EnumTopicCategory,
   EnumElasticSearchSortField,
+  EnumDatasetSize,
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
 import store from '@/store';
@@ -1264,6 +1265,14 @@ export default class Catalogue extends Vue {
     }
     if (filters.priceMax !== null) {
       filterSet.maxPrice = Number(filters.priceMax);
+    }
+
+    // NUMBER OF FEATURES
+    if (filters.numberOfFeatures.isSmallChecked || filters.numberOfFeatures.isMediumChecked || filters.numberOfFeatures.isLargeChecked) {
+      filterSet.sizeOfDataset = [];
+      if (filters.numberOfFeatures.isSmallChecked) filterSet.sizeOfDataset.push(EnumDatasetSize.SMALL);
+      if (filters.numberOfFeatures.isMediumChecked) filterSet.sizeOfDataset.push(EnumDatasetSize.MEDIUM);
+      if (filters.numberOfFeatures.isLargeChecked) filterSet.sizeOfDataset.push(EnumDatasetSize.LARGE);
     }
 
     // ATTRIBUTES
