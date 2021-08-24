@@ -251,8 +251,13 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/become-vendor',
-    name: 'BocomeVendor',
+    name: 'BecomeVendor',
     component: (): Promise<any> => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
+  },
+  {
+    path: '/become-consumer',
+    name: 'BecomeConsumer',
+    component: (): Promise<any> => import(/* webpackChunkName: "becomeconsumer" */ '../views/BecomeConsumer.vue'),
   },
   {
     path: '/error/:error',

@@ -320,7 +320,7 @@ export default class Metadata extends Vue {
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
-  onEpsgSelection(epsgLabel: string) {
+  onEpsgSelection(epsgLabel: string): void {
     const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
     this.assetLocal.referenceSystem = this.epsgList[i].code;
   }
