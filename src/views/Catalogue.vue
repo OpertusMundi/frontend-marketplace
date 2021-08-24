@@ -117,7 +117,7 @@
             <div class="mt-xs-10">
               <div v-for="crs in filters.crsList" :key="crs.code" class="checkbox-group mb-xs-5">
                 <input type="checkbox" class="mr-xs-10" :id="'EPSG_' + crs.code" v-model="crs.isChecked">
-                <label :for="'EPSG_' + crs.code"> {{ crs.description }} </label>
+                <label :for="'EPSG_' + crs.code"> {{`EPSG:${crs.code}, ${crs.description}`}} </label>
               </div>
             </div>
 
@@ -126,7 +126,7 @@
               <input v-model="crsSearchString" @input="searchCrs($event.target.value)" type="text" class="form-group__text mt-xs-10" placeholder="CRS name or Code">
               <div v-if="crsSearchString" class="crs-search-autocomplete">
                 <ul>
-                  <li @click="addCrsToList(crs)" v-for="crs in crsSearchList" :key="crs.code">{{crs.description}}</li>
+                  <li @click="addCrsToList(crs)" v-for="crs in crsSearchList" :key="crs.code">{{`EPSG:${crs.code}, ${crs.description}`}}</li>
                 </ul>
               </div>
             </div>
@@ -386,6 +386,7 @@ import CatalogueCard from '@/components/Catalogue/Card.vue';
 import Pagination from '@/components/Pagination.vue';
 import CatalogueApi from '@/service/catalogue';
 import ConfigurationApi from '@/service/config';
+import SpatialApi from '@/service/spatial';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
@@ -505,6 +506,8 @@ export default class Catalogue extends Vue {
 
   configurationApi: ConfigurationApi;
 
+  spatialApi: SpatialApi;
+
   queryResults: CatalogueItem[] | CatalogueItemDetails[];
 
   queryResultsCount: number | null;
@@ -604,6 +607,7 @@ export default class Catalogue extends Vue {
 
     this.catalogueApi = new CatalogueApi();
     this.configurationApi = new ConfigurationApi();
+    this.spatialApi = new SpatialApi();
 
     this.filterMenuItemSelected = '';
 
@@ -674,7 +678,7 @@ export default class Catalogue extends Vue {
     this.filters.priceMax = null;
 
     this.epsgAll = epsgList;
-    this.filters.crsList = [{ code: '4326', description: 'EPSG:4326, WGS84', isChecked: false }, { code: '3857', description: 'EPSG:3857, Pseudo-Mercator WGS84', isChecked: false }];
+    this.filters.crsList = [{ code: '4326', description: 'WGS84', isChecked: false }, { code: '3857', description: 'Pseudo-Mercator WGS84', isChecked: false }];
     this.crsSearchString = '';
     this.crsSearchList = [];
 
@@ -1134,8 +1138,14 @@ export default class Catalogue extends Vue {
       this.crsSearchList = [];
       return;
     }
-    const filtered = this.epsgAll.filter((x) => x.code.toLowerCase().includes(str.toLowerCase()) || x.description.toLowerCase().includes(str.toLowerCase()));
-    this.crsSearchList = filtered;
+    // const filtered = this.epsgAll.filter((x) => x.code.toLowerCase().includes(str.toLowerCase()) || x.description.toLowerCase().includes(str.toLowerCase()));
+    // this.crsSearchList = filtered;
+
+    const epsgPromise = Number.isNaN(Number(str)) ? this.spatialApi.getEpsgCodes(undefined, str) : this.spatialApi.getEpsgCodes(str, undefined);
+    epsgPromise.then((epsgListResponse) => {
+      console.log(epsgListResponse);
+      this.crsSearchList = epsgListResponse.result.map((x) => ({ code: x.code.toString(), description: x.name, isChecked: false })).filter((x) => !this.filters.crsList.some((y) => y.code === x.code));
+    });
   }
 
   addCrsToList(crs: FilterCRS): void {

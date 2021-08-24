@@ -236,8 +236,10 @@ small {
     width: auto !important;
 }
 
-// .crs-search-autocomplete {
-// }
+.crs-search-autocomplete {
+    max-height: 200px;
+    overflow-y: scroll;
+}
 
 .crs-search-autocomplete ul li {
     border-bottom: solid 1px #f2f2f2;
