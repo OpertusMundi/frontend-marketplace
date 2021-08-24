@@ -291,19 +291,11 @@
               <!-- LANGUAGE -->
               <div v-show="filterMoreSubmenuItemSelected == 'language'">
                 <h4>Language of asset fields / labels</h4>
-                <span style="color: orange">more to be added</span>
-                <div class="checkbox-group mt-xs-10">
-                  <input type="checkbox" class="mr-xs-10" id="dataset_small">
-                  <label for="dataset_small"> English (UK/US)</label>
-                </div>
-                <hr>
-                <div class="checkbox-group mt-xs-10">
-                  <input type="checkbox" class="mr-xs-10" id="dataset_medium">
-                  <label for="dataset_medium"> German</label>
-                </div>
-                <div class="checkbox-group mt-xs-10">
-                  <input type="checkbox" class="mr-xs-10" id="dataset_large">
-                  <label for="dataset_large"> French</label>
+                <div class="filters__language_container">
+                  <div class="checkbox-group mt-xs-10" v-for="language in filters.languages" :key="language.code">
+                    <input :value="language.code" v-model="language.isChecked" type="checkbox" class="mr-xs-10" :id="`lang_${language.code}`">
+                    <label :for="`lang_${language.code}`"> {{ language.name }}</label>
+                  </div>
                 </div>
               </div>
 
@@ -393,6 +385,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
 import Pagination from '@/components/Pagination.vue';
 import CatalogueApi from '@/service/catalogue';
+import ConfigurationApi from '@/service/config';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
@@ -405,6 +398,7 @@ import {
   EnumDatasetSize,
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
+// import { Configuration } from '@/model/configuration';
 import store from '@/store';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
@@ -459,6 +453,12 @@ interface FilterNumberOfFeatures {
   isLargeChecked: boolean,
 }
 
+interface FilterLanguage {
+  code: string,
+  name: string,
+  isChecked: boolean,
+}
+
 interface FilterLicense {
   id: string,
   name: string,
@@ -485,6 +485,7 @@ interface Filters {
   numberOfFeatures: FilterNumberOfFeatures,
   attributes: string[],
   vendors: string[],
+  languages: FilterLanguage[],
   licenses: FilterLicense[],
 }
 
@@ -501,6 +502,8 @@ export default class Catalogue extends Vue {
   catalogQuery: CatalogueQuery;
 
   catalogueApi: CatalogueApi;
+
+  configurationApi: ConfigurationApi;
 
   queryResults: CatalogueItem[] | CatalogueItemDetails[];
 
@@ -600,6 +603,7 @@ export default class Catalogue extends Vue {
     this.selectedOrderOption = 'DATE DESCENDING';
 
     this.catalogueApi = new CatalogueApi();
+    this.configurationApi = new ConfigurationApi();
 
     this.filterMenuItemSelected = '';
 
@@ -681,6 +685,7 @@ export default class Catalogue extends Vue {
     this.filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
     this.filters.vendors = [''];
     this.filters.attributes = [''];
+    this.filters.languages = [];
     this.filters.licenses = [
       // eslint-disable-next-line
       { id: 'open', name: 'Open license', pillLabel: 'open', isChecked: false },
@@ -710,6 +715,10 @@ export default class Catalogue extends Vue {
   mounted(): void {
     // this.searchAssets();
     this.searchUsingFilters(true);
+
+    this.configurationApi.getConfiguration().then((configResponse) => {
+      this.filters.languages = configResponse.result.europeLanguages.map((x) => ({ ...x, isChecked: false }));
+    });
 
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
@@ -831,6 +840,11 @@ export default class Catalogue extends Vue {
       }
       case 'vendor': {
         filters.vendors = filters.vendors.map(() => '');
+        break;
+      }
+      case 'language': {
+        // eslint-disable-next-line
+        filters.languages.find((x) => x.code === filterName)!.isChecked = false;
         break;
       }
       case 'license': {
@@ -960,6 +974,11 @@ export default class Catalogue extends Vue {
         category: 'vendor',
       });
     }
+
+    // LANGUAGES
+    result = result.concat(
+      filters.languages.filter((x) => x.isChecked).map((x) => ({ label: x.code.toUpperCase(), category: 'language', filterName: x.code })),
+    );
 
     // LICENSES
     if (filters.licenses.some((x) => (x.isChecked))) {
@@ -1283,6 +1302,12 @@ export default class Catalogue extends Vue {
     // VENDORS
     if (filters.vendors.length && filters.vendors.some((x) => x.length)) {
       filterSet.publisher = filters.vendors.filter((x) => x.length);
+    }
+
+    // LANGUAGES
+    if (filters.languages.some((x) => x.isChecked)) {
+      // filterSet.crs = filters.crsList.filter((x) => x.isChecked).map((x) => x.code);
+      filterSet.language = filters.languages.filter((x) => x.isChecked).map((x) => x.code);
     }
 
     // LICENSE
