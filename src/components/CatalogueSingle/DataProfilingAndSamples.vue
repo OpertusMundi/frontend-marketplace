@@ -107,7 +107,10 @@
               <hr>
               <!-- MBR -->
               <div v-if="metadata.mbr">
-                <span class="map-type">MBR</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">MBR</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('mbr')">HIDE</button>
+                </div>
                 <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -129,7 +132,10 @@
               </div>
               <!-- CONVEX HULL -->
               <div v-if="metadata.convexHull">
-                <span class="map-type">Convex Hull</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Convex Hull</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('convexHull')">HIDE</button>
+                </div>
                 <p>Convex polygon enclosing all features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -151,7 +157,10 @@
               </div>
               <!-- THUMBNAIL -->
               <div v-if="metadata.thumbnail">
-                <span class="map-type">Thumbnail</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Thumbnail</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('thumbnail')">HIDE</button>
+                </div>
                 <p>Thumbnail image depicting the spatial coverage of the dataset</p>
                 <div class="tab_maps-map tab_maps-map-thumbnail">
                   <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
@@ -159,7 +168,10 @@
               </div>
               <!-- HEATMAP -->
               <div v-if="metadata.heatmap">
-                <span class="map-type">Heatmap</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Heatmap</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('heatmap')">HIDE</button>
+                </div>
                 <p>Colormap with varying intensity according to the density of features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -184,7 +196,10 @@
               </div>
               <!-- CLUSTERS -->
               <div v-if="metadata.clusters && metadata.clusters.features.length">
-                <span class="map-type">Clusters</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Clusters</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('clusters')">HIDE</button>
+                </div>
                 <p>Density-based spatial clusters of features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -251,6 +266,8 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
+import DraftAssetApi from '@/service/draft';
+import { CatalogueItemProviderCommand } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 
@@ -267,7 +284,13 @@ import { GeoJsonObject } from 'geojson';
 export default class DataProfilingAndSamples extends Vue {
   @Prop({ required: true }) private metadata: any;
 
+  @Prop() private mode?: string;
+
+  @Prop() private assetKey?: string;
+
   catalogueApi: CatalogueApi;
+
+  draftAssetApi: DraftAssetApi;
 
   activeTab: number;
 
@@ -284,6 +307,7 @@ export default class DataProfilingAndSamples extends Vue {
     super();
 
     this.catalogueApi = new CatalogueApi();
+    this.draftAssetApi = new DraftAssetApi();
 
     console.log('met', this.metadata);
 
@@ -319,6 +343,8 @@ export default class DataProfilingAndSamples extends Vue {
     this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
       this.heatmapGeoJson = heatmapResponse;
     });
+    console.log('keyyy', this.assetKey);
+    console.log('k', this.metadata.key);
   }
 
   @Watch('activeTab')
@@ -475,6 +501,20 @@ export default class DataProfilingAndSamples extends Vue {
       .map((x) => [x[1], x[0]]);
     return bounds;
   }
+
+  hideField(field: string): void {
+    store.commit('setLoading', true);
+    const key = this.assetKey ? this.assetKey : '';
+    const fieldsToHide: CatalogueItemProviderCommand = {
+      // TODO: handle multiple resources
+      resourceKey: this.metadata.key,
+      visibility: [field],
+    };
+    this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
+      console.log('hfr', hideFieldResponse);
+      store.commit('setLoading', false);
+    });
+  }
 }
 </script>
 <style lang="scss">
@@ -482,5 +522,6 @@ export default class DataProfilingAndSamples extends Vue {
   @import "~vue-multiselect/dist/vue-multiselect.min.css";
   @import "@/assets/styles/graphs/_table.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>
