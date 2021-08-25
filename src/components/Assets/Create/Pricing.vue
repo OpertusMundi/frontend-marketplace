@@ -232,6 +232,7 @@ import {
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
 } from '@/model/pricing-model';
+import store from '@/store';
 
 extend('required', required);
 
@@ -289,6 +290,26 @@ export default class Pricing extends Vue {
         name: 'Health',
         code: 'HE',
       },
+      {
+        name: 'Advertising & Marketing',
+        code: 'AM',
+      },
+      {
+        name: 'Navigation & Mobility',
+        code: 'NM',
+      },
+      {
+        name: 'Mobile applications',
+        code: 'MA',
+      },
+      {
+        name: 'Internet applications',
+        code: 'IA',
+      },
+      {
+        name: 'Web applications',
+        code: 'WA',
+      },
     ];
 
     this.menusData.continents = [
@@ -322,16 +343,20 @@ export default class Pricing extends Vue {
       },
     ];
 
-    this.menusData.countries = [
-      {
-        name: 'France',
-        code: 'FRA',
-      },
-      {
-        name: 'Spain',
-        code: 'ESP',
-      },
-    ];
+    // console.log('confcou', store.getters.getConfig.configuration.countries);
+
+    // this.menusData.countries = [
+    //   {
+    //     name: 'France',
+    //     code: 'FRA',
+    //   },
+    //   {
+    //     name: 'Spain',
+    //     code: 'ESP',
+    //   },
+    // ];
+
+    this.menusData.countries = store.getters.getConfig.configuration.europeCountries;
 
     this.pricingModelsLocal = [];
 
