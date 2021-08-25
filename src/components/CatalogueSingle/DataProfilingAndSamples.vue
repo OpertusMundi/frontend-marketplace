@@ -1,5 +1,10 @@
 <template>
   <section class="asset__section" :class="{'asset__section--expanded': isExpanded}">
+
+    <!-- MODALS -->
+    <modal :show="modalToShow == 'modalUploadSample'" @dismiss="modalToShow = ''" @submit="onDisplaySample" :title="'Upload sample'" :modalId="'modalSample'" :inputs="[{id: 'sample', name: 'Sample', type: 'file', returnType: 'blob'}]"></modal>
+    <!-- END OF MODALS -->
+
     <div class="asset__section__head">
       <div class="d-flex space-between">
         <h4>Data Profiling and Samples</h4>
@@ -226,17 +231,21 @@
           </li>
 
           <li v-if="activeTab > 2">
-            <div v-for="(sampleTab, i) in metadata.samples" :key="i">
+            <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
+              <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
+              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
+              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
+
               <div v-if="activeTab === i + 3" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
               <div v-if="activeTab === i + 3" class="samples_table__wrapper">
                 <table class="samples_table">
                   <tr class="samples_table__header">
-                    <th v-for="(attribute, j) in Object.keys(metadata.samples[i])" :key="j">{{ attribute }}</th>
+                    <th v-for="(attribute, j) in Object.keys(tempSamples[i])" :key="j">{{ attribute }}</th>
                   </tr>
-                  <tr class="samples_table__data" v-for="(value, j) in Object.values(metadata.samples[i])[0]" :key="j">
-                    <td v-for="(attribute, k) in Object.keys(metadata.samples[i])" :key="k">
-                      {{ metadata.samples[i][attribute][j] ? metadata.samples[i][attribute][j] : '-' }}
+                  <tr class="samples_table__data" v-for="(value, j) in Object.values(tempSamples[i])[0]" :key="j">
+                    <td v-for="(attribute, k) in Object.keys(tempSamples[i])" :key="k">
+                      {{ tempSamples[i][attribute][j] ? tempSamples[i][attribute][j] : '-' }}
                     </td>
                   </tr>
                 </table>
@@ -270,9 +279,12 @@ import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
-import { CatalogueItemVisibilityCommand } from '@/model/catalogue';
+import { CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
+import Modal from '@/components/Modal.vue';
+import csvToSample from '@/helper/file';
+import { cloneDeep } from 'lodash';
 
 @Component({
   components: {
@@ -282,6 +294,7 @@ import { GeoJsonObject } from 'geojson';
     LTileLayer,
     LPolygon,
     LGeoJson,
+    Modal,
   },
 })
 export default class DataProfilingAndSamples extends Vue {
@@ -308,6 +321,14 @@ export default class DataProfilingAndSamples extends Vue {
 
   isExpanded: boolean;
 
+  modalToShow: string;
+
+  indexOfSampleToReplace: number | null;
+
+  tempSamples: any;
+
+  indexesOfReplacedSamples: number[];
+
   constructor() {
     super();
 
@@ -326,6 +347,15 @@ export default class DataProfilingAndSamples extends Vue {
 
     // this.metadataDownloadFileSelection = 'sample 1';
     this.metadataDownloadFileSelection = '';
+
+    this.modalToShow = '';
+
+    this.indexOfSampleToReplace = null;
+
+    this.tempSamples = cloneDeep(this.metadata.samples);
+    console.log('ts', this.tempSamples);
+
+    this.indexesOfReplacedSamples = [];
 
     this.mapConfig = {
       options: {
@@ -531,6 +561,54 @@ export default class DataProfilingAndSamples extends Vue {
     //   console.log('hfr', hideFieldResponse);
     //   store.commit('setLoading', false);
     // });
+  }
+
+  onReplaceSample(i: number): void {
+    console.log('replace', i);
+    this.indexOfSampleToReplace = i;
+    this.modalToShow = 'modalUploadSample';
+  }
+
+  // eslint-disable-next-line
+  onDisplaySample(v): void {
+    store.commit('setLoading', true);
+    console.log('f', v.inputValues[0].value);
+    const f = v.inputValues[0].value;
+    csvToSample(f).then((r) => {
+      console.log('r', r);
+      if (this.indexOfSampleToReplace) this.tempSamples[this.indexOfSampleToReplace] = r?.samples[0];
+      if (this.indexOfSampleToReplace) this.indexesOfReplacedSamples.push(this.indexOfSampleToReplace);
+      console.log(this.tempSamples);
+      this.modalToShow = '';
+      store.commit('setLoading', false);
+    });
+  }
+
+  onRevertSample(i: number): void {
+    // this.tempSamples[i] = this.metadata.samples[i];
+    Vue.set(this.tempSamples, i, this.metadata.samples[i]);
+    this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
+  }
+
+  onSubmitSample(i: number): void {
+    store.commit('setLoading', true);
+    const key = this.assetKey ? this.assetKey : '';
+    const samplesData = cloneDeep(this.metadata.samples);
+    samplesData[i] = this.tempSamples[i];
+    console.log('k', key);
+    console.log(samplesData);
+    const samples: CatalogueItemSamplesCommand = {
+      resourceKey: this.metadata.key,
+      data: samplesData,
+    };
+    this.draftAssetApi.updateDraftSamples(key, samples).then((updateSamplesResponse) => {
+      if (updateSamplesResponse.data.success) {
+        console.log('successfully updated samples!', updateSamplesResponse);
+        store.commit('setLoading', false);
+      } else {
+        console.log('error updating samples...');
+      }
+    });
   }
 }
 </script>
