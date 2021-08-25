@@ -528,4 +528,31 @@ export default class DataProfilingAndSamples extends Vue {
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
+
+  // LEAFLET FIXES DUE TO STYLE OVERRIDE
+  .leaflet-container a {
+    -webkit-tap-highlight-color: rgba(51, 181, 229, 0.4) !important;
+  }
+  .leaflet-container a {
+    color: #0078A8 !important;
+  }
+  .leaflet-touch .leaflet-bar a {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+  }
+  .leaflet-control-attribution, .leaflet-control-attribution a {
+    font-size: 11px !important;
+  }
+  .leaflet-control-attribution a {
+    text-decoration: none !important;
+  }
+  .leaflet-bar > a:link {
+    color: black !important;
+    text-decoration: none !important;
+    font-size: 22px !important;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
 </style>
