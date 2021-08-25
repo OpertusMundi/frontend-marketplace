@@ -84,24 +84,29 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="row">
-                      <div class="col-xs-6">
-                        <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
-                        <div class="form-group">
-                          <label for="fpr_count">Threshold</label>
-                          <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <div class="form-group">
+                            <label for="fpr_count">Threshold</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
                         </div>
-                        </validation-provider>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <div class="form-group">
+                            <label for="fpr_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
                       </div>
-                      <div class="col-xs-6">
-                        <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
-                        <div class="form-group">
-                          <label for="fpr_discount">Discount %</label>
-                          <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                        </div>
-                        </validation-provider>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
@@ -122,24 +127,29 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="row">
-                      <div class="col-md-6">
-                        <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
-                        <div class="form-group">
-                          <label for="ffp_count">Threshold</label>
-                          <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <div class="form-group">
+                            <label for="ffp_count">Threshold</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
                         </div>
-                        </validation-provider>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <div class="form-group">
+                            <label for="ffp_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
                       </div>
-                      <div class="col-md-6">
-                        <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
-                        <div class="form-group">
-                          <label for="ffp_discount">Discount percent %</label>
-                          <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                        </div>
-                        </validation-provider>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
@@ -232,6 +242,7 @@ import {
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
 } from '@/model/pricing-model';
+import store from '@/store';
 
 extend('required', required);
 
@@ -289,6 +300,26 @@ export default class Pricing extends Vue {
         name: 'Health',
         code: 'HE',
       },
+      {
+        name: 'Advertising & Marketing',
+        code: 'AM',
+      },
+      {
+        name: 'Navigation & Mobility',
+        code: 'NM',
+      },
+      {
+        name: 'Mobile applications',
+        code: 'MA',
+      },
+      {
+        name: 'Internet applications',
+        code: 'IA',
+      },
+      {
+        name: 'Web applications',
+        code: 'WA',
+      },
     ];
 
     this.menusData.continents = [
@@ -322,16 +353,20 @@ export default class Pricing extends Vue {
       },
     ];
 
-    this.menusData.countries = [
-      {
-        name: 'France',
-        code: 'FRA',
-      },
-      {
-        name: 'Spain',
-        code: 'ESP',
-      },
-    ];
+    // console.log('confcou', store.getters.getConfig.configuration.countries);
+
+    // this.menusData.countries = [
+    //   {
+    //     name: 'France',
+    //     code: 'FRA',
+    //   },
+    //   {
+    //     name: 'Spain',
+    //     code: 'ESP',
+    //   },
+    // ];
+
+    this.menusData.countries = store.getters.getConfig.configuration.europeCountries;
 
     this.pricingModelsLocal = [];
 
@@ -458,6 +493,11 @@ export default class Pricing extends Vue {
     (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
   }
 
+  onRemoveDiscount(i: number): void {
+    // eslint-disable-next-line
+    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.splice(i, 1);
+  }
+
   async setPricingModel(): Promise<void> {
     const isValid = await this.$refs.refPricingModelDetails.validate();
     if (!isValid) {
@@ -474,4 +514,5 @@ export default class Pricing extends Vue {
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
 </style>

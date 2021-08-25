@@ -175,7 +175,8 @@ const routes: RouteConfig[] = [
         path: 'settings',
         name: 'Settings',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsettings" */ '../views/dashboard/Settings.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        // meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'users',
@@ -202,6 +203,16 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: '', layout: 'dashboard' },
       },
     ],
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: (): Promise<any> => import(/* webpackChunkName: "cart" */ '../views/orders/Cart.vue'),
+  },
+  {
+    path: '/checkout',
+    name: 'Checkout',
+    component: (): Promise<any> => import(/* webpackChunkName: "checkout" */ '../views/orders/Checkout.vue'),
   },
   {
     path: '/order-thankyou',
@@ -241,8 +252,13 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/become-vendor',
-    name: 'BocomeVendor',
+    name: 'BecomeVendor',
     component: (): Promise<any> => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
+  },
+  {
+    path: '/become-consumer',
+    name: 'BecomeConsumer',
+    component: (): Promise<any> => import(/* webpackChunkName: "becomeconsumer" */ '../views/BecomeConsumer.vue'),
   },
   {
     path: '/error/:error',
@@ -297,6 +313,7 @@ router.beforeEach((to, from, next) => {
   // Set loading to TRUE before visiting these routes. Loading must be set to FALSE from inside the component, after content loaded
   const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle', 'Assets', 'Settings', 'Orders', 'OrderPreview', 'Purchases', 'PurchasePreview'];
   if (to.name && routesWithInitialLoading.includes(to.name)) {
+    console.log('init loader', to.name);
     store.commit('setLoading', true);
   }
 

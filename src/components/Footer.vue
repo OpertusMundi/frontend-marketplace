@@ -94,6 +94,14 @@
             <img src="@/assets/images/icons/eu_icon.svg" alt="">
             <span>© 2020 · Opertus Mundi • This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 870228</span>
           </div>
+          <!-- FOR DEVELOPING -->
+          <div class="footer__lower" style="margin-top: 20px; display: flex; flex-direction: column; color: orange">
+            <span>commit id: {{ $store.getters.getConfig.configuration.buildInfo.commitId }}</span>
+            <span>comment: {{ $store.getters.getConfig.configuration.buildInfo.commitComment }}</span>
+            <span>description: {{ $store.getters.getConfig.configuration.buildInfo.commitIdDescription }}</span>
+            <span>build timestamp: {{ $store.getters.getConfig.configuration.buildInfo.buildTimestamp }}</span>
+          </div>
+          <!--  -->
         </div>
     </footer>
   </div>

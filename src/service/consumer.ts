@@ -2,7 +2,12 @@ import Api from '@/service/api';
 
 import { EnumAssetType } from '@/model/enum';
 import { Sorting } from '@/model/request';
-import { AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse } from '@/model/response';
+import {
+  AxiosPageResponse,
+  AxiosServerResponse,
+  PageResult,
+  ServerResponse,
+} from '@/model/response';
 import { ConsumerIndividualCommand, ConsumerProfessionalCommand, Profile } from '@/model/account';
 import { AccountAsset, EnumConsumerAssetSortField } from '@/model/account-asset';
 
@@ -73,7 +78,7 @@ export default class ConsumerApi extends Api {
    * @returns
    */
   public async findAssets(
-    status: EnumAssetType | null = null, page = 0, size = 10, sorting: Sorting<EnumConsumerAssetSortField>
+    status: EnumAssetType | null = null, page = 0, size = 10, sorting: Sorting<EnumConsumerAssetSortField>,
   ): Promise<AxiosPageResponse<AccountAsset>> {
     const { id: field, order } = sorting;
 

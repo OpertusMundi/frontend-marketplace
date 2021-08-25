@@ -176,6 +176,7 @@ export default class ShopCard extends Vue {
     this.cartApi.addItem(cartItem)
       // .then((cartResponse: ServerResponse<Cart>) => {
       .then((cartResponse) => {
+        console.log('add item to cart');
         if (cartResponse.success) {
           console.log('successfully added item to cart');
           store.commit('setCartItems', cartResponse.result);

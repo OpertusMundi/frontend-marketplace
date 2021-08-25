@@ -1,7 +1,10 @@
 <template>
-  <section class="asset__section">
+  <section class="asset__section" :class="{'asset__section--expanded': isExpanded}">
     <div class="asset__section__head">
-      <h4>Data Profiling and Samples</h4>
+      <div class="d-flex space-between">
+        <h4>Data Profiling and Samples</h4>
+        <div @click="toggleExpansion" style="cursor: pointer"><svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16"><path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333"/><path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333"/><path data-name="Path 9451" d="m.801 16-.8-.8v-3.764h1.346v1.73l-.093.453.1.058.29-.372 3.24-3.24L5.923 11.1l-3.229 3.251-.372.29.058.1.453-.093h1.731V16z" fill="#333"/><path data-name="Path 9450" d="m15.187 16 .8-.8v-3.76h-1.346v1.73l.093.453-.1.058-.29-.372-3.24-3.24-1.034 1.034 3.229 3.252.372.29-.058.1-.453-.093h-1.73v1.347z" fill="#333"/></svg></div>
+      </div>
 
       <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples && metadata.samples.length">
         <span><strong>Download metadata:</strong></span>
@@ -107,7 +110,10 @@
               <hr>
               <!-- MBR -->
               <div v-if="metadata.mbr">
-                <span class="map-type">MBR</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">MBR</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('mbr')">HIDE</button>
+                </div>
                 <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -129,7 +135,10 @@
               </div>
               <!-- CONVEX HULL -->
               <div v-if="metadata.convexHull">
-                <span class="map-type">Convex Hull</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Convex Hull</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('convexHull')">HIDE</button>
+                </div>
                 <p>Convex polygon enclosing all features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -151,7 +160,10 @@
               </div>
               <!-- THUMBNAIL -->
               <div v-if="metadata.thumbnail">
-                <span class="map-type">Thumbnail</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Thumbnail</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('thumbnail')">HIDE</button>
+                </div>
                 <p>Thumbnail image depicting the spatial coverage of the dataset</p>
                 <div class="tab_maps-map tab_maps-map-thumbnail">
                   <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
@@ -159,7 +171,10 @@
               </div>
               <!-- HEATMAP -->
               <div v-if="metadata.heatmap">
-                <span class="map-type">Heatmap</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Heatmap</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('heatmap')">HIDE</button>
+                </div>
                 <p>Colormap with varying intensity according to the density of features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -184,7 +199,10 @@
               </div>
               <!-- CLUSTERS -->
               <div v-if="metadata.clusters && metadata.clusters.features.length">
-                <span class="map-type">Clusters</span>
+                <div class="d-flex space-between mb-xs-5">
+                  <span class="map-type">Clusters</span>
+                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('clusters')">HIDE</button>
+                </div>
                 <p>Density-based spatial clusters of features</p>
                 <div class="tab_maps-map">
                   <l-map
@@ -251,6 +269,8 @@ import { parse as wktToGeojsonParser } from 'wellknown';
 import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
+import DraftAssetApi from '@/service/draft';
+import { CatalogueItemVisibilityCommand } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 
@@ -267,7 +287,13 @@ import { GeoJsonObject } from 'geojson';
 export default class DataProfilingAndSamples extends Vue {
   @Prop({ required: true }) private metadata: any;
 
+  @Prop() private mode?: string;
+
+  @Prop() private assetKey?: string;
+
   catalogueApi: CatalogueApi;
+
+  draftAssetApi: DraftAssetApi;
 
   activeTab: number;
 
@@ -280,14 +306,19 @@ export default class DataProfilingAndSamples extends Vue {
   // currently, just a dummy property (todo)
   metadataDownloadFileSelection: string;
 
+  isExpanded: boolean;
+
   constructor() {
     super();
 
     this.catalogueApi = new CatalogueApi();
+    this.draftAssetApi = new DraftAssetApi();
 
     console.log('met', this.metadata);
 
     this.activeTab = 1;
+
+    this.isExpanded = false;
 
     this.isUserAuthenticated = store.getters.isAuthenticated;
 
@@ -319,6 +350,8 @@ export default class DataProfilingAndSamples extends Vue {
     this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
       this.heatmapGeoJson = heatmapResponse;
     });
+    console.log('keyyy', this.assetKey);
+    console.log('k', this.metadata.key);
   }
 
   @Watch('activeTab')
@@ -327,6 +360,12 @@ export default class DataProfilingAndSamples extends Vue {
     if (activeTab === 2 && this.isUserAuthenticated) {
       this.setMinMaxZoomLevels();
     }
+  }
+
+  toggleExpansion(): void {
+    // if (!this.isExpanded) window.scrollTo(0, 0);
+    this.isExpanded = !this.isExpanded;
+    document.body.style.overflowY = this.isExpanded ? 'hidden' : 'visible';
   }
 
   showDistributionPieChart(attribute: string): boolean {
@@ -475,6 +514,24 @@ export default class DataProfilingAndSamples extends Vue {
       .map((x) => [x[1], x[0]]);
     return bounds;
   }
+
+  hideField(field: string): void {
+    store.commit('setLoading', true);
+    const key = this.assetKey ? this.assetKey : '';
+    const fieldsToHide: CatalogueItemVisibilityCommand = {
+      // TODO: handle multiple resources
+      resourceKey: this.metadata.key,
+      visibility: [field],
+    };
+    this.draftAssetApi.updateDraftMetadataVisibility(key, fieldsToHide).then((hideFieldResponse) => {
+      console.log('hfr', hideFieldResponse);
+      store.commit('setLoading', false);
+    });
+    // this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
+    //   console.log('hfr', hideFieldResponse);
+    //   store.commit('setLoading', false);
+    // });
+  }
 }
 </script>
 <style lang="scss">
@@ -482,5 +539,33 @@ export default class DataProfilingAndSamples extends Vue {
   @import "~vue-multiselect/dist/vue-multiselect.min.css";
   @import "@/assets/styles/graphs/_table.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
+
+  // LEAFLET FIXES DUE TO STYLE OVERRIDE
+  .leaflet-container a {
+    -webkit-tap-highlight-color: rgba(51, 181, 229, 0.4) !important;
+  }
+  .leaflet-container a {
+    color: #0078A8 !important;
+  }
+  .leaflet-touch .leaflet-bar a {
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+  }
+  .leaflet-control-attribution, .leaflet-control-attribution a {
+    font-size: 11px !important;
+  }
+  .leaflet-control-attribution a {
+    text-decoration: none !important;
+  }
+  .leaflet-bar > a:link {
+    color: black !important;
+    text-decoration: none !important;
+    font-size: 22px !important;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
 </style>

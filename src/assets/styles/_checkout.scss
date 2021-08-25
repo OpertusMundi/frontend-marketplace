@@ -1,0 +1,14 @@
+.checkout {
+    &__billing_table {
+        color: $labelColor;
+        display: grid;
+        grid-column-gap: 20px;
+        grid-template-columns: min-content 1fr;
+        span:nth-child(odd) {
+            white-space: nowrap;
+        }
+    }
+    &__billing_checkbox_label {
+        color: $secondColor !important;
+    }
+}

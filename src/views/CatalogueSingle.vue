@@ -16,7 +16,7 @@
 
             <terms-and-restrictions :catalogueItem="catalogueItem"></terms-and-restrictions>
 
-            <data-profiling-and-samples :metadata="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples>
+            <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :metadata="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -81,6 +81,8 @@ export default class CatalogueSingle extends Vue {
 
   mode: string; // catalog or review
 
+  reviewModeAssetKey?: string;
+
   isItemLoaded: boolean;
 
   selectedPricingModelKey: string;
@@ -132,6 +134,7 @@ export default class CatalogueSingle extends Vue {
     } else if (mode === 'review') {
       console.log('review mode!');
       const { key } = this.$route.params;
+      this.reviewModeAssetKey = key;
       this.draftAssetApi.findOne(key).then((queryResponse) => {
         if (queryResponse.success === false && queryResponse.messages[0].code === 'BasicMessageCode.NotFound') {
           this.$router.push('/errors/404');

@@ -1,0 +1,37 @@
+.cart_items {
+    &__container {
+        display: grid;
+        grid-template-columns: 1fr min-content;
+
+        button {
+            align-self: center;
+            margin: -10px 0 0 20px;
+        }
+    }
+
+    &__total_price {
+        text-align: right;
+        font-weight: 600;
+        margin-top: 15px;
+        span:nth-child(1) {
+            font-size: em(13);
+        }
+        span:nth-child(2) {
+            font-size: em(25);
+            margin-left: 5px;
+        }
+    }
+
+    &__bottom_btns {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        button:nth-child(1) {
+            margin-right: 20px;
+        }
+    }
+}
+
+.grid-ignore-wrapper {
+    display: contents;
+}

@@ -169,6 +169,13 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
+          <validation-provider v-slot="{ errors }" name="Type">
+            <div class="form-group">
+              <label for="multiselect_epsg">Reference system</label>
+              <multiselect id="multiselect_epsg" @input="onEpsgSelection($event)" v-model="selectedEpsgLabel" :options="menusData.epsgLabels" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select reference system"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
           <div class="d-flex align-items-center form-group" v-if="assetLocal.type === 'VECTOR'">
             <input type="checkbox" id="ingested" v-model="assetLocal.ingested" class="mr-xs-10 mb-xs-10">
             <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
@@ -215,6 +222,7 @@ import {
   Watch,
   Prop,
 } from 'vue-property-decorator';
+import SpatialApi from '@/service/spatial';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
@@ -242,6 +250,8 @@ export default class Metadata extends Vue {
 
   @Prop({ required: true }) private additionalResourcesToUpload!: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
+  spatialApi: SpatialApi;
+
   assetLocal: CatalogueItemCommand;
 
   additionalResourcesToUploadLocal: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
@@ -261,12 +271,19 @@ export default class Metadata extends Vue {
   menusData: {
     assetTypes: string[],
     availableFormats: string[],
+    epsgLabels: string[],
   }
+
+  epsgList: { code: string, name: string }[];
+
+  selectedEpsgLabel: string | null;
 
   // TODO: currently, URIs are stored in asset.additionalResources and FILES are uploaded as additional resources on asset submit
 
   constructor() {
     super();
+
+    this.spatialApi = new SpatialApi();
 
     this.assetLocal = this.asset;
 
@@ -294,13 +311,31 @@ export default class Metadata extends Vue {
 
     this.keywordsForDisplay = this.assetLocal.keywords.map((x) => x.keyword);
 
-    this.menusData = { assetTypes: [], availableFormats: [] };
+    this.menusData = { assetTypes: [], availableFormats: [], epsgLabels: [] };
+
+    this.epsgList = [];
+
+    this.selectedEpsgLabel = null;
 
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
+  onEpsgSelection(epsgLabel: string): void {
+    const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
+    this.assetLocal.referenceSystem = this.epsgList[i].code;
+  }
+
   created(): void {
     this.populateAvailableFormatsForSelectedType();
+    this.spatialApi.getEpsgCodes().then((epsgCodesResponse) => {
+      this.epsgList = epsgCodesResponse.result.map((x) => ({ code: x.code.toString(), name: x.name }));
+      this.menusData.epsgLabels = this.epsgList.map((x) => `EPSG:${x.code}, ${x.name}`);
+
+      if (this.assetLocal.referenceSystem) {
+        const i = this.epsgList.findIndex((x) => x.code === this.assetLocal.referenceSystem);
+        this.selectedEpsgLabel = this.menusData.epsgLabels[i];
+      }
+    });
   }
 
   @Watch('assetLocal', { deep: true })

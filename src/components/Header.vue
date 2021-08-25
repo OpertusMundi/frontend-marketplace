@@ -209,7 +209,7 @@
           </svg>
         </div>
         <div class="header__cart">
-          <router-link to="/order-thankyou">
+          <router-link to="/cart">
             <svg xmlns="http://www.w3.org/2000/svg" width="24.08" height="24.001" viewBox="0 0 24.08 24.001">
               <g id="Group_1973" data-name="Group 1973" transform="translate(-1684 -36)">
                 <g id="Group_1972" data-name="Group 1972" transform="translate(1005.503 -324.638)">

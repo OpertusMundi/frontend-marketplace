@@ -13,7 +13,7 @@
       <modal :show="modalToShow == 'fullName'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your full name'" :modalId="'fullName'" :inputs="[{id: 'firstName', name: 'First Name', value: userData.profile.firstName, type: 'text'}, {id: 'lastName', name: 'Last Name', value: userData.profile.lastName, type: 'text'}]"></modal>
       <modal :show="modalToShow == 'mobileNumber'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your mobile number'" :modalId="'mobile'" :inputs="[{id: 'mobile', name: 'Mobile number', value: userData.profile.mobile, type: 'text'}]"></modal>
 
-      <!-- <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: userData.profile.provider.draft? userData.profile.provider.draft.name : userData.profile.provider.current.name, type: 'text'}]"></modal> -->
+      <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: getCurrentOrDraftValue('companyNumber'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: getCurrentOrDraftValue('companyType'), type: 'text'}]"></modal>
@@ -270,16 +270,52 @@
         </h3>
       </div>
 
+      <!-- TABS -->
       <div class="collection__menu">
         <ul>
           <li @click="selectTab('general')" :class="{ 'active': selectedTab=='general' }"><a href="#" @click.prevent="">General</a></li>
+
           <li @click="selectTab('loginAndSecurity')" :class="{ 'active': selectedTab=='loginAndSecurity' }"><a href="#" @click.prevent="">Login & Security</a></li>
-          <li v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }"><a href="#" @click.prevent="">Company Information</a></li>
-          <li v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'" @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }"><a href="#" @click.prevent="">Payout Options</a></li>
-          <li @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }"><a href="#" @click.prevent="">Addresses</a></li>
-          <li v-if="includeTabDueToRole('ROLE_CONSUMER')" @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }"><a href="#" @click.prevent="">Payment Methods</a></li>
-          <li @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a></li>
-          <li v-if="includeTabDueToRole('ROLE_PROVIDER')" @click="selectTab('ubo')" :class="{ 'active': selectedTab=='ubo' }"><a href="#" @click.prevent="">UBO</a></li>
+
+          <li
+            v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'"
+            @click="selectTab('companyInformation')" :class="{ 'active': selectedTab=='companyInformation' }">
+            <a href="#" @click.prevent="">Company Information</a>
+          </li>
+
+          <li
+            v-if="!isLoading && getCurrentOrDraftValue('type') === 'PROFESSIONAL'"
+            @click="selectTab('payoutOptions')" :class="{ 'active': selectedTab=='payoutOptions' }">
+            <a href="#" @click.prevent="">Payout Options</a>
+          </li>
+
+          <li
+            v-if="includeTabDueToRole('ROLE_CONSUMER') || includeTabDueToRole('ROLE_PROVIDER')"
+            @click="selectTab('addresses')" :class="{ 'active': selectedTab=='addresses' }">
+            <a href="#" @click.prevent="">Addresses</a>
+          </li>
+
+          <li
+            v-if="includeTabDueToRole('ROLE_CONSUMER')"
+            @click="selectTab('paymentMethods')" :class="{ 'active': selectedTab=='paymentMethods' }">
+            <a href="#" @click.prevent="">Payment Methods</a>
+          </li>
+
+          <li
+            v-if="includeTabDueToRole('ROLE_CONSUMER') || includeTabDueToRole('ROLE_PROVIDER')"
+            @click="selectTab('kyc')" :class="{ 'active': selectedTab=='kyc' }"><a href="#" @click.prevent="">KYC</a>
+          </li>
+
+          <li
+            v-if="includeTabDueToRole('ROLE_PROVIDER')"
+            @click="selectTab('ubo')" :class="{ 'active': selectedTab=='ubo' }">
+            <a href="#" @click.prevent="">UBO</a>
+          </li>
+
+          <li
+            v-if="!includeTabDueToRole('ROLE_PROVIDER') && !includeTabDueToRole('ROLE_CONSUMER')">
+            <router-link to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
+          </li>
         </ul>
       </div>
 
@@ -998,6 +1034,9 @@ export default class DashboardHome extends Vue {
       this.kycViewAsRole = EnumCustomerType.PROVIDER;
     } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
       this.kycViewAsRole = EnumCustomerType.CONSUMER;
+    } else {
+      this.isKycDocumentsLoaded = true;
+      return;
     }
 
     this.kycDocumentApi.findAll(this.kycViewAsRole).then((documentsResponse) => {
@@ -1063,9 +1102,15 @@ export default class DashboardHome extends Vue {
     }
 
     // const obj = this.userData.profile.provider.draft ? this.userData.profile.provider.draft : this.userData.profile.provider.current;
-    // eslint-disable-next-line
-    const res = propertyPath.split('.').reduce((previous, current) => previous![current], obj) as any;
-    return res;
+
+    // TODO: refactoring.
+    try {
+      // eslint-disable-next-line
+      const res = propertyPath.split('.').reduce((previous, current) => previous![current], obj) as any;
+      return res;
+    } catch (err) {
+      return '';
+    }
   }
 
   canEditMangoPayRelatedField(): boolean {
