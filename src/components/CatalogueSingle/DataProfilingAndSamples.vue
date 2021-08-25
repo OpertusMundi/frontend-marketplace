@@ -267,7 +267,7 @@ import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
-import { CatalogueItemProviderCommand } from '@/model/catalogue';
+import { CatalogueItemVisibilityCommand } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 
@@ -505,15 +505,19 @@ export default class DataProfilingAndSamples extends Vue {
   hideField(field: string): void {
     store.commit('setLoading', true);
     const key = this.assetKey ? this.assetKey : '';
-    const fieldsToHide: CatalogueItemProviderCommand = {
+    const fieldsToHide: CatalogueItemVisibilityCommand = {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
       visibility: [field],
     };
-    this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
+    this.draftAssetApi.updateDraftMetadataVisibility(key, fieldsToHide).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
       store.commit('setLoading', false);
     });
+    // this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
+    //   console.log('hfr', hideFieldResponse);
+    //   store.commit('setLoading', false);
+    // });
   }
 }
 </script>

@@ -175,7 +175,8 @@ const routes: RouteConfig[] = [
         path: 'settings',
         name: 'Settings',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsettings" */ '../views/dashboard/Settings.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        // meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'users',

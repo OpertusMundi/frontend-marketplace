@@ -446,6 +446,13 @@ export default class BecomeConsumer extends Vue {
 
   submitForm() {
     console.log('submit form');
+
+    // fix date format (birthday)
+    const d = new Date((this.consumerData as ConsumerIndividualCommand).birthdate);
+    const isoString = d.toISOString();
+    (this.consumerData as ConsumerIndividualCommand).birthdate = isoString;
+    /* */
+
     this.consumerApi.submitRegistration(this.consumerData).then((submitResponse) => {
       console.log(submitResponse);
       if (submitResponse.success) {
