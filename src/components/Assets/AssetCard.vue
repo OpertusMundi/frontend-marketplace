@@ -7,7 +7,7 @@
           <div class="asset_card__top__left">
             <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
             <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
-            <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'API'">
+            <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
             <span class="asset_card__type">{{asset.command.type}}</span>
             <span v-for="(category, i) in asset.command.topicCategory" :key="category">
               {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
@@ -62,6 +62,7 @@ import {
   FixedRowPricingModelCommand,
 } from '@/model/pricing-model';
 import moment from 'moment';
+import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
 
 @Component
 export default class AssetCard extends Vue {
@@ -121,7 +122,7 @@ export default class AssetCard extends Vue {
   getPriceOrMinimumPrice(): {prefix: string, value: string, suffix: string} {
     const res = { prefix: '', value: '', suffix: '' };
 
-    res.prefix = this.asset.command.pricingModels.length > 1 || (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.command.pricingModels[0].type)) ? 'FROM' : '';
+    res.prefix = this.asset.command.pricingModels.length > 1 || (this.asset.command.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.command.pricingModels[0].type))) ? 'FROM' : '';
 
     let minPrice = Infinity;
     for (let i = 0; i < this.asset.command.pricingModels.length; i += 1) {
@@ -154,29 +155,33 @@ export default class AssetCard extends Vue {
 
   createWMS(): void {
     console.log('create WMS');
-    // const draftApi: DraftApiFromAssetCommand = {
-    //   type: EnumDraftCommandType.ASSET,
-    //   pid: this.asset.assetPublished,
-    //   title: this.asset.title,
-    //   version: this.asset.version,
-    //   serviceType: 'WMS',
-    // };
-    // this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
-    //   if (createApiResponse.success) {
-    //     console.log('wms draft created successfully!!', createApiResponse);
-    //     const { key } = createApiResponse.result;
-    //     const item: CatalogueItemCommand = createApiResponse.result.command;
-    //     this.draftAssetApi.updateAndSubmit(key, item).then((submitResponse) => {
-    //       if (submitResponse.success) {
-    //         console.log('wms submitted successfully', submitResponse);
-    //       } else {
-    //         console.log('error submitting wms', submitResponse);
-    //       }
-    //     });
-    //   } else {
-    //     console.log('error creating wms draft', createApiResponse);
-    //   }
-    // });
+    const draftApi: DraftApiFromAssetCommand = {
+      type: EnumDraftCommandType.ASSET,
+      pid: this.asset.assetPublished,
+      title: this.asset.title,
+      version: this.asset.version,
+      serviceType: 'WMS',
+    };
+    this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
+      if (createApiResponse.success) {
+        console.log('wms draft created successfully!!', createApiResponse);
+        const { key } = createApiResponse.result;
+        console.log(`/dashboard/assets/create/${key}`);
+        this.$router.push(`/dashboard/assets/create/${key}`);
+        // console.log('wms draft created successfully!!', createApiResponse);
+        // const { key } = createApiResponse.result;
+        // const item: CatalogueItemCommand = createApiResponse.result.command;
+        // this.draftAssetApi.updateAndSubmit(key, item).then((submitResponse) => {
+        //   if (submitResponse.success) {
+        //     console.log('wms submitted successfully', submitResponse);
+        //   } else {
+        //     console.log('error submitting wms', submitResponse);
+        //   }
+        // });
+      } else {
+        console.log('error creating wms draft', createApiResponse);
+      }
+    });
   }
 }
 </script>
