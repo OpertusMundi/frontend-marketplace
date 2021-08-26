@@ -1,40 +1,60 @@
 <template>
-  <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
-    <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
-      <div class="asset_card__inner" :style="{'--color': getColor()}">
-      <div class="asset_card__top">
-        <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
-          <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
-          <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'API'">
-          <span class="asset_card__type">{{asset.command.type}}</span>
-          <span v-for="(category, i) in asset.command.topicCategory" :key="category">
-            {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
-          </span>
+  <div class="asset_card__wrapper">
+    <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
+      <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
+        <div class="asset_card__inner" :style="{'--color': getColor()}">
+        <div class="asset_card__top">
+          <div class="asset_card__top__left">
+            <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
+            <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
+            <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'API'">
+            <span class="asset_card__type">{{asset.command.type}}</span>
+            <span v-for="(category, i) in asset.command.topicCategory" :key="category">
+              {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
+            </span>
+          </div>
+          <div class="asset_card__top__right"><span>{{ formatStatus(asset.status) }}</span></div>
         </div>
-        <div class="asset_card__top__right"><span>{{ formatStatus(asset.status) }}</span></div>
-      </div>
-      <div class="asset_card__center">
-        <div class="asset_card__title">{{ asset.title }}</div>
-        <div class="asset_card__price">
-          <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
-          {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€</span>
-          <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
+        <div class="asset_card__center">
+          <div class="asset_card__title">{{ asset.title }}</div>
+          <div class="asset_card__price">
+            <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
+            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€</span>
+            <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
+          </div>
         </div>
-      </div>
-      <div class="asset_card__bottom">
-        <div class="asset_card__bottom__left">
-          <div class="asset_card__bottom__left__info">
-            <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
+        <div class="asset_card__bottom">
+          <div class="asset_card__bottom__left">
+            <div class="asset_card__bottom__left__info">
+              <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
+            </div>
           </div>
         </div>
       </div>
+    </router-link>
+    <div class="asset_card__right_dropdown_container">
+      <div @click="isRightDropdownOpen = !isRightDropdownOpen" class="asset_card__three_dots_btn">
+        <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17"><g data-name="Group 2622" fill="#333"><circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5"/><circle data-name="Ellipse 170" cx="1.5" cy="1.5" r="1.5" transform="translate(0 14)"/><circle data-name="Ellipse 171" cx="1.5" cy="1.5" r="1.5" transform="translate(0 7)"/></g></svg>
+      </div>
+      <transition name="fade" mode="out-in">
+        <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
+          <ul>
+            <li>Publish</li>
+            <li>Edit</li>
+            <li @click="createWMS">Create WMS</li>
+            <li>Create WFS</li>
+            <li>Delete</li>
+          </ul>
+        </div>
+      </transition>
     </div>
-  </router-link>
+  </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
+// import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
 import {
   EnumPricingModel,
   FixedPopulationPricingModelCommand,
@@ -46,6 +66,18 @@ import moment from 'moment';
 @Component
 export default class AssetCard extends Vue {
   @Prop({ required: true }) readonly asset!: AssetDraft;
+
+  draftAssetApi: DraftAssetApi;
+
+  isRightDropdownOpen: boolean;
+
+  constructor() {
+    super();
+
+    this.draftAssetApi = new DraftAssetApi();
+
+    this.isRightDropdownOpen = false;
+  }
 
   // TODO: api must return asset type
   getColor(): string {
@@ -118,6 +150,33 @@ export default class AssetCard extends Vue {
     }
 
     return res;
+  }
+
+  createWMS(): void {
+    console.log('create WMS');
+    // const draftApi: DraftApiFromAssetCommand = {
+    //   type: EnumDraftCommandType.ASSET,
+    //   pid: this.asset.assetPublished,
+    //   title: this.asset.title,
+    //   version: this.asset.version,
+    //   serviceType: 'WMS',
+    // };
+    // this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
+    //   if (createApiResponse.success) {
+    //     console.log('wms draft created successfully!!', createApiResponse);
+    //     const { key } = createApiResponse.result;
+    //     const item: CatalogueItemCommand = createApiResponse.result.command;
+    //     this.draftAssetApi.updateAndSubmit(key, item).then((submitResponse) => {
+    //       if (submitResponse.success) {
+    //         console.log('wms submitted successfully', submitResponse);
+    //       } else {
+    //         console.log('error submitting wms', submitResponse);
+    //       }
+    //     });
+    //   } else {
+    //     console.log('error creating wms draft', createApiResponse);
+    //   }
+    // });
   }
 }
 </script>
