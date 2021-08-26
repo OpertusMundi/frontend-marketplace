@@ -16,21 +16,18 @@
               </router-link>
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Assets')">
-              <router-link to="/dashboard/assets" data-name="Assets">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.999" viewBox="0 0 24 23.999"><g id="Group_1969" data-name="Group 1969" transform="translate(-1493.5 -354.679)"><path id="Path_8960" data-name="Path 8960" d="M1505.595,376.4a.233.233,0,0,1-.218,0l-10.271-5.477a1.152,1.152,0,0,0-1.071,0h0a.953.953,0,0,0,0,1.713l11.2,5.972a.584.584,0,0,0,.542,0l11.178-5.961a.969.969,0,0,0,0-1.741h0a1.167,1.167,0,0,0-1.094,0Z" fill="#333"/><path id="Path_8961" data-name="Path 8961" d="M1505.609,371.288a.233.233,0,0,1-.218,0l-10.25-5.466a1.163,1.163,0,0,0-1.085,0h0a.965.965,0,0,0,0,1.735l11.178,5.961a.584.584,0,0,0,.542,0l11.179-5.962a.969.969,0,0,0,.005-1.74h0a1.169,1.169,0,0,0-1.095,0Z" fill="#333"/><path id="Path_8962" data-name="Path 8962" d="M1505.776,368.4l11.164-5.954a.973.973,0,0,0,0-1.749l-11.164-5.954a.584.584,0,0,0-.542,0L1494.07,360.7a.973.973,0,0,0,0,1.749l11.164,5.954A.584.584,0,0,0,1505.776,368.4Zm-8.825-6.916,8.445-4.5a.233.233,0,0,1,.218,0l8.444,4.5a.1.1,0,0,1,0,.175l-8.444,4.5a.234.234,0,0,1-.218,0l-8.445-4.5A.1.1,0,0,1,1496.951,361.487Z" fill="#333"/></g></svg>
-                <span>Assets</span>
-              </router-link>
+              <span>
+                <router-link to="/dashboard/assets" data-name="Assets">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.999" viewBox="0 0 24 23.999"><g id="Group_1969" data-name="Group 1969" transform="translate(-1493.5 -354.679)"><path id="Path_8960" data-name="Path 8960" d="M1505.595,376.4a.233.233,0,0,1-.218,0l-10.271-5.477a1.152,1.152,0,0,0-1.071,0h0a.953.953,0,0,0,0,1.713l11.2,5.972a.584.584,0,0,0,.542,0l11.178-5.961a.969.969,0,0,0,0-1.741h0a1.167,1.167,0,0,0-1.094,0Z" fill="#333"/><path id="Path_8961" data-name="Path 8961" d="M1505.609,371.288a.233.233,0,0,1-.218,0l-10.25-5.466a1.163,1.163,0,0,0-1.085,0h0a.965.965,0,0,0,0,1.735l11.178,5.961a.584.584,0,0,0,.542,0l11.179-5.962a.969.969,0,0,0,.005-1.74h0a1.169,1.169,0,0,0-1.095,0Z" fill="#333"/><path id="Path_8962" data-name="Path 8962" d="M1505.776,368.4l11.164-5.954a.973.973,0,0,0,0-1.749l-11.164-5.954a.584.584,0,0,0-.542,0L1494.07,360.7a.973.973,0,0,0,0,1.749l11.164,5.954A.584.584,0,0,0,1505.776,368.4Zm-8.825-6.916,8.445-4.5a.233.233,0,0,1,.218,0l8.444,4.5a.1.1,0,0,1,0,.175l-8.444,4.5a.234.234,0,0,1-.218,0l-8.445-4.5A.1.1,0,0,1,1496.951,361.487Z" fill="#333"/></g></svg>
+                  <span>Assets</span>
+                </router-link>
+                <router-link v-if="!sidebarClosed" to="/dashboard/assets/create"><div class="btn--fab">+</div></router-link>
+              </span>
             </li>
-            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Profile')">
-              <router-link to="/dashboard/profile" data-name="Profile">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g id="Group_556" data-name="Group 556" transform="translate(0 -0.259)"><path id="Union_1" data-name="Union 1" d="M0 24V21c0-3.3 5.4-6 12-6s12 2.7 12 6v3zM6 6a6 6 0 1 1 6 6A6 6 0 0 1 6 6z" transform="translate(0 0.259)" fill="#333"/></g></svg>
-                <span>Profile</span>
-              </router-link>
-            </li>
-            <li @click="toggleMobileMenu">
-              <router-link to="/dashboard/analytics" data-name="Analytics">
-                <svg xmlns="http://www.w3.org/2000/svg" width="23.954" height="23.953" viewBox="0 0 23.954 23.953"><g id="Group_3586" data-name="Group 3586" transform="translate(-1396.997 -950.237)"><path id="Path_9719" data-name="Path 9719" d="M1419.882,964.082a1.006,1.006,0,0,0-1.224.707,10,10,0,1,1-12.325-12.24,1,1,0,1,0-.531-1.928,12,12,0,1,0,14.787,14.685A1,1,0,0,0,1419.882,964.082Z" fill="#333"/><path id="Path_9720" data-name="Path 9720" d="M1417.993,954.247a11.972,11.972,0,0,0-7.884-4.006,1.011,1.011,0,0,0-1.111,1v9.449a1.5,1.5,0,0,0,1.5,1.5h9.449a1.012,1.012,0,0,0,1-1.113A11.956,11.956,0,0,0,1417.993,954.247ZM1411,960.19v-7.8a10,10,0,0,1,7.8,7.8Z" fill="#333"/></g></svg>
-                <span>Analytics</span>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Earnings')">
+              <router-link to="/dashboard/earnings" data-name="Earnings">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24.004" height="24.055"><g data-name="Group 2645" fill="#333"><path data-name="Path 9480" d="M1 15.241a1 1 0 0 0-1 1v6.814a1 1 0 1 0 2 0v-6.813a1 1 0 0 0-1-1.001z"/><path data-name="Path 9481" d="M6.6 12.522a1 1 0 0 0-1 1v9.533a1 1 0 0 0 2 0v-9.532a1 1 0 0 0-1-1.001z"/><path data-name="Path 9482" d="M12.2 9.804a1 1 0 0 0-1 1v12.251a1 1 0 0 0 2 0v-12.25a1 1 0 0 0-1-1.001z"/><path data-name="Path 9483" d="M17.798 7.085a1 1 0 0 0-1 1v14.97a1 1 0 0 0 2 0V8.085a1 1 0 0 0-1-1z"/><path data-name="Path 9484" d="m23.674 4.973-5.2-4.714a1 1 0 0 0-1.342 0l-5.2 4.714a1 1 0 1 0 1.342 1.482l4.533-4.106 4.535 4.106a1 1 0 1 0 1.341-1.482z"/></g></svg>
+                <span>Earnings</span>
               </router-link>
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Orders')">
@@ -39,6 +36,19 @@
                 <span>Orders</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Contracts')">
+              <router-link to="/dashboard/contracts" data-name="Contracts">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.892"><g data-name="Group 2653" fill="#333"><path data-name="Path 9507" d="M20.291 21.892H3.709a1 1 0 0 0 0 2h16.583a1 1 0 0 0 0-2z"/><path data-name="Path 9508" d="M23 14.016h-2.2c-1.567-.088-4.328-.623-5.059-1.687-.639-.928-1.029-2.046.434-3.914l-.01-.008a5.169 5.169 0 0 0 .951-4.318 5.25 5.25 0 0 0-10.37 1.162 5.2 5.2 0 0 0 1.079 3.152l-.016.012c1.463 1.868 1.073 2.986.435 3.914-.759 1.1-3.737 1.613-5.06 1.687H.997a1 1 0 0 0-1 1v4.063a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-4.063a1 1 0 0 0-.997-1zm-1 4.063H2v-2.063h1.572c1.012-.084 4.2-.475 5.828-2a3.359 3.359 0 0 0 .495-.555 4.781 4.781 0 0 0 .933-3.1 5.676 5.676 0 0 0-1.1-2.792 3.325 3.325 0 0 1-.334-.4 3.212 3.212 0 0 1-.539-2.735 3.25 3.25 0 0 1 6.4.816 3.222 3.222 0 0 1-.646 1.926 3.4 3.4 0 0 1-.23.279 5.8 5.8 0 0 0-1.2 2.9 4.721 4.721 0 0 0 .922 3.1 3.4 3.4 0 0 0 .495.555c1.567 1.465 4.565 1.892 5.7 2h1.71z"/></g></svg>
+                <span>Contracts</span>
+              </router-link>
+            </li>
+            <li @click="toggleMobileMenu">
+              <router-link to="/dashboard/analytics" data-name="Analytics">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23.954" height="23.953" viewBox="0 0 23.954 23.953"><g id="Group_3586" data-name="Group 3586" transform="translate(-1396.997 -950.237)"><path id="Path_9719" data-name="Path 9719" d="M1419.882,964.082a1.006,1.006,0,0,0-1.224.707,10,10,0,1,1-12.325-12.24,1,1,0,1,0-.531-1.928,12,12,0,1,0,14.787,14.685A1,1,0,0,0,1419.882,964.082Z" fill="#333"/><path id="Path_9720" data-name="Path 9720" d="M1417.993,954.247a11.972,11.972,0,0,0-7.884-4.006,1.011,1.011,0,0,0-1.111,1v9.449a1.5,1.5,0,0,0,1.5,1.5h9.449a1.012,1.012,0,0,0,1-1.113A11.956,11.956,0,0,0,1417.993,954.247ZM1411,960.19v-7.8a10,10,0,0,1,7.8,7.8Z" fill="#333"/></g></svg>
+                <span>Analytics</span>
+              </router-link>
+            </li>
+            <hr>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Storage')">
               <router-link to="/dashboard/storage" data-name="Storage">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.9" viewBox="0 0 24 23.9"><g id="Group_2758" data-name="Group 2758" transform="translate(-8.26 -339.4)"><path id="Path_9490" data-name="Path 9490" d="M30.36,348.2c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8a1.012,1.012,0,1,0-1.7-1.1Z" fill="#333"/><path id="Path_9491" data-name="Path 9491" d="M31.76,353a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,353Z" fill="#333"/><path id="Path_9492" data-name="Path 9492" d="M31.76,358.1a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,0,0-1.5,1.3c1.6,1.8,5.9,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,358.1Z" fill="#333"/><path id="Path_9493" data-name="Path 9493" d="M20.26,348c5.8,0,12-1.4,12-4.3,0-3-6.2-4.3-12-4.3s-12,1.4-12,4.3S14.46,348,20.26,348Zm0-6.7c6.5,0,10,1.7,10,2.3s-3.5,2.3-10,2.3-10-1.7-10-2.3S13.76,341.3,20.26,341.3Z" fill="#333"/></g></svg>
@@ -57,12 +67,20 @@
                 <span>t&#176;Maps</span>
               </router-link>
             </li>
+            <hr>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Purchases')">
               <router-link to="/dashboard/purchases" data-name="Purchases">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.605"><g data-name="Group 2648" fill="#333"><path data-name="Path 9494" d="M23.971 21.303 21.483 6.939a.985.985 0 1 0-1.941.337l2.488 14.363H1.97L4.488 7.274a.986.986 0 0 0-1.942-.34L.028 21.303a1.972 1.972 0 0 0 1.943 2.3H22.03a1.972 1.972 0 0 0 1.941-2.307z"/><path data-name="Path 9495" d="M7.061 10.208a.985.985 0 0 0 .985-.985v-3.3a3.954 3.954 0 1 1 7.908 0v3.3a.985.985 0 1 0 1.97 0v-3.3a5.924 5.924 0 1 0-11.848 0v3.3a.984.984 0 0 0 .985.985z"/><path data-name="Path 9496" d="M10.362 6.116a.985.985 0 1 0 0 1.97h3.285a.985.985 0 1 0 0-1.97z"/></g></svg>
                 <span>Purchases</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Subscriptions')">
+              <router-link to="/dashboard/subscriptions" data-name="Subscriptions">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g data-name="Group 2654" fill="#333"><path data-name="Path 9509" d="M15.36 8.897a5.693 5.693 0 1 0-1.74 11.113 5.567 5.567 0 0 0 .749-.05.929.929 0 0 0-.245-1.841 3.835 3.835 0 1 1 .667-7.453 3.805 3.805 0 0 1 1.994 1.521l-1.927.012a1.02 1.02 0 0 0 .006 2.04h.006l5.193-.032V8.994a1.02 1.02 0 0 0-2.039 0v1.727a5.641 5.641 0 0 0-2.664-1.824z"/><path data-name="Path 9510" d="M19.267 1.019A1.019 1.019 0 0 0 18.247 0H2.039A2.042 2.042 0 0 0 0 2.039v16.208a1.02 1.02 0 1 0 2.039 0V2.039h16.208a1.019 1.019 0 0 0 1.02-1.02z"/><path data-name="Path 9511" d="M21.882 3.985H6.104a2.121 2.121 0 0 0-2.118 2.119v15.778A2.121 2.121 0 0 0 6.104 24h15.778A2.121 2.121 0 0 0 24 21.882V6.104a2.121 2.121 0 0 0-2.118-2.119zm0 17.9H6.104V6.104h15.778z"/></g></svg>
+                <span>Subscriptions</span>
+              </router-link>
+            </li>
+            <hr>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Messages')">
               <router-link to="/dashboard/messages" data-name="Messages">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16.667" viewBox="0 0 24 16.667"><g id="Group_1968" data-name="Group 1968" transform="translate(-1619.5 -489.374)"><path id="Path_8958" data-name="Path 8958" d="M1642.5,489.374h-22a1,1,0,0,0-1,1v14.667a1,1,0,0,0,1,1h22a1,1,0,0,0,1-1V490.374A1,1,0,0,0,1642.5,489.374Zm-1,14.667h-20V491.374h20Z" fill="#333"/><path id="Path_8959" data-name="Path 8959" d="M1630.831,501.357a1,1,0,0,0,1.341,0l6.944-6.292a1,1,0,1,0-1.344-1.482l-6.275,5.687-6.273-5.642a1,1,0,0,0-1.338,1.486Z" fill="#333"/></g></svg>
