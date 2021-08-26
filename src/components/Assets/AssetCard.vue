@@ -43,7 +43,7 @@
             <li>Edit</li>
             <li @click="createWMS">Create WMS</li>
             <li>Create WFS</li>
-            <li>Delete</li>
+            <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
       </transition>
@@ -182,6 +182,10 @@ export default class AssetCard extends Vue {
         console.log('error creating wms draft', createApiResponse);
       }
     });
+  }
+
+  deleteAsset(): void {
+    this.$emit('delete', this.asset.assetPublished);
   }
 }
 </script>

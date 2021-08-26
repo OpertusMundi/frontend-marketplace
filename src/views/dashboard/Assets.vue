@@ -1,5 +1,17 @@
 <template>
   <div class="dashboard__inner">
+    <!-- MODALS -->
+    <modal :withSlots="true" :show="modalToShow === 'modalDeleteAsset'" @dismiss="modalToShow = ''" :modalId="'modalDeleteAsset'">
+      <template v-slot:body>
+        <h2>Are you sure you want to delete asset?</h2>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="onConfirmDeleteAsset">Delete</button>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
+
     <div class="dashboard__head">
       <div class="dashboard__head__helpers dashboard__head__helpers--full-width">
         <h1>Assets</h1>
@@ -62,7 +74,7 @@
       </div>
     </div>
 
-    <asset-card v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-card>
+    <asset-card @delete="onDeleteAsset" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-card>
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
 
   </div>
@@ -72,6 +84,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import store from '@/store';
 import DraftAssetApi from '@/service/draft';
+import ProviderAssetsApi from '@/service/provider-assets';
 import AssetCard from '@/components/Assets/AssetCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import {
@@ -82,15 +95,19 @@ import {
 } from '@/model/draft';
 import { Order } from '@/model/request';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
+import Modal from '@/components/Modal.vue';
 
 @Component({
   components: {
     AssetCard,
     Pagination,
+    Modal,
   },
 })
 export default class DashboardHome extends Vue {
   draftAssetApi: DraftAssetApi;
+
+  providerAssetsApi: ProviderAssetsApi;
 
   unpublishedAssets: AssetDraft[];
 
@@ -122,10 +139,15 @@ export default class DashboardHome extends Vue {
 
   selectedTab: string;
 
+  modalToShow: string;
+
+  idOfAssetToDelete: string;
+
   constructor() {
     super();
 
     this.draftAssetApi = new DraftAssetApi();
+    this.providerAssetsApi = new ProviderAssetsApi();
 
     this.unpublishedAssets = [];
     this.publishedAssets = [];
@@ -158,6 +180,9 @@ export default class DashboardHome extends Vue {
     this.selectedOrderOptionUnpublished = 'MODIFIED DESCENDING';
 
     this.selectedTab = 'ALL_ASSETS';
+
+    this.modalToShow = '';
+    this.idOfAssetToDelete = '';
   }
 
   @Watch('selectedStatus')
@@ -286,6 +311,26 @@ export default class DashboardHome extends Vue {
       return true;
     }
     return false;
+  }
+
+  onDeleteAsset(id: string): void {
+    console.log('delete asset: ', id);
+    this.idOfAssetToDelete = id;
+    this.modalToShow = 'modalDeleteAsset';
+  }
+
+  onConfirmDeleteAsset(): void {
+    store.commit('setLoading', true);
+    this.providerAssetsApi.deleteAsset(this.idOfAssetToDelete).then((deleteResponse) => {
+      if (deleteResponse.data.success) {
+        console.log('asset deleted successfully', deleteResponse);
+        this.modalToShow = '';
+        store.commit('setLoading', false);
+        this.searchAssets(true, this.publishedCurrentPage);
+      } else {
+        console.log('error deleting asset', deleteResponse);
+      }
+    });
   }
 
   @Watch('isLoading')
