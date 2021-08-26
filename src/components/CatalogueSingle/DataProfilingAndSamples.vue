@@ -117,10 +117,11 @@
               <div v-if="metadata.mbr">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">MBR</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('mbr')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'mbr')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'mbr')">SHOW</button>
                 </div>
                 <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('mbr')">
                   <l-map
                     ref="mapConfigMbr"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
@@ -142,10 +143,11 @@
               <div v-if="metadata.convexHull">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Convex Hull</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('convexHull')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'convexHull')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'convexHull')">SHOW</button>
                 </div>
                 <p>Convex polygon enclosing all features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('convexHull')">
                   <l-map
                     ref="mapConfigConvexHull"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
@@ -167,10 +169,11 @@
               <div v-if="metadata.thumbnail">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Thumbnail</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('thumbnail')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'thumbnail')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'thumbnail')">SHOW</button>
                 </div>
                 <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-                <div class="tab_maps-map tab_maps-map-thumbnail">
+                <div class="tab_maps-map tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
                   <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
                 </div>
               </div>
@@ -178,10 +181,11 @@
               <div v-if="metadata.heatmap">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Heatmap</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('heatmap')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'heatmap')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'heatmap')">SHOW</button>
                 </div>
                 <p>Colormap with varying intensity according to the density of features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('heatmap')">
                   <l-map
                     ref="mapConfigHeatmap"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
@@ -206,10 +210,11 @@
               <div v-if="metadata.clusters && metadata.clusters.features.length">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Clusters</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('clusters')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'clusters')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'clusters')">SHOW</button>
                 </div>
                 <p>Density-based spatial clusters of features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('clusters')">
                   <l-map
                     ref="mapClusters"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
@@ -279,7 +284,11 @@ import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
-import { CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand } from '@/model/catalogue';
+import {
+  CatalogueItemVisibilityCommand,
+  CatalogueItemSamplesCommand,
+  CatalogueItemDetails,
+} from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 import Modal from '@/components/Modal.vue';
@@ -298,11 +307,15 @@ import { cloneDeep } from 'lodash';
   },
 })
 export default class DataProfilingAndSamples extends Vue {
-  @Prop({ required: true }) private metadata: any;
+  @Prop({ required: true }) private catalogueItem!: CatalogueItemDetails;
 
   @Prop() private mode?: string;
 
   @Prop() private assetKey?: string;
+
+  metadata: any;
+
+  hiddenMetadata: string[] | undefined;
 
   catalogueApi: CatalogueApi;
 
@@ -335,7 +348,11 @@ export default class DataProfilingAndSamples extends Vue {
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
 
+    this.metadata = {};
+    if (this.catalogueItem.automatedMetadata) [this.metadata] = this.catalogueItem.automatedMetadata;
     console.log('met', this.metadata);
+
+    this.hiddenMetadata = this.catalogueItem.visibility;
 
     this.activeTab = 1;
 
@@ -545,22 +562,39 @@ export default class DataProfilingAndSamples extends Vue {
     return bounds;
   }
 
-  hideField(field: string): void {
+  onToggleField(hide: boolean, field: string): void {
     store.commit('setLoading', true);
     const key = this.assetKey ? this.assetKey : '';
-    const fieldsToHide: CatalogueItemVisibilityCommand = {
+    let fieldsToHide:string[] = [];
+    if (hide) {
+      fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.concat([field]) : [field];
+    } else {
+      fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.filter((x) => x !== field) : [];
+    }
+    const visibility: CatalogueItemVisibilityCommand = {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
-      visibility: [field],
+      visibility: fieldsToHide,
     };
-    this.draftAssetApi.updateDraftMetadataVisibility(key, fieldsToHide).then((hideFieldResponse) => {
+    this.draftAssetApi.updateDraftMetadataVisibility(key, visibility).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
+      this.hiddenMetadata = hideFieldResponse.data.result.command.visibility;
       store.commit('setLoading', false);
+      this.$nextTick(() => {
+        ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
+          try {
+            (this as any).$refs[x].mapObject.invalidateSize();
+            this.setMinMaxZoomLevels();
+          } catch (err) { console.log('err'); }
+        });
+      });
+      // this.$nextTick(() => {
+      //   (this as any).$refs.mapConfigMbr.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigConvexHull.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigHeatmap.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigClusters.mapObject.invalidateSize();
+      // });
     });
-    // this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
-    //   console.log('hfr', hideFieldResponse);
-    //   store.commit('setLoading', false);
-    // });
   }
 
   onReplaceSample(i: number): void {

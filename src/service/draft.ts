@@ -6,7 +6,8 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
-  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand, Sample,
+  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand,
+  //  Sample,
 } from '@/model/catalogue';
 import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
@@ -36,6 +37,7 @@ export default class DraftAssetApi extends Api {
 
     const queryString = (Object.keys(query) as Array<keyof AssetDraftQuery>)
       .reduce((result: string[], k: keyof AssetDraftQuery) => {
+        // eslint-disable-next-line
         const value = query[k] ? [...result, `${k}=${Array.isArray(query[k]) ? query[k]!.join(',') : query[k]}`] : result;
         return value;
       }, []);
@@ -148,10 +150,10 @@ export default class DraftAssetApi extends Api {
    *
    * @param key
    */
-  public async updateDraftMetadataVisibility(key: string, command: CatalogueItemVisibilityCommand): Promise<AxiosServerResponse<void>> {
+  public async updateDraftMetadataVisibility(key: string, command: CatalogueItemVisibilityCommand): Promise<AxiosServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}/metadata/visibility`;
 
-    return this.post<CatalogueItemVisibilityCommand, ServerResponse<void>>(url, command);
+    return this.post<CatalogueItemVisibilityCommand, ServerResponse<AssetDraft>>(url, command);
   }
 
   /**

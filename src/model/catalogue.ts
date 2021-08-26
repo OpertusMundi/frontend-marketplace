@@ -855,6 +855,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * Contract template key
    */
   contractTemplateKey: string;
+  /**
+   * Metadata fields to be hidden by vendor
+   */
+  visibility?: string[];
 }
 
 export enum EnumDraftCommandType {
