@@ -11,7 +11,7 @@
         <div @click="toggleExpansion" style="cursor: pointer"><svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16"><path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333"/><path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333"/><path data-name="Path 9451" d="m.801 16-.8-.8v-3.764h1.346v1.73l-.093.453.1.058.29-.372 3.24-3.24L5.923 11.1l-3.229 3.251-.372.29.058.1.453-.093h1.731V16z" fill="#333"/><path data-name="Path 9450" d="m15.187 16 .8-.8v-3.76h-1.346v1.73l.093.453-.1.058-.29-.372-3.24-3.24-1.034 1.034 3.229 3.252.372.29-.058.1-.453-.093h-1.73v1.347z" fill="#333"/></svg></div>
       </div>
 
-      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples && metadata.samples.length">
+      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
         <span><strong>Download metadata:</strong></span>
         <multiselect v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
@@ -29,7 +29,7 @@
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">Maps</a></li>
         <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
         <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
-        <li v-for="(sample, i) in metadata.samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
+        <li v-for="(sample, i) in samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
       </ul>
     </div>
     <div class="asset__section__content">
@@ -235,7 +235,7 @@
             </div>
           </li>
 
-          <li v-if="activeTab > 2">
+          <li v-if="activeTab > 2 && samples !== null">
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
               <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
@@ -288,6 +288,7 @@ import {
   CatalogueItemVisibilityCommand,
   CatalogueItemSamplesCommand,
   CatalogueItemDetails,
+  Sample,
 } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -315,6 +316,8 @@ export default class DataProfilingAndSamples extends Vue {
 
   metadata: any;
 
+  samples: Sample[];
+
   hiddenMetadata: string[] | undefined;
 
   catalogueApi: CatalogueApi;
@@ -338,7 +341,7 @@ export default class DataProfilingAndSamples extends Vue {
 
   indexOfSampleToReplace: number | null;
 
-  tempSamples: any;
+  tempSamples: Sample[];
 
   indexesOfReplacedSamples: number[];
 
@@ -360,6 +363,9 @@ export default class DataProfilingAndSamples extends Vue {
 
     this.isUserAuthenticated = store.getters.isAuthenticated;
 
+    this.samples = [];
+    this.tempSamples = [];
+
     this.heatmapGeoJson = null;
 
     // this.metadataDownloadFileSelection = 'sample 1';
@@ -368,9 +374,6 @@ export default class DataProfilingAndSamples extends Vue {
     this.modalToShow = '';
 
     this.indexOfSampleToReplace = null;
-
-    this.tempSamples = cloneDeep(this.metadata.samples);
-    console.log('ts', this.tempSamples);
 
     this.indexesOfReplacedSamples = [];
 
@@ -396,6 +399,11 @@ export default class DataProfilingAndSamples extends Vue {
     console.log('heatmap link', this.metadata.heatmap);
     this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
       this.heatmapGeoJson = heatmapResponse;
+    });
+    this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
+      console.log('samples!', samplesResponse);
+      this.samples = samplesResponse;
+      this.tempSamples = cloneDeep(samplesResponse);
     });
     console.log('keyyy', this.assetKey);
     console.log('k', this.metadata.key);
@@ -435,10 +443,10 @@ export default class DataProfilingAndSamples extends Vue {
     // const index = parseInt(this.metadataDownloadFileSelection.split('_')!.pop()!.split('.')[0]) - 1;
 
     const csvArr: Record<string, string>[] = [];
-    Object.values<Array<any>>(this.metadata.samples[index])[0].forEach((v, i) => {
+    Object.values<Array<any>>(this.samples[index])[0].forEach((v, i) => {
       const obj: Record<string, string> = {};
-      Object.keys(this.metadata.samples[index]).forEach((x) => {
-        obj[x] = this.metadata.samples[index][x][i];
+      Object.keys(this.samples[index]).forEach((x) => {
+        obj[x] = `${this.samples[index][x][i]}`;
       });
       csvArr.push(obj);
     });
@@ -610,7 +618,7 @@ export default class DataProfilingAndSamples extends Vue {
     const f = v.inputValues[0].value;
     csvToSample(f).then((r) => {
       console.log('r', r);
-      if (this.indexOfSampleToReplace) this.tempSamples[this.indexOfSampleToReplace] = r?.samples[0];
+      if (this.indexOfSampleToReplace && r?.samples[0]) [this.tempSamples[this.indexOfSampleToReplace]] = r.samples;
       if (this.indexOfSampleToReplace) this.indexesOfReplacedSamples.push(this.indexOfSampleToReplace);
       console.log(this.tempSamples);
       this.modalToShow = '';
@@ -620,14 +628,15 @@ export default class DataProfilingAndSamples extends Vue {
 
   onRevertSample(i: number): void {
     // this.tempSamples[i] = this.metadata.samples[i];
-    Vue.set(this.tempSamples, i, this.metadata.samples[i]);
+    console.log(i, this.samples[i]);
+    Vue.set(this.tempSamples, i, this.samples[i]);
     this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
   }
 
   onSubmitSample(i: number): void {
     store.commit('setLoading', true);
     const key = this.assetKey ? this.assetKey : '';
-    const samplesData = cloneDeep(this.metadata.samples);
+    const samplesData = cloneDeep(this.samples);
     samplesData[i] = this.tempSamples[i];
     console.log('k', key);
     console.log(samplesData);
@@ -638,6 +647,7 @@ export default class DataProfilingAndSamples extends Vue {
     this.draftAssetApi.updateDraftSamples(key, samples).then((updateSamplesResponse) => {
       if (updateSamplesResponse.data.success) {
         console.log('successfully updated samples!', updateSamplesResponse);
+        this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
         store.commit('setLoading', false);
       } else {
         console.log('error updating samples...');

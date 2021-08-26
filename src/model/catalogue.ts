@@ -495,9 +495,9 @@ export interface VectorMetadata extends Metadata {
    */
   recurring: { [attribute: string]: (string | number)[] };
   /**
-   * Collection of samples
+   * A link to a collection of samples
    */
-  samples: Sample[];
+  samples: string;
   /**
    * Descriptive statistics (min, max, mean, median, std, sum) for the numerical attributes in the dataset.
    */
