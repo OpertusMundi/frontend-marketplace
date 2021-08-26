@@ -435,7 +435,7 @@ export default class DataProfilingAndSamples extends Vue {
   // }
 
   onDownloadAutomatedMetadata(): void {
-    fileDownload(JSON.stringify(this.metadata), 'metadata.txt');
+    fileDownload(JSON.stringify(this.metadata), 'metadata.json');
   }
 
   onDownloadSample(index: number): void {
