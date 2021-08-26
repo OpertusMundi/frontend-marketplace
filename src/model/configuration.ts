@@ -36,6 +36,7 @@ interface AssetFileType {
 }
 
 interface AssetConfiguration {
+  domains: string[];
   fileTypes: AssetFileType[];
   pricingModels: PricingModelSettings[];
 }
