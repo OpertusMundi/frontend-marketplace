@@ -33,17 +33,16 @@
     <asset-card v-for="asset, i in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-20': i==0}"></asset-card>
     <pagination :currentPage="unpublishedCurrentPage" :itemsPerPage="unpublishedItemsPerPage" :itemsTotal="unpublishedItemsTotal" @pageSelection="onPageSelect(false, $event)"></pagination>
 
-    <hr class="mt-xs-50 mb-xs-50">
+    <hr class="mt-xs-50 mb-xs-50 seperator-published-unpublished">
 
-    <!-- <div class="filters">
-      <div class="filters__block">
-        <p class="filters__title">
-          <template v-if="!$store.getters.isLoading">
-            {{ publishedItemsTotal }} PUBLISHED ASSETS
-          </template>
-        </p>
-      </div>
-    </div> -->
+    <div class="collection__menu">
+      <ul>
+        <li @click="selectedTab = 'ALL_ASSETS'" :class="{ 'active': selectedTab==='ALL_ASSETS' }"><a href="#" @click.prevent="">All assets</a></li>
+        <li @click="selectedTab = 'DATA_FILES'" :class="{ 'active': selectedTab==='DATA_FILES' }"><a href="#" @click.prevent="">Data files</a></li>
+        <li @click="selectedTab = 'YOUR_APIS'" :class="{ 'active': selectedTab==='YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li>
+        <li @click="selectedTab = 'TOPIO_APIS'" :class="{ 'active': selectedTab==='TOPIO_APIS' }"><a href="#" @click.prevent="">Topio APIs</a></li>
+      </ul>
+    </div>
 
     <div class="filters mt-xs-30">
       <div class="filters__block">
@@ -75,8 +74,14 @@ import store from '@/store';
 import DraftAssetApi from '@/service/draft';
 import AssetCard from '@/components/Assets/AssetCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
+import {
+  AssetDraft,
+  AssetDraftQuery,
+  EnumDraftStatus,
+  EnumSortField,
+} from '@/model/draft';
 import { Order } from '@/model/request';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 
 @Component({
   components: {
@@ -115,6 +120,8 @@ export default class DashboardHome extends Vue {
 
   selectedOrderOptionUnpublished: string;
 
+  selectedTab: string;
+
   constructor() {
     super();
 
@@ -149,6 +156,8 @@ export default class DashboardHome extends Vue {
 
     this.selectedOrderOptionPublished = 'MODIFIED DESCENDING';
     this.selectedOrderOptionUnpublished = 'MODIFIED DESCENDING';
+
+    this.selectedTab = 'ALL_ASSETS';
   }
 
   @Watch('selectedStatus')
@@ -166,6 +175,11 @@ export default class DashboardHome extends Vue {
     this.searchAssets(false, 0);
   }
 
+  @Watch('selectedTab')
+  onSelectedTabChange(): void {
+    this.searchAssets(true, 0, true);
+  }
+
   mounted(): void {
     this.searchAssets(false, 0);
     this.searchAssets(true, 0);
@@ -175,9 +189,17 @@ export default class DashboardHome extends Vue {
     this.isLoadingPublished = published ? true : this.isLoadingPublished;
     this.isLoadingUnpublished = published ? this.isLoadingUnpublished : true;
 
-    const query: { status: EnumDraftStatus[] } = { status: [] };
+    const query: Partial<AssetDraftQuery> = {};
     if (published) {
       query.status = [EnumDraftStatus.PUBLISHED];
+      const assetTypes = {
+        DATA_FILES: [EnumAssetType.RASTER, EnumAssetType.VECTOR],
+        YOUR_APIS: [],
+        TOPIO_APIS: [EnumAssetType.SERVICE],
+      };
+      if (this.selectedTab !== 'ALL_ASSETS') query.type = assetTypes[this.selectedTab];
+      // TODO: Your APIs should currently return no results.The following assignment (TMS) is just a dummy value. To be removed in the future when YOUR_APIS is supported.
+      if (this.selectedTab === 'YOUR_APIS') query.serviceType = [EnumSpatialDataServiceType.TMS];
     } else {
       query.status = this.selectedStatus === 'ALL' ? [
         EnumDraftStatus.DRAFT,
@@ -230,7 +252,8 @@ export default class DashboardHome extends Vue {
           if (scrollBehavior) {
             Vue.nextTick(() => {
               window.scrollTo({
-                top: document.querySelector('.asset_card__published--first') ? (document.querySelector('.asset_card__published--first') as HTMLElement).offsetTop : 0,
+                // top: document.querySelector('.asset_card__published--first') ? (document.querySelector('.asset_card__published--first') as HTMLElement).offsetTop : 0,
+                top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
                 behavior: 'smooth',
               });
             });
@@ -274,4 +297,5 @@ export default class DashboardHome extends Vue {
 <style lang="scss">
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/_filters.scss";
+  @import "@/assets/styles/_collection.scss";
 </style>
