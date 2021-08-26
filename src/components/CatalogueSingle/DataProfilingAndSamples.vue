@@ -124,8 +124,8 @@
                 <div class="tab_maps-map" v-if="!hiddenMetadata.includes('mbr')">
                   <l-map
                     ref="mapConfigMbr"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromWKT(metadata.mbr)"
+                    :maxBounds="getMapBoundsFromWKT(metadata.mbr)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -148,10 +148,16 @@
                 </div>
                 <p>Convex polygon enclosing all features</p>
                 <div class="tab_maps-map" v-if="!hiddenMetadata.includes('convexHull')">
-                  <l-map
+                  <!-- <l-map
                     ref="mapConfigConvexHull"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
                     :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
+                  > -->
+                  <l-map
+                    ref="mapConfigConvexHull"
+                    :bounds="getMapBoundsFromWKT(metadata.convexHull)"
+                    :maxBounds="getMapBoundsFromWKT(metadata.convexHull)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -188,8 +194,8 @@
                 <div class="tab_maps-map" v-if="!hiddenMetadata.includes('heatmap')">
                   <l-map
                     ref="mapConfigHeatmap"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromGeoJson(heatmapGeoJson)"
+                    :maxBounds="getMapBoundsFromGeoJson(heatmapGeoJson)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -217,8 +223,8 @@
                 <div class="tab_maps-map" v-if="!hiddenMetadata.includes('clusters')">
                   <l-map
                     ref="mapClusters"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromGeoJson(metadata.clusters)"
+                    :maxBounds="getMapBoundsFromGeoJson(metadata.clusters)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -295,6 +301,7 @@ import { GeoJsonObject } from 'geojson';
 import Modal from '@/components/Modal.vue';
 import csvToSample from '@/helper/file';
 import { cloneDeep } from 'lodash';
+import { bbox as turfBBox } from '@turf/turf';
 
 @Component({
   components: {
@@ -547,15 +554,23 @@ export default class DataProfilingAndSamples extends Vue {
 
   setMinMaxZoomLevels(): void {
     this.$nextTick(() => {
-      const fitBoundsZoomLevel = (this as any).$refs.mapConfigMbr.mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson(this.metadata.mbr)).getBounds());
+      let fitBoundsZoomLevel;
+      ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].every((map) => {
+        if (this.$refs[map]) {
+          fitBoundsZoomLevel = (this as any).$refs[map].mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson(this.metadata.mbr)).getBounds());
 
-      const zoomOffset = 2;
+          const zoomOffset = 2;
 
-      const minZoom = fitBoundsZoomLevel - zoomOffset < 0 ? 0 : fitBoundsZoomLevel - zoomOffset;
-      const maxZoom = fitBoundsZoomLevel + zoomOffset;
+          const minZoom = fitBoundsZoomLevel - zoomOffset < 0 ? 0 : fitBoundsZoomLevel - zoomOffset;
+          const maxZoom = fitBoundsZoomLevel + zoomOffset;
 
-      Vue.set(this.mapConfig.options, 'minZoom', minZoom);
-      Vue.set(this.mapConfig.options, 'maxZoom', maxZoom);
+          Vue.set(this.mapConfig.options, 'minZoom', minZoom);
+          Vue.set(this.mapConfig.options, 'maxZoom', maxZoom);
+
+          return false;
+        }
+        return true;
+      });
     });
   }
 
@@ -563,11 +578,22 @@ export default class DataProfilingAndSamples extends Vue {
     return wktToGeojsonParser(wkt);
   }
 
-  mbrToLeafletBounds(wkt: string): number[][] {
+  // mbrToLeafletBounds(wkt: string): number[][] {
+  //   const geoJson = wktToGeojsonParser(wkt);
+  //   const bounds = geoJson.coordinates[0]
+  //     .map((x) => [x[1], x[0]]);
+  //   return bounds;
+  // }
+
+  getMapBoundsFromWKT(wkt: string): number[][] {
     const geoJson = wktToGeojsonParser(wkt);
-    const bounds = geoJson.coordinates[0]
-      .map((x) => [x[1], x[0]]);
-    return bounds;
+    const bbox = turfBBox(geoJson);
+    return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
+  }
+
+  getMapBoundsFromGeoJson(geoJson: GeoJsonObject): number[][] {
+    const bbox = turfBBox(geoJson);
+    return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
   }
 
   onToggleField(hide: boolean, field: string): void {
