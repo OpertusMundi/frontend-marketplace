@@ -1,21 +1,21 @@
 <template>
   <div class="asset_card__wrapper">
-    <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
+    <router-link :to="`/catalogue/${asset.id}`" class="asset_card asset_card--wrapped" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
       <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
         <div class="asset_card__inner" :style="{'--color': getColor()}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
-            <div v-if="asset.command">
-              <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
-              <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
-              <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
-              <span class="asset_card__type">{{asset.command.type}}</span>
-              <span v-for="(category, i) in asset.command.topicCategory" :key="category">
-                {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
+            <div>
+              <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.type === 'VECTOR'">
+              <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.type === 'RASTER'">
+              <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.type === 'SERVICE'">
+              <span class="asset_card__type">{{asset.type}}</span>
+              <span v-for="(category, i) in asset.topicCategory" :key="category">
+                {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.topicCategory.length - 1">, </span>
               </span>
             </div>
           </div>
-          <div class="asset_card__top__right"><span>{{ formatStatus(asset.status) }}</span></div>
+          <div class="asset_card__top__right"><span>PUBLISHED</span></div>
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
@@ -28,7 +28,7 @@
         <div class="asset_card__bottom">
           <div class="asset_card__bottom__left">
             <div class="asset_card__bottom__left__info">
-              <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.command && asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
+              <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.revisionDate) }}</span>
             </div>
           </div>
         </div>
@@ -55,20 +55,22 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import DraftAssetApi from '@/service/draft';
-import { AssetDraft } from '@/model/draft';
+// import { AssetDraft } from '@/model/draft';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
 import {
+  EffectivePricingModel,
   EnumPricingModel,
   FixedPopulationPricingModelCommand,
   FixedPricingModelCommand,
   FixedRowPricingModelCommand,
+  FreePricingModelCommand,
 } from '@/model/pricing-model';
 import moment from 'moment';
-import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
+import { CatalogueItem, DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
 
 @Component
-export default class AssetCard extends Vue {
-  @Prop({ required: true }) readonly asset!: AssetDraft;
+export default class AssetPublishedCard extends Vue {
+  @Prop({ required: true }) readonly asset!: CatalogueItem;
 
   draftAssetApi: DraftAssetApi;
 
@@ -85,12 +87,11 @@ export default class AssetCard extends Vue {
   // TODO: api must return asset type
   getColor(): string {
     let color = '#358F8B';
-    if (!this.asset.command || !this.asset.command.type) return color; // in buggy case that no type is returned
-    if (this.asset.command && this.asset.command.type === 'VECTOR') {
+    if (this.asset.type === 'VECTOR') {
       color = '#358F8B';
-    } else if (this.asset.command && this.asset.command.type === 'SERVICE') {
+    } else if (this.asset.type === 'SERVICE') {
       color = '#6F43B5';
-    } else if (this.asset.command && this.asset.command.type === 'RASTER') {
+    } else if (this.asset.type === 'RASTER') {
       color = '#197196';
     }
     return color;
@@ -100,19 +101,19 @@ export default class AssetCard extends Vue {
     return status.replaceAll('_', ' ');
   }
 
-  getRouterLink(assetStatus: string, assetKey: string, assetPublished: string): string {
-    const links = {
-      DRAFT: `/dashboard/assets/create/${assetKey}`,
-      SUBMITTED: '',
-      PENDING_HELPDESK_REVIEW: '',
-      HELPDESK_REJECTED: '',
-      PENDING_PROVIDER_REVIEW: `/review/${assetKey}`,
-      PROVIDER_REJECTED: '',
-      POST_PROCESSING: '',
-      PUBLISHED: `/catalogue/${assetPublished}`,
-    };
-    return links[assetStatus];
-  }
+  // getRouterLink(assetStatus: string, assetKey: string, assetPublished: string): string {
+  //   const links = {
+  //     DRAFT: `/dashboard/assets/create/${assetKey}`,
+  //     SUBMITTED: '',
+  //     PENDING_HELPDESK_REVIEW: '',
+  //     HELPDESK_REJECTED: '',
+  //     PENDING_PROVIDER_REVIEW: `/review/${assetKey}`,
+  //     PROVIDER_REJECTED: '',
+  //     POST_PROCESSING: '',
+  //     PUBLISHED: `/catalogue/${assetPublished}`,
+  //   };
+  //   return links[assetStatus];
+  // }
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');
@@ -125,32 +126,32 @@ export default class AssetCard extends Vue {
   getPriceOrMinimumPrice(): {prefix: string, value: string, suffix: string} {
     const res = { prefix: '', value: '', suffix: '' };
 
-    if (!this.asset.command) return { prefix: '', value: '', suffix: '' };
+    if (!this.asset.pricingModels || !this.asset.pricingModels.length) return { prefix: '', value: '', suffix: '' };
 
-    res.prefix = this.asset.command.pricingModels.length > 1 || (this.asset.command.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.command.pricingModels[0].type))) ? 'FROM' : '';
+    res.prefix = this.asset.pricingModels.length > 1 || (this.asset.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.pricingModels[0].model.type))) ? 'FROM' : '';
 
     let minPrice = Infinity;
-    for (let i = 0; i < this.asset.command.pricingModels.length; i += 1) {
-      const x = this.asset.command.pricingModels[i];
-      if (x.type === EnumPricingModel.FREE) {
+    for (let i = 0; i < this.asset.pricingModels.length; i += 1) {
+      const x = this.asset.pricingModels[i] as EffectivePricingModel;
+      if ((x.model as FreePricingModelCommand).type === EnumPricingModel.FREE) {
         minPrice = 0;
         res.value = 'FREE';
         res.suffix = '';
         break;
       }
-      if (x.type === EnumPricingModel.FIXED && (x as FixedPricingModelCommand).totalPriceExcludingTax < minPrice) {
-        minPrice = (x as FixedPricingModelCommand).totalPriceExcludingTax;
-        res.value = `${(x as FixedPricingModelCommand).totalPriceExcludingTax}`;
+      if (x.model.type === EnumPricingModel.FIXED && (x.model as FixedPricingModelCommand).totalPriceExcludingTax < minPrice) {
+        minPrice = (x.model as FixedPricingModelCommand).totalPriceExcludingTax;
+        res.value = `${(x.model as FixedPricingModelCommand).totalPriceExcludingTax}`;
         res.suffix = '';
       }
-      if (x.type === EnumPricingModel.FIXED_PER_ROWS && (x as FixedRowPricingModelCommand).price < minPrice) {
-        minPrice = (x as FixedRowPricingModelCommand).price;
-        res.value = `${(x as FixedRowPricingModelCommand).price}`;
+      if (x.model.type === EnumPricingModel.FIXED_PER_ROWS && (x.model as FixedRowPricingModelCommand).price < minPrice) {
+        minPrice = (x.model as FixedRowPricingModelCommand).price;
+        res.value = `${(x.model as FixedRowPricingModelCommand).price}`;
         res.suffix = '1,000 rows';
       }
-      if (x.type === EnumPricingModel.FIXED_FOR_POPULATION && (x as FixedPopulationPricingModelCommand).price < minPrice) {
-        minPrice = (x as FixedPopulationPricingModelCommand).price;
-        res.value = `${(x as FixedPopulationPricingModelCommand).price}`;
+      if (x.model.type === EnumPricingModel.FIXED_FOR_POPULATION && (x.model as FixedPopulationPricingModelCommand).price < minPrice) {
+        minPrice = (x.model as FixedPopulationPricingModelCommand).price;
+        res.value = `${(x.model as FixedPopulationPricingModelCommand).price}`;
         res.suffix = '10,000 people';
       }
     }
@@ -162,7 +163,7 @@ export default class AssetCard extends Vue {
     console.log('create WMS');
     const draftApi: DraftApiFromAssetCommand = {
       type: EnumDraftCommandType.ASSET,
-      pid: this.asset.assetPublished,
+      pid: this.asset.id,
       title: this.asset.title,
       version: this.asset.version,
       serviceType,
@@ -180,7 +181,7 @@ export default class AssetCard extends Vue {
   }
 
   deleteAsset(): void {
-    this.$emit('delete', this.asset.assetPublished);
+    this.$emit('delete', this.asset.id);
   }
 }
 </script>
