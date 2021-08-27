@@ -77,7 +77,8 @@
 
             <!-- PRICING -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep == 4"></pricing>
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType !== 'API' && currentStep == 4"></pricing>
+              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
             <!-- </transition> -->
 
             <!-- DELIVERY -->
@@ -158,6 +159,7 @@ import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
+import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
 import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
@@ -184,6 +186,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     Payout,
     Review,
     ApiDetails,
+    ApiPricing,
     Modal,
   },
 })

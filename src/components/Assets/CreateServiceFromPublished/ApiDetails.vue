@@ -132,7 +132,9 @@ export default class ApiDetails extends Vue {
 
   @Watch('serviceTypeLocal')
   onServiceTypeChange(serviceType: EnumSpatialDataServiceType | null): void {
-    this.assetLocal.spatialDataServiceType = serviceType;
+    console.log('s', serviceType);
+    // this.assetLocal.spatialDataServiceType = serviceType;
+    Vue.set(this.assetLocal, 'spatialDataServiceType', serviceType);
   }
 
   created(): void {
