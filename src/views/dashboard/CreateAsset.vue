@@ -66,7 +66,7 @@
             <!-- METADATA -->
             <!-- <transition name="fade" mode="out-in"> -->
               <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
-              <api-details ref="step2" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
+              <api-details ref="step2" :asset.sync="asset" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
             <!-- </transition> -->
 
             <!-- CONTRACT -->
@@ -147,7 +147,7 @@ import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
 import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
-import { EnumAssetType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
@@ -212,6 +212,8 @@ export default class CreateAsset extends Vue {
 
   assetMainType: string; // Data File / API / Collection
 
+  serviceType: null | EnumSpatialDataServiceType;
+
   selectedPricingModelForEditing: number | null;
 
   // contract: string;
@@ -244,6 +246,8 @@ export default class CreateAsset extends Vue {
     };
 
     this.assetMainType = '';
+
+    this.serviceType = null;
 
     this.selectedPricingModelForEditing = null;
 
@@ -340,6 +344,8 @@ export default class CreateAsset extends Vue {
     this.draftAssetApi.findOne(this.assetId).then((assetResponse) => {
       this.asset = { ...this.asset, ...assetResponse.result.command };
 
+      this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
+
       // todo: use Enum (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
         this.assetMainType = 'datafile';
@@ -434,6 +440,14 @@ export default class CreateAsset extends Vue {
 
     const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
     console.log(submitResponse);
+    if (submitResponse.success) {
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.title = 'Service created!';
+      this.uploading.subtitle = '';
+    } else {
+      console.log('error submitting service');
+    }
   }
 
   // needs refactoring

@@ -43,8 +43,8 @@
           <ul>
             <li>Publish</li>
             <li>Edit</li>
-            <li @click="createWMS">Create WMS</li>
-            <li>Create WFS</li>
+            <li @click="createService('WMS')">Create WMS</li>
+            <li @click="createService('WFS')">Create WFS</li>
             <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
@@ -158,33 +158,23 @@ export default class AssetCard extends Vue {
     return res;
   }
 
-  createWMS(): void {
+  createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {
     console.log('create WMS');
     const draftApi: DraftApiFromAssetCommand = {
       type: EnumDraftCommandType.ASSET,
       pid: this.asset.assetPublished,
       title: this.asset.title,
       version: this.asset.version,
-      serviceType: 'WMS',
+      serviceType,
     };
     this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
       if (createApiResponse.success) {
-        console.log('wms draft created successfully!!', createApiResponse);
+        console.log('service draft created successfully!!', createApiResponse);
         const { key } = createApiResponse.result;
         console.log(`/dashboard/assets/create/${key}`);
         this.$router.push(`/dashboard/assets/create/${key}`);
-        // console.log('wms draft created successfully!!', createApiResponse);
-        // const { key } = createApiResponse.result;
-        // const item: CatalogueItemCommand = createApiResponse.result.command;
-        // this.draftAssetApi.updateAndSubmit(key, item).then((submitResponse) => {
-        //   if (submitResponse.success) {
-        //     console.log('wms submitted successfully', submitResponse);
-        //   } else {
-        //     console.log('error submitting wms', submitResponse);
-        //   }
-        // });
       } else {
-        console.log('error creating wms draft', createApiResponse);
+        console.log('error creating service draft', createApiResponse);
       }
     });
   }
