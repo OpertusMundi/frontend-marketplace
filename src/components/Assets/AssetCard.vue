@@ -5,13 +5,15 @@
         <div class="asset_card__inner" :style="{'--color': getColor()}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
-            <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
-            <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
-            <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
-            <span class="asset_card__type">{{asset.command.type}}</span>
-            <span v-for="(category, i) in asset.command.topicCategory" :key="category">
-              {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
-            </span>
+            <div v-if="asset.command">
+              <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
+              <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
+              <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
+              <span class="asset_card__type">{{asset.command.type}}</span>
+              <span v-for="(category, i) in asset.command.topicCategory" :key="category">
+                {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
+              </span>
+            </div>
           </div>
           <div class="asset_card__top__right"><span>{{ formatStatus(asset.status) }}</span></div>
         </div>
@@ -26,7 +28,7 @@
         <div class="asset_card__bottom">
           <div class="asset_card__bottom__left">
             <div class="asset_card__bottom__left__info">
-              <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
+              <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.command && asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
             </div>
           </div>
         </div>
@@ -83,6 +85,7 @@ export default class AssetCard extends Vue {
   // TODO: api must return asset type
   getColor(): string {
     let color = '#358F8B';
+    if (!this.asset.command || !this.asset.command.type) return color; // in buggy case that no type is returned
     if (this.asset.command && this.asset.command.type === 'VECTOR') {
       color = '#358F8B';
     } else if (this.asset.command && this.asset.command.type === 'SERVICE') {
@@ -121,6 +124,8 @@ export default class AssetCard extends Vue {
 
   getPriceOrMinimumPrice(): {prefix: string, value: string, suffix: string} {
     const res = { prefix: '', value: '', suffix: '' };
+
+    if (!this.asset.command) return { prefix: '', value: '', suffix: '' };
 
     res.prefix = this.asset.command.pricingModels.length > 1 || (this.asset.command.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.command.pricingModels[0].type))) ? 'FROM' : '';
 

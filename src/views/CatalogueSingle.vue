@@ -17,7 +17,7 @@
             <terms-and-restrictions :catalogueItem="catalogueItem"></terms-and-restrictions>
 
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
-            <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem"></data-profiling-and-samples>
+            <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -82,7 +82,7 @@ export default class CatalogueSingle extends Vue {
 
   mode: string; // catalog or review
 
-  reviewModeAssetKey?: string;
+  reviewModeAssetKey: string;
 
   isItemLoaded: boolean;
 
@@ -98,6 +98,8 @@ export default class CatalogueSingle extends Vue {
 
     // todo: enum
     this.mode = '';
+
+    this.reviewModeAssetKey = '';
 
     this.isItemLoaded = false;
 
