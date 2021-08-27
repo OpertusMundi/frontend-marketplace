@@ -105,6 +105,18 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
       {
+        path: 'earnings',
+        name: 'Earnings',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardearnings" */ '../views/dashboard/Earnings.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
+        path: 'contracts',
+        name: 'Contracts',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardcontracts" */ '../views/dashboard/Contracts.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
         path: 'storage',
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
@@ -122,12 +134,6 @@ const routes: RouteConfig[] = [
         name: 'CreateAsset',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateasset" */ '../views/dashboard/CreateAsset.vue'),
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
-      },
-      {
-        path: 'profile',
-        name: 'Profile',
-        component: (): Promise<any> => import(/* webpackChunkName: "dashboardprofile" */ '../views/dashboard/Profile.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'favorites',
@@ -164,6 +170,12 @@ const routes: RouteConfig[] = [
         name: 'Purchases',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardpurchases" */ '../views/dashboard/Purchases.vue'),
         meta: { requiresRole: [EnumRole.ROLE_CONSUMER], layout: 'dashboard' },
+      },
+      {
+        path: 'subscriptions',
+        name: 'Subscriptions',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardsubscriptions" */ '../views/dashboard/Subscriptions.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'purchase/:key',

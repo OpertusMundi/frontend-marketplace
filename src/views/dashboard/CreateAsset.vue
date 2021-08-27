@@ -48,7 +48,7 @@
         <ul v-else class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a></li>
-          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Meadata</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
           <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
           <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
@@ -65,12 +65,14 @@
 
             <!-- METADATA -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep == 2"></metadata>
+              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
+              <api-details ref="step2" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
             <!-- </transition> -->
 
             <!-- CONTRACT -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep == 3"></contract>
+              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
+              <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType === 'API' && currentStep === 3"></metadata>
             <!-- </transition> -->
 
             <!-- PRICING -->
@@ -80,7 +82,8 @@
 
             <!-- DELIVERY -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep == 5"></delivery>
+              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="assetMainType !== 'API' && currentStep == 5"></delivery>
+              <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType === 'API' && currentStep === 5"></contract>
             <!-- </transition> -->
 
             <!-- PAYOUT -->
@@ -154,6 +157,7 @@ import Pricing from '@/components/Assets/Create/Pricing.vue';
 import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
+import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
 import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
@@ -179,6 +183,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     Delivery,
     Payout,
     Review,
+    ApiDetails,
     Modal,
   },
 })
@@ -338,7 +343,7 @@ export default class CreateAsset extends Vue {
       // todo: use Enum (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
         this.assetMainType = 'datafile';
-      } else if (this.asset.type as string === 'API') {
+      } else if (this.asset.type as string === 'SERVICE') {
         this.assetMainType = 'API';
       } else {
         // todo
@@ -362,7 +367,11 @@ export default class CreateAsset extends Vue {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
-          this.submitForm();
+          if (this.assetMainType === 'API') {
+            this.submitServiceForm();
+          } else {
+            this.submitForm();
+          }
         } else {
           this.currentStep += 1;
           window.scrollTo({
@@ -403,6 +412,28 @@ export default class CreateAsset extends Vue {
   fixDataForSubmitting(): void {
     // fix dates format
     this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
+  }
+
+  // todo: needs refactoring
+  async submitServiceForm(): Promise<void> {
+    this.fixDataForSubmitting();
+
+    const config: AxiosRequestConfig = {
+      onUploadProgress: (progressEvent: any): void => {
+        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+        if (totalLength !== null) {
+          this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+        }
+      },
+    };
+
+    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config);
+
+    // const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
+    const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
+
+    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    console.log(submitResponse);
   }
 
   // needs refactoring

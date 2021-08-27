@@ -7,7 +7,7 @@ import {
 import { AxiosResponse } from 'axios';
 import { Provider } from '@/model/account';
 import {
-  CatalogueHarvestCommand, CatalogueHarvestImportCommand, CatalogueItemDetails, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField,
+  CatalogueHarvestCommand, CatalogueHarvestImportCommand, CatalogueItemDetails, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField, Sample,
 } from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 // eslint-disable-next-line
@@ -163,6 +163,14 @@ export default class CatalogueApi extends Api {
   }
 
   public async getAssetHeatmap(url: string): Promise<GeoJsonObject> {
+    return this.get(url).then((response: AxiosResponse) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
+
+  public async getAssetSamples(url: string): Promise<Sample[]> {
     return this.get(url).then((response: AxiosResponse) => {
       const { data } = response;
 

@@ -1,12 +1,17 @@
 <template>
   <section class="asset__section" :class="{'asset__section--expanded': isExpanded}">
+
+    <!-- MODALS -->
+    <modal :show="modalToShow == 'modalUploadSample'" @dismiss="modalToShow = ''" @submit="onDisplaySample" :title="'Upload sample'" :modalId="'modalSample'" :inputs="[{id: 'sample', name: 'Sample', type: 'file', returnType: 'blob'}]"></modal>
+    <!-- END OF MODALS -->
+
     <div class="asset__section__head">
       <div class="d-flex space-between">
         <h4>Data Profiling and Samples</h4>
         <div @click="toggleExpansion" style="cursor: pointer"><svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16"><path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333"/><path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333"/><path data-name="Path 9451" d="m.801 16-.8-.8v-3.764h1.346v1.73l-.093.453.1.058.29-.372 3.24-3.24L5.923 11.1l-3.229 3.251-.372.29.058.1.453-.093h1.731V16z" fill="#333"/><path data-name="Path 9450" d="m15.187 16 .8-.8v-3.76h-1.346v1.73l.093.453-.1.058-.29-.372-3.24-3.24-1.034 1.034 3.229 3.252.372.29-.058.1-.453-.093h-1.73v1.347z" fill="#333"/></svg></div>
       </div>
 
-      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples && metadata.samples.length">
+      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
         <span><strong>Download metadata:</strong></span>
         <multiselect v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
@@ -24,7 +29,7 @@
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">Maps</a></li>
         <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
         <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
-        <li v-for="(sample, i) in metadata.samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
+        <li v-for="(sample, i) in samples" :key="i"><a href="#" @click.prevent="activeTab = i + 3" :class="{ 'active' : activeTab == i + 3 }">Sample {{ i + 1 }}</a></li>
       </ul>
     </div>
     <div class="asset__section__content">
@@ -112,14 +117,15 @@
               <div v-if="metadata.mbr">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">MBR</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('mbr')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'mbr')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'mbr')">SHOW</button>
                 </div>
                 <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('mbr')">
                   <l-map
                     ref="mapConfigMbr"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromWKT(metadata.mbr)"
+                    :maxBounds="getMapBoundsFromWKT(metadata.mbr)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -137,14 +143,21 @@
               <div v-if="metadata.convexHull">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Convex Hull</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('convexHull')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'convexHull')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'convexHull')">SHOW</button>
                 </div>
                 <p>Convex polygon enclosing all features</p>
-                <div class="tab_maps-map">
-                  <l-map
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('convexHull')">
+                  <!-- <l-map
                     ref="mapConfigConvexHull"
                     :bounds="mbrToLeafletBounds(metadata.mbr)"
                     :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :options="mapConfig.options"
+                  > -->
+                  <l-map
+                    ref="mapConfigConvexHull"
+                    :bounds="getMapBoundsFromWKT(metadata.convexHull)"
+                    :maxBounds="getMapBoundsFromWKT(metadata.convexHull)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -162,10 +175,11 @@
               <div v-if="metadata.thumbnail">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Thumbnail</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('thumbnail')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'thumbnail')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'thumbnail')">SHOW</button>
                 </div>
                 <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-                <div class="tab_maps-map tab_maps-map-thumbnail">
+                <div class="tab_maps-map tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
                   <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail">
                 </div>
               </div>
@@ -173,14 +187,15 @@
               <div v-if="metadata.heatmap">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Heatmap</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('heatmap')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'heatmap')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'heatmap')">SHOW</button>
                 </div>
                 <p>Colormap with varying intensity according to the density of features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('heatmap')">
                   <l-map
                     ref="mapConfigHeatmap"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromGeoJson(heatmapGeoJson)"
+                    :maxBounds="getMapBoundsFromGeoJson(heatmapGeoJson)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -201,14 +216,15 @@
               <div v-if="metadata.clusters && metadata.clusters.features.length">
                 <div class="d-flex space-between mb-xs-5">
                   <span class="map-type">Clusters</span>
-                  <button v-if="mode === 'review'" class="btn--std btn--outlineblue" @click="hideField('clusters')">HIDE</button>
+                  <button v-if="mode === 'review' && !hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'clusters')">HIDE</button>
+                  <button v-if="mode === 'review' && hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'clusters')">SHOW</button>
                 </div>
                 <p>Density-based spatial clusters of features</p>
-                <div class="tab_maps-map">
+                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('clusters')">
                   <l-map
                     ref="mapClusters"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                    :bounds="getMapBoundsFromGeoJson(metadata.clusters)"
+                    :maxBounds="getMapBoundsFromGeoJson(metadata.clusters)"
                     :options="mapConfig.options"
                   >
                     <l-tile-layer
@@ -225,18 +241,22 @@
             </div>
           </li>
 
-          <li v-if="activeTab > 2">
-            <div v-for="(sampleTab, i) in metadata.samples" :key="i">
+          <li v-if="activeTab > 2 && samples !== null">
+            <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
+              <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
+              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
+              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
+
               <div v-if="activeTab === i + 3" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
               <div v-if="activeTab === i + 3" class="samples_table__wrapper">
                 <table class="samples_table">
                   <tr class="samples_table__header">
-                    <th v-for="(attribute, j) in Object.keys(metadata.samples[i])" :key="j">{{ attribute }}</th>
+                    <th v-for="(attribute, j) in Object.keys(tempSamples[i])" :key="j">{{ attribute }}</th>
                   </tr>
-                  <tr class="samples_table__data" v-for="(value, j) in Object.values(metadata.samples[i])[0]" :key="j">
-                    <td v-for="(attribute, k) in Object.keys(metadata.samples[i])" :key="k">
-                      {{ metadata.samples[i][attribute][j] ? metadata.samples[i][attribute][j] : '-' }}
+                  <tr class="samples_table__data" v-for="(value, j) in Object.values(tempSamples[i])[0]" :key="j">
+                    <td v-for="(attribute, k) in Object.keys(tempSamples[i])" :key="k">
+                      {{ tempSamples[i][attribute][j] ? tempSamples[i][attribute][j] : '-' }}
                     </td>
                   </tr>
                 </table>
@@ -270,9 +290,18 @@ import fileDownload from 'js-file-download';
 import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
-import { CatalogueItemVisibilityCommand } from '@/model/catalogue';
+import {
+  CatalogueItemVisibilityCommand,
+  CatalogueItemSamplesCommand,
+  CatalogueItemDetails,
+  Sample,
+} from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
+import Modal from '@/components/Modal.vue';
+import csvToSample from '@/helper/file';
+import { cloneDeep } from 'lodash';
+import { bbox as turfBBox } from '@turf/turf';
 
 @Component({
   components: {
@@ -282,14 +311,21 @@ import { GeoJsonObject } from 'geojson';
     LTileLayer,
     LPolygon,
     LGeoJson,
+    Modal,
   },
 })
 export default class DataProfilingAndSamples extends Vue {
-  @Prop({ required: true }) private metadata: any;
+  @Prop({ required: true }) private catalogueItem!: CatalogueItemDetails;
 
   @Prop() private mode?: string;
 
   @Prop() private assetKey?: string;
+
+  metadata: any;
+
+  samples: Sample[];
+
+  hiddenMetadata: string[] | undefined;
 
   catalogueApi: CatalogueApi;
 
@@ -308,13 +344,25 @@ export default class DataProfilingAndSamples extends Vue {
 
   isExpanded: boolean;
 
+  modalToShow: string;
+
+  indexOfSampleToReplace: number | null;
+
+  tempSamples: Sample[];
+
+  indexesOfReplacedSamples: number[];
+
   constructor() {
     super();
 
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
 
+    this.metadata = {};
+    if (this.catalogueItem.automatedMetadata) [this.metadata] = this.catalogueItem.automatedMetadata;
     console.log('met', this.metadata);
+
+    this.hiddenMetadata = this.catalogueItem.visibility;
 
     this.activeTab = 1;
 
@@ -322,10 +370,19 @@ export default class DataProfilingAndSamples extends Vue {
 
     this.isUserAuthenticated = store.getters.isAuthenticated;
 
+    this.samples = [];
+    this.tempSamples = [];
+
     this.heatmapGeoJson = null;
 
     // this.metadataDownloadFileSelection = 'sample 1';
     this.metadataDownloadFileSelection = '';
+
+    this.modalToShow = '';
+
+    this.indexOfSampleToReplace = null;
+
+    this.indexesOfReplacedSamples = [];
 
     this.mapConfig = {
       options: {
@@ -349,6 +406,11 @@ export default class DataProfilingAndSamples extends Vue {
     console.log('heatmap link', this.metadata.heatmap);
     this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
       this.heatmapGeoJson = heatmapResponse;
+    });
+    this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
+      console.log('samples!', samplesResponse);
+      this.samples = samplesResponse;
+      this.tempSamples = cloneDeep(samplesResponse);
     });
     console.log('keyyy', this.assetKey);
     console.log('k', this.metadata.key);
@@ -380,7 +442,7 @@ export default class DataProfilingAndSamples extends Vue {
   // }
 
   onDownloadAutomatedMetadata(): void {
-    fileDownload(JSON.stringify(this.metadata), 'metadata.txt');
+    fileDownload(JSON.stringify(this.metadata), 'metadata.json');
   }
 
   onDownloadSample(index: number): void {
@@ -388,10 +450,10 @@ export default class DataProfilingAndSamples extends Vue {
     // const index = parseInt(this.metadataDownloadFileSelection.split('_')!.pop()!.split('.')[0]) - 1;
 
     const csvArr: Record<string, string>[] = [];
-    Object.values<Array<any>>(this.metadata.samples[index])[0].forEach((v, i) => {
+    Object.values<Array<any>>(this.samples[index])[0].forEach((v, i) => {
       const obj: Record<string, string> = {};
-      Object.keys(this.metadata.samples[index]).forEach((x) => {
-        obj[x] = this.metadata.samples[index][x][i];
+      Object.keys(this.samples[index]).forEach((x) => {
+        obj[x] = `${this.samples[index][x][i]}`;
       });
       csvArr.push(obj);
     });
@@ -492,15 +554,23 @@ export default class DataProfilingAndSamples extends Vue {
 
   setMinMaxZoomLevels(): void {
     this.$nextTick(() => {
-      const fitBoundsZoomLevel = (this as any).$refs.mapConfigMbr.mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson(this.metadata.mbr)).getBounds());
+      let fitBoundsZoomLevel;
+      ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].every((map) => {
+        if (this.$refs[map]) {
+          fitBoundsZoomLevel = (this as any).$refs[map].mapObject.getBoundsZoom(L.geoJSON(this.wktToGeoJson(this.metadata.mbr)).getBounds());
 
-      const zoomOffset = 2;
+          const zoomOffset = 2;
 
-      const minZoom = fitBoundsZoomLevel - zoomOffset < 0 ? 0 : fitBoundsZoomLevel - zoomOffset;
-      const maxZoom = fitBoundsZoomLevel + zoomOffset;
+          const minZoom = fitBoundsZoomLevel - zoomOffset < 0 ? 0 : fitBoundsZoomLevel - zoomOffset;
+          const maxZoom = fitBoundsZoomLevel + zoomOffset;
 
-      Vue.set(this.mapConfig.options, 'minZoom', minZoom);
-      Vue.set(this.mapConfig.options, 'maxZoom', maxZoom);
+          Vue.set(this.mapConfig.options, 'minZoom', minZoom);
+          Vue.set(this.mapConfig.options, 'maxZoom', maxZoom);
+
+          return false;
+        }
+        return true;
+      });
     });
   }
 
@@ -508,29 +578,107 @@ export default class DataProfilingAndSamples extends Vue {
     return wktToGeojsonParser(wkt);
   }
 
-  mbrToLeafletBounds(wkt: string): number[][] {
+  // mbrToLeafletBounds(wkt: string): number[][] {
+  //   const geoJson = wktToGeojsonParser(wkt);
+  //   const bounds = geoJson.coordinates[0]
+  //     .map((x) => [x[1], x[0]]);
+  //   return bounds;
+  // }
+
+  getMapBoundsFromWKT(wkt: string): number[][] {
     const geoJson = wktToGeojsonParser(wkt);
-    const bounds = geoJson.coordinates[0]
-      .map((x) => [x[1], x[0]]);
-    return bounds;
+    const bbox = turfBBox(geoJson);
+    return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
   }
 
-  hideField(field: string): void {
+  getMapBoundsFromGeoJson(geoJson: GeoJsonObject): number[][] {
+    const bbox = turfBBox(geoJson);
+    return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
+  }
+
+  onToggleField(hide: boolean, field: string): void {
     store.commit('setLoading', true);
     const key = this.assetKey ? this.assetKey : '';
-    const fieldsToHide: CatalogueItemVisibilityCommand = {
+    let fieldsToHide:string[] = [];
+    if (hide) {
+      fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.concat([field]) : [field];
+    } else {
+      fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.filter((x) => x !== field) : [];
+    }
+    const visibility: CatalogueItemVisibilityCommand = {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
-      visibility: [field],
+      visibility: fieldsToHide,
     };
-    this.draftAssetApi.updateDraftMetadataVisibility(key, fieldsToHide).then((hideFieldResponse) => {
+    this.draftAssetApi.updateDraftMetadataVisibility(key, visibility).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
+      this.hiddenMetadata = hideFieldResponse.data.result.command.visibility;
+      store.commit('setLoading', false);
+      this.$nextTick(() => {
+        ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
+          try {
+            (this as any).$refs[x].mapObject.invalidateSize();
+            this.setMinMaxZoomLevels();
+          } catch (err) { console.log('err'); }
+        });
+      });
+      // this.$nextTick(() => {
+      //   (this as any).$refs.mapConfigMbr.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigConvexHull.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigHeatmap.mapObject.invalidateSize();
+      //   (this as any).$refs.mapConfigClusters.mapObject.invalidateSize();
+      // });
+    });
+  }
+
+  onReplaceSample(i: number): void {
+    console.log('replace', i);
+    this.indexOfSampleToReplace = i;
+    this.modalToShow = 'modalUploadSample';
+  }
+
+  // eslint-disable-next-line
+  onDisplaySample(v): void {
+    store.commit('setLoading', true);
+    console.log('f', v.inputValues[0].value);
+    const f = v.inputValues[0].value;
+    csvToSample(f).then((r) => {
+      console.log('r', r);
+      if (this.indexOfSampleToReplace && r?.samples[0]) [this.tempSamples[this.indexOfSampleToReplace]] = r.samples;
+      if (this.indexOfSampleToReplace) this.indexesOfReplacedSamples.push(this.indexOfSampleToReplace);
+      console.log(this.tempSamples);
+      this.modalToShow = '';
       store.commit('setLoading', false);
     });
-    // this.draftAssetApi.setProviderReviewUpdates(key, fieldsToHide).then((hideFieldResponse) => {
-    //   console.log('hfr', hideFieldResponse);
-    //   store.commit('setLoading', false);
-    // });
+  }
+
+  onRevertSample(i: number): void {
+    // this.tempSamples[i] = this.metadata.samples[i];
+    console.log(i, this.samples[i]);
+    Vue.set(this.tempSamples, i, this.samples[i]);
+    this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
+  }
+
+  onSubmitSample(i: number): void {
+    store.commit('setLoading', true);
+    const key = this.assetKey ? this.assetKey : '';
+    const samplesData = cloneDeep(this.samples);
+    samplesData[i] = this.tempSamples[i];
+    console.log('k', key);
+    console.log(samplesData);
+    const samples: CatalogueItemSamplesCommand = {
+      resourceKey: this.metadata.key,
+      data: samplesData,
+    };
+    this.draftAssetApi.updateDraftSamples(key, samples).then((updateSamplesResponse) => {
+      if (updateSamplesResponse.data.success) {
+        console.log('successfully updated samples!', updateSamplesResponse);
+        this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
+        store.commit('setLoading', false);
+      } else {
+        console.log('error updating samples...');
+      }
+    });
   }
 }
 </script>

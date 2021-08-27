@@ -1,5 +1,17 @@
 <template>
   <div class="dashboard__inner">
+    <!-- MODALS -->
+    <modal :withSlots="true" :show="modalToShow === 'modalDeleteAsset'" @dismiss="modalToShow = ''" :modalId="'modalDeleteAsset'">
+      <template v-slot:body>
+        <h2>Are you sure you want to delete asset?</h2>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="onConfirmDeleteAsset">Delete</button>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
+
     <div class="dashboard__head">
       <div class="dashboard__head__helpers dashboard__head__helpers--full-width">
         <h1>Assets</h1>
@@ -33,17 +45,16 @@
     <asset-card v-for="asset, i in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-20': i==0}"></asset-card>
     <pagination :currentPage="unpublishedCurrentPage" :itemsPerPage="unpublishedItemsPerPage" :itemsTotal="unpublishedItemsTotal" @pageSelection="onPageSelect(false, $event)"></pagination>
 
-    <hr class="mt-xs-50 mb-xs-50">
+    <hr class="mt-xs-50 mb-xs-50 seperator-published-unpublished">
 
-    <!-- <div class="filters">
-      <div class="filters__block">
-        <p class="filters__title">
-          <template v-if="!$store.getters.isLoading">
-            {{ publishedItemsTotal }} PUBLISHED ASSETS
-          </template>
-        </p>
-      </div>
-    </div> -->
+    <div class="collection__menu">
+      <ul>
+        <li @click="selectedTab = 'ALL_ASSETS'" :class="{ 'active': selectedTab==='ALL_ASSETS' }"><a href="#" @click.prevent="">All assets</a></li>
+        <li @click="selectedTab = 'DATA_FILES'" :class="{ 'active': selectedTab==='DATA_FILES' }"><a href="#" @click.prevent="">Data files</a></li>
+        <li @click="selectedTab = 'YOUR_APIS'" :class="{ 'active': selectedTab==='YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li>
+        <li @click="selectedTab = 'TOPIO_APIS'" :class="{ 'active': selectedTab==='TOPIO_APIS' }"><a href="#" @click.prevent="">Topio APIs</a></li>
+      </ul>
+    </div>
 
     <div class="filters mt-xs-30">
       <div class="filters__block">
@@ -63,7 +74,7 @@
       </div>
     </div>
 
-    <asset-card v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-card>
+    <asset-card @delete="onDeleteAsset" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-card>
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
 
   </div>
@@ -73,19 +84,30 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import store from '@/store';
 import DraftAssetApi from '@/service/draft';
+import ProviderAssetsApi from '@/service/provider-assets';
 import AssetCard from '@/components/Assets/AssetCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
+import {
+  AssetDraft,
+  AssetDraftQuery,
+  EnumDraftStatus,
+  EnumSortField,
+} from '@/model/draft';
 import { Order } from '@/model/request';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
+import Modal from '@/components/Modal.vue';
 
 @Component({
   components: {
     AssetCard,
     Pagination,
+    Modal,
   },
 })
 export default class DashboardHome extends Vue {
   draftAssetApi: DraftAssetApi;
+
+  providerAssetsApi: ProviderAssetsApi;
 
   unpublishedAssets: AssetDraft[];
 
@@ -115,10 +137,17 @@ export default class DashboardHome extends Vue {
 
   selectedOrderOptionUnpublished: string;
 
+  selectedTab: string;
+
+  modalToShow: string;
+
+  idOfAssetToDelete: string;
+
   constructor() {
     super();
 
     this.draftAssetApi = new DraftAssetApi();
+    this.providerAssetsApi = new ProviderAssetsApi();
 
     this.unpublishedAssets = [];
     this.publishedAssets = [];
@@ -149,6 +178,11 @@ export default class DashboardHome extends Vue {
 
     this.selectedOrderOptionPublished = 'MODIFIED DESCENDING';
     this.selectedOrderOptionUnpublished = 'MODIFIED DESCENDING';
+
+    this.selectedTab = 'ALL_ASSETS';
+
+    this.modalToShow = '';
+    this.idOfAssetToDelete = '';
   }
 
   @Watch('selectedStatus')
@@ -166,6 +200,11 @@ export default class DashboardHome extends Vue {
     this.searchAssets(false, 0);
   }
 
+  @Watch('selectedTab')
+  onSelectedTabChange(): void {
+    this.searchAssets(true, 0, true);
+  }
+
   mounted(): void {
     this.searchAssets(false, 0);
     this.searchAssets(true, 0);
@@ -175,9 +214,17 @@ export default class DashboardHome extends Vue {
     this.isLoadingPublished = published ? true : this.isLoadingPublished;
     this.isLoadingUnpublished = published ? this.isLoadingUnpublished : true;
 
-    const query: { status: EnumDraftStatus[] } = { status: [] };
+    const query: Partial<AssetDraftQuery> = {};
     if (published) {
       query.status = [EnumDraftStatus.PUBLISHED];
+      const assetTypes = {
+        DATA_FILES: [EnumAssetType.RASTER, EnumAssetType.VECTOR],
+        YOUR_APIS: [],
+        TOPIO_APIS: [EnumAssetType.SERVICE],
+      };
+      if (this.selectedTab !== 'ALL_ASSETS') query.type = assetTypes[this.selectedTab];
+      // TODO: Your APIs should currently return no results.The following assignment (TMS) is just a dummy value. To be removed in the future when YOUR_APIS is supported.
+      if (this.selectedTab === 'YOUR_APIS') query.serviceType = [EnumSpatialDataServiceType.TMS];
     } else {
       query.status = this.selectedStatus === 'ALL' ? [
         EnumDraftStatus.DRAFT,
@@ -230,7 +277,8 @@ export default class DashboardHome extends Vue {
           if (scrollBehavior) {
             Vue.nextTick(() => {
               window.scrollTo({
-                top: document.querySelector('.asset_card__published--first') ? (document.querySelector('.asset_card__published--first') as HTMLElement).offsetTop : 0,
+                // top: document.querySelector('.asset_card__published--first') ? (document.querySelector('.asset_card__published--first') as HTMLElement).offsetTop : 0,
+                top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
                 behavior: 'smooth',
               });
             });
@@ -265,6 +313,26 @@ export default class DashboardHome extends Vue {
     return false;
   }
 
+  onDeleteAsset(id: string): void {
+    console.log('delete asset: ', id);
+    this.idOfAssetToDelete = id;
+    this.modalToShow = 'modalDeleteAsset';
+  }
+
+  onConfirmDeleteAsset(): void {
+    store.commit('setLoading', true);
+    this.providerAssetsApi.deleteAsset(this.idOfAssetToDelete).then((deleteResponse) => {
+      if (deleteResponse.data.success) {
+        console.log('asset deleted successfully', deleteResponse);
+        this.modalToShow = '';
+        store.commit('setLoading', false);
+        this.searchAssets(true, this.publishedCurrentPage);
+      } else {
+        console.log('error deleting asset', deleteResponse);
+      }
+    });
+  }
+
   @Watch('isLoading')
   onLoadingStatusChange(): void {
     store.commit('setLoading', this.isLoading);
@@ -274,4 +342,5 @@ export default class DashboardHome extends Vue {
 <style lang="scss">
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/_filters.scss";
+  @import "@/assets/styles/_collection.scss";
 </style>
