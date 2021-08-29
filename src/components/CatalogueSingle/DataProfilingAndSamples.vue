@@ -644,8 +644,8 @@ export default class DataProfilingAndSamples extends Vue {
     const f = v.inputValues[0].value;
     csvToSample(f).then((r) => {
       console.log('r', r);
-      if (this.indexOfSampleToReplace && r?.samples[0]) [this.tempSamples[this.indexOfSampleToReplace]] = r.samples;
-      if (this.indexOfSampleToReplace) this.indexesOfReplacedSamples.push(this.indexOfSampleToReplace);
+      if (this.indexOfSampleToReplace !== null && r?.samples[0]) [this.tempSamples[this.indexOfSampleToReplace]] = r.samples;
+      if (this.indexOfSampleToReplace !== null) this.indexesOfReplacedSamples.push(this.indexOfSampleToReplace);
       console.log(this.tempSamples);
       this.modalToShow = '';
       store.commit('setLoading', false);
@@ -674,6 +674,7 @@ export default class DataProfilingAndSamples extends Vue {
       if (updateSamplesResponse.data.success) {
         console.log('successfully updated samples!', updateSamplesResponse);
         this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);
+        this.samples = samplesData;
         store.commit('setLoading', false);
       } else {
         console.log('error updating samples...');
