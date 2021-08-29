@@ -143,7 +143,8 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import VueCardFormat from 'vue-credit-card-validation';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+// import { AxiosError, AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
@@ -504,12 +505,15 @@ export default class CreateAsset extends Vue {
       }
       this.asset = draftAssetResponse.result.command;
       draftAssetKey = draftAssetResponse.result.key;
+      console.log('create draft success', draftAssetResponse);
     } catch (err) {
+      // eslint-disable-next-line
       alert(`Error: ${err.message}`);
       throw new Error(err.message);
     }
     if (!draftAssetResponse.success) {
       console.log('error', draftAssetResponse);
+      // eslint-disable-next-line
       alert(`Error: ${draftAssetResponse.messages}`);
       return;
     }
@@ -525,14 +529,18 @@ export default class CreateAsset extends Vue {
       for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
         let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
         try {
+          // eslint-disable-next-line
           uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
           this.asset = uploadAdditionalResourceResponse.result.command;
+          console.log('upload additional resource success', uploadAdditionalResourceResponse);
         } catch (err) {
+          // eslint-disable-next-line
           alert(`Error: ${err.message}`);
           throw new Error(err.message);
         }
         if (!uploadAdditionalResourceResponse.success) {
           console.log('error', uploadAdditionalResourceResponse);
+          // eslint-disable-next-line
           alert(`Error: ${uploadAdditionalResourceResponse.messages}`);
           return;
         }
@@ -545,17 +553,20 @@ export default class CreateAsset extends Vue {
       this.uploading.errors = [];
       this.uploading.completed = false;
       this.uploading.title = 'Your resource is being uploaded';
-      
+
       let uploadResource: ServerResponse<AssetDraft>;
       try {
         uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
         this.asset = uploadResource.result.command;
+        console.log('upload resource success', uploadResource);
       } catch (err) {
+        // eslint-disable-next-line
         alert(`Error: ${err.message}`);
         throw new Error(err.message);
       }
       if (!uploadResource.success) {
         console.log('error', uploadResource);
+        // eslint-disable-next-line
         alert(`Error: ${uploadResource.messages}`);
         return;
       }
@@ -574,14 +585,16 @@ export default class CreateAsset extends Vue {
         this.uploading.status = true;
         this.uploading.completed = true;
         this.uploading.subtitle = '';
+        console.log('submit success', submitResponse);
       } catch (err) {
+        // eslint-disable-next-line
         alert(`Error: ${err.message}`);
         throw new Error(err.message);
       }
       if (!submitResponse.success) {
         console.log('error', submitResponse);
+        // eslint-disable-next-line
         alert(`Error: ${submitResponse.messages}`);
-        return;
       }
     }
   }
