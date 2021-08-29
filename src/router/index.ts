@@ -212,7 +212,7 @@ const routes: RouteConfig[] = [
         path: 'analytics',
         name: 'Analytics',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardfanalytics" */ '../views/dashboard/Analytics/Analytics.vue'),
-        meta: { requiresRole: '', layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
     ],
   },
