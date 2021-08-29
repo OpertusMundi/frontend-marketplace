@@ -169,10 +169,17 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Type">
+          <!-- <validation-provider v-slot="{ errors }" name="Type">
             <div class="form-group">
               <label for="multiselect_epsg">Reference system</label>
               <multiselect id="multiselect_epsg" @input="onEpsgSelection($event)" v-model="selectedEpsgLabel" :options="menusData.epsgLabels" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select reference system"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Reference system">
+            <div class="form-group">
+              <label for="ajax">Reference system</label>
+              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -276,7 +283,13 @@ export default class Metadata extends Vue {
 
   epsgList: { code: string, name: string }[];
 
-  selectedEpsgLabel: string | null;
+  // epsgsList: { code: string, name: string }[]; // deprecated
+
+  // selectedEpsgLabel: string | null; // deprecated
+
+  selectedEpsg: { code: string, name: string };
+
+  isLoadingEpsg: boolean;
 
   // TODO: currently, URIs are stored in asset.additionalResources and FILES are uploaded as additional resources on asset submit
 
@@ -315,27 +328,57 @@ export default class Metadata extends Vue {
 
     this.epsgList = [];
 
-    this.selectedEpsgLabel = null;
+    // this.epsgsList = [];
+
+    // this.selectedEpsgLabel = null;
+
+    this.selectedEpsg = { name: '', code: '' };
+
+    this.isLoadingEpsg = false;
 
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
-  onEpsgSelection(epsgLabel: string): void {
-    const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
-    this.assetLocal.referenceSystem = this.epsgList[i].code;
+  asyncFindEpsg(q: string): void {
+    if (!q) return;
+    console.log(q);
+    this.isLoadingEpsg = true;
+    const typeOfSearch = Number.isNaN(Number(q)) ? 'name' : 'number';
+    console.log(typeOfSearch);
+    const epsgPromise = Number.isNaN(Number(q)) ? this.spatialApi.getEpsgCodes(undefined, q) : this.spatialApi.getEpsgCodes(q, undefined);
+    epsgPromise.then((epsgResponse) => {
+      this.epsgList = epsgResponse.result.map((x) => ({ code: `${x.code}`, name: `EPSG:${x.code} | ${x.name}` }));
+      this.isLoadingEpsg = false;
+    });
+  }
+
+  onEpsgSelection(selectedEpsg: { code: string, name: string }): void {
+    // const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
+    // this.assetLocal.referenceSystem = this.epsgsList[i].code;
+    if (selectedEpsg && selectedEpsg.code) this.assetLocal.referenceSystem = selectedEpsg.code;
   }
 
   created(): void {
     this.populateAvailableFormatsForSelectedType();
-    this.spatialApi.getEpsgCodes().then((epsgCodesResponse) => {
-      this.epsgList = epsgCodesResponse.result.map((x) => ({ code: x.code.toString(), name: x.name }));
-      this.menusData.epsgLabels = this.epsgList.map((x) => `EPSG:${x.code}, ${x.name}`);
 
-      if (this.assetLocal.referenceSystem) {
-        const i = this.epsgList.findIndex((x) => x.code === this.assetLocal.referenceSystem);
-        this.selectedEpsgLabel = this.menusData.epsgLabels[i];
-      }
-    });
+    if (this.assetLocal.referenceSystem) {
+      this.isLoadingEpsg = true;
+      this.spatialApi.getEpsgCodes(this.assetLocal.referenceSystem).then((epsgResponse) => {
+        const epsg = epsgResponse.result.find((x) => `${x.code}` === this.assetLocal.referenceSystem);
+        if (epsg) this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
+        this.isLoadingEpsg = false;
+      });
+    }
+
+    // this.spatialApi.getEpsgCodes().then((epsgCodesResponse) => {
+    //   this.epsgsList = epsgCodesResponse.result.map((x) => ({ code: x.code.toString(), name: x.name }));
+    //   this.menusData.epsgLabels = this.epsgsList.map((x) => `EPSG:${x.code}, ${x.name}`);
+
+    //   if (this.assetLocal.referenceSystem) {
+    //     const i = this.epsgsList.findIndex((x) => x.code === this.assetLocal.referenceSystem);
+    //     this.selectedEpsgLabel = this.menusData.epsgLabels[i];
+    //   }
+    // });
   }
 
   @Watch('assetLocal', { deep: true })
