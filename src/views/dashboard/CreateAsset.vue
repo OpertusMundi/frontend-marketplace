@@ -493,17 +493,28 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
-      .catch((err: AxiosError) => { console.log('eeeee', err); });
-    const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
-    const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
-    console.log('draft status', isDraftCreated, draftAssetKey);
-
-    if (!isDraftCreated && draftAssetResponse) {
-      console.log('error creating draft', draftAssetResponse);
-      this.onError(draftAssetResponse);
+    // CREATE DRAFT
+    let draftAssetResponse: ServerResponse<AssetDraft>;
+    let draftAssetKey = '';
+    try {
+      if (this.isEditingExistingDraft) {
+        draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+      } else {
+        draftAssetResponse = await this.draftAssetApi.create(this.asset, config);
+      }
+      this.asset = draftAssetResponse.result.command;
+      draftAssetKey = draftAssetResponse.result.key;
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+      throw new Error(err.message);
+    }
+    if (!draftAssetResponse.success) {
+      console.log('error', draftAssetResponse);
+      alert(`Error: ${draftAssetResponse.messages}`);
+      return;
     }
 
+    // UPLOAD ADDITIONAL RESOURCES FILES
     if (!isDraft && this.additionalResourcesToUpload.length) {
       console.log('upload additional resources');
       this.uploading.status = true;
@@ -512,67 +523,77 @@ export default class CreateAsset extends Vue {
       this.uploading.title = 'Your additional metadata resources are being uploaded';
 
       for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
-        // eslint-disable-next-line
-        const uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
-        this.asset = uploadAdditionalResourceResponse.result.command;
-        if (uploadAdditionalResourceResponse.success) console.log('successfully uploaded additional resource!');
+        let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
+        try {
+          uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
+          this.asset = uploadAdditionalResourceResponse.result.command;
+        } catch (err) {
+          alert(`Error: ${err.message}`);
+          throw new Error(err.message);
+        }
+        if (!uploadAdditionalResourceResponse.success) {
+          console.log('error', uploadAdditionalResourceResponse);
+          alert(`Error: ${uploadAdditionalResourceResponse.messages}`);
+          return;
+        }
       }
     }
 
+    // UPLOAD RESOURCE
     if (!isDraft && this.fileToUpload.isFileSelected) {
       this.uploading.status = true;
       this.uploading.errors = [];
       this.uploading.completed = false;
       this.uploading.title = 'Your resource is being uploaded';
-      // todo: catch error
-      const uploadResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
-      this.asset = uploadResponse.result.command;
-
-      if (uploadResponse.success) {
-        console.log('uploaded resource!');
-        // this.uploading.completed = true;
-        // this.uploading.title = 'Your asset is uploaded successfully!';
-        // this.uploading.subtitle = '';
-      } else {
-        console.log('error uploading resource', uploadResponse);
-        this.onError(uploadResponse);
-        this.uploading.completed = true;
-        this.uploading.title = 'Error uploading asset';
-        this.uploading.subtitle = '';
+      
+      let uploadResource: ServerResponse<AssetDraft>;
+      try {
+        uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
+        this.asset = uploadResource.result.command;
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+        throw new Error(err.message);
+      }
+      if (!uploadResource.success) {
+        console.log('error', uploadResource);
+        alert(`Error: ${uploadResource.messages}`);
         return;
       }
     }
 
+    // SUBMIT
     if (isDraft) {
       this.uploading.status = true;
       this.uploading.completed = true;
       this.uploading.title = 'Draft saved!';
       this.uploading.subtitle = '';
     } else {
-      // todo: catch error
-      const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-      this.uploading.status = true;
-      this.uploading.completed = true;
-      this.uploading.subtitle = '';
-      if (submitResponse.success) {
-        console.log('submitted successfully!');
-        this.uploading.title = 'Asset created!';
-      } else {
-        console.log('error submitting asset', submitResponse);
-        this.onError(submitResponse);
-        this.uploading.title = 'Error creating asset';
+      let submitResponse: ServerResponse<AssetDraft>;
+      try {
+        submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+        this.uploading.status = true;
+        this.uploading.completed = true;
+        this.uploading.subtitle = '';
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+        throw new Error(err.message);
+      }
+      if (!submitResponse.success) {
+        console.log('error', submitResponse);
+        alert(`Error: ${submitResponse.messages}`);
+        return;
       }
     }
   }
 
   // todo
-  onError(response: ServerResponse<AssetDraft>): void {
-    this.uploading.errors = response.messages;
-    setTimeout(() => {
-      this.uploading.errors = [];
-    }, 10000);
-    this.uploading.status = false;
-  }
+  // onError(response: ServerResponse<AssetDraft>): void {
+  //   this.uploading.errors = response.messages;
+  //   setTimeout(() => {
+  //     this.uploading.errors = [];
+  //   }, 10000);
+  //   this.uploading.status = false;
+  // }
 }
 </script>
 <style lang="scss">
