@@ -810,6 +810,14 @@
     &:last-child {
         margin-bottom: 0px;
     }
+    // &__order {
+    //     .asset_card__view {
+    //         background: $secondColor;
+    //     }
+    //     .asset_card__inner, .asset_card__inner:hover {
+    //         border-color: $secondColor;
+    //     }
+    // }
 
     &--sm {
         font-size: 15px;
@@ -1001,6 +1009,14 @@
         &__left {
             display: flex;
             align-items: center;
+        }
+        &__right {
+            &--blue {
+                span {
+                    color: $secondColor;
+                    font-weight: 500;
+                }                
+            }
         }
         // span {
             // margin-left: 20px;

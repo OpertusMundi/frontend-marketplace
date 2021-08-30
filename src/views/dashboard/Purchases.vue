@@ -20,9 +20,9 @@
       </div>
     </div>
 
-    <purchase-card v-for="purchase in purchases" :key="purchase.key" :purchase="purchase"></purchase-card>
+    <purchase-card v-for="(purchase, i) in purchases" :key="purchase.key" :purchase="purchase" :index="currentPage * itemsPerPage + i + 1"></purchase-card>
 
-    <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalPurchases" @pageSelection="getOrders(null, $event, true)"></pagination>
+    <pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :itemsTotal="totalPurchases" @pageSelection="getOrders(null, $event, true)"></pagination>
   </div>
 </template>
 
@@ -48,6 +48,8 @@ export default class DashboardPurchases extends Vue {
 
   totalPurchases: number | null;
 
+  itemsPerPage: number;
+
   currentPage: number;
 
   statusFilterOptions: Array<EnumOrderStatus | string>;
@@ -61,6 +63,7 @@ export default class DashboardPurchases extends Vue {
 
     this.purchases = [];
     this.totalPurchases = null;
+    this.itemsPerPage = 5;
     this.currentPage = 0;
     this.statusFilterOptions = [
       'ALL',

@@ -2,16 +2,18 @@
   <!-- <router-link :to="`/dashboard/assets/preview/${asset.key}`" class="purchase_card"> -->
   <!-- <router-link :to="asset.status === 'DRAFT' ? `/dashboard/assets/create/${asset.key}` : `/dashboard/assets/preview/${asset.key}`" class="purchase_card"> -->
   <router-link :to="`purchase/${ purchase.key }`" class="purchase_card purchase_card--purchase">
-    <div class="purchase_card__view" :style="{'--color': getColor()}"><span>VIEW PURCHASE</span></div>
-      <div class="purchase_card__inner" :style="{'--color': getColor()}">
+    <!-- <div class="purchase_card__view" :style="{'--color': getColor()}"><span>VIEW PURCHASE</span></div> -->
+    <div class="purchase_card__view"><span>VIEW PURCHASE</span></div>
+      <div class="purchase_card__inner">
       <!-- <div class="purchase_card__top">
         <div class="purchase_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>asset type</span><span>Environment, Natural resources</span></div>
         <div class="purchase_card__top__right"><span>asset status</span></div>
       </div> -->
       <div class="purchase_card__top">
-        <div class="purchase_card__title">Asset Title</div>
+        <!-- <div class="purchase_card__title">{{ `Purchase #${index}` }}</div> -->
+        <div class="purchase_card__title">{{ getPurchaseAssets() }}</div>
         <!-- <div class="purchase_card__price">Order Placed</div> -->
-        <div class="purchase_card__top__right"><span>{{ purchase.status }}</span></div>
+        <div class="purchase_card__top__right purchase_card__top__right--blue"><span>{{ purchase.status }}</span></div>
       </div>
       <div class="purchase_card__bottom">
         <div class="purchase_card__bottom__left">
@@ -38,18 +40,11 @@ import moment from 'moment';
 export default class PurchaseCard extends Vue {
   @Prop({ required: true }) readonly purchase!: Order;
 
-  // TODO
-  getColor(): string {
-    const color = '#358F8B';
-    // let color = '#358F8B';
-    // if (this.asset.command && this.asset.command.type === 'VECTOR') {
-    //   color = '#358F8B';
-    // } else if (this.asset.command && this.asset.command.type === 'SERVICE') {
-    //   color = '#6F43B5';
-    // } else if (this.asset.command && this.asset.command.type === 'RASTER') {
-    //   color = '#197196';
-    // }
-    return color;
+  @Prop({ required: true }) readonly index!: number;
+
+  getPurchaseAssets(): string {
+    // eslint-disable-next-line
+    return this.purchase.items.map((x) => x.description).reduce((t, v, i) => (t += i < this.purchase.items.map((x) => x.description).length ? `${v}, ` : `${v}`));
   }
 
   formatDate(date: string): string {
