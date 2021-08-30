@@ -158,7 +158,7 @@
           <validation-provider v-slot="{ errors }" name="Keywords">
             <div class="form-group">
               <label for="multiselect_keywords">Keywords</label>
-              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
+              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" @remove="(x) => onRemoveKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
