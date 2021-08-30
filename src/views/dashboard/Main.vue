@@ -42,7 +42,7 @@
                 <span>Contracts</span>
               </router-link>
             </li>
-            <li @click="toggleMobileMenu">
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Analytics')">
               <router-link to="/dashboard/analytics" data-name="Analytics">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23.954" height="23.953" viewBox="0 0 23.954 23.953"><g id="Group_3586" data-name="Group 3586" transform="translate(-1396.997 -950.237)"><path id="Path_9719" data-name="Path 9719" d="M1419.882,964.082a1.006,1.006,0,0,0-1.224.707,10,10,0,1,1-12.325-12.24,1,1,0,1,0-.531-1.928,12,12,0,1,0,14.787,14.685A1,1,0,0,0,1419.882,964.082Z" fill="#333"/><path id="Path_9720" data-name="Path 9720" d="M1417.993,954.247a11.972,11.972,0,0,0-7.884-4.006,1.011,1.011,0,0,0-1.111,1v9.449a1.5,1.5,0,0,0,1.5,1.5h9.449a1.012,1.012,0,0,0,1-1.113A11.956,11.956,0,0,0,1417.993,954.247ZM1411,960.19v-7.8a10,10,0,0,1,7.8,7.8Z" fill="#333"/></g></svg>
                 <span>Analytics</span>

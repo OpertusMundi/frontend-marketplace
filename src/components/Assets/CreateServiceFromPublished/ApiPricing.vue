@@ -51,55 +51,31 @@
                   <!-- free -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FREE'">
                   </div>
-                  <!-- fixed -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED'">
+                  <!-- per call with prepaid -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_PREPAID'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
-                      <label for="fixed_price">Price</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="fixed_price" name="fixed_price">
+                      <label for="pcwp_price">Price</label>
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="pcwp_price" name="pcwp_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required">
-                    <div class="form-group">
-                      <label for="number_of_years">Number of years</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                  </div>
-                  <!-- fixed per rows -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED_PER_ROWS'">
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <div class="form-group">
-                      <label for="fpr_price">Price</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required">
-                    <div class="form-group">
-                      <label for="min_rows">Minimum rows</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].minRows" type="number" class="form-group__text" id="min_rows" name="min_rows">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
+                    <div v-for="(prePaidTier, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
                           <div class="form-group">
-                            <label for="fpr_count">Threshold</label>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
+                            <label for="pcwp_count">Count</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].count" type="number" class="form-group__text" id="pcwp_count" name="pcwp_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
                           <div class="form-group">
-                            <label for="fpr_discount">Discount %</label>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
+                            <label for="pcwp_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].discount" type="number" class="form-group__text" id="pcwp_discount" name="pcwp_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
@@ -111,38 +87,103 @@
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
                   </div>
-                  <!-- fixed for population -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED_FOR_POPULATION'">
+                  <!-- per call with block rate -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_BLOCK_RATE'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
-                      <label for="ffp_price">Price</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                    </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required">
-                    <div class="form-group">
-                      <label for="min_percentage">Minimum population percentage</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].minPercent" type="number" class="form-group__text" id="min_percentage" name="min_percentage">
+                      <label for="pcwbr_price">Price</label>
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="pcwbr_price" name="pcwbr_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
                     <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
                           <div class="form-group">
-                            <label for="ffp_count">Threshold</label>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
+                            <label for="pcwbr_count">Threshold</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="pcwbr_count" name="pcwbr_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
                           <div class="form-group">
-                            <label for="ffp_discount">Discount %</label>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
+                            <label for="pcwbr_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="pcwbr_discount" name="pcwbr_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                      </div>
+                    </div>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                  </div>
+                  <!-- per row with prepaid -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_PREPAID'">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <div class="form-group">
+                      <label for="prwp_price">Price</label>
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="prwp_price" name="prwp_price">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                    </validation-provider>
+                    <div v-for="(prePaidTier, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="i" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <div class="form-group">
+                            <label for="prwp_count">Count</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].count" type="number" class="form-group__text" id="prwp_count" name="prwp_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <div class="form-group">
+                            <label for="prwp_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].discount" type="number" class="form-group__text" id="prwp_discount" name="prwp_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                      </div>
+                    </div>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                  </div>
+                  <!-- per row with block rate -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <div class="form-group">
+                      <label for="prwbr_price">Price</label>
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="prwbr_price" name="prwbr_price">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                    </validation-provider>
+                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <div class="form-group">
+                            <label for="prwbr_count">Threshold</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="prwbr_count" name="prwbr_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <div class="form-group">
+                            <label for="prwbr_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="prwbr_discount" name="prwbr_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
@@ -240,10 +281,12 @@ import {
   BasePricingModelCommand,
   DiscountRate,
   EnumPricingModel,
-  FixedPopulationPricingModelCommand,
-  FixedPricingModelCommand,
-  FixedRowPricingModelCommand,
   FreePricingModelCommand,
+  CallPrePaidPricingModelCommand,
+  CallBlockRatePricingModelCommand,
+  RowPrePaidPricingModelCommand,
+  RowBlockRatePricingModelCommand,
+  PrePaidTier,
 } from '@/model/pricing-model';
 import store from '@/store';
 import { EnumContinent } from '@/model/enum';
@@ -257,7 +300,7 @@ extend('required', required);
     Multiselect,
   },
 })
-export default class Pricing extends Vue {
+export default class ApiPricing extends Vue {
   @Prop({ required: true }) private pricingModels!: BasePricingModelCommand[];
 
   @Prop({ required: true }) private selectedPricingModelForEditing!: number | null;
@@ -325,9 +368,10 @@ export default class Pricing extends Vue {
 
     this.pricingModelTypes = [
       { name: 'Free', priceModel: EnumPricingModel.FREE },
-      { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
-      { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },
-      { name: 'Fixed per population', priceModel: EnumPricingModel.FIXED_FOR_POPULATION },
+      { name: 'Per call with prepaid', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
+      { name: 'Per call with block rate', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
+      { name: 'Per row with prepaid', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
+      { name: 'Per row with block rate', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
     ];
 
     console.log('constructor');
@@ -419,18 +463,24 @@ export default class Pricing extends Vue {
         (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
         break;
       }
-      case EnumPricingModel.FIXED: {
-        (pricingModel as FixedPricingModelCommand).type = EnumPricingModel.FIXED;
+      case EnumPricingModel.PER_CALL_WITH_PREPAID: {
+        (pricingModel as CallPrePaidPricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_PREPAID;
+        (pricingModel as CallPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
         break;
       }
-      case EnumPricingModel.FIXED_PER_ROWS: {
-        (pricingModel as FixedRowPricingModelCommand).type = EnumPricingModel.FIXED_PER_ROWS;
-        (pricingModel as FixedRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
+      case EnumPricingModel.PER_CALL_WITH_BLOCK_RATE: {
+        (pricingModel as CallBlockRatePricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_BLOCK_RATE;
+        (pricingModel as CallBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
         break;
       }
-      case EnumPricingModel.FIXED_FOR_POPULATION: {
-        (pricingModel as FixedPopulationPricingModelCommand).type = EnumPricingModel.FIXED_FOR_POPULATION;
-        (pricingModel as FixedPopulationPricingModelCommand).discountRates = [{}] as DiscountRate[];
+      case EnumPricingModel.PER_ROW_WITH_PREPAID: {
+        (pricingModel as RowPrePaidPricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_PREPAID;
+        (pricingModel as RowPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
+        break;
+      }
+      case EnumPricingModel.PER_ROW_WITH_BLOCK_RATE: {
+        (pricingModel as RowBlockRatePricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_BLOCK_RATE;
+        (pricingModel as RowBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
         break;
       }
       default:
@@ -441,12 +491,16 @@ export default class Pricing extends Vue {
 
   addDiscountRate(): void {
     // eslint-disable-next-line
-    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.push({} as DiscountRate);
+    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.push({} as DiscountRate);
+    // eslint-disable-next-line
+    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.push({} as DiscountRate);
   }
 
   onRemoveDiscount(i: number): void {
     // eslint-disable-next-line
-    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as FixedRowPricingModelCommand | FixedPopulationPricingModelCommand).discountRates.splice(i, 1);
+    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.splice(i, 1);
+    // eslint-disable-next-line
+    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.splice(i, 1);
   }
 
   async setPricingModel(): Promise<void> {

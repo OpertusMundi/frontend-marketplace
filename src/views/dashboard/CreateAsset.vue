@@ -66,7 +66,7 @@
             <!-- METADATA -->
             <!-- <transition name="fade" mode="out-in"> -->
               <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
-              <api-details ref="step2" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
+              <api-details ref="step2" :asset.sync="asset" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
             <!-- </transition> -->
 
             <!-- CONTRACT -->
@@ -77,7 +77,8 @@
 
             <!-- PRICING -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep == 4"></pricing>
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType !== 'API' && currentStep == 4"></pricing>
+              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
             <!-- </transition> -->
 
             <!-- DELIVERY -->
@@ -142,12 +143,13 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import VueCardFormat from 'vue-credit-card-validation';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+// import { AxiosError, AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
 import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
-import { EnumAssetType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
@@ -158,6 +160,7 @@ import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
+import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
 import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
@@ -184,6 +187,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     Payout,
     Review,
     ApiDetails,
+    ApiPricing,
     Modal,
   },
 })
@@ -211,6 +215,8 @@ export default class CreateAsset extends Vue {
   asset: CatalogueItemCommand;
 
   assetMainType: string; // Data File / API / Collection
+
+  serviceType: null | EnumSpatialDataServiceType;
 
   selectedPricingModelForEditing: number | null;
 
@@ -244,6 +250,8 @@ export default class CreateAsset extends Vue {
     };
 
     this.assetMainType = '';
+
+    this.serviceType = null;
 
     this.selectedPricingModelForEditing = null;
 
@@ -340,6 +348,8 @@ export default class CreateAsset extends Vue {
     this.draftAssetApi.findOne(this.assetId).then((assetResponse) => {
       this.asset = { ...this.asset, ...assetResponse.result.command };
 
+      this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
+
       // todo: use Enum (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
         this.assetMainType = 'datafile';
@@ -434,6 +444,14 @@ export default class CreateAsset extends Vue {
 
     const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
     console.log(submitResponse);
+    if (submitResponse.success) {
+      this.uploading.status = true;
+      this.uploading.completed = true;
+      this.uploading.title = 'Service created!';
+      this.uploading.subtitle = '';
+    } else {
+      console.log('error submitting service');
+    }
   }
 
   // needs refactoring
@@ -476,17 +494,31 @@ export default class CreateAsset extends Vue {
     };
     console.log('ASSET', this.asset);
 
-    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config)
-      .catch((err: AxiosError) => { console.log('eeeee', err); });
-    const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
-    const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
-    console.log('draft status', isDraftCreated, draftAssetKey);
-
-    if (!isDraftCreated && draftAssetResponse) {
-      console.log('error creating draft', draftAssetResponse);
-      this.onError(draftAssetResponse);
+    // CREATE DRAFT
+    let draftAssetResponse: ServerResponse<AssetDraft>;
+    let draftAssetKey = '';
+    try {
+      if (this.isEditingExistingDraft) {
+        draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+      } else {
+        draftAssetResponse = await this.draftAssetApi.create(this.asset, config);
+      }
+      this.asset = draftAssetResponse.result.command;
+      draftAssetKey = draftAssetResponse.result.key;
+      console.log('create draft success', draftAssetResponse);
+    } catch (err) {
+      // eslint-disable-next-line
+      alert(`Error: ${err.message}`);
+      throw new Error(err.message);
+    }
+    if (!draftAssetResponse.success) {
+      console.log('error', draftAssetResponse);
+      // eslint-disable-next-line
+      alert(`Error: ${draftAssetResponse.messages}`);
+      return;
     }
 
+    // UPLOAD ADDITIONAL RESOURCES FILES
     if (!isDraft && this.additionalResourcesToUpload.length) {
       console.log('upload additional resources');
       this.uploading.status = true;
@@ -495,67 +527,86 @@ export default class CreateAsset extends Vue {
       this.uploading.title = 'Your additional metadata resources are being uploaded';
 
       for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
-        // eslint-disable-next-line
-        const uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
-        this.asset = uploadAdditionalResourceResponse.result.command;
-        if (uploadAdditionalResourceResponse.success) console.log('successfully uploaded additional resource!');
+        let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
+        try {
+          // eslint-disable-next-line
+          uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
+          this.asset = uploadAdditionalResourceResponse.result.command;
+          console.log('upload additional resource success', uploadAdditionalResourceResponse);
+        } catch (err) {
+          // eslint-disable-next-line
+          alert(`Error: ${err.message}`);
+          throw new Error(err.message);
+        }
+        if (!uploadAdditionalResourceResponse.success) {
+          console.log('error', uploadAdditionalResourceResponse);
+          // eslint-disable-next-line
+          alert(`Error: ${uploadAdditionalResourceResponse.messages}`);
+          return;
+        }
       }
     }
 
+    // UPLOAD RESOURCE
     if (!isDraft && this.fileToUpload.isFileSelected) {
       this.uploading.status = true;
       this.uploading.errors = [];
       this.uploading.completed = false;
       this.uploading.title = 'Your resource is being uploaded';
-      // todo: catch error
-      const uploadResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
-      this.asset = uploadResponse.result.command;
 
-      if (uploadResponse.success) {
-        console.log('uploaded resource!');
-        // this.uploading.completed = true;
-        // this.uploading.title = 'Your asset is uploaded successfully!';
-        // this.uploading.subtitle = '';
-      } else {
-        console.log('error uploading resource', uploadResponse);
-        this.onError(uploadResponse);
-        this.uploading.completed = true;
-        this.uploading.title = 'Error uploading asset';
-        this.uploading.subtitle = '';
+      let uploadResource: ServerResponse<AssetDraft>;
+      try {
+        uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
+        this.asset = uploadResource.result.command;
+        console.log('upload resource success', uploadResource);
+      } catch (err) {
+        // eslint-disable-next-line
+        alert(`Error: ${err.message}`);
+        throw new Error(err.message);
+      }
+      if (!uploadResource.success) {
+        console.log('error', uploadResource);
+        // eslint-disable-next-line
+        alert(`Error: ${uploadResource.messages}`);
         return;
       }
     }
 
+    // SUBMIT
     if (isDraft) {
       this.uploading.status = true;
       this.uploading.completed = true;
       this.uploading.title = 'Draft saved!';
       this.uploading.subtitle = '';
     } else {
-      // todo: catch error
-      const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-      this.uploading.status = true;
-      this.uploading.completed = true;
-      this.uploading.subtitle = '';
-      if (submitResponse.success) {
-        console.log('submitted successfully!');
-        this.uploading.title = 'Asset created!';
-      } else {
-        console.log('error submitting asset', submitResponse);
-        this.onError(submitResponse);
-        this.uploading.title = 'Error creating asset';
+      let submitResponse: ServerResponse<AssetDraft>;
+      try {
+        submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+        this.uploading.status = true;
+        this.uploading.completed = true;
+        this.uploading.subtitle = '';
+        console.log('submit success', submitResponse);
+      } catch (err) {
+        // eslint-disable-next-line
+        alert(`Error: ${err.message}`);
+        throw new Error(err.message);
+      }
+      if (!submitResponse.success) {
+        console.log('error', submitResponse);
+        // eslint-disable-next-line
+        alert(`Error: ${submitResponse.messages}`);
       }
     }
   }
 
   // todo
-  onError(response: ServerResponse<AssetDraft>): void {
-    this.uploading.errors = response.messages;
-    setTimeout(() => {
-      this.uploading.errors = [];
-    }, 10000);
-    this.uploading.status = false;
-  }
+  // onError(response: ServerResponse<AssetDraft>): void {
+  //   this.uploading.errors = response.messages;
+  //   setTimeout(() => {
+  //     this.uploading.errors = [];
+  //   }, 10000);
+  //   this.uploading.status = false;
+  // }
 }
 </script>
 <style lang="scss">

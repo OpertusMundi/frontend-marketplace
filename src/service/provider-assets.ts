@@ -1,11 +1,32 @@
 import Api from '@/service/api';
-
+import { AxiosResponse } from 'axios';
+import { CatalogueQueryResponse } from '@/model';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
+import { ProviderDraftQuery } from '@/model/provider-assets';
 
 export default class ProviderAssetsApi extends Api {
   constructor() {
     super({ withCredentials: true });
   }
+
+  /**
+   *
+   */
+  public async find(query: ProviderDraftQuery): Promise<CatalogueQueryResponse> {
+    const { page, size } = query.pageRequest;
+    const { id: field, order } = query.sorting;
+
+    const queryString = `q=${query.q}&type=${query.type}&page=${page}&size=${size}&orderBy=${field}&order=${order}`;
+    const url = `/action/assets?${queryString}`;
+
+    return this.get<CatalogueQueryResponse>(url)
+      .then((response: AxiosResponse<CatalogueQueryResponse>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
 
   /**
    * Delete asset.

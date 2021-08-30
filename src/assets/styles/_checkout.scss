@@ -1,11 +1,63 @@
 .checkout {
-    &__billing_table {
+    li {
+        color: $labelColor;
+    }
+    &__info_table {
         color: $labelColor;
         display: grid;
         grid-column-gap: 20px;
         grid-template-columns: min-content 1fr;
         span:nth-child(odd) {
             white-space: nowrap;
+        }
+        span {
+            margin: 3px 0;
+        }
+        &--text-blue {
+            color: $secondColor;
+        }
+    }
+    &__payment {
+        &__payment_card {
+            padding-right: 20px;
+            margin-bottom: 30px;
+            &__top {
+                display: flex;
+                justify-content: space-between;
+            }
+            p {
+                color: $labelColor;
+                margin-top: 8px;
+                // font-size: em(15);
+                img {
+                    margin-right: 10px;
+                }
+                &::nth-child(2) {
+                    font-size: em(16) !important;
+                }
+            }
+        }
+        &__bottom_fields {
+            div {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: 20px 0;
+                span {
+                    white-space: nowrap;
+                    color: $darkColor;
+                }
+                input {
+                    max-width: 240px;
+                    margin-bottom: -5px;
+                }
+                &:nth-child(1) {
+                    margin-top: 50px;
+                }
+                &:last-child {
+                    margin-top: 25px;
+                }
+            }
         }
     }
     &__billing_checkbox_label {

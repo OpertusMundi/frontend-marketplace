@@ -55,12 +55,19 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Language">
+          <!-- <validation-provider v-slot="{ errors }" name="Language">
           <div class="form-group">
             <label for="metadata_language">Language</label>
             <input type="text" class="form-group__text" name="metadata_language" id="metadata_language" v-model="assetLocal.language">
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
           </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Language">
+            <div class="form-group">
+              <label for="multiselect_language">Language</label>
+              <multiselect id="multiselect_language" @input="onSelectLanguage" v-model="selectedLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select language"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
           </validation-provider>
           <validation-provider v-slot="{ errors }" name="Editor's name">
             <div class="form-group">
@@ -97,14 +104,20 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Metadata language">
+          <!-- <validation-provider v-slot="{ errors }" name="Metadata language">
             <div class="form-group">
               <label for="">Metadata language</label>
               <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="assetLocal.metadataLanguage">
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Metadata language">
+            <div class="form-group">
+              <label for="multiselect_metadata_language">Metadata language</label>
+              <multiselect id="multiselect_metadata_language" @input="onSelectMetadataLanguage" v-model="selectedMetadataLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select metadata language"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
           </validation-provider>
-
           <validation-provider name="Date start">
             <div class="form-group">
               <label for="">Date start (of resource temporal extent)</label>
@@ -158,7 +171,7 @@
           <validation-provider v-slot="{ errors }" name="Keywords">
             <div class="form-group">
               <label for="multiselect_keywords">Keywords</label>
-              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
+              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" @remove="(x) => onRemoveKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -169,10 +182,17 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Type">
+          <!-- <validation-provider v-slot="{ errors }" name="Type">
             <div class="form-group">
               <label for="multiselect_epsg">Reference system</label>
               <multiselect id="multiselect_epsg" @input="onEpsgSelection($event)" v-model="selectedEpsgLabel" :options="menusData.epsgLabels" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select reference system"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Reference system">
+            <div class="form-group">
+              <label for="ajax">Reference system</label>
+              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -271,12 +291,23 @@ export default class Metadata extends Vue {
   menusData: {
     assetTypes: string[],
     availableFormats: string[],
-    epsgLabels: string[],
   }
 
   epsgList: { code: string, name: string }[];
 
-  selectedEpsgLabel: string | null;
+  languages: { code: string, name: string }[];
+
+  // epsgsList: { code: string, name: string }[]; // deprecated
+
+  // selectedEpsgLabel: string | null; // deprecated
+
+  selectedLanguage: { code: string, name: string };
+
+  selectedMetadataLanguage: { code: string, name: string };
+
+  selectedEpsg: { code: string, name: string };
+
+  isLoadingEpsg: boolean;
 
   // TODO: currently, URIs are stored in asset.additionalResources and FILES are uploaded as additional resources on asset submit
 
@@ -311,31 +342,69 @@ export default class Metadata extends Vue {
 
     this.keywordsForDisplay = this.assetLocal.keywords.map((x) => x.keyword);
 
-    this.menusData = { assetTypes: [], availableFormats: [], epsgLabels: [] };
+    this.menusData = { assetTypes: [], availableFormats: [] };
 
     this.epsgList = [];
 
-    this.selectedEpsgLabel = null;
+    this.languages = store.getters.getConfig.configuration.europeLanguages;
+
+    // this.epsgsList = [];
+
+    // this.selectedEpsgLabel = null;
+
+    this.selectedLanguage = { name: '', code: '' };
+    this.selectedMetadataLanguage = { name: '', code: '' };
+
+    this.selectedEpsg = { name: '', code: '' };
+
+    this.isLoadingEpsg = false;
 
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
-  onEpsgSelection(epsgLabel: string): void {
-    const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
-    this.assetLocal.referenceSystem = this.epsgList[i].code;
-  }
-
   created(): void {
     this.populateAvailableFormatsForSelectedType();
-    this.spatialApi.getEpsgCodes().then((epsgCodesResponse) => {
-      this.epsgList = epsgCodesResponse.result.map((x) => ({ code: x.code.toString(), name: x.name }));
-      this.menusData.epsgLabels = this.epsgList.map((x) => `EPSG:${x.code}, ${x.name}`);
 
-      if (this.assetLocal.referenceSystem) {
-        const i = this.epsgList.findIndex((x) => x.code === this.assetLocal.referenceSystem);
-        this.selectedEpsgLabel = this.menusData.epsgLabels[i];
-      }
+    if (this.assetLocal.referenceSystem) {
+      this.isLoadingEpsg = true;
+      this.spatialApi.getEpsgCodes(this.assetLocal.referenceSystem).then((epsgResponse) => {
+        const epsg = epsgResponse.result.find((x) => `${x.code}` === this.assetLocal.referenceSystem);
+        if (epsg) this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
+        this.isLoadingEpsg = false;
+      });
+    }
+
+    // eslint-disable-next-line
+    if (this.assetLocal.language && this.languages.find((x) => x.code === this.assetLocal.language)) this.selectedLanguage = this.languages.find((x) => x.code === this.assetLocal.language)!;
+    // eslint-disable-next-line
+    if (this.assetLocal.metadataLanguage && this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)) this.selectedMetadataLanguage = this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)!;
+  }
+
+  asyncFindEpsg(q: string): void {
+    if (!q) return;
+    console.log(q);
+    this.isLoadingEpsg = true;
+    const typeOfSearch = Number.isNaN(Number(q)) ? 'name' : 'number';
+    console.log(typeOfSearch);
+    const epsgPromise = Number.isNaN(Number(q)) ? this.spatialApi.getEpsgCodes(undefined, q) : this.spatialApi.getEpsgCodes(q, undefined);
+    epsgPromise.then((epsgResponse) => {
+      this.epsgList = epsgResponse.result.map((x) => ({ code: `${x.code}`, name: `EPSG:${x.code} | ${x.name}` }));
+      this.isLoadingEpsg = false;
     });
+  }
+
+  onSelectLanguage(language: { code: string, name: string }): void {
+    if (language && language.code) this.assetLocal.language = language.code;
+  }
+
+  onSelectMetadataLanguage(language: { code: string, name: string }): void {
+    if (language && language.code) this.assetLocal.metadataLanguage = language.code;
+  }
+
+  onEpsgSelection(selectedEpsg: { code: string, name: string }): void {
+    // const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
+    // this.assetLocal.referenceSystem = this.epsgsList[i].code;
+    if (selectedEpsg && selectedEpsg.code) this.assetLocal.referenceSystem = selectedEpsg.code;
   }
 
   @Watch('assetLocal', { deep: true })
