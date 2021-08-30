@@ -163,8 +163,11 @@
                     <validation-provider>
                     <div class="form-group">
                       <label class="typo__label">Domain Restrictions</label>
-                      <multiselect
+                      <!-- <multiselect
                         v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].domainRestrictions" track-by="code" placeholder="Search domain" label="name" :options="menusData.domainRestrictions" :multiple="true">
+                      </multiselect> -->
+                      <multiselect
+                        v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].domainRestrictions" placeholder="Select domains" :options="menusData.domainRestrictions" :multiple="true">
                       </multiselect>
                     </div>
                     </validation-provider>
@@ -243,6 +246,7 @@ import {
   FreePricingModelCommand,
 } from '@/model/pricing-model';
 import store from '@/store';
+import { EnumContinent } from '@/model/enum';
 
 extend('required', required);
 
@@ -270,7 +274,7 @@ export default class Pricing extends Vue {
   pricingModelTypes: { name: string, priceModel: EnumPricingModel }[];
 
   menusData: {
-    domainRestrictions: any[],
+    domainRestrictions: string[],
     continents: any[],
     countries: any[],
   };
@@ -279,92 +283,39 @@ export default class Pricing extends Vue {
     super();
 
     this.menusData = { domainRestrictions: [], continents: [], countries: [] };
-    this.menusData.domainRestrictions = [
-      {
-        name: 'Photogrammetry',
-        code: 'PH',
-      },
-      {
-        name: 'Geography',
-        code: 'GE',
-      },
-      {
-        name: 'Elevation',
-        code: 'EL',
-      },
-      {
-        name: 'Pharming',
-        code: 'PA',
-      },
-      {
-        name: 'Health',
-        code: 'HE',
-      },
-      {
-        name: 'Advertising & Marketing',
-        code: 'AM',
-      },
-      {
-        name: 'Navigation & Mobility',
-        code: 'NM',
-      },
-      {
-        name: 'Mobile applications',
-        code: 'MA',
-      },
-      {
-        name: 'Internet applications',
-        code: 'IA',
-      },
-      {
-        name: 'Web applications',
-        code: 'WA',
-      },
-    ];
+
+    this.menusData.domainRestrictions = store.getters.getConfig.configuration.asset.domains;
 
     this.menusData.continents = [
       {
         name: 'Europe',
-        code: 'EUROPE',
+        code: EnumContinent.EUROPE,
       },
       {
         name: 'Africa',
-        code: 'AFRICA',
+        code: EnumContinent.AFRICA,
       },
       {
         name: 'Asia',
-        code: 'ASIA',
+        code: EnumContinent.ASIA,
       },
       {
         name: 'North America',
-        code: 'NORTH_AMERICA',
+        code: EnumContinent.NORTH_AMERICA,
       },
       {
         name: 'South America',
-        code: 'SOUTH_AMERICA',
+        code: EnumContinent.SOUTH_AMERICA,
       },
       {
         name: 'Oceania',
-        code: 'OCEANIA',
+        code: EnumContinent.OCEANIA,
       },
       {
         name: 'Antarctica',
-        code: 'ANTARCTICA',
+        code: EnumContinent.ANTARCTICA,
       },
     ];
-
-    // console.log('confcou', store.getters.getConfig.configuration.countries);
-
-    // this.menusData.countries = [
-    //   {
-    //     name: 'France',
-    //     code: 'FRA',
-    //   },
-    //   {
-    //     name: 'Spain',
-    //     code: 'ESP',
-    //   },
-    // ];
 
     this.menusData.countries = store.getters.getConfig.configuration.europeCountries;
 
@@ -413,7 +364,7 @@ export default class Pricing extends Vue {
     this.pricingModelsLocal.forEach((model) => {
       /* eslint-disable no-param-reassign */
       console.log('m', this.menusData);
-      model.domainRestrictions = model.domainRestrictions.map((x) => this.menusData.domainRestrictions.find((y) => y.code === x));
+      // model.domainRestrictions = model.domainRestrictions.map((x) => this.menusData.domainRestrictions.find((y) => y.code === x));
       model.coverageRestrictionContinents = model.coverageRestrictionContinents.map((x) => this.menusData.continents.find((y) => y.code === x));
       model.coverageRestrictionCountries = model.coverageRestrictionCountries.map((x) => this.menusData.countries.find((y) => y.code === x));
       model.consumerRestrictionContinents = model.consumerRestrictionContinents.map((x) => this.menusData.continents.find((y) => y.code === x));
@@ -425,7 +376,7 @@ export default class Pricing extends Vue {
   fixPricingModelsFormatForParent(): void {
     this.pricingModelsLocal.forEach((x) => {
       /* eslint-disable no-param-reassign */
-      x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
+      // x.domainRestrictions = x.domainRestrictions.map((c: any) => c.code);
       x.consumerRestrictionContinents = x.consumerRestrictionContinents.map((c: any) => c.code);
       x.coverageRestrictionContinents = x.coverageRestrictionContinents.map((c: any) => c.code);
       x.consumerRestrictionCountries = x.consumerRestrictionCountries.map((c: any) => c.code);
