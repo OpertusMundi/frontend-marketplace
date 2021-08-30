@@ -44,7 +44,8 @@
         <li><strong>Created:</strong><span v-if="catalogueItem.publicationDate">{{ catalogueItem.publicationDate | format_date }}</span><span v-else>-</span></li>
         <li><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
         <li><strong>Format:</strong>{{ catalogueItem.format }}</li>
-        <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem }}</li>
+        <!-- <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem ? `EPSG:${catalogueItem.referenceSystem}` : '' }}</li> -->
+        <li><strong>CRS:</strong>{{ crsLabel }}</li>
         <li><strong>Scale:</strong><span v-for="(scale, i) in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.description }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
         <!-- <li><strong>Coverage:</strong>97% of Greece (DUMMY)</li> -->
       </ul>
@@ -61,6 +62,7 @@ import {
 } from 'vue-property-decorator';
 import moment from 'moment';
 import DraftAssetApi from '@/service/draft';
+import SpatialApi from '@/service/spatial';
 import { CatalogueItem } from '@/model';
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 import Modal from '@/components/Modal.vue';
@@ -81,9 +83,13 @@ export default class AssetHead extends Vue {
 
   @Prop({ required: true }) private mode!: string;
 
-  draftAssetApi: DraftAssetApi
+  draftAssetApi: DraftAssetApi;
+
+  spatialApi: SpatialApi;
 
   // selectedVersion: string;
+
+  crsLabel: string;
 
   modalToShow: string;
 
@@ -91,10 +97,22 @@ export default class AssetHead extends Vue {
     super();
 
     this.draftAssetApi = new DraftAssetApi();
+    this.spatialApi = new SpatialApi();
 
     // this.selectedVersion = '';
 
+    this.crsLabel = '';
+
     this.modalToShow = '';
+  }
+
+  created(): void {
+    if (this.catalogueItem.referenceSystem) {
+      this.spatialApi.getEpsgCodes(this.catalogueItem.referenceSystem).then((epsgResponse) => {
+        const epsg = epsgResponse.result.find((x) => `${x.code}` === this.catalogueItem.referenceSystem);
+        if (epsg) this.crsLabel = `EPSG:${epsg.code} | ${epsg.name}`;
+      });
+    }
   }
 
   // @Watch('catalogueItem', { deep: true, immediate: true })
