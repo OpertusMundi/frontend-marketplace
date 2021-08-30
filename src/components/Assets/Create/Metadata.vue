@@ -55,12 +55,19 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Language">
+          <!-- <validation-provider v-slot="{ errors }" name="Language">
           <div class="form-group">
             <label for="metadata_language">Language</label>
             <input type="text" class="form-group__text" name="metadata_language" id="metadata_language" v-model="assetLocal.language">
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
           </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Language">
+            <div class="form-group">
+              <label for="multiselect_language">Language</label>
+              <multiselect id="multiselect_language" @input="onSelectLanguage" v-model="selectedLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select language"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
           </validation-provider>
           <validation-provider v-slot="{ errors }" name="Editor's name">
             <div class="form-group">
@@ -97,14 +104,20 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Metadata language">
+          <!-- <validation-provider v-slot="{ errors }" name="Metadata language">
             <div class="form-group">
               <label for="">Metadata language</label>
               <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="assetLocal.metadataLanguage">
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
+          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Metadata language">
+            <div class="form-group">
+              <label for="multiselect_metadata_language">Metadata language</label>
+              <multiselect id="multiselect_metadata_language" @input="onSelectMetadataLanguage" v-model="selectedMetadataLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select metadata language"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
           </validation-provider>
-
           <validation-provider name="Date start">
             <div class="form-group">
               <label for="">Date start (of resource temporal extent)</label>
@@ -282,9 +295,15 @@ export default class Metadata extends Vue {
 
   epsgList: { code: string, name: string }[];
 
+  languages: { code: string, name: string }[];
+
   // epsgsList: { code: string, name: string }[]; // deprecated
 
   // selectedEpsgLabel: string | null; // deprecated
+
+  selectedLanguage: { code: string, name: string };
+
+  selectedMetadataLanguage: { code: string, name: string };
 
   selectedEpsg: { code: string, name: string };
 
@@ -327,15 +346,38 @@ export default class Metadata extends Vue {
 
     this.epsgList = [];
 
+    this.languages = store.getters.getConfig.configuration.europeLanguages;
+
     // this.epsgsList = [];
 
     // this.selectedEpsgLabel = null;
+
+    this.selectedLanguage = { name: '', code: '' };
+    this.selectedMetadataLanguage = { name: '', code: '' };
 
     this.selectedEpsg = { name: '', code: '' };
 
     this.isLoadingEpsg = false;
 
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
+  }
+
+  created(): void {
+    this.populateAvailableFormatsForSelectedType();
+
+    if (this.assetLocal.referenceSystem) {
+      this.isLoadingEpsg = true;
+      this.spatialApi.getEpsgCodes(this.assetLocal.referenceSystem).then((epsgResponse) => {
+        const epsg = epsgResponse.result.find((x) => `${x.code}` === this.assetLocal.referenceSystem);
+        if (epsg) this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
+        this.isLoadingEpsg = false;
+      });
+    }
+
+    // eslint-disable-next-line
+    if (this.assetLocal.language && this.languages.find((x) => x.code === this.assetLocal.language)) this.selectedLanguage = this.languages.find((x) => x.code === this.assetLocal.language)!;
+    // eslint-disable-next-line
+    if (this.assetLocal.metadataLanguage && this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)) this.selectedMetadataLanguage = this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)!;
   }
 
   asyncFindEpsg(q: string): void {
@@ -351,33 +393,18 @@ export default class Metadata extends Vue {
     });
   }
 
+  onSelectLanguage(language: { code: string, name: string }): void {
+    if (language && language.code) this.assetLocal.language = language.code;
+  }
+
+  onSelectMetadataLanguage(language: { code: string, name: string }): void {
+    if (language && language.code) this.assetLocal.metadataLanguage = language.code;
+  }
+
   onEpsgSelection(selectedEpsg: { code: string, name: string }): void {
     // const i = this.menusData.epsgLabels.findIndex((x) => x === epsgLabel);
     // this.assetLocal.referenceSystem = this.epsgsList[i].code;
     if (selectedEpsg && selectedEpsg.code) this.assetLocal.referenceSystem = selectedEpsg.code;
-  }
-
-  created(): void {
-    this.populateAvailableFormatsForSelectedType();
-
-    if (this.assetLocal.referenceSystem) {
-      this.isLoadingEpsg = true;
-      this.spatialApi.getEpsgCodes(this.assetLocal.referenceSystem).then((epsgResponse) => {
-        const epsg = epsgResponse.result.find((x) => `${x.code}` === this.assetLocal.referenceSystem);
-        if (epsg) this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
-        this.isLoadingEpsg = false;
-      });
-    }
-
-    // this.spatialApi.getEpsgCodes().then((epsgCodesResponse) => {
-    //   this.epsgsList = epsgCodesResponse.result.map((x) => ({ code: x.code.toString(), name: x.name }));
-    //   this.menusData.epsgLabels = this.epsgsList.map((x) => `EPSG:${x.code}, ${x.name}`);
-
-    //   if (this.assetLocal.referenceSystem) {
-    //     const i = this.epsgsList.findIndex((x) => x.code === this.assetLocal.referenceSystem);
-    //     this.selectedEpsgLabel = this.menusData.epsgLabels[i];
-    //   }
-    // });
   }
 
   @Watch('assetLocal', { deep: true })
