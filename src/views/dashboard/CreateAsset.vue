@@ -488,7 +488,8 @@ export default class CreateAsset extends Vue {
       onUploadProgress: (progressEvent: any): void => {
         const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
         if (totalLength !== null) {
-          this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+          // this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+          Vue.set(this.uploading, 'percentage', Math.round((progressEvent.loaded * 100) / totalLength));
         }
       },
     };
@@ -521,10 +522,10 @@ export default class CreateAsset extends Vue {
     // UPLOAD ADDITIONAL RESOURCES FILES
     if (!isDraft && this.additionalResourcesToUpload.length) {
       console.log('upload additional resources');
-      this.uploading.status = true;
-      this.uploading.errors = [];
-      this.uploading.completed = false;
-      this.uploading.title = 'Your additional metadata resources are being uploaded';
+      Vue.set(this.uploading, 'status', true);
+      Vue.set(this.uploading, 'errors', []);
+      Vue.set(this.uploading, 'completed', false);
+      Vue.set(this.uploading, 'title', 'Your additional metadata resources are being uploaded');
 
       for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
         let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
@@ -549,10 +550,10 @@ export default class CreateAsset extends Vue {
 
     // UPLOAD RESOURCE
     if (!isDraft && this.fileToUpload.isFileSelected) {
-      this.uploading.status = true;
-      this.uploading.errors = [];
-      this.uploading.completed = false;
-      this.uploading.title = 'Your resource is being uploaded';
+      Vue.set(this.uploading, 'status', true);
+      Vue.set(this.uploading, 'errors', []);
+      Vue.set(this.uploading, 'completed', false);
+      Vue.set(this.uploading, 'title', 'Your resource is being uploaded');
 
       let uploadResource: ServerResponse<AssetDraft>;
       try {
@@ -574,14 +575,18 @@ export default class CreateAsset extends Vue {
 
     // SUBMIT
     if (isDraft) {
-      this.uploading.status = true;
-      this.uploading.completed = true;
-      this.uploading.title = 'Draft saved!';
-      this.uploading.subtitle = '';
+      Vue.set(this.uploading, 'status', true);
+      Vue.set(this.uploading, 'completed', true);
+      Vue.set(this.uploading, 'title', 'Draft saved!');
+      Vue.set(this.uploading, 'subtitle', '');
     } else {
       let submitResponse: ServerResponse<AssetDraft>;
       try {
         submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+        Vue.set(this.uploading, 'status', true);
+        Vue.set(this.uploading, 'completed', true);
+        Vue.set(this.uploading, 'title', 'Asset created!');
+        Vue.set(this.uploading, 'subtitle', '');
         this.uploading.status = true;
         this.uploading.completed = true;
         this.uploading.subtitle = '';

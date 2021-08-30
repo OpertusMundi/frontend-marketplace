@@ -314,7 +314,8 @@
 
           <li
             v-if="!includeTabDueToRole('ROLE_PROVIDER') && !includeTabDueToRole('ROLE_CONSUMER')">
-            <router-link to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
+            <router-link v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'" to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
+            <button disabled v-if="$store.getters.getProfile.consumer.draft && $store.getters.getProfile.consumer.draft.status === 'SUBMITTED'" class="btn btn--std btn--outlinedark">pending consumer role...</button>
           </li>
         </ul>
       </div>
@@ -978,6 +979,7 @@ export default class DashboardHome extends Vue {
     this.loadCards();
     this.loadKycDocuments();
     this.loadUboDeclarations();
+    console.log('q', this.$store.getters.getProfile.consumer.draft);
   }
 
   /*
