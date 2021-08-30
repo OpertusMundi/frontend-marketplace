@@ -278,7 +278,6 @@ export default class Metadata extends Vue {
   menusData: {
     assetTypes: string[],
     availableFormats: string[],
-    epsgLabels: string[],
   }
 
   epsgList: { code: string, name: string }[];
@@ -324,7 +323,7 @@ export default class Metadata extends Vue {
 
     this.keywordsForDisplay = this.assetLocal.keywords.map((x) => x.keyword);
 
-    this.menusData = { assetTypes: [], availableFormats: [], epsgLabels: [] };
+    this.menusData = { assetTypes: [], availableFormats: [] };
 
     this.epsgList = [];
 
