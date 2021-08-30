@@ -271,6 +271,7 @@ import moment from 'moment';
 import Modal from '@/components/Modal.vue';
 import ConsumerPayInApi from '@/service/consumer-payin';
 import CartApi from '@/service/cart';
+import ConsumerContractsApi from '@/service/consumer-contracts';
 import { Card, CardDirectPayInCommand } from '@/model/payin';
 import { Profile } from '@/model/account';
 import { Cart } from '@/model/cart';
@@ -292,6 +293,8 @@ export default class Checkout extends Vue {
 
   cartApi: CartApi;
 
+  consumerContractsApi: ConsumerContractsApi;
+
   totalSteps: number;
 
   currentStep: number;
@@ -302,7 +305,9 @@ export default class Checkout extends Vue {
 
   useDifferentShippingInfo: boolean;
 
-  countries: string[];
+  // countries: string[];
+
+  orderKey: string;
 
   availableCards: Card[] | null;
 
@@ -319,12 +324,15 @@ export default class Checkout extends Vue {
 
     this.consumerPayInApi = new ConsumerPayInApi();
     this.cartApi = new CartApi();
+    this.consumerContractsApi = new ConsumerContractsApi();
+
     this.totalSteps = 3;
     this.currentStep = 1;
     this.modalToShow = '';
     this.profile = store.getters.getProfile;
     this.useDifferentShippingInfo = false;
-    this.countries = ['Greece', 'Spain', 'Germany'];
+    // this.countries = ['Greece', 'Spain', 'Germany'];
+    this.orderKey = '';
     this.availableCards = null;
     this.selectedCard = null;
     this.selectedShippingCountry = '';
@@ -387,8 +395,24 @@ export default class Checkout extends Vue {
 
       if (this.currentStep === 2) {
         store.commit('setLoading', true);
-        this.cartApi.getCart().then((cartResponse) => {
+        // this.cartApi.getCart().then((cartResponse) => {
+        //   this.cart = cartResponse.result;
+        //   store.commit('setLoading', false);
+        // });
+        Promise.all([
+          this.cartApi.getCart(),
+          this.consumerPayInApi.checkout().then((checkoutResponse) => {
+            this.orderKey = checkoutResponse.result.key;
+            return this.consumerContractsApi.printContract(this.orderKey, 1);
+          }),
+        ]).then((responses) => {
+          const [cartResponse] = responses;
+          const { 1: printContractResponse } = responses;
+
           this.cart = cartResponse.result;
+          const pdf = printContractResponse;
+          console.log('pdf', pdf);
+
           store.commit('setLoading', false);
         });
       }
@@ -402,25 +426,40 @@ export default class Checkout extends Vue {
   }
 
   submitCheckout(): void {
-    this.consumerPayInApi.checkout().then((checkoutResponse) => {
-      console.log('checkout response', checkoutResponse);
-      if (checkoutResponse.success) {
-        const orderKey = checkoutResponse.result.key;
-        const cardPayIn: CardDirectPayInCommand = {
-          // eslint-disable-next-line
-          cardId: this.selectedCard!,
-        };
-        this.consumerPayInApi.createCardDirectPayIn(orderKey, cardPayIn).then((payInResponse) => {
-          console.log('payin response', payInResponse);
-          if (payInResponse.success) {
-            console.log('successfull payin!');
-            this.$router.push('/order-thankyou');
-          } else {
-            console.log('payin error');
-          }
-        });
+    store.commit('setLoading', true);
+    const cardPayIn: CardDirectPayInCommand = {
+      // eslint-disable-next-line
+      cardId: this.selectedCard!,
+    };
+    this.consumerPayInApi.createCardDirectPayIn(this.orderKey, cardPayIn).then((payInResponse) => {
+      console.log('payin response', payInResponse);
+      if (payInResponse.success) {
+        console.log('successful payin!');
+        this.$router.push('/order-thankyou');
+      } else {
+        console.log('payin error');
       }
+      store.commit('setLoading', false);
     });
+    // this.consumerPayInApi.checkout().then((checkoutResponse) => {
+    //   console.log('checkout response', checkoutResponse);
+    //   if (checkoutResponse.success) {
+    //     const orderKey = checkoutResponse.result.key;
+    //     const cardPayIn: CardDirectPayInCommand = {
+    //       // eslint-disable-next-line
+    //       cardId: this.selectedCard!,
+    //     };
+    //     this.consumerPayInApi.createCardDirectPayIn(orderKey, cardPayIn).then((payInResponse) => {
+    //       console.log('payin response', payInResponse);
+    //       if (payInResponse.success) {
+    //         console.log('successfull payin!');
+    //         this.$router.push('/order-thankyou');
+    //       } else {
+    //         console.log('payin error');
+    //       }
+    //     });
+    //   }
+    // });
   }
 }
 </script>
