@@ -789,6 +789,70 @@ export interface CatalogueItem extends BaseCatalogueItem {
   publisherId: string;
 }
 
+export enum EnumContractIcon {
+  AlterationNotPermitted = 'AlterationNotPermitted',
+  AlterationPermitted = 'AlterationPermitted',
+  CommercialUseNotPermitted = 'CommercialUseNotPermitted',
+  CommercialUsePermitted = 'CommercialUsePermitted',
+  DeliveredByTopio = 'DeliveredByTopio',
+  DeliveredByVendor = 'DeliveredByVendor',
+  DigitalDelivery = 'DigitalDelivery',
+  PhysicalDelivery = 'PhysicalDelivery',
+  ThirdPartyNotPermitted = 'ThirdPartyNotPermitted',
+  ThirdPartyPermitted = 'ThirdPartyPermitted',
+  UpdatesNotIncluded = 'UpdatesNotIncluded',
+  UpdatesIncluded = 'UpdatesIncluded',
+  WarrantyNotProvided = 'WarrantyNotProvided',
+  WarrantyProvided = 'WarrantyProvided',
+  NoRestrictionsWorldwide = 'NoRestrictionsWorldwide',
+  Geomarketing = 'Geomarketing',
+}
+
+export enum EnumContractIconCategory {
+  Terms = 'Terms',
+  Countries = 'Countries',
+  Restrictions = 'Restrictions',
+}
+
+export interface ContractTerm {
+  /**
+   * Icon
+   */
+  icon: EnumContractIcon;
+  /**
+   * Icon category
+   */
+  category: EnumContractIconCategory;
+  /**
+   * Base64 encoded icon SVG image. Rendered as a data URL e.g.
+   * data:image/svg+xml;base64,<image>
+   */
+  image: string;
+  /**
+   * "Description of the icon
+   */
+  description: string;
+}
+
+export interface Contract {
+  /**
+   * Unique key
+   */
+  key: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Version
+   */
+  version: string;
+  /**
+   * License terms
+   */
+  terms: ContractTerm[];
+}
+
 export interface CatalogueItemDetails extends CatalogueItem {
   /**
    * Auxiliary files or additional resources to the dataset
@@ -800,6 +864,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * using the key property.
    */
   automatedMetadata?: Metadata[];
+  /**
+   * Contract details
+   */
+  contract: Contract;
   /**
    * Ingestion information. Only visible to the owners (publishers) of the asset.
    * The array contains an element for each ingested resource. The resource can
