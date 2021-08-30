@@ -489,6 +489,7 @@ export default class CreateAsset extends Vue {
         const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
         if (totalLength !== null) {
           // this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+          console.log('percentage', Math.round((progressEvent.loaded * 100) / totalLength));
           Vue.set(this.uploading, 'percentage', Math.round((progressEvent.loaded * 100) / totalLength));
         }
       },
