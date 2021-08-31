@@ -1125,6 +1125,57 @@
         }
     }
 }
+.asset_card_api_details {
+    border-radius: 7px;
+    background: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: em(16);
+    color: $darkColor;
+    cursor: pointer;
+    &--selected {
+        background: $secondColor;
+        color: #fff !important;
+        .asset_card_api_details__top {
+            span {
+                color: #fff !important;
+            }
+        }
+    }
+    > div {
+        display: flex;
+    }
+    &__top {
+        justify-content: space-between;
+        span:first-child {
+            color: $labelColor;
+        }
+    }
+    &__middle {
+        font-weight: 600;
+        font-size: em(20);
+        margin: 5px 0 10px 0;
+    }
+    &__bottom {
+        span {
+            margin-right: 10px;
+        }
+    }
+    &__price {
+        font-family: $titleFont;
+        font-weight: 700;
+        font-size: em(20);
+        letter-spacing: 0.02em;
+
+        div {
+            margin-top: 20px;
+        }
+
+        small {
+            font-size: em(13);
+        }
+    }
+}
 
 // bootstrap-style utility classes
 .bg-dark {
