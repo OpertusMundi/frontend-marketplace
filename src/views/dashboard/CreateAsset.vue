@@ -66,7 +66,7 @@
             <!-- METADATA -->
             <!-- <transition name="fade" mode="out-in"> -->
               <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
-              <api-details ref="step2" :asset.sync="asset" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
+              <api-details ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
             <!-- </transition> -->
 
             <!-- CONTRACT -->
@@ -148,7 +148,13 @@ import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
-import { EnumConformity, EnumDeliveryMethod } from '@/model/catalogue';
+import {
+  CatalogueItem,
+  EnumConformity,
+  EnumDeliveryMethod,
+  DraftApiFromAssetCommand,
+  EnumDraftCommandType,
+} from '@/model/catalogue';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import store from '@/store';
@@ -220,6 +226,8 @@ export default class CreateAsset extends Vue {
 
   selectedPricingModelForEditing: number | null;
 
+  selectedPublishedAssetForApiCreation: CatalogueItem | null;
+
   // contract: string;
 
   totalSteps = 7;
@@ -254,6 +262,8 @@ export default class CreateAsset extends Vue {
     this.serviceType = null;
 
     this.selectedPricingModelForEditing = null;
+
+    this.selectedPublishedAssetForApiCreation = null;
 
     this.assetId = '';
 
@@ -378,7 +388,7 @@ export default class CreateAsset extends Vue {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
           if (this.assetMainType === 'API') {
-            this.submitServiceForm();
+            this.submitFormForService();
           } else {
             this.submitForm();
           }
@@ -425,22 +435,66 @@ export default class CreateAsset extends Vue {
   }
 
   // todo: needs refactoring
-  async submitServiceForm(): Promise<void> {
+  async submitFormForService(): Promise<void> {
+    // old
+    // this.fixDataForSubmitting();
+    // const config: AxiosRequestConfig = {
+    //   onUploadProgress: (progressEvent: any): void => {
+    //     const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+    //     if (totalLength !== null) {
+    //       this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+    //     }
+    //   },
+    // };
+    // const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config);
+    // // const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
+    // const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
+    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    // console.log(submitResponse);
+    // if (submitResponse.success) {
+    //   this.uploading.status = true;
+    //   this.uploading.completed = true;
+    //   this.uploading.title = 'Service created!';
+    //   this.uploading.subtitle = '';
+    // } else {
+    //   console.log('error submitting service');
+    // }
+
+    // refactored
+
     this.fixDataForSubmitting();
 
-    const config: AxiosRequestConfig = {
-      onUploadProgress: (progressEvent: any): void => {
-        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-        if (totalLength !== null) {
-          this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
-        }
-      },
-    };
-
-    const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config);
-
-    // const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
-    const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
+    let draftAssetResponse: ServerResponse<AssetDraft>;
+    let draftAssetKey = '';
+    try {
+      if (this.isEditingExistingDraft) {
+        console.log('editing existing draft');
+        draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+      } else {
+        console.log('new draft');
+        const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+        const draftApi: DraftApiFromAssetCommand = {
+          type: EnumDraftCommandType.ASSET,
+          pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+          title: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.title : '',
+          version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+          serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+        };
+        draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+      }
+      draftAssetKey = draftAssetResponse.result.key;
+      console.log('create draft success', draftAssetResponse);
+    } catch (err) {
+      // eslint-disable-next-line
+      alert(`Error: ${err.message}`);
+      throw new Error(err.message);
+    }
+    if (!draftAssetResponse.success) {
+      console.log('error', draftAssetResponse);
+      // eslint-disable-next-line
+      alert(`Error: ${draftAssetResponse.messages}`);
+      return;
+    }
 
     const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
     console.log(submitResponse);
@@ -489,6 +543,7 @@ export default class CreateAsset extends Vue {
         const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
         if (totalLength !== null) {
           // this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
+          console.log('percentage', Math.round((progressEvent.loaded * 100) / totalLength));
           Vue.set(this.uploading, 'percentage', Math.round((progressEvent.loaded * 100) / totalLength));
         }
       },
@@ -587,9 +642,9 @@ export default class CreateAsset extends Vue {
         Vue.set(this.uploading, 'completed', true);
         Vue.set(this.uploading, 'title', 'Asset created!');
         Vue.set(this.uploading, 'subtitle', '');
-        this.uploading.status = true;
-        this.uploading.completed = true;
-        this.uploading.subtitle = '';
+        // this.uploading.status = true;
+        // this.uploading.completed = true;
+        // this.uploading.subtitle = '';
         console.log('submit success', submitResponse);
       } catch (err) {
         // eslint-disable-next-line

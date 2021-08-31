@@ -86,6 +86,23 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
+   * Create a new draft from existing asset
+   */
+  public async createFromAsset(pid: string): Promise<ServerResponse<AssetDraft>> {
+    const url = '/action/drafts/asset';
+
+    const command = {
+      pid,
+    };
+
+    return this.post<{ pid: string }, ServerResponse<AssetDraft>>(url, command).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
+
+  /**
    * Create a new API draft
    *
    * @param command

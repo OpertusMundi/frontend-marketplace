@@ -21,7 +21,7 @@ import Shape from '@/components/Shape.vue';
 @Component({
   components: { Shape },
 })
-export default class Login extends Vue {
+export default class RegistrationSuccess extends Vue {
   mounted(): void {
     console.log('confirm email mounted');
   }

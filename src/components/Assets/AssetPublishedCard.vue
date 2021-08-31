@@ -41,8 +41,7 @@
       <transition name="fade" mode="out-in">
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
-            <li>Publish</li>
-            <li>Edit</li>
+            <li @click="createNewDraftFromPublished">Edit</li>
             <li @click="createService('WMS')">Create WMS</li>
             <li @click="createService('WFS')">Create WFS</li>
             <li @click="deleteAsset">Delete</li>
@@ -178,6 +177,10 @@ export default class AssetPublishedCard extends Vue {
         console.log('error creating service draft', createApiResponse);
       }
     });
+  }
+
+  createNewDraftFromPublished(): void {
+    this.$emit('createNewDraft', this.asset.id);
   }
 
   deleteAsset(): void {

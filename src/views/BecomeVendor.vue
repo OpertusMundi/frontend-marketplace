@@ -17,7 +17,7 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:11">
+                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
                   <div class="form-group">
                     <label for="vat_number">VAT number *</label>
                     <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
@@ -29,6 +29,14 @@
                   <div class="form-group">
                     <label for="name">Name *</label>
                     <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+
+                <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
+                  <div class="form-group">
+                    <label for="vendor_email">Email *</label>
+                    <input type="text" class="form-group__text" name="email" id="vendor_email" v-model="vendorData.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -58,13 +66,21 @@
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="country">Country *</label>
                       <select class="form-group__select" name="country" id="country" v-model="vendorData.headquartersAddress.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider> -->
+
+                  <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
+                    <div class="form-group">
+                      <label for="multiselect_headquarters_country">Country *</label>
+                      <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
 
@@ -134,19 +150,35 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
+                <!-- <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
                   <div class="form-group">
                     <label for="nationality">Nationality *</label>
                     <input type="text" class="form-group__text" name="nationality" id="nationality" v-model="vendorData.representative.nationality">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
+                </validation-provider> -->
+
+                <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
+                  <div class="form-group">
+                    <label for="multiselect_representative_nationality">Nationality *</label>
+                    <multiselect id="multiselect_representative_nationality" @input="onSelectRepresentativeNationality" v-model="selectedRepresentativeNationality" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+                  </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
+                <!-- <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                   <div class="form-group">
                     <label for="lr_country_of_residence">Country of residence *</label>
                     <input type="text" class="form-group__text" name="lr_country_of_residence" id="lr_country_of_residence" v-model="vendorData.representative.countryOfResidence">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider> -->
+
+                <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
+                  <div class="form-group">
+                    <label for="multiselect_representative_country_residence">Country of residence *</label>
+                    <multiselect id="multiselect_representative_country_residence" @input="onSelectRepresentativeCountryOfResidence" v-model="selectedRepresentativeCountryOfResidence" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
 
@@ -166,14 +198,30 @@
                   </div>
                 </validation-provider>
 
+                <validation-provider v-slot="{ errors }" name="Legal Person type" rules="required">
+                  <div class="form-group">
+                    <label for="multiselect_legal_person_type">Country *</label>
+                    <multiselect id="multiselect_legal_person_type" @input="onSelectLegalPersonType" v-model="selectedLegalPersonType" :options="legalPersonTypeOptions" label="name" track-by="code" placeholder="Select type" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+                  </div>
+                </validation-provider>
+
                 <div class="wrapper-50-50">
-                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="lr_country">Country *</label>
                       <select class="form-group__select" name="lr_country" id="lr_country" v-model="vendorData.representative.address.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider> -->
+
+                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                    <div class="form-group">
+                      <label for="multiselect_representative_address_country">Country *</label>
+                      <multiselect id="multiselect_representative_address_country" @input="onSelectRepresentativeAddressCountry" v-model="selectedRepresentativeAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
 
@@ -252,13 +300,21 @@
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
                     <div class="form-group">
                       <label for="ba_country">Country *</label>
                       <select class="form-group__select" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
                         <option v-for="country in countries" :key="country"> {{country}} </option>
                       </select>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider> -->
+
+                  <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                    <div class="form-group">
+                      <label for="multiselect_representative_bank_account_country">Country *</label>
+                      <multiselect id="multiselect_representative_bank_account_country" @input="onSelectBankAccountAddressCountry" v-model="selectedBankAccountAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
 
@@ -401,9 +457,11 @@ import {
   extend,
   localize,
 } from 'vee-validate';
+import Multiselect from 'vue-multiselect';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
 import ProviderAPI from '@/service/provider';
+import store from '@/store';
 
 extend('required', required);
 extend('email', email);
@@ -430,6 +488,7 @@ extend('phoneNumber', phoneNumber);
     ValidationProvider,
     ValidationObserver,
     VuePhoneNumberInput,
+    Multiselect,
   },
   filters: {
     // input format: yyyy-mm-dd
@@ -445,7 +504,11 @@ export default class BecomeVendor extends Vue {
   providerAPI: ProviderAPI;
 
   // temporarily? using the following array of countries to populate options of country-select inputs 
-  countries: string[] = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova", "Monaco", "Montenegro", "The Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City",];
+  // countries: string[] = ["Albania", "Andorra", "Armenia", "Austria", "Azerbaijan", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Moldova", "Monaco", "Montenegro", "The Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City",];
+
+  countries: { name: string, code: string }[];
+
+  legalPersonTypeOptions: { name: string, code: string }[];
 
   $refs!: {
     step1: InstanceType<typeof ValidationObserver>,
@@ -460,10 +523,30 @@ export default class BecomeVendor extends Vue {
 
   vendorData: ProviderProfessionalCommand;
 
+  selectedHeadquartersCountry: { name: string, code: string };
+
+  selectedRepresentativeNationality: { name: string, code: string };
+
+  selectedRepresentativeCountryOfResidence: { name: string, code: string };
+
+  selectedRepresentativeAddressCountry: { name: string, code: string };
+
+  selectedBankAccountAddressCountry: { name: string, code: string };
+
+  selectedLegalPersonType : { name: string, code: string };
+
   constructor() {
     super();
 
     this.providerAPI = new ProviderAPI();
+
+    this.countries = store.getters.getConfig.configuration.countries;
+
+    this.legalPersonTypeOptions = [
+      { name: 'Business', code: 'BUSINESS' },
+      { name: 'Organization', code: 'ORGANIZATION' },
+      { name: 'Soletrader', code: 'SOLETRADER' },
+    ];
 
     this.vendorData = {
       name: '',
@@ -515,6 +598,38 @@ export default class BecomeVendor extends Vue {
         } as AddressCommand,
       } as BankAccountCommand,
     };
+
+    this.selectedHeadquartersCountry = { name: '', code: '' };
+    this.selectedRepresentativeNationality = { name: '', code: '' };
+    this.selectedRepresentativeCountryOfResidence = { name: '', code: '' };
+    this.selectedRepresentativeAddressCountry = { name: '', code: '' };
+    this.selectedBankAccountAddressCountry = { name: '', code: '' };
+    this.selectedLegalPersonType = { name: 'Business', code: 'BUSINESS' };
+  }
+
+  onSelectHeadquartersCountry(): void {
+    this.vendorData.headquartersAddress.country = this.selectedHeadquartersCountry.code;
+  }
+
+  onSelectRepresentativeNationality(): void {
+    this.vendorData.representative.nationality = this.selectedRepresentativeNationality.code;
+  }
+
+  onSelectRepresentativeCountryOfResidence(): void {
+    this.vendorData.representative.countryOfResidence = this.selectedRepresentativeCountryOfResidence.code;
+  }
+
+  onSelectRepresentativeAddressCountry(): void {
+    this.vendorData.representative.address.country = this.selectedRepresentativeAddressCountry.code;
+  }
+
+  onSelectBankAccountAddressCountry(): void {
+    this.vendorData.bankAccount.ownerAddress.country = this.selectedBankAccountAddressCountry.code;
+  }
+
+  onSelectLegalPersonType(): void {
+    // this.vendorData.legalPersonType = this.selectedLegalPersonType.code as EnumLegalPersonType;
+    Vue.set(this.vendorData, 'legalPersonType', this.selectedLegalPersonType.code);
   }
 
   goToStep(step:number):void {
@@ -528,6 +643,7 @@ export default class BecomeVendor extends Vue {
   }
 
   nextStep():void {
+    console.log(this.vendorData);
     if (this.currentStep === this.totalSteps) {
       this.submitForm();
       return;
@@ -543,11 +659,34 @@ export default class BecomeVendor extends Vue {
     });
   }
 
+  fixDataForSubmitting(): void {
+    // fix date format (birthday)
+    const d = new Date(this.vendorData.representative.birthdate);
+    const isoString = d.toISOString();
+    this.vendorData.representative.birthdate = isoString;
+    /* */
+
+    Object.keys(this.vendorData).forEach((x) => {
+      if (this.vendorData[x] === '') delete this.vendorData[x];
+    })
+
+    if (this.vendorData.bankAccount.ownerAddress.line2 === '') this.vendorData.bankAccount.ownerAddress.line2 = null;
+    if (this.vendorData.headquartersAddress.line2 === '') this.vendorData.headquartersAddress.line2 = null;
+    if (this.vendorData.representative.address.line2 === '') this.vendorData.representative.address.line2 = null;
+  }
+
   submitForm() {
-    console.log('submit form');
+    this.fixDataForSubmitting();
+
+    console.log('submit form', this.vendorData);
     this.providerAPI.submitRegistration(this.vendorData)
-      .then(() => {
-        console.log('form was submitted');
+      .then((submitResponse) => {
+        if (submitResponse.success) {
+          console.log('form was submitted');
+          this.$router.push('/become-vendor-success');
+        } else {
+          console.log('submit error', submitResponse);
+        }
       })
       .catch((err) => {
         console.log('error in submitting form: ', err);
@@ -560,3 +699,5 @@ export default class BecomeVendor extends Vue {
   @import "@/assets/styles/_becomevendor.scss";
   @import "@/assets/styles/_forms.scss";
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+
