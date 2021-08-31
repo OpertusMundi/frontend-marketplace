@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <asset-published-card @delete="onDeleteAsset" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-published-card>
+    <asset-published-card @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-published-card>
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
 
   </div>
@@ -443,6 +443,18 @@ export default class DashboardHome extends Vue {
     console.log('delete asset: ', id);
     this.idOfAssetToDelete = id;
     this.modalToShow = 'modalDeleteAsset';
+  }
+
+  onCreateNewDraft(id: string): void {
+    store.commit('setLoading', true);
+    console.log('create new draft', id);
+    this.draftAssetApi.createFromAsset(id).then((createDraftResponse) => {
+      if (createDraftResponse.success) {
+        store.commit('setLoading', false);
+      } else {
+        console.log('error creating draft', createDraftResponse);
+      }
+    });
   }
 
   onConfirmDeleteAsset(): void {
