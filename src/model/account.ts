@@ -62,7 +62,7 @@ interface AddressBase {
    */
   country: string;
   line1: string;
-  line2: string;
+  line2: string | null;
   postalCode: string;
   region: string;
 }
@@ -190,7 +190,7 @@ export interface ConsumerIndividualCommand extends CustomerCommand {
  * Property type value expected to be PROFESSIONAL
  */
 export interface ConsumerProfessionalCommand extends CustomerCommand {
-  additionalInfo: string;
+  additionalInfo?: string;
   /**
    * VAT number
    */
