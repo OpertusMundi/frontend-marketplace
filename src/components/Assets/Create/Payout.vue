@@ -8,6 +8,7 @@
         <div class="col-md-4">
           <div class="dashboard__form__step__title">
             <p class="mt-xs-5">Select where your profits will be transfered</p>
+            <validation-provider v-slot="{ errors }" name="Payout method" rules="required">
             <div class="form-group mt-xs-20">
               <label class="control control-radio">
                 Through the platform
@@ -19,7 +20,9 @@
                 <input type="radio" name="payout_method" v-model="selectedPayoutMethod" value="external_means" />
                 <div class="control_indicator"></div>
               </label>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
+            </validation-provider>
           </div>
         </div>
         <div class="col-md-8">
@@ -37,8 +40,8 @@
               <div v-if="selectedPayoutMethod === 'through_platform'">
                 <div class="form-group">
                   <label class="control control-radio">
-                    1234 XXXX 6789
-                    <input selected type="radio" name="payout_card" value="" />
+                    {{ iban }}
+                    <input selected type="radio" name="payout_card" v-model="selectedIban" :value="iban" />
                     <div class="control_indicator"></div>
                   </label>
                 </div>
@@ -107,6 +110,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
+import store from '@/store';
 
 extend('required', required);
 
@@ -121,12 +125,25 @@ export default class Payout extends Vue {
 
   selectedExternalPayoutMethod: string;
 
+  iban: string;
+
+  selectedIban: string;
+
   constructor() {
     super();
 
     this.selectedPayoutMethod = '';
 
     this.selectedExternalPayoutMethod = '';
+
+    this.iban = '';
+
+    this.selectedIban = '';
+  }
+
+  created(): void {
+    this.iban = store.getters.getProfile.provider.current.bankAccount.iban;
+    this.selectedIban = store.getters.getProfile.provider.current.bankAccount.iban;
   }
 
   @Watch('selectedPayoutMethod')
