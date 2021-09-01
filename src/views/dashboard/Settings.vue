@@ -533,6 +533,22 @@
 
                 </div>
                 <div class="col-md-7 d-flex flex-column" v-if="kycDocuments">
+                  <div class="mb-xs-20" v-if="showRoleSelectionForKyc">
+                    <h4 class="mb-xs-20">You are viewing / editing your KYC documents as</h4>
+                    <div class="form-group">
+                      <label class="control control-radio">
+                        Provider
+                        <input type="radio" name="kyc_role" v-model="kycViewAsRole" value="PROVIDER" />
+                        <div class="control_indicator"></div>
+                      </label>
+                      <label class="control control-radio">
+                        Consumer
+                        <input type="radio" name="kyc_role" v-model="kycViewAsRole" value="CONSUMER" />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </div>
+                  </div>
+
                   <span class="text-black"><strong>Vendor validation status</strong></span>
                   <div class="mt-xs-20" v-if="isVendorKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--validated">KYC VALIDATED</span></div>
                   <div class="mt-xs-20" v-if="!isVendorKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--not-validated">NOT KYC VALIDATED</span></div>
@@ -909,6 +925,8 @@ export default class DashboardHome extends Vue {
 
   cardsCurrentPage: number;
 
+  showRoleSelectionForKyc: boolean;
+
   kycViewAsRole: EnumCustomerType;
 
   kycDocuments: KycDocument[] | null;
@@ -962,6 +980,7 @@ export default class DashboardHome extends Vue {
     this.cardsPerPage = 100;
     this.cardsCurrentPage = 0;
 
+    this.showRoleSelectionForKyc = false;
     this.kycViewAsRole = {} as EnumCustomerType;
     this.kycDocuments = null;
     this.kycNumberOfInputs = 1;
@@ -975,16 +994,30 @@ export default class DashboardHome extends Vue {
   // TODO: add pagination to documents that support it (e.g. KYC)
 
   mounted(): void {
+    this.setKycRole();
+
     this.loadUserData();
     this.loadCards();
     this.loadKycDocuments();
     this.loadUboDeclarations();
     console.log('q', this.$store.getters.getProfile.consumer.draft);
+
+    this.checkIfRoleToggleIsNeeded();
   }
 
   /*
     LOADING - INITIALIZATION
   */
+
+  setKycRole(): void {
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+      this.kycViewAsRole = EnumCustomerType.PROVIDER;
+    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.kycViewAsRole = EnumCustomerType.CONSUMER;
+    } else {
+      this.isKycDocumentsLoaded = true;
+    }
+  }
 
   loadUserData(): void {
     this.isUserDataLoaded = false;
@@ -1031,16 +1064,6 @@ export default class DashboardHome extends Vue {
   loadKycDocuments(): void {
     this.isKycDocumentsLoaded = false;
 
-    // todo: handle case with both roles
-    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
-      this.kycViewAsRole = EnumCustomerType.PROVIDER;
-    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
-      this.kycViewAsRole = EnumCustomerType.CONSUMER;
-    } else {
-      this.isKycDocumentsLoaded = true;
-      return;
-    }
-
     this.kycDocumentApi.findAll(this.kycViewAsRole).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
       this.isKycDocumentsLoaded = true;
@@ -1066,6 +1089,19 @@ export default class DashboardHome extends Vue {
       return true;
     }
     return false;
+  }
+
+  checkIfRoleToggleIsNeeded(): void {
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) && store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.showRoleSelectionForKyc = true;
+      return;
+    }
+    this.showRoleSelectionForKyc = false;
+  }
+
+  @Watch('kycViewAsRole')
+  onKycViewAsRoleChange(): void {
+    this.loadKycDocuments();
   }
 
   @Watch('isLoading')
@@ -1409,12 +1445,12 @@ export default class DashboardHome extends Vue {
 
     // ATTENTION: it currently creates only PROVIDER document (TODO)
     const document: KycDocumentCommand = {
-      customerType: EnumCustomerType.PROVIDER,
+      customerType: this.kycViewAsRole,
       type: documentType,
     };
 
     // FIRSTLY, CHECK IF DOCUMENT OF THIS TYPE IS CREATED
-    this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((getDocumentsResponse) => {
+    this.kycDocumentApi.findAll(this.kycViewAsRole).then((getDocumentsResponse) => {
       if (getDocumentsResponse.success) {
         console.log('count: ', getDocumentsResponse.result.count, 'documentType: ', documentType, getDocumentsResponse);
         if (getDocumentsResponse.result.count && getDocumentsResponse.result.items.some((x) => x.type === documentType && x.status === 'CREATED')) {
@@ -1444,7 +1480,7 @@ export default class DashboardHome extends Vue {
     const addPagePromises: any = [];
     data.forEach((x) => {
       const documentPage: KycDocumentPageCommand = {
-        customerType: EnumCustomerType.PROVIDER,
+        customerType: this.kycViewAsRole,
         comment: x.comments,
       };
       addPagePromises.push(this.kycDocumentApi.addPage(documentId, documentPage, x.file));
