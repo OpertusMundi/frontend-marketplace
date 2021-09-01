@@ -401,17 +401,13 @@ export default class Checkout extends Vue {
         // });
         Promise.all([
           this.cartApi.getCart(),
-          this.consumerPayInApi.checkout().then((checkoutResponse) => {
-            this.orderKey = checkoutResponse.result.key;
-            return this.consumerContractsApi.printContract(this.orderKey, 1);
-          }),
+          this.consumerPayInApi.checkout(),
         ]).then((responses) => {
           const [cartResponse] = responses;
-          const { 1: printContractResponse } = responses;
+          const { 1: checkoutResponse } = responses;
 
           this.cart = cartResponse.result;
-          const pdf = printContractResponse;
-          console.log('pdf', pdf);
+          this.orderKey = checkoutResponse.result.key;
 
           store.commit('setLoading', false);
         });
