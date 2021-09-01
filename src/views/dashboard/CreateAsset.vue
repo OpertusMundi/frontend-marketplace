@@ -94,7 +94,7 @@
 
             <!-- REVIEW -->
             <!-- <transition name="fade" mode="out-in"> -->
-              <review ref="step7" :asset="asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+              <review ref="step7" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
             <!-- </transition> -->
 
             <div class="dashboard__form__errors" v-if="uploading.errors.length">

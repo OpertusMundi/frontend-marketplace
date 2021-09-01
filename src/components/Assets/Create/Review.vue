@@ -12,7 +12,8 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
-                  <li><strong>Type:</strong>{{ asset.type }}</li>
+                  <li><strong>{{ asset.spatialDataServiceType ? 'Published Asset type:' : 'Type:' }}</strong>{{ asset.type }}</li>
+                  <li v-if="asset.spatialDataServiceType"><strong>Service type:</strong>{{ asset.spatialDataServiceType }}</li>
                 </ul>
               </div>
             </div>
@@ -48,7 +49,7 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
-                  <li><strong>Template:</strong></li>
+                  <li><strong>Template:</strong>{{ contractTitle }}</li>
                 </ul>
               </div>
             </div>
@@ -76,6 +77,26 @@
                     <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
                       {{ pricingModel.totalPriceExcludingTax }}€, minimum percent: {{ pricingModel.minPercent }} <br>
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                    </span>
+                    <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">
+                      <strong>Pricing model {{ index + 1 }}:</strong>
+                      {{ pricingModel.price }}€ per call<br>
+                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br></div>
+                    </span>
+                    <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
+                      <strong>Pricing model {{ index + 1 }}:</strong>
+                      {{ pricingModel.price }}€ per call<br>
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br></div>
+                    </span>
+                    <span v-if="pricingModel.type === 'PER_ROW_WITH_PREPAID'">
+                      <strong>Pricing model {{ index + 1 }}:</strong>
+                      {{ pricingModel.price }}€ per row<br>
+                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                    </span>
+                    <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
+                      <strong>Pricing model {{ index + 1 }}:</strong>
+                      {{ pricingModel.price }}€ per row<br>
                       <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
                     </span>
                   </li>
@@ -119,6 +140,8 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { CatalogueItemCommand } from '@/model';
 import { ValidationObserver } from 'vee-validate';
+import ContractApi from '@/service/provider-contract';
+import store from '@/store';
 
 @Component({
   components: {
@@ -128,16 +151,35 @@ import { ValidationObserver } from 'vee-validate';
 export default class Review extends Vue {
   @Prop({ required: true }) private asset!: CatalogueItemCommand;
 
+  contractApi: ContractApi;
+
   vettingOption: boolean;
+
+  contractTitle: string;
 
   constructor() {
     super();
 
+    this.contractApi = new ContractApi();
+
     this.vettingOption = false;
+    this.contractTitle = '';
+  }
+
+  created(): void {
+    this.setContractTitle();
   }
 
   goToStep(step: number): void {
     this.$emit('goToStep', step);
+  }
+
+  setContractTitle(): void {
+    store.commit('setLoading', true);
+    this.contractApi.findOneTemplate(this.asset.contractTemplateKey).then((response) => {
+      this.contractTitle = response.result.title;
+      store.commit('setLoading', false);
+    });
   }
 }
 </script>
