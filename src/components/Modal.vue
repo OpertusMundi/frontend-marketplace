@@ -41,6 +41,8 @@
   Props:
     withSlots?: boolean
     showCancelButton?: boolean
+    showCloseButton?: boolean
+    closeOnClickOutside?: boolean
     title: string
     modalId: string
     inputs: {
@@ -67,9 +69,9 @@
 
 <template>
   <transition name="fade">
-    <div class="modal__wrapper" v-if="show" @click="onDismiss">
+    <div class="modal__wrapper" v-if="show" @click="onClickOutside">
       <div class="modal" @click.stop>
-        <div class="mb-xs-40">
+        <div v-if="showCloseButton" class="mb-xs-40">
           <svg @click="onDismiss" class="modal__btn-close" xmlns="http://www.w3.org/2000/svg" width="31.121" height="31.121" viewBox="0 0 31.121 31.121">
             <g id="Group_506" data-name="Group 506" transform="translate(-1737.939 -45.939)">
               <path id="Path_815" data-name="Path 815" d="M0,0H41.012" transform="translate(1739 47) rotate(45)" fill="none" stroke="#190aff" stroke-width="3"/>
@@ -132,6 +134,10 @@ export default class Modal extends Vue {
 
   @Prop({ default: true }) private showCancelButton!: boolean;
 
+  @Prop({ default: true }) private showCloseButton!: boolean;
+
+  @Prop({ default: true }) private closeOnClickOutside!: boolean;
+
   // eslint-disable-next-line
   readFile(i: number, e): void {
     const file = e.srcElement.files[0];
@@ -155,6 +161,11 @@ export default class Modal extends Vue {
 
   onDismiss(): void {
     this.$emit('dismiss');
+  }
+
+  onClickOutside(): void {
+    if (!this.closeOnClickOutside) return;
+    this.onDismiss();
   }
 
   onSubmit(): void {
