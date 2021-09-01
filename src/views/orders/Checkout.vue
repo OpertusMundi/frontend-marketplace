@@ -209,6 +209,13 @@
                   <div class="col-md-4">
                     <h3>Contract's terms</h3>
                     <hr>
+                    <!-- <h5 v-for="contract in contracts" :key="contract.key">asd</h5> -->
+                    <div class="checkout__info_table mb-xs-20" v-for="contract in contracts" :key="contract.key">
+                      <span><strong>Key:</strong></span><span>{{ contract.key }}</span>
+                      <span><strong>Title:</strong></span><span>{{ contract.title }}</span>
+                      <span><strong>Version:</strong></span><span>{{ contract.version }}</span>
+                      <span><strong>Terms:</strong></span><span>{{ contract.terms.map((x) => x.description).join(', ') }}</span>
+                    </div>
                   </div>
                   <div class="col-md-4">
                     <h3>Payment</h3>
@@ -277,8 +284,8 @@ import { Card, CardDirectPayInCommand } from '@/model/payin';
 import { Profile } from '@/model/account';
 import { Cart } from '@/model/cart';
 import store from '@/store';
-import { CatalogueQueryResponse, ServerResponse } from '@/model';
-import { CatalogueItem, CatalogueItemDetails } from '@/model/catalogue';
+import { ServerResponse } from '@/model';
+import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
 
 extend('required', required);
 extend('email', email);
@@ -324,7 +331,7 @@ export default class Checkout extends Vue {
 
   currentItemToReviewContract: number;
 
-  contracts: any[];
+  contracts: Contract[];
 
   constructor() {
     super();
@@ -422,15 +429,18 @@ export default class Checkout extends Vue {
         });
       }
 
-      let promises: Promise<ServerResponse<CatalogueItem | CatalogueItemDetails>>[] = [];
-      if (this.currentStep === 3 && this.cart) {
-        this.cart.items.forEach((x) => {
-          promises.push(this.catalogueApi.findOne(x.id));
-        })
+      if (this.currentStep === 3) {
+        store.commit('setLoading', true);
+        let itemsPromises: Promise<ServerResponse<CatalogueItem | CatalogueItemDetails>>[] = [];
+        console.log(this.cart?.items);
+        if (this.cart) itemsPromises = this.cart.items.map((x) => this.catalogueApi.findOne(x.asset.id));
+        console.log('pr', itemsPromises);
+        Promise.all(itemsPromises).then((responses) => {
+          console.log('itp', responses);
+          this.contracts = responses.map((x) => (x.result as CatalogueItemDetails).contract);
+          store.commit('setLoading', false);
+        });
       }
-      Promise.all(promises).then((responses) => {
-        // this.contracts = responses.map((x) => x.result.contra)
-      })
     });
   }
 
