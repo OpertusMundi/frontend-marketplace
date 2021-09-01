@@ -410,6 +410,11 @@
 .form-group {
     margin-bottom: 25px;
     position: relative;
+    &--paragraph-small-margin {
+        p {
+            margin-bottom: 10px;
+        }
+    }
     &--full {
         flex: 1;
     }

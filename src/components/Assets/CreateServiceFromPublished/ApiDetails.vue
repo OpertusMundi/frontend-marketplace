@@ -132,7 +132,7 @@ export default class ApiDetails extends Vue {
     this.assetLocal = this.asset;
     this.serviceTypeLocal = this.serviceType;
 
-    this.creationType = CreationType.UNDEFINED;
+    this.creationType = CreationType.PUBLISHED_ASSET;
 
     this.publishedAssets = [];
 

@@ -10,6 +10,18 @@
         <button class="btn btn--std btn--blue ml-xs-20" @click="onConfirmDeleteAsset">Delete</button>
       </template>
     </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'modalCreatedServiceFromPublished'" @dismiss="modalToShow = ''" :modalId="'modalCreatedServiceFromPublished'" :showCancelButton="false" :showCloseButton="false" :closeOnClickOutside="false">
+      <template v-slot:body>
+        <div class="p-xs-30">
+          <h2>A draft {{ serviceDraftCreatedData.serviceType }} service was created</h2>
+        </div>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="onRedirectToDraftService">OK</button>
+      </template>
+    </modal>
     <!-- END OF MODALS -->
 
     <div class="dashboard__head">
@@ -74,7 +86,7 @@
       </div>
     </div>
 
-    <asset-published-card @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-published-card>
+    <asset-published-card @serviceDraftCreated="onServiceDraftCreated" @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-published-card>
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
 
   </div>
@@ -149,6 +161,8 @@ export default class DashboardHome extends Vue {
 
   idOfAssetToDelete: string;
 
+  serviceDraftCreatedData: { key: string, serviceType: string };
+
   constructor() {
     super();
 
@@ -189,6 +203,7 @@ export default class DashboardHome extends Vue {
 
     this.modalToShow = '';
     this.idOfAssetToDelete = '';
+    this.serviceDraftCreatedData = { key: '', serviceType: '' };
   }
 
   @Watch('selectedStatus')
@@ -412,6 +427,15 @@ export default class DashboardHome extends Vue {
       return true;
     }
     return false;
+  }
+
+  onServiceDraftCreated(data: { key: string, serviceType: string }): void {
+    this.serviceDraftCreatedData = data;
+    this.modalToShow = 'modalCreatedServiceFromPublished';
+  }
+
+  onRedirectToDraftService(): void {
+    this.$router.push(`/dashboard/assets/create/${this.serviceDraftCreatedData.key}`);
   }
 
   onDeleteAsset(id: string): void {
