@@ -198,13 +198,13 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Legal Person type" rules="required">
+                <!-- <validation-provider v-slot="{ errors }" name="Legal Person type" rules="required">
                   <div class="form-group">
-                    <label for="multiselect_legal_person_type">Country *</label>
+                    <label for="multiselect_legal_person_type">Legal Person type *</label>
                     <multiselect id="multiselect_legal_person_type" @input="onSelectLegalPersonType" v-model="selectedLegalPersonType" :options="legalPersonTypeOptions" label="name" track-by="code" placeholder="Select type" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
-                </validation-provider>
+                </validation-provider> -->
 
                 <div class="wrapper-50-50">
                   <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
@@ -533,7 +533,7 @@ export default class BecomeVendor extends Vue {
 
   selectedBankAccountAddressCountry: { name: string, code: string };
 
-  selectedLegalPersonType : { name: string, code: string };
+  // selectedLegalPersonType : { name: string, code: string };
 
   constructor() {
     super();
@@ -564,7 +564,7 @@ export default class BecomeVendor extends Vue {
         postalCode: '',
         country: '',
       } as AddressCommand,
-      legalPersonType: '' as EnumLegalPersonType,
+      legalPersonType: EnumLegalPersonType.BUSINESS,
       representative: {
         birthdate: '',
         countryOfResidence: '',
@@ -604,7 +604,7 @@ export default class BecomeVendor extends Vue {
     this.selectedRepresentativeCountryOfResidence = { name: '', code: '' };
     this.selectedRepresentativeAddressCountry = { name: '', code: '' };
     this.selectedBankAccountAddressCountry = { name: '', code: '' };
-    this.selectedLegalPersonType = { name: 'Business', code: 'BUSINESS' };
+    // this.selectedLegalPersonType = { name: 'Business', code: 'BUSINESS' };
   }
 
   onSelectHeadquartersCountry(): void {
@@ -627,10 +627,10 @@ export default class BecomeVendor extends Vue {
     this.vendorData.bankAccount.ownerAddress.country = this.selectedBankAccountAddressCountry.code;
   }
 
-  onSelectLegalPersonType(): void {
-    // this.vendorData.legalPersonType = this.selectedLegalPersonType.code as EnumLegalPersonType;
-    Vue.set(this.vendorData, 'legalPersonType', this.selectedLegalPersonType.code);
-  }
+  // onSelectLegalPersonType(): void {
+  //   // this.vendorData.legalPersonType = this.selectedLegalPersonType.code as EnumLegalPersonType;
+  //   Vue.set(this.vendorData, 'legalPersonType', this.selectedLegalPersonType.code);
+  // }
 
   goToStep(step:number):void {
     this.currentStep = step;
