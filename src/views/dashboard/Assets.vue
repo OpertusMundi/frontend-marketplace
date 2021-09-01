@@ -450,7 +450,10 @@ export default class DashboardHome extends Vue {
     console.log('create new draft', id);
     this.draftAssetApi.createFromAsset(id).then((createDraftResponse) => {
       if (createDraftResponse.success) {
-        store.commit('setLoading', false);
+        // store.commit('setLoading', false);
+        this.selectedOrderOptionUnpublished = 'MODIFIED DESCENDING';
+        this.selectedStatus = 'ALL';
+        this.searchUnpublishedAssets(0, true);
       } else {
         console.log('error creating draft', createDraftResponse);
       }

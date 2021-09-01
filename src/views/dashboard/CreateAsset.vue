@@ -72,7 +72,7 @@
             <!-- CONTRACT -->
             <!-- <transition name="fade" mode="out-in"> -->
               <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
-              <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType === 'API' && currentStep === 3"></metadata>
+              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
             <!-- </transition> -->
 
             <!-- PRICING -->
@@ -167,6 +167,7 @@ import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
 import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
+import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
 import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
@@ -194,6 +195,7 @@ extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(v
     Review,
     ApiDetails,
     ApiPricing,
+    ApiMetadata,
     Modal,
   },
 })
@@ -360,6 +362,13 @@ export default class CreateAsset extends Vue {
 
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
 
+      if (this.asset.type === EnumAssetType.SERVICE) {
+        console.log('type: service');
+        this.catalogueApi.findOne(this.asset.parentId).then((parentAssetResponse) => {
+          this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
+        });
+      }
+
       // todo: use Enum (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
         this.assetMainType = 'datafile';
@@ -462,10 +471,59 @@ export default class CreateAsset extends Vue {
 
     // refactored
 
+    // this.fixDataForSubmitting();
+
+    // let draftAssetResponse: ServerResponse<AssetDraft>;
+    // let draftAssetKey = '';
+    // try {
+    //   if (this.isEditingExistingDraft) {
+    //     console.log('editing existing draft');
+    //     draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+    //   } else {
+    //     console.log('new draft');
+    //     const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+    //     const draftApi: DraftApiFromAssetCommand = {
+    //       type: EnumDraftCommandType.ASSET,
+    //       pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+    //       title: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.title : '',
+    //       version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+    //       serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+    //     };
+    //     draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+    //     this.asset.parentId = draftAssetResponse.result.command.parentId;
+    //   }
+    //   draftAssetKey = draftAssetResponse.result.key;
+    //   console.log('create draft success', draftAssetResponse);
+    // } catch (err) {
+    //   // eslint-disable-next-line
+    //   alert(`Error: ${err.message}`);
+    //   throw new Error(err.message);
+    // }
+    // if (!draftAssetResponse.success) {
+    //   console.log('error', draftAssetResponse);
+    //   // eslint-disable-next-line
+    //   alert(`Error: ${draftAssetResponse.messages}`);
+    //   return;
+    // }
+
+    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    // console.log(submitResponse);
+    // if (submitResponse.success) {
+    //   this.uploading.status = true;
+    //   this.uploading.completed = true;
+    //   this.uploading.title = 'Service created!';
+    //   this.uploading.subtitle = '';
+    // } else {
+    //   console.log('error submitting service');
+    // }
+
+    // refactored 2
+
     this.fixDataForSubmitting();
 
     let draftAssetResponse: ServerResponse<AssetDraft>;
     let draftAssetKey = '';
+    // let asset: CatalogueItemCommand;
     try {
       if (this.isEditingExistingDraft) {
         console.log('editing existing draft');
@@ -481,6 +539,9 @@ export default class CreateAsset extends Vue {
           serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
         };
         draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+        // this.asset.parentId = draftAssetResponse.result.command.parentId;
+        this.asset = { ...draftAssetResponse.result.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
+        console.log('qwe', this.asset);
       }
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);
