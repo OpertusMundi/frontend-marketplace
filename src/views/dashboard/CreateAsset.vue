@@ -358,6 +358,9 @@ export default class CreateAsset extends Vue {
 
   loadExistingDraftAsset(): void {
     this.draftAssetApi.findOne(this.assetId).then((assetResponse) => {
+      console.log('asset id', this.assetId);
+      console.log('asset', this.asset);
+      console.log('asset resp', assetResponse);
       this.asset = { ...this.asset, ...assetResponse.result.command };
 
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
@@ -365,6 +368,7 @@ export default class CreateAsset extends Vue {
       if (this.asset.type === EnumAssetType.SERVICE) {
         console.log('type: service');
         this.catalogueApi.findOne(this.asset.parentId).then((parentAssetResponse) => {
+          console.log('parent id', this.asset.parentId, parentAssetResponse);
           this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
         });
       }
