@@ -72,7 +72,7 @@
             <!-- CONTRACT -->
             <!-- <transition name="fade" mode="out-in"> -->
               <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
-              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
+              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
             <!-- </transition> -->
 
             <!-- PRICING -->
@@ -557,7 +557,9 @@ export default class CreateAsset extends Vue {
       return;
     }
 
-    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    const titleWithServiceTypeInParenthesis = `${this.asset.title} (${this.asset.spatialDataServiceType})`;
+    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, { ...this.asset, ...{ title: titleWithServiceTypeInParenthesis } });
     console.log(submitResponse);
     if (submitResponse.success) {
       this.uploading.status = true;

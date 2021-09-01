@@ -31,7 +31,7 @@
           <validation-provider v-slot="{ errors }" name="Title" rules="required">
           <div class="form-group">
             <label for="metadata_title">Title *</label>
-            <input disabled type="text" class="form-group__text" name="metadata_title" id="metadata_title" :value="asset.title">
+            <input disabled type="text" class="form-group__text" name="metadata_title" id="metadata_title" :value="`${asset.title} (${serviceType})`">
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
           </div>
           </validation-provider>
@@ -266,6 +266,7 @@ import Modal from '@/components/Modal.vue';
 import { CatalogueItemCommand } from '@/model';
 import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import moment from 'moment';
+import { EnumSpatialDataServiceType } from '@/model/enum';
 
 extend('required', required);
 
@@ -280,6 +281,8 @@ extend('required', required);
 })
 export default class Metadata extends Vue {
   @Prop({ required: true }) private asset!: CatalogueItemCommand;
+
+  @Prop({ required: true }) private serviceType!: EnumSpatialDataServiceType;
 
   @Prop({ required: true }) private additionalResourcesToUpload!: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
