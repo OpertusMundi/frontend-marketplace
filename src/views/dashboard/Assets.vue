@@ -99,6 +99,7 @@ import { EnumAssetType } from '@/model/enum';
 import Modal from '@/components/Modal.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { CatalogueItem } from '@/model';
+import { chunk as lodashChunk } from 'lodash';
 
 @Component({
   components: {
@@ -281,45 +282,56 @@ export default class DashboardHome extends Vue {
   searchPublishedAssets(page: number, scrollBehavior = false): void {
     this.isLoadingPublished = true;
 
-    // TODO: api should support arrays so that DATA_FILES is [EnumAssetType.VECTOR, EnumAssetType.RASTER]. Currently RASTER is not supported.
-    // TODO: just a dummy value for YOUR_APIS as it should currently return no value
-    const assetTypes = {
-      DATA_FILES: EnumAssetType.VECTOR,
-      YOUR_APIS: EnumAssetType.RASTER,
-      TOPIO_APIS: EnumAssetType.SERVICE,
-    };
-
-    const orderOptions = [
-      { option: 'TITLE ASCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'ASC' },
-      { option: 'TITLE DESCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'DESC' },
-      { option: 'TYPE ASCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'ASC' },
-      { option: 'TYPE DESCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'DESC' },
-      { option: 'VERSION ASCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'ASC' },
-      { option: 'VERSION DESCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'DESC' },
-    ];
-
     const query: ProviderDraftQuery = {
       q: '',
-      type: this.selectedTab === 'ALL_ASSETS' ? '' : assetTypes[this.selectedTab],
+      type: EnumAssetType.VECTOR,
       pageRequest: {
-        page,
-        size: this.publishedItemsPerPage,
+        page: 0,
+        size: 100000,
       },
       sorting: {
-        // eslint-disable-next-line
-        id: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy,
-        // eslint-disable-next-line
-        order: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order,
+        id: EnumProviderAssetSortField.TITLE,
+        order: 'ASC',
       },
     };
 
     this.providerAssetsApi.find(query).then((resp) => {
-      console.log('published', resp.result);
-      this.publishedAssets = resp.result.items;
-      this.publishedItemsTotal = resp.result.count;
-      this.publishedCurrentPage = resp.result.pageRequest.page;
+      let assets = resp.result.items;
+
+      if (this.selectedTab === 'DATA_FILES') {
+        assets = assets.filter((x) => x.type === EnumAssetType.VECTOR || x.type === EnumAssetType.RASTER);
+      } else if (this.selectedTab === 'YOUR_APIS') {
+        assets = [];
+      } else if (this.selectedTab === 'TOPIO_APIS') {
+        assets = assets.filter((x) => x.type === EnumAssetType.SERVICE);
+      }
+
+      const orderOptions = [
+        { option: 'TITLE ASCENDING', orderBy: 'title', order: 'ASC' },
+        { option: 'TITLE DESCENDING', orderBy: 'title', order: 'DESC' },
+        { option: 'TYPE ASCENDING', orderBy: 'type', order: 'ASC' },
+        { option: 'TYPE DESCENDING', orderBy: 'type', order: 'DESC' },
+        { option: 'VERSION ASCENDING', orderBy: 'version', order: 'ASC' },
+        { option: 'VERSION DESCENDING', orderBy: 'version', order: 'DESC' },
+      ];
+      // eslint-disable-next-line
+      const field = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy;
+      // eslint-disable-next-line
+      const order = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order;
+
+      if (order === 'ASC') {
+        assets.sort((a, b) => (a[field] > b[field] ? 1 : -1));
+      } else if (order === 'DESC') {
+        assets.sort((a, b) => (a[field] < b[field] ? 1 : -1));
+      }
+
+      this.publishedItemsTotal = assets.length;
+
+      const pages = lodashChunk(assets, this.publishedItemsPerPage);
+      this.publishedAssets = pages[page];
+      this.publishedCurrentPage = page;
       this.isLoadingPublished = false;
-      console.log('scroll', scrollBehavior);
+
       this.$nextTick(() => {
         if (scrollBehavior) {
           window.scrollTo({
@@ -331,95 +343,58 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  // searchAssets(published: boolean, page: number, scrollBehavior = false): void {
-  //   this.isLoadingPublished = published ? true : this.isLoadingPublished;
-  //   this.isLoadingUnpublished = published ? this.isLoadingUnpublished : true;
+  // TODO: The following function is the correct one. However, API doesnt work (ignores parameters), therefore, a dummy one is used (which makes pagination in the front-end etc)
 
-  //   const query: Partial<AssetDraftQuery> = {};
-  //   if (published) {
-  //     query.status = [EnumDraftStatus.PUBLISHED];
-  //     const assetTypes = {
-  //       DATA_FILES: [EnumAssetType.RASTER, EnumAssetType.VECTOR],
-  //       YOUR_APIS: [],
-  //       TOPIO_APIS: [EnumAssetType.SERVICE],
-  //     };
-  //     if (this.selectedTab !== 'ALL_ASSETS') query.type = assetTypes[this.selectedTab];
-  //     // TODO: Your APIs should currently return no results.The following assignment (TMS) is just a dummy value. To be removed in the future when YOUR_APIS is supported.
-  //     if (this.selectedTab === 'YOUR_APIS') query.serviceType = [EnumSpatialDataServiceType.TMS];
-  //   } else {
-  //     query.status = this.selectedStatus === 'ALL' ? [
-  //       EnumDraftStatus.DRAFT,
-  //       EnumDraftStatus.SUBMITTED,
-  //       EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-  //       EnumDraftStatus.HELPDESK_REJECTED,
-  //       EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-  //       EnumDraftStatus.PROVIDER_REJECTED,
-  //       EnumDraftStatus.POST_PROCESSING,
-  //     ] : [
-  //       this.selectedStatus as EnumDraftStatus,
-  //     ];
-  //   }
+  // searchPublishedAssets(page: number, scrollBehavior = false): void {
+  //   this.isLoadingPublished = true;
 
-  //   const pageRequest = {
-  //     page,
-  //     size: published ? this.publishedItemsPerPage : this.unpublishedItemsPerPage,
+  //   // TODO: api should support arrays so that DATA_FILES is [EnumAssetType.VECTOR, EnumAssetType.RASTER]. Currently RASTER is not supported.
+  //   // TODO: just a dummy value for YOUR_APIS as it should currently return no value
+  //   const assetTypes = {
+  //     DATA_FILES: EnumAssetType.VECTOR,
+  //     YOUR_APIS: EnumAssetType.RASTER,
+  //     TOPIO_APIS: EnumAssetType.SERVICE,
   //   };
-  //   // const sort = {
-  //   //   id: EnumSortField.CREATED_ON,
-  //   //   order: 'ASC' as Order,
-  //   // };
+
   //   const orderOptions = [
-  //     { option: 'CREATED ASCENDING', orderBy: EnumSortField.CREATED_ON, order: 'ASC' },
-  //     { option: 'CREATED DESCENDING', orderBy: EnumSortField.CREATED_ON, order: 'DESC' },
-  //     { option: 'MODIFIED ASCENDING', orderBy: EnumSortField.MODIFIED_ON, order: 'ASC' },
-  //     { option: 'MODIFIED DESCENDING', orderBy: EnumSortField.MODIFIED_ON, order: 'DESC' },
-  //     { option: 'TITLE ASCENDING', orderBy: EnumSortField.TITLE, order: 'ASC' },
-  //     { option: 'TITLE DESCENDING', orderBy: EnumSortField.TITLE, order: 'DESC' },
-  //     { option: 'VERSION ASCENDING', orderBy: EnumSortField.VERSION, order: 'ASC' },
-  //     { option: 'VERSION DESCENDING', orderBy: EnumSortField.VERSION, order: 'DESC' },
-  //     { option: 'STATUS ASCENDING', orderBy: EnumSortField.STATUS, order: 'ASC' },
-  //     { option: 'STATUS DESCENDING', orderBy: EnumSortField.STATUS, order: 'DESC' },
+  //     { option: 'TITLE ASCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'ASC' },
+  //     { option: 'TITLE DESCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'DESC' },
+  //     { option: 'TYPE ASCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'ASC' },
+  //     { option: 'TYPE DESCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'DESC' },
+  //     { option: 'VERSION ASCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'ASC' },
+  //     { option: 'VERSION DESCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'DESC' },
   //   ];
 
-  //   const sort = {
-  //     // eslint-disable-next-line
-  //     id: published ? orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy : orderOptions.find((x) => x.option === this.selectedOrderOptionUnpublished)!.orderBy,
-  //     // eslint-disable-next-line
-  //     order: published ? orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order : orderOptions.find((x) => x.option === this.selectedOrderOptionUnpublished)!.order as Order,
+  //   const query: ProviderDraftQuery = {
+  //     q: '',
+  //     type: this.selectedTab === 'ALL_ASSETS' ? '' : assetTypes[this.selectedTab],
+  //     pageRequest: {
+  //       page,
+  //       size: this.publishedItemsPerPage,
+  //     },
+  //     sorting: {
+  //       // eslint-disable-next-line
+  //       id: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy,
+  //       // eslint-disable-next-line
+  //       order: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order,
+  //     },
   //   };
 
-  //   this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-  //     if (resp.data.success) {
-  //       if (published) {
-  //         this.publishedAssets = resp.data.result.items;
-  //         this.publishedItemsTotal = resp.data.result.count;
-  //         this.publishedCurrentPage = resp.data.result.pageRequest.page;
-  //         this.isLoadingPublished = false;
-  //         if (scrollBehavior) {
-  //           Vue.nextTick(() => {
-  //             window.scrollTo({
-  //               // top: document.querySelector('.asset_card__published--first') ? (document.querySelector('.asset_card__published--first') as HTMLElement).offsetTop : 0,
-  //               top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
-  //               behavior: 'smooth',
-  //             });
-  //           });
-  //         }
-  //       } else {
-  //         this.unpublishedAssets = resp.data.result.items;
-  //         this.unpublishedItemsTotal = resp.data.result.count;
-  //         this.unpublishedCurrentPage = resp.data.result.pageRequest.page;
-  //         console.log(resp.data.result);
-  //         this.isLoadingUnpublished = false;
-  //         if (scrollBehavior) {
-  //           window.scrollTo({
-  //             top: 0,
-  //             behavior: 'smooth',
-  //           });
-  //         }
+  //   this.providerAssetsApi.find(query).then((resp) => {
+  //     console.log('published', resp.result);
+  //     this.publishedAssets = resp.result.items;
+  //     this.publishedItemsTotal = resp.result.count;
+  //     this.publishedCurrentPage = resp.result.pageRequest.page;
+  //     this.isLoadingPublished = false;
+  //     console.log('scroll', scrollBehavior);
+  //     this.$nextTick(() => {
+  //       if (scrollBehavior) {
+  //         window.scrollTo({
+  //           top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
+  //           behavior: 'smooth',
+  //         });
   //       }
-  //     } else {
-  //       console.log('error', resp.data);
-  //     }
+  //     });
   //   });
   // }
 
