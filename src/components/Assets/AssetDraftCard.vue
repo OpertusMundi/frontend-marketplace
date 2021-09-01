@@ -9,7 +9,7 @@
               <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
               <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
               <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
-              <span class="asset_card__type">{{asset.command.type}}</span>
+              <span class="asset_card__type">{{asset.command.type === 'SERVICE' ? asset.command.spatialDataServiceType : asset.command.type}}</span>
               <span v-for="(category, i) in asset.command.topicCategory" :key="category">
                 {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
               </span>
