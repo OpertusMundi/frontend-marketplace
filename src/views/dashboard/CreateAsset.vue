@@ -534,7 +534,7 @@ export default class CreateAsset extends Vue {
         const draftApi: DraftApiFromAssetCommand = {
           type: EnumDraftCommandType.ASSET,
           pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-          title: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.title : '',
+          title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
           version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
           serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
         };
@@ -558,8 +558,7 @@ export default class CreateAsset extends Vue {
     }
 
     // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-    const titleWithServiceTypeInParenthesis = `${this.asset.title} (${this.asset.spatialDataServiceType})`;
-    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, { ...this.asset, ...{ title: titleWithServiceTypeInParenthesis } });
+    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
     console.log(submitResponse);
     if (submitResponse.success) {
       this.uploading.status = true;

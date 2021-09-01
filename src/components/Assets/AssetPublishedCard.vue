@@ -160,12 +160,13 @@ export default class AssetPublishedCard extends Vue {
   }
 
   createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {
+    // todo: refactoring, logic should be transfered in parent component
     console.log('create Service');
     store.commit('setLoading', true);
     const draftApi: DraftApiFromAssetCommand = {
       type: EnumDraftCommandType.ASSET,
       pid: this.asset.id,
-      title: this.asset.title,
+      title: `${this.asset.title} (${serviceType})`,
       version: this.asset.version,
       serviceType,
     };
