@@ -19,9 +19,9 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price">
+          <div class="asset_card__price" v-if="getPriceOrMinimumPrice().value">
             <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
-            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€</span>
+            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€ </span>
             <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
           </div>
         </div>
@@ -153,6 +153,26 @@ export default class AssetPublishedCard extends Vue {
         minPrice = (x.model as FixedPopulationPricingModelCommand).price;
         res.value = `${(x.model as FixedPopulationPricingModelCommand).price}`;
         res.suffix = '10,000 people';
+      }
+      if (x.model.type === EnumPricingModel.PER_CALL_WITH_PREPAID && x.model.price < minPrice) {
+        minPrice = x.model.price;
+        res.value = `${x.model.price}`;
+        res.suffix = 'per call';
+      }
+      if (x.model.type === EnumPricingModel.PER_CALL_WITH_BLOCK_RATE && x.model.price < minPrice) {
+        minPrice = x.model.price;
+        res.value = `${x.model.price}`;
+        res.suffix = 'per call';
+      }
+      if (x.model.type === EnumPricingModel.PER_ROW_WITH_PREPAID && x.model.price < minPrice) {
+        minPrice = x.model.price;
+        res.value = `${x.model.price}`;
+        res.suffix = 'per row';
+      }
+      if (x.model.type === EnumPricingModel.PER_ROW_WITH_BLOCK_RATE && x.model.price < minPrice) {
+        minPrice = x.model.price;
+        res.value = `${x.model.price}`;
+        res.suffix = 'per row';
       }
     }
 
