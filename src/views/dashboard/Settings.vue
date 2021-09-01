@@ -533,15 +533,31 @@
 
                 </div>
                 <div class="col-md-7 d-flex flex-column" v-if="kycDocuments">
+                  <div class="mb-xs-20" v-if="showRoleSelectionForKyc">
+                    <h4 class="mb-xs-20">You are viewing / editing your KYC documents as</h4>
+                    <div class="form-group">
+                      <label class="control control-radio">
+                        Provider
+                        <input type="radio" name="kyc_role" v-model="kycViewAsRole" value="PROVIDER" />
+                        <div class="control_indicator"></div>
+                      </label>
+                      <label class="control control-radio">
+                        Consumer
+                        <input type="radio" name="kyc_role" v-model="kycViewAsRole" value="CONSUMER" />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </div>
+                  </div>
+
                   <span class="text-black"><strong>Vendor validation status</strong></span>
-                  <div class="mt-xs-20" v-if="isVendorKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--validated">KYC VALIDATED</span></div>
-                  <div class="mt-xs-20" v-if="!isVendorKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--not-validated">NOT KYC VALIDATED</span></div>
-                  <div class="mt-xs-30 d-flex" v-if="!isVendorKycValidated()">
+                  <div class="mt-xs-20" v-if="isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--validated">KYC VALIDATED</span></div>
+                  <div class="mt-xs-20" v-if="!isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--not-validated">NOT KYC VALIDATED</span></div>
+                  <div class="mt-xs-30 d-flex" v-if="!isKycValidated()">
                     <div class="font-weight-500">Issues:</div>
                     <div class="ml-xs-20">
-                      <p v-if="!kycDocuments.filter(x => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Identity proof document</p>
-                      <p v-if="!kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Articles of association document</p>
-                      <p v-if="!kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Registration proof document</p>
+                      <p v-if="kycCategoriesForSelectedRole.includes('IDENTITY_PROOF') && !kycDocuments.filter(x => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Identity proof document</p>
+                      <p v-if="kycCategoriesForSelectedRole.includes('ARTICLES_OF_ASSOCIATION') && !kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Articles of association document</p>
+                      <p v-if="kycCategoriesForSelectedRole.includes('REGISTRATION_PROOF') && !kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')" class="mb-xs-5">Missing Registration proof document</p>
                     </div>
                   </div>
                 </div>
@@ -549,55 +565,61 @@
 
               <div class="tabs__tab__kyc__list mt-xs-30">
                 <!-- identity proof -->
-                <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
-                  <button @click="modalToShow = 'kycIdentityProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
-                  <h3>Identity proof *</h3>
-                </div>
-                <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
-                <div class="tabs__tab__ignore-grid-wrapper">
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'IDENTITY_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div class="mr-xs-40">{{ i + 1 }}.</div>
-                    <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
-                    <div>{{ document.refusedReasonMessage }}</div>
-                    <div><small>{{ document.id }}</small></div>
-                    <div>{{ document.createdOn }}</div>
-                    <div>{{ document.processedOn }}</div>
+                <div v-if="kycCategoriesForSelectedRole.includes('IDENTITY_PROOF')" style="display: contents;">
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycIdentityProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Identity proof *</h3>
                   </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'IDENTITY_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div class="mr-xs-40">{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
+                    </div>
+                  </div>
+                  <hr>
                 </div>
-                <hr>
 
                 <!-- articles of association -->
-                <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
-                  <button @click="modalToShow = 'kycArticlesOfAssociation'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
-                  <h3>Articles of Association *</h3>
-                </div>
-                <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
-                <div class="tabs__tab__ignore-grid-wrapper">
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div>{{ i + 1 }}.</div>
-                    <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
-                    <div>{{ document.refusedReasonMessage }}</div>
-                    <div><small>{{ document.id }}</small></div>
-                    <div>{{ document.createdOn }}</div>
-                    <div>{{ document.processedOn }}</div>
+                <div v-if="kycCategoriesForSelectedRole.includes('ARTICLES_OF_ASSOCIATION')" style="display: contents;">
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycArticlesOfAssociation'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Articles of Association *</h3>
                   </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'ARTICLES_OF_ASSOCIATION')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div>{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
+                    </div>
+                  </div>
+                  <hr>
                 </div>
-                <hr>
 
                 <!-- registration proof -->
-                <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
-                  <button @click="modalToShow = 'kycRegistrationProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
-                  <h3>Registration proof *</h3>
-                </div>
-                <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
-                <div class="tabs__tab__ignore-grid-wrapper">
-                  <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
-                    <div>{{ i + 1 }}.</div>
-                    <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
-                    <div>{{ document.refusedReasonMessage }}</div>
-                    <div><small>{{ document.id }}</small></div>
-                    <div>{{ document.createdOn }}</div>
-                    <div>{{ document.processedOn }}</div>
+                <div v-if="kycCategoriesForSelectedRole.includes('REGISTRATION_PROOF')" style="display: contents;">
+                  <div class="tabs__tab__kyc__list__title d-flex align-items-center mb-xs-20">
+                    <button @click="modalToShow = 'kycRegistrationProof'" class="mr-xs-20 btn--std btn--blue">Add Document</button>
+                    <h3>Registration proof *</h3>
+                  </div>
+                  <span></span><span>STATUS</span><span>REFUSAL REASON</span><span>ID</span><span>CREATION DATE</span><span>PROCESSED DATE</span>
+                  <div class="tabs__tab__ignore-grid-wrapper">
+                    <div v-for="(document, i) in kycDocuments.filter(x => x.type === 'REGISTRATION_PROOF')" :key="i" class="tabs__tab__ignore-grid-wrapper">
+                      <div>{{ i + 1 }}.</div>
+                      <div :class="{'validated': document.status == 'VALIDATED', 'refused': document.status == 'REFUSED'}">{{ document.status }}</div>
+                      <div>{{ document.refusedReasonMessage }}</div>
+                      <div><small>{{ document.id }}</small></div>
+                      <div>{{ document.createdOn }}</div>
+                      <div>{{ document.processedOn }}</div>
+                    </div>
                   </div>
                 </div>
 
@@ -909,9 +931,13 @@ export default class DashboardHome extends Vue {
 
   cardsCurrentPage: number;
 
+  showRoleSelectionForKyc: boolean;
+
   kycViewAsRole: EnumCustomerType;
 
   kycDocuments: KycDocument[] | null;
+
+  kycCategoriesForSelectedRole: EnumKycDocumentType[];
 
   kycNumberOfInputs: number;
 
@@ -962,6 +988,8 @@ export default class DashboardHome extends Vue {
     this.cardsPerPage = 100;
     this.cardsCurrentPage = 0;
 
+    this.showRoleSelectionForKyc = false;
+    this.kycCategoriesForSelectedRole = [];
     this.kycViewAsRole = {} as EnumCustomerType;
     this.kycDocuments = null;
     this.kycNumberOfInputs = 1;
@@ -975,16 +1003,39 @@ export default class DashboardHome extends Vue {
   // TODO: add pagination to documents that support it (e.g. KYC)
 
   mounted(): void {
+    this.setKycRole();
+    this.setKycCategoriesForSelectedRole();
+
     this.loadUserData();
     this.loadCards();
     this.loadKycDocuments();
     this.loadUboDeclarations();
     console.log('q', this.$store.getters.getProfile.consumer.draft);
+
+    this.checkIfRoleToggleIsNeeded();
   }
 
   /*
     LOADING - INITIALIZATION
   */
+
+  setKycRole(): void {
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
+      this.kycViewAsRole = EnumCustomerType.PROVIDER;
+    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.kycViewAsRole = EnumCustomerType.CONSUMER;
+    } else {
+      this.isKycDocumentsLoaded = true;
+    }
+  }
+
+  setKycCategoriesForSelectedRole(): void {
+    if (this.kycViewAsRole === EnumCustomerType.CONSUMER) {
+      this.kycCategoriesForSelectedRole = [EnumKycDocumentType.IDENTITY_PROOF];
+    } else if (this.kycViewAsRole === EnumCustomerType.PROVIDER) {
+      this.kycCategoriesForSelectedRole = [EnumKycDocumentType.IDENTITY_PROOF, EnumKycDocumentType.ARTICLES_OF_ASSOCIATION, EnumKycDocumentType.REGISTRATION_PROOF];
+    }
+  }
 
   loadUserData(): void {
     this.isUserDataLoaded = false;
@@ -1031,16 +1082,6 @@ export default class DashboardHome extends Vue {
   loadKycDocuments(): void {
     this.isKycDocumentsLoaded = false;
 
-    // todo: handle case with both roles
-    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER])) {
-      this.kycViewAsRole = EnumCustomerType.PROVIDER;
-    } else if (store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
-      this.kycViewAsRole = EnumCustomerType.CONSUMER;
-    } else {
-      this.isKycDocumentsLoaded = true;
-      return;
-    }
-
     this.kycDocumentApi.findAll(this.kycViewAsRole).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
       this.isKycDocumentsLoaded = true;
@@ -1066,6 +1107,20 @@ export default class DashboardHome extends Vue {
       return true;
     }
     return false;
+  }
+
+  checkIfRoleToggleIsNeeded(): void {
+    if (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) && store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.showRoleSelectionForKyc = true;
+      return;
+    }
+    this.showRoleSelectionForKyc = false;
+  }
+
+  @Watch('kycViewAsRole')
+  onKycViewAsRoleChange(): void {
+    this.setKycCategoriesForSelectedRole();
+    this.loadKycDocuments();
   }
 
   @Watch('isLoading')
@@ -1368,11 +1423,15 @@ export default class DashboardHome extends Vue {
     KYC
   */
 
-  isVendorKycValidated():boolean {
-    // eslint-disable-next-line
-    if (!this.kycDocuments!.filter((x) => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')) {
-      return false;
+  isKycValidated():boolean {
+    for (let i = 0; i < this.kycCategoriesForSelectedRole.length; i += 1) {
+      // eslint-disable-next-line
+      if (!this.kycDocuments!.filter((x) => x.type === this.kycCategoriesForSelectedRole[i]).some((x) => x.status === 'VALIDATED')) return false;
     }
+    // eslint-disable-next-line
+    // if (!this.kycDocuments!.filter((x) => x.type === 'IDENTITY_PROOF').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'ARTICLES_OF_ASSOCIATION').some((x) => x.status === 'VALIDATED') || !this.kycDocuments!.filter((x) => x.type === 'REGISTRATION_PROOF').some((x) => x.status === 'VALIDATED')) {
+    //   return false;
+    // }
     return true;
   }
 
@@ -1381,6 +1440,7 @@ export default class DashboardHome extends Vue {
   }
 
   onSubmitKycPages(documentTypeString: string): void {
+    store.commit('setLoading', true);
     const files = [...this.$el.querySelectorAll('.input-kyc-file')].map((x) => (x as any).files[0]);
     const comments = [...this.$el.querySelectorAll('.input-kyc-comments')].map((x) => (x as any).value);
 
@@ -1409,12 +1469,12 @@ export default class DashboardHome extends Vue {
 
     // ATTENTION: it currently creates only PROVIDER document (TODO)
     const document: KycDocumentCommand = {
-      customerType: EnumCustomerType.PROVIDER,
+      customerType: this.kycViewAsRole,
       type: documentType,
     };
 
     // FIRSTLY, CHECK IF DOCUMENT OF THIS TYPE IS CREATED
-    this.kycDocumentApi.findAll(EnumCustomerType.PROVIDER).then((getDocumentsResponse) => {
+    this.kycDocumentApi.findAll(this.kycViewAsRole).then((getDocumentsResponse) => {
       if (getDocumentsResponse.success) {
         console.log('count: ', getDocumentsResponse.result.count, 'documentType: ', documentType, getDocumentsResponse);
         if (getDocumentsResponse.result.count && getDocumentsResponse.result.items.some((x) => x.type === documentType && x.status === 'CREATED')) {
@@ -1431,11 +1491,13 @@ export default class DashboardHome extends Vue {
               this.addPagesInKycDocument(data, document, documentId);
             } else { // error creating document
               console.log('error creating document', createDocumentResponse);
+              store.commit('setLoading', false);
             }
           });
         }
       } else {
         console.log('error searching documents');
+        store.commit('setLoading', false);
       }
     });
   }
@@ -1444,7 +1506,7 @@ export default class DashboardHome extends Vue {
     const addPagePromises: any = [];
     data.forEach((x) => {
       const documentPage: KycDocumentPageCommand = {
-        customerType: EnumCustomerType.PROVIDER,
+        customerType: this.kycViewAsRole,
         comment: x.comments,
       };
       addPagePromises.push(this.kycDocumentApi.addPage(documentId, documentPage, x.file));
@@ -1455,6 +1517,7 @@ export default class DashboardHome extends Vue {
       console.log(addPagesResponse);
       if (addPagesResponse.some((x) => (x as any).success !== true)) {
         console.log('at least one page was not uploaded in document', addPagesResponse);
+        store.commit('setLoading', false);
       } else {
         console.log('pages added successfully');
 
@@ -1462,6 +1525,8 @@ export default class DashboardHome extends Vue {
         this.kycDocumentApi.submitDocument(documentId, document).then((submitDocumentResponse) => {
           if (submitDocumentResponse.success) {
             console.log('document submitted successfully!');
+            this.modalToShow = '';
+            store.commit('setLoading', false);
             // IF DOCUMENT ALREADY EXISTED, REPLACE IT WITH THE NEW FROM RESPONSE
             // eslint-disable-next-line
             if (this.kycDocuments?.some((x) => x.id === submitDocumentResponse.result.id)) {
@@ -1474,6 +1539,7 @@ export default class DashboardHome extends Vue {
             }
           } else {
             console.log('error submitting document', submitDocumentResponse);
+            store.commit('setLoading', false);
           }
         });
       }

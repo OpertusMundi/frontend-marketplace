@@ -1,6 +1,6 @@
 <template>
   <validation-observer ref="refObserver">
-    <div class="dashboard__form__step dashboard__form__step--pricing">
+    <div class="dashboard__form__step dashboard__form__step--pricing dashboard__form__step--full-width">
       <div class="dashboard__form__step__title">
         <h3>Pricing model</h3>
         <p>Assign one or more pricing models to your asset. If there are multiple, select one as default. Some options may be disabled based on the previous steps. All prices must not include VAT.</p>
@@ -49,13 +49,19 @@
               <div v-if="selectedPricingModelForEditingLocal !== null && pricingModelsLocal[selectedPricingModelForEditingLocal].type">
                 <validation-observer ref="refPricingModelDetails">
                   <!-- free -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FREE'">
-                  </div>
+                  <!-- <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FREE'">
+                  </div> -->
                   <!-- per call with prepaid -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_PREPAID'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <div class="form-group">
-                      <label for="pcwp_price">Price</label>
+                    <p>Customers subscribe to the service and receive an API key. You simply set the price per individual call of the service.</p>
+                    <p>Optionally, you can allow consumers to prepay a given number of calls at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid calls at any point in time. If their prepaid calls are depleted, then they are charged with the standard price.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer.</p>
+                    <p>Consumers may cancel their subscription at any point time. If they had any prepaid calls still left, they will not be reimbursed.</p>
+                    <p>We will automatically bill your account whenever your total reimbursement for all the services we provide based on your asset has reached [50] Euros. This is to avoid excess processing fees.</p>
+                    <div class="form-group form-group--paragraph-small-margin">
+                      <label for="pcwp_price">Your price per call</label>
+                      <p>This is the reimbursement you will receive per service call</p>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="pcwp_price" name="pcwp_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -64,8 +70,9 @@
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
-                          <div class="form-group">
-                            <label for="pcwp_count">Count</label>
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="pcwp_count">Number of calls</label>
+                            <p>Number of prepaid service calls offered for this tier</p>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].count" type="number" class="form-group__text" id="pcwp_count" name="pcwp_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
@@ -73,8 +80,9 @@
                         </div>
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwp_discount">Discount %</label>
+                            <p>This is the discount you provide for the prepaid calls</p>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].discount" type="number" class="form-group__text" id="pcwp_discount" name="pcwp_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
@@ -85,13 +93,19 @@
                         <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
-                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Prepaid Tier</button>
                   </div>
                   <!-- per call with block rate -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_BLOCK_RATE'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <div class="form-group">
-                      <label for="pcwbr_price">Price</label>
+                    <p>Customers subscribe to the service and receive an API key.</p>
+                    <p>You simply set the price per individual call of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
+                    <p>Consumers may cancel their subscription at any point time.</p>
+                    <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
+                    <div class="form-group form-group form-group--paragraph-small-margin">
+                      <label for="pcwbr_price">Your price per call</label>
+                      <p>This is the reimbursement you will receive per service call</p>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="pcwbr_price" name="pcwbr_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -100,7 +114,7 @@
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwbr_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="pcwbr_count" name="pcwbr_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -109,7 +123,7 @@
                         </div>
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwbr_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="pcwbr_discount" name="pcwbr_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -121,13 +135,19 @@
                         <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
-                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Blocking Rate</button>
                   </div>
                   <!-- per row with prepaid -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_PREPAID'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <div class="form-group">
-                      <label for="prwp_price">Price</label>
+                    <p>Customers subscribe to the service and receive an API key.</p>
+                    <p>You simply set the price per individual row of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
+                    <p>Consumers may cancel their subscription at any point time.</p>
+                    <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
+                    <div class="form-group form-group--paragraph-small-margin">
+                      <label for="prwp_price">Your price per row</label>
+                      <p>This is the reimbursement you will receive per service row</p>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="prwp_price" name="prwp_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -136,8 +156,9 @@
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
-                          <div class="form-group">
-                            <label for="prwp_count">Count</label>
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="prwp_count">Number of rows</label>
+                            <p>Number of prepaid service rows offered for this tier</p>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].count" type="number" class="form-group__text" id="prwp_count" name="prwp_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
@@ -145,8 +166,9 @@
                         </div>
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwp_discount">Discount %</label>
+                            <p>This is the discount you provide for the prepaid rows</p>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].discount" type="number" class="form-group__text" id="prwp_discount" name="prwp_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
@@ -157,13 +179,19 @@
                         <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
-                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Prepaid Tier</button>
                   </div>
                   <!-- per row with block rate -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <div class="form-group">
-                      <label for="prwbr_price">Price</label>
+                    <p>Customers subscribe to the service and receive an API key.</p>
+                    <p>You simply set the price per individual row of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
+                    <p>Consumers may cancel their subscription at any point time.</p>
+                    <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
+                    <div class="form-group form-group--paragraph-small-margin">
+                      <label for="prwbr_price">Your price per row</label>
+                      <p>This is the discount you provide for the prepaid rows</p>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="prwbr_price" name="prwbr_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -172,7 +200,7 @@
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwbr_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="prwbr_count" name="prwbr_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -181,7 +209,7 @@
                         </div>
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
-                          <div class="form-group">
+                          <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwbr_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="prwbr_discount" name="prwbr_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
@@ -193,7 +221,7 @@
                         <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
                       </div>
                     </div>
-                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Discount Rate</button>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Blocking Rate</button>
                   </div>
                   <!-- common fields for all pricing models -->
                   <div class="form-group-checkbox">
@@ -367,11 +395,11 @@ export default class ApiPricing extends Vue {
     this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
 
     this.pricingModelTypes = [
-      { name: 'Free', priceModel: EnumPricingModel.FREE },
-      { name: 'Per call with prepaid', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
-      { name: 'Per call with block rate', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
-      { name: 'Per row with prepaid', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
-      { name: 'Per row with block rate', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
+      // { name: 'Free', priceModel: EnumPricingModel.FREE },
+      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
+      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
+      { name: 'Subscription, fixed price per row', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
+      { name: 'Subscription, blocking rates per row', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
     ];
 
     console.log('constructor');
@@ -517,6 +545,7 @@ export default class ApiPricing extends Vue {
 }
 </script>
 <style lang="scss">
+  @import "@/assets/styles/_forms.scss";
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";

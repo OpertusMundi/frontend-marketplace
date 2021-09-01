@@ -1266,7 +1266,7 @@ export default class Catalogue extends Vue {
 
     // CRS
     if (filters.crsList.some((x) => x.isChecked)) {
-      filterSet.crs = filters.crsList.filter((x) => x.isChecked).map((x) => x.code);
+      filterSet.crs = filters.crsList.filter((x) => x.isChecked).map((x) => `EPSG:${x.code}`);
     }
 
     // SCALE

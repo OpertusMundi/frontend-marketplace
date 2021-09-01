@@ -66,6 +66,7 @@ import {
 } from '@/model/pricing-model';
 import moment from 'moment';
 import { CatalogueItem, DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
+import store from '@/store';
 
 @Component
 export default class AssetPublishedCard extends Vue {
@@ -159,11 +160,13 @@ export default class AssetPublishedCard extends Vue {
   }
 
   createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {
-    console.log('create WMS');
+    // todo: refactoring, logic should be transfered in parent component
+    console.log('create Service');
+    store.commit('setLoading', true);
     const draftApi: DraftApiFromAssetCommand = {
       type: EnumDraftCommandType.ASSET,
       pid: this.asset.id,
-      title: this.asset.title,
+      title: `${this.asset.title} (${serviceType})`,
       version: this.asset.version,
       serviceType,
     };
@@ -171,8 +174,10 @@ export default class AssetPublishedCard extends Vue {
       if (createApiResponse.success) {
         console.log('service draft created successfully!!', createApiResponse);
         const { key } = createApiResponse.result;
-        console.log(`/dashboard/assets/create/${key}`);
-        this.$router.push(`/dashboard/assets/create/${key}`);
+        store.commit('setLoading', false);
+        this.$emit('serviceDraftCreated', { key, serviceType });
+        // console.log(`/dashboard/assets/create/${key}`);
+        // this.$router.push(`/dashboard/assets/create/${key}`);
       } else {
         console.log('error creating service draft', createApiResponse);
       }

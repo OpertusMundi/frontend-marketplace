@@ -83,12 +83,12 @@
           color: $labelColor;
         }
 
-        > span {
+        > div > span {
           color: $labelColor;
           font-size: .8em;
         }
 
-        > hr {
+        > div > hr {
           grid-column: 1/7;
         }
 

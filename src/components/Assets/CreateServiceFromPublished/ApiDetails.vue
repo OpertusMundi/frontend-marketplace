@@ -31,7 +31,7 @@
         </div>
         <!-- MIDDLE  -->
         <div class="col-md-4">
-          <div class="dashboard__form__step__title">
+          <div v-if="creationType === 'PUBLISHED_ASSET' && selectedPublishedAssetForApiCreationLocal" class="dashboard__form__step__title">
             <p>Select one of your published data files</p>
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
@@ -132,11 +132,12 @@ export default class ApiDetails extends Vue {
     this.assetLocal = this.asset;
     this.serviceTypeLocal = this.serviceType;
 
-    this.creationType = CreationType.UNDEFINED;
+    this.creationType = CreationType.PUBLISHED_ASSET;
 
     this.publishedAssets = [];
 
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
+    console.log('local', this.selectedPublishedAssetForApiCreationLocal);
   }
 
   @Watch('assetLocal', { deep: true })
