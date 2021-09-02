@@ -1,5 +1,5 @@
 <template>
-  <validation-observer ref="step2">
+  <validation-observer ref="refObserver">
     <div class="dashboard__form__step dashboard__form__step--full-width" style="padding:0">
       <div class="contract-builder" v-if="masterContract">
         <div class="contract-builder__index">
@@ -58,11 +58,19 @@
           </div>
         </div>
       </div>
+      <validation-provider name="Contract Template data" rules="required">
+        <input type="hidden" v-model="templateFilled">
+      </validation-provider>
     </div>
   </validation-observer>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Watch,
+  Prop,
+} from 'vue-property-decorator';
 import { MasterContract } from '@/model/provider-contract';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
@@ -79,11 +87,15 @@ extend('required', required);
 export default class ContractBuilder extends Vue {
   @Prop({ required: true }) readonly masterContractType!: MasterContract;
 
+  @Prop({ required: true }) readonly templateContractFilled!: boolean;
+
+  @Prop({ required: true }) readonly templateContract!: any;
+
   providerContractApi: ProviderContractApi;
 
   masterContract: MasterContract | null;
 
-  templateContract: any | null;
+  templateContractC: any | null;
 
   selectedSection: any | null;
 
@@ -92,6 +104,8 @@ export default class ContractBuilder extends Vue {
   selectedSectionValue: number | null;
 
   currentSelectionValid: boolean;
+
+  templateFilled: boolean | null;
 
   constructor() {
     super();
@@ -102,10 +116,24 @@ export default class ContractBuilder extends Vue {
     this.keepCurrentSection = true;
     this.selectedSectionValue = null;
     this.currentSelectionValid = false;
+    this.templateFilled = null;
+    this.templateContractC = {};
   }
 
   created(): void {
+    if (this.masterContractType) {
+      this.getMasterContract();
+    }
+  }
+
+  @Watch('masterContractType')
+  masterContractTypeChange(): void {
     this.getMasterContract();
+  }
+
+  @Watch('templateContractC', { immediate: true, deep: true })
+  templateContractChange(): void {
+    this.$emit('update:templateContract', this.templateContractC);
   }
 
   previousSection(): void {
@@ -125,6 +153,10 @@ export default class ContractBuilder extends Vue {
       this.selectedSection = this.masterContract?.sections[currentSectionIndex + 1];
       this.loadSelectedSectionValue();
       this.scrollToActive();
+    }
+    if (this.lastSection() && this.isValid()) {
+      this.templateFilled = true;
+      this.$emit('update:templateContractFilled', this.templateFilled);
     }
   }
 
@@ -159,15 +191,15 @@ export default class ContractBuilder extends Vue {
       selectedOptions.option = 0;
     }
     this.selectedSectionValue = null;
-    const selectionExists = this.templateContract.sections.find((o) => o.masterSectionId === this.selectedSection.id);
+    const selectionExists = this.templateContractC.sections.find((o) => o.masterSectionId === this.selectedSection.id);
     if (selectionExists) {
-      this.templateContract.sections = this.templateContract.sections.filter((item) => item.masterSectionId !== this.selectedSection.id);
+      this.templateContractC.sections = this.templateContractC.sections.filter((item) => item.masterSectionId !== this.selectedSection.id);
     }
-    this.templateContract.sections.push(selectedOptions);
+    this.templateContractC.sections.push(selectedOptions);
   }
 
   loadSelectedSectionValue(): void {
-    const selectionExists = this.templateContract.sections.find((o) => o.masterSectionId === this.selectedSection.id);
+    const selectionExists = this.templateContractC.sections.find((o) => o.masterSectionId === this.selectedSection.id);
     if (selectionExists) {
       if (this.selectedSection.dynamic && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.option;
@@ -187,8 +219,10 @@ export default class ContractBuilder extends Vue {
 
   lastSection(): boolean {
     const currentSectionIndex = this.masterContract?.sections.map((e) => e.id).indexOf(this.selectedSection.id);
-    if (currentSectionIndex === this.masterContract?.sections.length) {
-      return true;
+    if (currentSectionIndex) {
+      if (currentSectionIndex + 1 === this.masterContract?.sections.length) {
+        return true;
+      }
     }
     return false;
   }
@@ -208,7 +242,7 @@ export default class ContractBuilder extends Vue {
   }
 
   initTemplateContract(): void {
-    this.templateContract = {
+    this.templateContractC = {
       templateKey: this.masterContract?.key,
       title: this.masterContract?.title,
       subtitle: '',

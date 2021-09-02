@@ -2,9 +2,9 @@
     <div class="dashboard__inner">
         <div class="dashboard__inner__steps">
         <div class="dashboard__head">
-            <h1>Add an asset</h1>
+            <h1>Create contract template</h1>
             <div class="dashboard__head__helpers">
-                <button href="#" class="btn btn--outlineblue" @click="onSaveDraft">SAVE DRAFT</button>
+                <button href="#" class="btn btn--outlineblue" @click="saveDraft">SAVE DRAFT</button>
             </div>
         </div>
 
@@ -18,35 +18,15 @@
             <transition name="fade" mode="out-in">
             <div class="dashboard__form__steps__inner">
                 <!-- steps here -->
-                <div class="dashboard__form__step dashboard__form__step--cente" v-if="currentStep == 1">
-                  <validation-observer ref="step1">
-                    <validation-provider v-slot="{ errors }" name="ContractType" rules="required">
-                      <div class="form-group">
-                        <label for="multiselect_type">Master Contract</label>
-                        <multiselect id="multiselect_type" v-model="contractType" :options="masterContracts" label="title" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select contract type"></multiselect>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                      </div>
-                    </validation-provider>
-                  </validation-observer>
-                </div>
-                <contract-builder :masterContractType="contractType" v-if="currentStep == 2"></contract-builder>
-                <div class="dashboard__form__step dashboard__form__step--cente" v-if="currentStep == 3">
-                  <validation-observer ref="step3">
-                    zdf
-                  </validation-observer>
-                </div>
-                <!-- <div class="dashboard__form__errors" v-if="errors.length">
-                    <ul>
-                        <li>desc</li>
-                    </ul>
-                </div> -->
-
+                <contract-type-select ref="step1" v-show="currentStep == 1" :contractType.sync='contractType'></contract-type-select>
+                <contract-builder ref="step2" :masterContractType="contractType" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-show="currentStep == 2"></contract-builder>
+                <contract-details ref="step3" :templateContract.sync="templateContract" v-show="currentStep == 3"></contract-details>
             </div>
             </transition>
             </div>
-            <div class="dashboard__form__navbuttons">
-            <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
-            <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
+            <div class="dashboard__form__navbuttons" v-if="showHideButtons()">
+              <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
+              <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and save' : 'NEXT' }}</button>
             </div>
         </div>
         </div>
@@ -59,9 +39,15 @@ import { required } from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
 import ProviderContractApi from '@/service/provider-contract';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import { EnumMasterContractSortField, MasterContract } from '@/model/provider-contract';
+import {
+  EnumMasterContractSortField,
+  MasterContract,
+  ProviderTemplateContractCommand,
+} from '@/model/provider-contract';
 import { Sorting } from '@/model/request';
 import ContractBuilder from '@/components/Contracts/ContractBuilder.vue';
+import ContractTypeSelect from '@/components/Contracts/ContractTypeSelect.vue';
+import ContractDetails from '@/components/Contracts/ContractDetails.vue';
 
 extend('required', required);
 
@@ -71,6 +57,8 @@ extend('required', required);
     ValidationProvider,
     Multiselect,
     ContractBuilder,
+    ContractTypeSelect,
+    ContractDetails,
   },
 })
 export default class ContractCreateTemplate extends Vue {
@@ -89,7 +77,11 @@ export default class ContractCreateTemplate extends Vue {
 
   masterContracts: MasterContract[];
 
+  templateContract: ProviderTemplateContractCommand;
+
   contractType: MasterContract | null;
+
+  templateContractFilled: boolean;
 
   constructor() {
     super();
@@ -99,6 +91,13 @@ export default class ContractCreateTemplate extends Vue {
     this.contractType = null;
     this.masterContracts = [];
     this.providerContractApi = new ProviderContractApi();
+    this.templateContractFilled = false;
+    this.templateContract = {
+      templateKey: '',
+      title: '',
+      subtitle: '',
+      sections: [],
+    };
   }
 
   created(): void {
@@ -125,10 +124,14 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   nextStep():void {
-    this.$refs[`step${this.currentStep}`].validate().then((isValid) => {
+    console.log(this.currentStep);
+
+    // this.$refs[`step${this.currentStep}`].validate().then((isValid) => {
+    this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log('submit');
+          this.saveDraft();
         } else {
           this.currentStep += 1;
           window.scrollTo({
@@ -140,8 +143,18 @@ export default class ContractCreateTemplate extends Vue {
     });
   }
 
-  onSaveDraft(): void {
+  saveDraft(): void {
     console.log('save draft');
+    this.providerContractApi.createDraft(this.templateContract).then((response) => {
+      console.log(response);
+    });
+  }
+
+  showHideButtons(): boolean {
+    if (this.currentStep === 2 && !this.templateContractFilled) {
+      return false;
+    }
+    return true;
   }
 }
 </script>

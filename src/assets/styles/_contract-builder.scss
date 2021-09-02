@@ -5,7 +5,8 @@
    max-height: calc(100vh - 300px);
 
    &__index {
-      flex: 0 1 250px;
+      flex: 0 1 300px;
+      padding-right: 5px;
       overflow-y: scroll;
       ul {
          margin-top: 15px;
@@ -48,8 +49,10 @@
          border-bottom: 1px solid $darkColor;
          display: flex;
          justify-content: space-between;
+         align-items: center;
          h3 {
             flex: 1;
+            padding: 0 10px;
          }
       }
 
