@@ -432,6 +432,9 @@
                     margin: 10px 0 10px 15px;
                     color: $darkColor;
                 }
+                &--includes-buttons {
+                    strong { line-height: 35px; }
+                }
             }
 
             &__toggle {
@@ -529,6 +532,42 @@
             &__pie-chart-container {
                 p {
                     margin-bottom: 0 !important;
+                }
+            }
+            &__service_details {
+                h3 {
+                    margin-bottom: 10px;
+                }
+                p {
+                    margin-bottom: 5px !important;
+                }
+                &__info_table {
+                    display: grid;
+                    grid-template-columns: min-content 1fr;
+                    column-gap: 20px;
+                    p {
+                        display: contents;
+                    }
+                    strong {
+                        white-space: nowrap;
+                    }
+                    &--includes-buttons {
+                        strong { line-height: 35px; }
+                    }
+                }
+            }
+            &__info_table {
+                display: grid;
+                grid-template-columns: min-content 1fr;
+                column-gap: 20px;
+                p {
+                    display: contents;
+                }
+                strong {
+                    white-space: nowrap;
+                }
+                &--includes-buttons {
+                    strong { line-height: 35px; }
                 }
             }
         }
