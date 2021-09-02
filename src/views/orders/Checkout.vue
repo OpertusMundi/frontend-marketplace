@@ -209,6 +209,13 @@
                   <div class="col-md-4">
                     <h3>Contract's terms</h3>
                     <hr>
+                    <!-- <h5 v-for="contract in contracts" :key="contract.key">asd</h5> -->
+                    <div class="checkout__info_table mb-xs-20" v-for="contract in contracts" :key="contract.key">
+                      <span><strong>Key:</strong></span><span>{{ contract.key }}</span>
+                      <span><strong>Title:</strong></span><span>{{ contract.title }}</span>
+                      <span><strong>Version:</strong></span><span>{{ contract.version }}</span>
+                      <span><strong>Terms:</strong></span><span>{{ contract.terms.map((x) => x.description).join(', ') }}</span>
+                    </div>
                   </div>
                   <div class="col-md-4">
                     <h3>Payment</h3>
@@ -225,7 +232,7 @@
                         <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="cartItem.asset.type === 'SERVICE'">
                         <span v-if="cartItem.asset.type === 'VECTOR'">Vector dataset</span>
                         <span v-if="cartItem.asset.type === 'RASTER'">Raster dataset</span>
-                        <span v-if="cartItem.asset.type === 'SERVICE'">API dataset</span>
+                        <span v-if="cartItem.asset.type === 'SERVICE'">Service dataset</span>
                       </p>
                     </div>
                     <div class="checkout__payment__bottom_fields">
@@ -272,10 +279,13 @@ import Modal from '@/components/Modal.vue';
 import ConsumerPayInApi from '@/service/consumer-payin';
 import CartApi from '@/service/cart';
 import ConsumerContractsApi from '@/service/consumer-contracts';
+import CatalogueApi from '@/service/catalogue';
 import { Card, CardDirectPayInCommand } from '@/model/payin';
 import { Profile } from '@/model/account';
 import { Cart } from '@/model/cart';
 import store from '@/store';
+import { ServerResponse } from '@/model';
+import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
 
 extend('required', required);
 extend('email', email);
@@ -294,6 +304,8 @@ export default class Checkout extends Vue {
   cartApi: CartApi;
 
   consumerContractsApi: ConsumerContractsApi;
+
+  catalogueApi: CatalogueApi;
 
   totalSteps: number;
 
@@ -319,12 +331,15 @@ export default class Checkout extends Vue {
 
   currentItemToReviewContract: number;
 
+  contracts: Contract[];
+
   constructor() {
     super();
 
     this.consumerPayInApi = new ConsumerPayInApi();
     this.cartApi = new CartApi();
     this.consumerContractsApi = new ConsumerContractsApi();
+    this.catalogueApi = new CatalogueApi();
 
     this.totalSteps = 3;
     this.currentStep = 1;
@@ -338,6 +353,7 @@ export default class Checkout extends Vue {
     this.selectedShippingCountry = '';
     this.cart = null;
     this.currentItemToReviewContract = 0;
+    this.contracts = [];
   }
 
   mounted(): void {
@@ -409,6 +425,19 @@ export default class Checkout extends Vue {
           this.cart = cartResponse.result;
           this.orderKey = checkoutResponse.result.key;
 
+          store.commit('setLoading', false);
+        });
+      }
+
+      if (this.currentStep === 3) {
+        store.commit('setLoading', true);
+        let itemsPromises: Promise<ServerResponse<CatalogueItem | CatalogueItemDetails>>[] = [];
+        console.log(this.cart?.items);
+        if (this.cart) itemsPromises = this.cart.items.map((x) => this.catalogueApi.findOne(x.asset.id));
+        console.log('pr', itemsPromises);
+        Promise.all(itemsPromises).then((responses) => {
+          console.log('itp', responses);
+          this.contracts = responses.map((x) => (x.result as CatalogueItemDetails).contract);
           store.commit('setLoading', false);
         });
       }

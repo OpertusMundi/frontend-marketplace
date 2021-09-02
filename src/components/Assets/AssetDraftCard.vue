@@ -9,7 +9,7 @@
               <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="asset.command.type === 'VECTOR'">
               <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="asset.command.type === 'RASTER'">
               <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="asset.command.type === 'SERVICE'">
-              <span class="asset_card__type">{{asset.command.type}}</span>
+              <span class="asset_card__type">{{asset.command.type === 'SERVICE' ? asset.command.spatialDataServiceType : asset.command.type}}</span>
               <span v-for="(category, i) in asset.command.topicCategory" :key="category">
                 {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span>
               </span>
@@ -19,9 +19,9 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price">
+          <div class="asset_card__price" v-if="getPriceOrMinimumPrice().value">
             <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
-            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€</span>
+            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€ </span>
             <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
           </div>
         </div>
@@ -58,10 +58,14 @@ import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
 import {
+  CallBlockRatePricingModelCommand,
+  CallPrePaidPricingModelCommand,
   EnumPricingModel,
   FixedPopulationPricingModelCommand,
   FixedPricingModelCommand,
   FixedRowPricingModelCommand,
+  RowBlockRatePricingModelCommand,
+  RowPrePaidPricingModelCommand,
 } from '@/model/pricing-model';
 import moment from 'moment';
 import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
@@ -153,6 +157,26 @@ export default class AssetDraftCard extends Vue {
         minPrice = (x as FixedPopulationPricingModelCommand).price;
         res.value = `${(x as FixedPopulationPricingModelCommand).price}`;
         res.suffix = '10,000 people';
+      }
+      if (x.type === EnumPricingModel.PER_CALL_WITH_PREPAID && (x as CallPrePaidPricingModelCommand).price < minPrice) {
+        minPrice = (x as CallPrePaidPricingModelCommand).price;
+        res.value = `${(x as CallPrePaidPricingModelCommand).price}`;
+        res.suffix = 'per call';
+      }
+      if (x.type === EnumPricingModel.PER_CALL_WITH_BLOCK_RATE && (x as CallBlockRatePricingModelCommand).price < minPrice) {
+        minPrice = (x as CallBlockRatePricingModelCommand).price;
+        res.value = `${(x as CallBlockRatePricingModelCommand).price}`;
+        res.suffix = 'per call';
+      }
+      if (x.type === EnumPricingModel.PER_ROW_WITH_PREPAID && (x as RowPrePaidPricingModelCommand).price < minPrice) {
+        minPrice = (x as RowPrePaidPricingModelCommand).price;
+        res.value = `${(x as RowPrePaidPricingModelCommand).price}`;
+        res.suffix = 'per row';
+      }
+      if (x.type === EnumPricingModel.PER_ROW_WITH_BLOCK_RATE && (x as RowBlockRatePricingModelCommand).price < minPrice) {
+        minPrice = (x as RowBlockRatePricingModelCommand).price;
+        res.value = `${(x as RowBlockRatePricingModelCommand).price}`;
+        res.suffix = 'per row';
       }
     }
 
