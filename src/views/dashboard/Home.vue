@@ -3,7 +3,40 @@
     <div class="dashboard__head">
       <h1>Hello, {{ fullName }}!</h1>
     </div>
-    <div class="stats-cards">
+
+    <!-- USER / CONSUMER -->
+    <div v-if="!isProvider">
+    <!-- <div> -->
+      <div class="row mb-md-100">
+        <div class="col-md-6">
+          <h3 class="mb-xs-20">Latest purchases</h3>
+          <router-link v-if="!isConsumer" to="/become-consumer" class="btn btn--std btn--outlineblue">become a consumer</router-link>
+          <div v-else>
+            <purchase-card v-for="(purchase, i) in latestPurchases" :key="purchase.key" :purchase="purchase" :index="i + 1"></purchase-card>
+            <div v-if="latestPurchases && latestPurchases.length === 0">
+              <p>No purchases yet <button class="btn btn--std btn--outlineblue" @click="$router.push('/catalogue')">explore assets</button></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h3 class="mb-xs-20">Active subscriptions</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h3 class="mb-xs-20">Latest messages</h3>
+          <p>No messages</p>
+        </div>
+        <div class="col-md-6">
+          <h3 class="mb-xs-20">Recently favourited assets</h3>
+          <p>No favourited assets</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROVIDER -->
+    <div v-else class="stats-cards">
+    <!-- <div class="stats-cards"> -->
       <div class="stats-cards__cont stats-cards__cont--double">
         <div class="stats-card">
           <div class="stats-card__upper">
@@ -35,7 +68,7 @@
               </div>
             </div>
           </div>
-          <div class="stats-card__value">13</div>
+          <div class="stats-card__value">{{ itemsNum }}</div>
         </div>
       </div>
       <div class="stats-cards__cont">
@@ -74,18 +107,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import BarChart from '@/components/Charts/BarChart.vue';
 import LineChart from '@/components/Charts/LineChart.vue';
+import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import ProviderAssetsApi from '@/service/provider-assets';
+import ConsumerOrderApi from '@/service/consumer-order';
 import store from '@/store';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType } from '@/model/enum';
+import { EnumRole } from '@/model/role';
+import { Sorting } from '@/model/request';
+import { ConsumerOrder, EnumOrderSortField } from '@/model/order';
 
 @Component({
   components: {
     BarChart,
     LineChart,
+    PurchaseCard,
   },
 })
 export default class DashboardHome extends Vue {
@@ -93,25 +132,66 @@ export default class DashboardHome extends Vue {
 
   providerAssetsApi: ProviderAssetsApi;
 
-  itemsNum;
+  consumerOrderApi: ConsumerOrderApi;
+
+  isProvider: boolean;
+
+  isConsumer: boolean;
+
+  itemsNum: number | null;
+
+  latestPurchases: ConsumerOrder[] | null;
+
+  latestMessages: any[];
+
+  latestFavourites: any[];
+
+  isLoadingItemsNum: boolean;
+
+  isLoadingLatestPurchases: boolean;
 
   constructor() {
     super();
 
     this.providerAssetsApi = new ProviderAssetsApi();
+    this.consumerOrderApi = new ConsumerOrderApi();
 
     this.fullName = '';
+
+    this.isProvider = store.getters.hasRole([EnumRole.ROLE_PROVIDER]);
+    this.isConsumer = store.getters.hasRole([EnumRole.ROLE_CONSUMER]);
+
+    this.itemsNum = null;
+    this.latestPurchases = null;
+    this.latestMessages = [];
+    this.latestFavourites = [];
+
+    this.isLoadingItemsNum = false;
+    this.isLoadingLatestPurchases = false;
   }
 
   created(): void {
     const profile = store.getters.getProfile;
     this.fullName = `${profile.firstName} ${profile.lastName}`;
 
-    this.setNumberOfItems();
+    if (this.isProvider) this.setNumberOfItems();
+    if (this.isConsumer) this.setLatestPurchases();
+  }
+
+  get isLoading(): boolean {
+    if (this.isLoadingItemsNum || this.isLoadingLatestPurchases) {
+      return true;
+    }
+    return false;
+  }
+
+  @Watch('isLoading', { immediate: true })
+  onLoadingChange(): void {
+    store.commit('setLoading', this.isLoading);
   }
 
   setNumberOfItems(): void {
-    store.commit('setLoading', true);
+    this.isLoadingItemsNum = true;
 
     // todo: currently, providerAssetsApi does not work correctly (ignores parameters). Also, I can not ask api for multiple types.
     const query: ProviderDraftQuery = {
@@ -129,12 +209,32 @@ export default class DashboardHome extends Vue {
 
     this.providerAssetsApi.find(query).then((response) => {
       this.itemsNum = response.result.count;
-      store.commit('setLoading', false);
+      this.isLoadingItemsNum = false;
+    });
+  }
+
+  setLatestPurchases(): void {
+    this.isLoadingLatestPurchases = true;
+
+    const order: Sorting<EnumOrderSortField> = {
+      id: EnumOrderSortField.CREATED_ON,
+      order: 'DESC',
+    };
+
+    this.consumerOrderApi.findOrders(null, null, 0, 3, order).then((response) => {
+      const { data } = response;
+      if (data.success) {
+        this.latestPurchases = data.result.items;
+      }
+      this.isLoadingLatestPurchases = false;
     });
   }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/_stats.scss";
+  @import "@/assets/styles/_btns.scss";
   @import "@/assets/styles/_select.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "~flexboxgrid/css/flexboxgrid.min.css";
 </style>
