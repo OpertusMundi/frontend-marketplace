@@ -69,7 +69,7 @@ export default class DashboardPurchases extends Vue {
       'ALL',
       EnumOrderStatus.CREATED,
       EnumOrderStatus.CHARGED,
-      EnumOrderStatus.PENDING,
+      EnumOrderStatus.ASSET_REGISTRATION,
       EnumOrderStatus.CANCELLED,
       EnumOrderStatus.REFUNDED,
       EnumOrderStatus.SUCCEEDED,
