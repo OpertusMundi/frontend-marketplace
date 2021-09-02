@@ -24,13 +24,14 @@
         <li class="no_results"><i>No results found for your query</i></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showRecent">
-        <li><a href="#"><h5>Road network</h5><span>Country: Greece, Language: English, Price: 800-2500€</span></a></li>
-        <li><a href="#"><h5>Road network</h5><span>Country: Greece, Language: English, Price: 800-2500€</span></a></li>
-        <li><a href="#"><h5>Road network</h5><span>Country: Greece, Language: English, Price: 800-2500€</span></a></li>
+        <li><a href="#"><h5>Administrative boundaries in Greece</h5><span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a></li>
+        <li><a href="#"><h5>POIs in Luxembourg</h5><span>POI, Points of Interest, Luxembourg, OpenStreetMap</span></a></li>
+        <li><a href="#"><h5>Athens road network WFS</h5><span>Roads, Street names, Athens, Greece, WFS</span></a></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showPopular">
-        <li><a href="#"><h5>Road network Popular</h5><span>Country: Greece, Language: English, Price: 800-2500€</span></a></li>
-        <li><a href="#"><h5>Road network</h5><span>Country: Greece, Language: English, Price: 800-2500€</span></a></li>
+        <li><a href="#"><h5>Administrative boundaries in Greece</h5><span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a></li>
+        <li><a href="#"><h5>POIs in Luxembourg</h5><span>POI, Points of Interest, Luxembourg, OpenStreetMap</span></a></li>
+        <li><a href="#"><h5>Athens road network WFS</h5><span>Roads, Street names, Athens, Greece, WFS</span></a></li>
       </ul>
       <a href="" class="asset_search__resultscont__action">Delete search history</a>
     </div>
