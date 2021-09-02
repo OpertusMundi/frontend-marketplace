@@ -517,20 +517,19 @@
           <div class="tabs__single-tab-wrapper" v-if="selectedTab == 'kyc'">
             <div class="tabs__tab tabs__tab__kyc">
               <div class="row mt-xs-20">
-                <div class="col-md-5 text-gray">
-                  <p> We need you to upload the following documents in order to validate the information you provided. </p>
-
+                <div v-if="kycViewAsRole === 'PROVIDER'" class="col-md-5 text-gray">
+                  <p>We need you to upload the following documents in order to validate the information you provided. </p>
                   <p class="mt-xs-20"><strong>Identity proof</strong></p>
                   <p>This document should refer to the individual duly empowered to act on behalf of the legal entity. ID card: Front AND Back (Valid) OR Passport (Valid).</p>
-
                   <p class="mt-xs-20"><strong>Articles of association</strong></p>
                   <p>Certified articles of association (Statute) - formal memorandum stated by the entrepreneurs, in which the following information is mentioned: business name, activity, registered address, shareholding, etc.</p>
-
                   <p class="mt-xs-20"><strong>Registration proof</strong></p>
                   <p>Extract from the Company Register issued within the last three months in the case of an organization or soletrader, this can be a proof of registration from the official authority.</p>
-
                   <p class="mt-xs-20">You can upload <strong>multiple files</strong> for each document type. <br>Max size per file is <strong>7MB</strong>.</p>
-
+                </div>
+                <div v-if="kycViewAsRole === 'CONSUMER'" class="col-md-5 text-gray">
+                  <p>To purchase geospatial data assets from Topio, please upload a legal document issued by your country, proving your identity. ID card: Front AND Back (Valid) OR Passport (Valid).</p>
+                  <p class="mt-xs-20">You can upload <strong>multiple files</strong>. Max size per file is 7MB.</p>
                 </div>
                 <div class="col-md-7 d-flex flex-column" v-if="kycDocuments">
                   <div class="mb-xs-20" v-if="showRoleSelectionForKyc">
@@ -549,7 +548,7 @@
                     </div>
                   </div>
 
-                  <span class="text-black"><strong>Vendor validation status</strong></span>
+                  <span class="text-black"><strong>{{ kycViewAsRole === 'PROVIDER' ? 'Vendor' : 'Consumer' }} validation status</strong></span>
                   <div class="mt-xs-20" v-if="isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--validated">KYC VALIDATED</span></div>
                   <div class="mt-xs-20" v-if="!isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--not-validated">NOT KYC VALIDATED</span></div>
                   <div class="mt-xs-30 d-flex" v-if="!isKycValidated()">
