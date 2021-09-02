@@ -161,7 +161,7 @@
                       <div v-for="(cartItem, i) in cart.items" :key="cartItem.id">
                         <div class="checkout__info_table" :class="{'checkout__info_table--text-blue': currentItemToReviewContract === i}">
                           <span><strong>Asset: </strong></span><span>{{ cartItem.asset.title }}</span>
-                          <span><strong>Vendor: </strong></span><span>{{ cartItem.asset.publisherName }}</span>
+                          <!-- <span><strong>Vendor: </strong></span><span>{{ cartItem.asset.publisherName }}</span> -->
                           <span><strong>Date of purchase: </strong></span><span>{{ formatDate(cartItem.addedAt) }}</span>
                           <span><strong>Price: </strong></span><span>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</span>
                         </div>
