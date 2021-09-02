@@ -19,7 +19,7 @@
               </div>
             </div>
           </div>
-          <div class="stats-card__value">€7.487</div>
+          <div class="stats-card__value">€0</div>
         </div>
         <div class="stats-card">
           <div class="stats-card__upper">
@@ -77,7 +77,10 @@
 import { Component, Vue } from 'vue-property-decorator';
 import BarChart from '@/components/Charts/BarChart.vue';
 import LineChart from '@/components/Charts/LineChart.vue';
+import ProviderAssetsApi from '@/service/provider-assets';
 import store from '@/store';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import { EnumAssetType } from '@/model/enum';
 
 @Component({
   components: {
@@ -88,15 +91,46 @@ import store from '@/store';
 export default class DashboardHome extends Vue {
   fullName: string;
 
+  providerAssetsApi: ProviderAssetsApi;
+
+  itemsNum;
+
   constructor() {
     super();
+
+    this.providerAssetsApi = new ProviderAssetsApi();
 
     this.fullName = '';
   }
 
-  created() {
+  created(): void {
     const profile = store.getters.getProfile;
     this.fullName = `${profile.firstName} ${profile.lastName}`;
+
+    this.setNumberOfItems();
+  }
+
+  setNumberOfItems(): void {
+    store.commit('setLoading', true);
+
+    // todo: currently, providerAssetsApi does not work correctly (ignores parameters). Also, I can not ask api for multiple types.
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100000,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TITLE,
+        order: 'ASC',
+      },
+    };
+
+    this.providerAssetsApi.find(query).then((response) => {
+      this.itemsNum = response.result.count;
+      store.commit('setLoading', false);
+    });
   }
 }
 </script>
