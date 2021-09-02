@@ -43,11 +43,11 @@
           </li>
           <li v-if="activeTab == 4">
             <div class="asset__section__tabs__info_table">
-              <p><strong>Date start:</strong><span>{{ formatDate(catalogueItem.dateStart) }}</span></p>
-              <p><strong>Date end:</strong><span>{{ formatDate(catalogueItem.dateEnd) }}</span></p>
-              <p><strong>Creation date:</strong><span>{{ formatDate(catalogueItem.creationDate) }}</span></p>
-              <p><strong>Publication date:</strong><span>{{ formatDate(catalogueItem.publicationDate) }}</span></p>
-              <p><strong>Revision date:</strong><span>{{ formatDate(catalogueItem.revisionDate) }}</span></p>
+              <p><strong>Date start:</strong><span>{{ catalogueItem.dateStart ? formatDate(catalogueItem.dateStart) : '' }}</span></p>
+              <p><strong>Date end:</strong><span>{{ catalogueItem.dateEnd ? formatDate(catalogueItem.dateEnd) : '' }}</span></p>
+              <p><strong>Creation date:</strong><span>{{ catalogueItem.creationDate ? formatDate(catalogueItem.creationDate) : '' }}</span></p>
+              <p><strong>Publication date:</strong><span>{{ catalogueItem.publicationDate ? formatDate(catalogueItem.publicationDate) : '' }}</span></p>
+              <p><strong>Revision date:</strong><span>{{ catalogueItem.revisionDate ? formatDate(catalogueItem.revisionDate) : '' }}</span></p>
             </div>
           </li>
           <li v-if="activeTab == 5">

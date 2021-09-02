@@ -230,7 +230,8 @@ export default class ShopCard extends Vue {
           store.commit('setCartItems', cartResponse.result);
         } else {
           // TODO: Handle error
-          console.error('cannot add item to cart!');
+          console.log('cannot add item to cart!', cartResponse);
+          console.log('cart item', cartItem);
         }
       });
   }
