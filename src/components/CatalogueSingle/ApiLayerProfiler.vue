@@ -84,7 +84,7 @@
           <!-- COVERAGE -->
           <li v-if="activeTab == 1 && resources[1].bbox">
             <p>Contains visualisation of the coverage on a map</p>
-            <div class="tab_maps-map">
+            <div class="tab_maps-map mt-xs-20">
               <l-map
                 ref="mapMbr"
                 :bounds="getMapBoundsFromGeoJson(resources[1].bbox)"
