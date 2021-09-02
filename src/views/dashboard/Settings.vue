@@ -1081,6 +1081,12 @@ export default class DashboardHome extends Vue {
   loadKycDocuments(): void {
     this.isKycDocumentsLoaded = false;
 
+    // if not provider or consumer, do not load KYC documents
+    if (!store.getters.hasRole([EnumRole.ROLE_PROVIDER]) && !store.getters.hasRole([EnumRole.ROLE_CONSUMER])) {
+      this.isKycDocumentsLoaded = true;
+      return;
+    }
+
     this.kycDocumentApi.findAll(this.kycViewAsRole).then((documentsResponse) => {
       this.kycDocuments = documentsResponse.result.items;
       this.isKycDocumentsLoaded = true;
