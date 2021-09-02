@@ -12,12 +12,15 @@
 
             <overview :catalogueItem="catalogueItem"></overview>
 
-            <api-usage-example v-if="catalogueItem.type === 'API'"></api-usage-example>
+            <!-- <api-usage-example v-if="catalogueItem && catalogueItem.type === 'SERVICE'"></api-usage-example> -->
 
-            <terms-and-restrictions :catalogueItem="catalogueItem"></terms-and-restrictions>
+            <terms-and-restrictions v-if="mode === 'catalogue'" :catalogueItem="catalogueItem"></terms-and-restrictions>
 
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
-            <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
+            <data-profiling-and-samples v-if="catalogueItem.type !== 'SERVICE'" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
+            <api-layer-profiler v-if="catalogueItem.type === 'SERVICE'" :mode="mode" :catalogueItem="catalogueItem"></api-layer-profiler>
+
+            <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -56,6 +59,8 @@ import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProvid
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
+import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
+import ApiMetadata from '../components/CatalogueSingle/ApiMetadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 
 @Component({
@@ -70,6 +75,8 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     OtherAvailableOptions,
     RelatedAssets,
     ApiUsageExample,
+    ApiLayerProfiler,
+    ApiMetadata,
     SelectAreas,
   },
 })

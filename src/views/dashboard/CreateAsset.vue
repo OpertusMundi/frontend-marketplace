@@ -72,7 +72,7 @@
             <!-- CONTRACT -->
             <!-- <transition name="fade" mode="out-in"> -->
               <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
-              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
+              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
             <!-- </transition> -->
 
             <!-- PRICING -->

@@ -39,14 +39,15 @@
     </div> -->
     <div class="asset__head__data">
       <ul>
+        <li v-if="catalogueItem.type === 'SERVICE'"><strong>Service type:</strong>{{ catalogueItem.spatialDataServiceType }}</li>
         <li><strong>Version:</strong>{{ catalogueItem.version }}</li>
-        <li><strong>Last updated:</strong><span v-if="catalogueItem.revisionDate">{{ catalogueItem.revisionDate | format_date }}</span><span v-else>-</span></li>
-        <li><strong>Created:</strong><span v-if="catalogueItem.publicationDate">{{ catalogueItem.publicationDate | format_date }}</span><span v-else>-</span></li>
-        <li><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
-        <li><strong>Format:</strong>{{ catalogueItem.format }}</li>
+        <li v-if="catalogueItem.type !== 'SERVICE'"><strong>Last updated:</strong><span v-if="catalogueItem.revisionDate">{{ catalogueItem.revisionDate | format_date }}</span><span v-else>-</span></li>
+        <li v-if="catalogueItem.type !== 'SERVICE'"><strong>Created:</strong><span v-if="catalogueItem.publicationDate">{{ catalogueItem.publicationDate | format_date }}</span><span v-else>-</span></li>
+        <li v-if="catalogueItem.type !== 'SERVICE'"><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
+        <li v-if="catalogueItem.type !== 'SERVICE'"><strong>Format:</strong>{{ catalogueItem.format }}</li>
         <!-- <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem ? `EPSG:${catalogueItem.referenceSystem}` : '' }}</li> -->
         <li><strong>CRS:</strong>{{ crsLabel }}</li>
-        <li><strong>Scale:</strong><span v-for="(scale, i) in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.description }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
+        <li v-if="catalogueItem.type !== 'SERVICE'"><strong>Scale:</strong><span v-for="(scale, i) in catalogueItem.scales" v-bind:key="`${scale}_scale`">{{ scale.description }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
         <!-- <li><strong>Coverage:</strong>97% of Greece (DUMMY)</li> -->
       </ul>
     </div>
