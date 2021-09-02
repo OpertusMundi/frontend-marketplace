@@ -25,7 +25,7 @@
       <div class="mt-xs-20" v-if="catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].type !== 'FREE'">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.key">
           <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.key}`" v-model="selectedPricingModel" :value="pr_model">
-          <label :for="`p_variation_${pr_model.key}`">{{ pr_model.type }}
+          <label :for="`p_variation_${pr_model.key}`">{{ formatPricingModelType(pr_model.type) }}
             <span v-if="pr_model.type === 'FIXED' && pr_model.yearsOfUpdates">+ {{ pr_model.yearsOfUpdates }} {{ pr_model.yearsOfUpdates > 1 ? 'years' : 'year' }} of updates</span>
             <div v-if="pr_model.type === 'FIXED_PER_ROWS'">
               Price per 1,000 rows<br><strong>Minimum rows:</strong> {{ pr_model.minRows ? pr_model.minRows : 'not specified' }}
@@ -198,6 +198,20 @@ export default class ShopCardProviderReview extends Vue {
   //     this.cartErrors = '';
   //   }
   // }
+
+  formatPricingModelType(t: string): string {
+    const labels = {
+      FREE: 'FREE',
+      FIXED: 'FIXED',
+      FIXED_PER_ROWS: 'FIXED PER ROWS',
+      FIXED_FOR_POPULATION: 'FIXED FOR POPULATION',
+      PER_CALL_WITH_PREPAID: 'PER CALL',
+      PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
+      PER_ROW_WITH_PREPAID: 'PER ROW',
+      PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+    };
+    return labels[t];
+  }
 
   // todo: not used currently
   prModelCurrencyFormat(currency:string): string {

@@ -14,7 +14,7 @@
 
             <!-- <api-usage-example v-if="catalogueItem && catalogueItem.type === 'SERVICE'"></api-usage-example> -->
 
-            <terms-and-restrictions :catalogueItem="catalogueItem"></terms-and-restrictions>
+            <terms-and-restrictions v-if="mode === 'catalogue'" :catalogueItem="catalogueItem"></terms-and-restrictions>
 
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
             <data-profiling-and-samples v-if="catalogueItem.type !== 'SERVICE'" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>

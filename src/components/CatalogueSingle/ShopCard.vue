@@ -19,7 +19,7 @@
       <div class="mt-xs-20" v-if="catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE'">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
           <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
-          <label :for="`p_variation_${pr_model.model.key}`">{{ pr_model.model.type }}
+          <label :for="`p_variation_${pr_model.model.key}`">{{ formatPricingModelType(pr_model.model.type) }}
             <span v-if="pr_model.model.type === 'FIXED' && pr_model.model.yearsOfUpdates">+ {{ pr_model.model.yearsOfUpdates }} {{ pr_model.model.yearsOfUpdates > 1 ? 'years' : 'year' }} of updates</span>
             <div v-if="pr_model.model.type === 'FIXED_PER_ROWS'">
               Price per 1,000 rows<br><strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
@@ -246,6 +246,20 @@ export default class ShopCard extends Vue {
       default:
         return '';
     }
+  }
+
+  formatPricingModelType(t: string): string {
+    const labels = {
+      FREE: 'FREE',
+      FIXED: 'FIXED',
+      FIXED_PER_ROWS: 'FIXED PER ROWS',
+      FIXED_FOR_POPULATION: 'FIXED FOR POPULATION',
+      PER_CALL_WITH_PREPAID: 'PER CALL',
+      PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
+      PER_ROW_WITH_PREPAID: 'PER ROW',
+      PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+    };
+    return labels[t];
   }
 
   openSelectAreaModal(): void {
