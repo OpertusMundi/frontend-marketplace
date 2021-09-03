@@ -50,9 +50,7 @@ export default class NotebooksApi extends Api {
     return this.delete<SimpleResponse>(url)
       .then((response: AxiosResponse<SimpleResponse>) => {
         const { data } = response;
-
         return data;
       });
   }
-
 }

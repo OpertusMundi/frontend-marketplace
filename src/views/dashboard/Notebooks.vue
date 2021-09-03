@@ -7,13 +7,14 @@
       </div>
     </div>
     <div class="notebooks pt-xs-50">
-      <div class="notebooks__inner">
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
+      <div class="notebooks__inner" v-if="configuration">
+        <notebook-card
+          v-for="(profile, index) in configuration.profiles"
+          v-bind:key="`notebook_${index}`"
+          :profile="profile"
+          :active="checkIfActive(profile.name)"
+        >
+        </notebook-card>
         <div class="notebooks-item notebooks-item--empty"></div>
         <div class="notebooks-item notebooks-item--empty"></div>
         <div class="notebooks-item notebooks-item--empty"></div>
@@ -21,8 +22,13 @@
       <hr>
       <div class="notebooks__sectiontitle">More servers</div>
       <div class="notebooks__inner">
-        <notebook-card></notebook-card>
-        <notebook-card></notebook-card>
+        <notebook-card
+          v-for="(profile, index) in configuration.profiles.slice(0, 2)"
+          v-bind:key="`notebook_${index}`"
+          :profile="profile"
+          :active="checkIfActive(profile.name)"
+        >
+        </notebook-card>
         <div class="notebooks-item notebooks-item--empty"></div>
         <div class="notebooks-item notebooks-item--empty"></div>
         <div class="notebooks-item notebooks-item--empty"></div>
@@ -34,11 +40,38 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import NotebookCard from '@/components/NotebookCard.vue';
+import { JupyterConfiguration } from '@/model/notebook';
+import NotebooksApi from '@/service/notebook';
 
 @Component({
   components: { NotebookCard },
 })
 export default class Notebooks extends Vue {
+  notebooksApi: NotebooksApi;
+
+  configuration: JupyterConfiguration | null;
+
+  constructor() {
+    super();
+
+    this.notebooksApi = new NotebooksApi();
+    this.configuration = null;
+  }
+
+  mounted():void {
+    this.notebooksApi.getConfiguration().then((response) => {
+      if (response.success) {
+        this.configuration = response.result;
+      }
+    });
+  }
+
+  checkIfActive(name:string):boolean {
+    if (name === this.configuration?.activeProfile) {
+      return true;
+    }
+    return false;
+  }
 }
 </script>
 <style lang="scss">
