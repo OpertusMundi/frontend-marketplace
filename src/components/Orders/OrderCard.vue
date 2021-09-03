@@ -7,7 +7,9 @@
         <div class="asset_card__top__right asset_card__top__right--blue"><span>{{ order.status }}</span></div>
       </div>
       <div class="asset_card__center">
-        <div>Asset title, Asset title</div>
+        <div>
+          <span v-for="(asset, i) in order.items" :key="asset.assetId">{{ asset.description }}{{ i !== order.items.length - 1 ? ', ' : '' }}</span>
+        </div>
         <!-- <div class="asset_card__price">300€</div> -->
       </div>
       <div class="asset_card__bottom">

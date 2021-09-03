@@ -24,7 +24,29 @@
       <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountIban'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change IBAN'" :modalId="'bankAccountIban'" :inputs="[{id: 'bankAccountIban', name: 'IBAN', value: getCurrentOrDraftValue('bankAccount.iban'), type: 'text'}]"></modal>
       <modal v-if="getCurrentOrDraftValue('type') === 'PROFESSIONAL'" :show="modalToShow == 'bankAccountBic'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change BIC'" :modalId="'bankAccountBic'" :inputs="[{id: 'bankAccountBic', name: 'BIC', value: getCurrentOrDraftValue('bankAccount.bic'), type: 'text'}]"></modal>
 
-      <modal :show="modalToShow == 'newCard'" @dismiss="modalToShow = ''" @submit="onSubmitNewCard" :title="'Add new card'" :modalId="'newCard'" :inputs="[{id: 'cardNumber', name: 'Card Number', type: 'text'}, {id: 'cardExpirationDate', name: 'Expiration Date', type: 'text'}, {id: 'cardCvx', name: 'CVX (3-digit number)', type: 'text'}]"></modal>
+      <!-- <modal :show="modalToShow == 'newCard'" @dismiss="modalToShow = ''" @submit="onSubmitNewCard" :title="'Add new card'" :modalId="'newCard'" :inputs="[{id: 'cardNumber', name: 'Card Number', type: 'text'}, {id: 'cardExpirationDate', name: 'Expiration Date', type: 'text'}, {id: 'cardCvx', name: 'CVX (3-digit number)', type: 'text'}]"></modal> -->
+
+      <modal :withSlots="true" :show="modalToShow == 'newCard'" @dismiss="modalToShow = ''" :modalId="'newCard'">
+        <template v-slot:body>
+          <h1>Add new card</h1>
+
+          <div class="form-group">
+            <label for="modal_input_addcard_number" class="mt-xs-20"> Card number </label>
+            <input v-model="newCardData.number" class="form-group__text" type="text" id="modal_input_addcard_number">
+
+            <label for="modal_input_addcard_expiration_date" class="mt-xs-20"> Expiration date (MMYY format)</label>
+            <!-- <datepicker input-class="form-group__text" v-model="newCardData.expirationDate" :format="'MM'"></datepicker> -->
+            <input v-model="newCardData.expirationDate" class="form-group__text" type="text" id="modal_input_addcard_expiration_date">
+
+            <label for="modal_input_addcard_cvx" class="mt-xs-20"> CVX (3-digit number) </label>
+            <input v-model="newCardData.cvx" class="form-group__text" type="text" id="modal_input_addcard_cvx">
+          </div>
+        </template>
+
+        <template v-slot:footer>
+          <button class="btn--std btn--blue ml-xs-20" @click="onSubmitNewCard">submit files</button>
+        </template>
+      </modal>
 
       <modal :withSlots="true" :show="modalToShow == 'password'" @dismiss="onPasswordModalDismiss" :modalId="'password'" :showCancelButton="false">
         <template v-slot:body>
@@ -830,6 +852,7 @@ import {
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
 import store from '@/store';
+import Datepicker from 'vuejs-datepicker';
 // eslint-disable-next-line
 import EnumRole from '@/model/role';
 import {
@@ -871,6 +894,7 @@ localize({
   components: {
     ValidationProvider,
     ValidationObserver,
+    Datepicker,
     Modal,
     Pagination,
   },
@@ -923,6 +947,8 @@ export default class DashboardHome extends Vue {
   passwordCurrentError: boolean;
 
   cards: Card[];
+
+  newCardData: { number: string, expirationDate: string, cvx: string };
 
   cardInitialization: CardRegistration;
 
@@ -983,6 +1009,7 @@ export default class DashboardHome extends Vue {
     this.passwordCurrentError = false;
 
     this.cards = [];
+    this.newCardData = { number: '', expirationDate: '', cvx: '' };
     this.cardInitialization = {} as CardRegistration;
     this.cardsPerPage = 100;
     this.cardsCurrentPage = 0;
@@ -1378,7 +1405,7 @@ export default class DashboardHome extends Vue {
   */
 
   addCard(): void {
-    // todo: add loader here
+    store.commit('setLoading', true);
     this.paymentApi.createCardRegistration().then((createCardResponse) => {
       if (createCardResponse.success) {
         // submit card registration
@@ -1387,22 +1414,29 @@ export default class DashboardHome extends Vue {
       } else {
         console.log('error initializing card creation', createCardResponse);
       }
+      store.commit('setLoading', false);
     });
   }
 
   // eslint-disable-next-line
   onSubmitNewCard(e: any): void {
+    store.commit('setLoading', true);
     const url = this.cardInitialization.cardRegistrationUrl;
 
     const cardData = {
       accessKeyRef: this.cardInitialization.accessKey,
       data: this.cardInitialization.preRegistrationData,
-      cardNumber: e.inputValues.find((x) => x.id === 'cardNumber').value,
-      cardExpirationDate: e.inputValues.find((x) => x.id === 'cardExpirationDate').value,
-      cardCvx: e.inputValues.find((x) => x.id === 'cardCvx').value,
+      // cardNumber: e.inputValues.find((x) => x.id === 'cardNumber').value,
+      // cardExpirationDate: e.inputValues.find((x) => x.id === 'cardExpirationDate').value,
+      // cardCvx: e.inputValues.find((x) => x.id === 'cardCvx').value,
+      cardNumber: this.newCardData.number,
+      cardExpirationDate: this.newCardData.expirationDate,
+      cardCvx: this.newCardData.cvx,
     };
 
+    console.log(cardData);
     this.paymentApi.postCardInfoToTokenizationServer(url, cardData).then((postCardResponse) => {
+      this.newCardData = { number: '', expirationDate: '', cvx: '' };
       if (postCardResponse && postCardResponse.startsWith('data=')) {
         const completeRegistrationData = {
           registrationData: postCardResponse,
@@ -1415,6 +1449,9 @@ export default class DashboardHome extends Vue {
           } else {
             console.log('error adding card', completeRegistrationResponse);
           }
+          store.commit('setLoading', false);
+          this.modalToShow = '';
+          this.loadCards();
         });
       } else {
         console.log('error posting card details to token server', postCardResponse);
