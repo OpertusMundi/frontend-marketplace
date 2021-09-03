@@ -22,6 +22,7 @@
               <button class="btn btn--std btn--dark" @click="previousSection" v-if="!firstSection()">PREV</button>
               <h3>{{ selectedSection.index }} {{ selectedSection.title }}</h3>
               <button class="btn btn--std btn--dark" :disabled="!isValid()" @click="nextSection" v-if="!lastSection()">NEXT</button>
+              <button class="btn btn--std btn--dark" :disabled="!isValid()" @click="finish" v-if="lastSection()">FINISH</button>
             </div>
             <div class="contract-builder__main__content">
               <div
@@ -154,7 +155,14 @@ export default class ContractBuilder extends Vue {
       this.loadSelectedSectionValue();
       this.scrollToActive();
     }
+  }
+
+  finish(): void {
     if (this.lastSection() && this.isValid()) {
+      const currentSectionIndex = this.masterContract?.sections.map((e) => e.id).indexOf(this.selectedSection.id);
+      if (this.masterContract && currentSectionIndex !== undefined) {
+        this.saveSection();
+      }
       this.templateFilled = true;
       this.$emit('update:templateContractFilled', this.templateFilled);
     }
@@ -179,7 +187,7 @@ export default class ContractBuilder extends Vue {
   saveSection(): void {
     const selectedOptions:any = {
       masterSectionId: this.selectedSection.id,
-      optional: true,
+      optional: this.selectedSection.optional,
       option: 0,
       subOption: null,
     };

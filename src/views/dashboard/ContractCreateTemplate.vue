@@ -12,7 +12,7 @@
             <ul class="dashboard__form__nav">
                 <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Select master contract</a></li>
                 <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Build your contract</a></li>
-                <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Review and save</a></li>
+                <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Save</a></li>
             </ul>
             <div class="dashboard__form__steps">
             <transition name="fade" mode="out-in">
@@ -48,6 +48,7 @@ import { Sorting } from '@/model/request';
 import ContractBuilder from '@/components/Contracts/ContractBuilder.vue';
 import ContractTypeSelect from '@/components/Contracts/ContractTypeSelect.vue';
 import ContractDetails from '@/components/Contracts/ContractDetails.vue';
+import store from '@/store';
 
 extend('required', required);
 
@@ -124,9 +125,6 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   nextStep():void {
-    console.log(this.currentStep);
-
-    // this.$refs[`step${this.currentStep}`].validate().then((isValid) => {
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
@@ -144,9 +142,18 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   saveDraft(): void {
-    console.log('save draft');
+    store.commit('setLoading', true);
     this.providerContractApi.createDraft(this.templateContract).then((response) => {
-      console.log(response);
+      store.commit('setLoading', false);
+      if (response.success) {
+        store.commit('setLoading', true);
+        this.providerContractApi.publishDraft(response.result.key).then((responsePublish) => {
+          store.commit('setLoading', false);
+          if (responsePublish.success) {
+            this.$router.push('/dashboard/contracts');
+          }
+        });
+      }
     });
   }
 
