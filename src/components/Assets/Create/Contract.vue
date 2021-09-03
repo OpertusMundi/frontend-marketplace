@@ -53,7 +53,7 @@
 
               </div>
               <div v-if="contractModeOption === 'create_new'">
-                create new
+                <router-link class="btn btn--std btn--blue" target='_blank' to="/dashboard/contracts/create-template">CREATE NEW CONTRACT TEMPLATE</router-link>
               </div>
               <div v-if="contractModeOption === 'upload_own'">
                 upload own

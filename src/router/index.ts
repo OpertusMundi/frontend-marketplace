@@ -117,6 +117,18 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
       {
+        path: 'contracts/create-template',
+        name: 'Contract Create Template',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardcontractscreatetemplate" */ '../views/dashboard/ContractCreateTemplate.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
+        path: 'contracts/:key',
+        name: 'Single Contract',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardcontractsingle" */ '../views/dashboard/ContractSingle.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+      },
+      {
         path: 'storage',
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
