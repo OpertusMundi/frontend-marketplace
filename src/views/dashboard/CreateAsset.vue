@@ -123,7 +123,7 @@
         <div class="dashboard__form__uploading__body">
           <h4>{{ uploading.title }}</h4>
           <p>{{ uploading.subtitle }}</p>
-          <div class="dashboard__form__uploading__body__btns">
+          <div v-if="uploading.completed" class="dashboard__form__uploading__body__btns">
             <router-link to="/dashboard" class="btn btn--std btn--blue">GO TO Dashboard</router-link>
           </div>
         </div>

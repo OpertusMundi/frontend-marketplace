@@ -115,6 +115,9 @@ export default class App extends Vue {
   handleAuthenticationChanges(isNowAuthenticated: boolean, wasPreviouslyAuthenticated: boolean): void {
     if (wasPreviouslyAuthenticated && !isNowAuthenticated) {
       const name = 'Home';
+
+      if (this.$route.name === 'RegistrationSuccess' || this.$route.name === 'RegistrationFailure') return;
+
       if (this.$route.name !== name) this.$router.push({ name });
     }
   }
