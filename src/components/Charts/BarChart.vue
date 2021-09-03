@@ -28,7 +28,8 @@ export default class BarChart extends Vue {
         showInLegend: false,
         borderRadius: '15px',
         color: '#BCBCBC',
-        data: [300, 400, 600, 550, 516, 150, 420],
+        // data: [300, 400, 600, 550, 516, 150, 420],
+        data: [],
         states: {
           hover: { color: '#190AFF' },
         },

@@ -49,7 +49,7 @@
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
       </div> -->
 
-      <div class="asset__section__head__main_information asset__section__head__main_information--includes-buttons" v-if="isUserAuthenticated">
+      <div class="asset__section__head__main_information asset__section__head__main_information--includes-buttons" v-if="isUserAuthenticated && resources[1]">
         <p v-if="resources[1].crs.length < 5"><strong>CRS:</strong> {{ resources[1].crs.join(', ') }}</p>
         <p v-else><strong>CRS:</strong> {{ resources[1].crs.slice(0, 5).join(', ') }}... <button @click="onShowWholeCrsList" class="btn btn--std btn--outlinedark">show all</button></p>
         <p><strong>ATTRIBUTION:</strong> {{ resources[1].attribution }}</p>
@@ -82,7 +82,7 @@
         <ul class="asset__section__tabs asset__section__tabs__service_details">
 
           <!-- COVERAGE -->
-          <li v-if="activeTab == 1 && resources[1].bbox">
+          <li v-if="activeTab == 1 && resources[1] && resources[1].bbox">
             <p>Contains visualisation of the coverage on a map</p>
             <div class="tab_maps-map mt-xs-20">
               <l-map
@@ -108,7 +108,7 @@
             <p>Details of the service</p>
             <hr>
             <h3>General</h3>
-            <div class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons">
+            <div class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons" v-if="resources[1]">
               <p><strong>Identifier</strong>{{ resources[1].id }}</p>
               <p><strong>Scale</strong>{{ `1:${resources[1].maxScale}` }} - {{ `1:${resources[1].minScale}` }}</p>
               <p v-if="resources[1].outputFormats.length < 3"><strong>Output formats</strong> {{ resources[1].outputFormats.join(', ') }}</p>
@@ -116,7 +116,7 @@
             </div>
             <hr>
             <h3>Attributes</h3>
-            <div v-if="resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons">
+            <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons">
               <p><strong>queryable</strong><span>{{ resources[1].attributes.queryable }}</span></p>
               <p><strong>cascaded</strong><span>{{ resources[1].attributes.cascaded }}</span></p>
               <p><strong>opaque</strong><span>{{ resources[1].attributes.opaque }}</span></p>
@@ -248,6 +248,8 @@ export default class ApiLayerProfiler extends Vue {
 
   setMinMaxZoomLevels(): void {
     this.$nextTick(() => {
+      if (!(this as any).$refs.mapMbr) return;
+
       const fitBoundsZoomLevel = (this as any).$refs.mapMbr.mapObject.getBoundsZoom(L.geoJSON((this.resources[1] as ServiceResource).bbox as GeoJsonObject).getBounds());
 
       const zoomOffset = 2;

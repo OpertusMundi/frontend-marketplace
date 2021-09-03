@@ -120,14 +120,14 @@ const routes: RouteConfig[] = [
         path: 'storage',
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'notebooks',
         name: 'Notebooks',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardnotebooks" */ '../views/dashboard/Notebooks.vue'),
         // TODO: correct role?
-        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
         path: 'assets/create/:id?',
@@ -194,7 +194,7 @@ const routes: RouteConfig[] = [
         path: 'users',
         name: 'Users',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardusers" */ '../views/dashboard/Users.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
       {
         path: 'messages/create',

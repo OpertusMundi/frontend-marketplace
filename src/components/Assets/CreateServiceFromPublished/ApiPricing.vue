@@ -100,7 +100,7 @@
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <p>Customers subscribe to the service and receive an API key.</p>
                     <p>You simply set the price per individual call of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
-                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer.</p>
                     <p>Consumers may cancel their subscription at any point time.</p>
                     <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
                     <div class="form-group form-group form-group--paragraph-small-margin">
@@ -140,10 +140,9 @@
                   <!-- per row with prepaid -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_PREPAID'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
-                    <p>Customers subscribe to the service and receive an API key.</p>
-                    <p>You simply set the price per individual row of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
-                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
-                    <p>Consumers may cancel their subscription at any point time.</p>
+                    <p>Customers subscribe to your service and receive an API key. You simply set the price per individual returned row of the service.</p>
+                    <p>Optionally, you can allow consumers to prepay a given number of rows at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid rows at any point in time. If their prepaid rows are depleted, then they are charged with the standard price.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. Consumers may cancel their subscription at any point time. If they had any prepaid rows still left, they will not be reimbursed.</p>
                     <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
                     <div class="form-group form-group--paragraph-small-margin">
                       <label for="prwp_price">Your price per row</label>
@@ -185,8 +184,8 @@
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <p>Customers subscribe to the service and receive an API key.</p>
-                    <p>You simply set the price per individual row of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
-                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. </p>
+                    <p>You simply set the price per individual row returned by service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
+                    <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement (SLA) between Topio and the Consumer.</p>
                     <p>Consumers may cancel their subscription at any point time.</p>
                     <p>We will automatically bill your account whenever your total reimbursement for all the services you provide has reached [50] Euros. This is to avoid excess processing fees.</p>
                     <div class="form-group form-group--paragraph-small-margin">
@@ -333,6 +332,8 @@ export default class ApiPricing extends Vue {
 
   @Prop({ required: true }) private selectedPricingModelForEditing!: number | null;
 
+  @Prop({ required: true }) private serviceType!: string;
+
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>,
     refPricingModelDetails: InstanceType<typeof ValidationObserver>,
@@ -394,12 +395,14 @@ export default class ApiPricing extends Vue {
 
     this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
 
-    this.pricingModelTypes = [
-      // { name: 'Free', priceModel: EnumPricingModel.FREE },
+    this.pricingModelTypes = this.serviceType === 'WFS' ? [
       { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
       { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
       { name: 'Subscription, fixed price per row', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
       { name: 'Subscription, blocking rates per row', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
+    ] : [
+      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
+      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
     ];
 
     console.log('constructor');

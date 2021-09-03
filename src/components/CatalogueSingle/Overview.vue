@@ -18,7 +18,8 @@
         </div>
         <div class="asset__section__overview__right">
           <h5>Asset Info</h5>
-          <p><strong>Language:</strong> {{ catalogueItem.language }} <br>
+          <!-- <p><strong>Language:</strong> {{ catalogueItem.language }} <br> -->
+          <p><strong>Language:</strong> {{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language) ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language).name : '' }} <br>
           <strong>Temporal extent:</strong>
           <span v-if="catalogueItem.dateStart && catalogueItem.dateEnd">{{ formatDate(catalogueItem.dateStart) }} - {{ formatDate(catalogueItem.dateEnd) }}</span>
           <span v-if="catalogueItem.dateStart && !catalogueItem.dateEnd">From {{ formatDate(catalogueItem.dateStart) }}</span>

@@ -78,7 +78,7 @@
             <!-- PRICING -->
             <!-- <transition name="fade" mode="out-in"> -->
               <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType !== 'API' && currentStep == 4"></pricing>
-              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
+              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
             <!-- </transition> -->
 
             <!-- DELIVERY -->
@@ -123,7 +123,7 @@
         <div class="dashboard__form__uploading__body">
           <h4>{{ uploading.title }}</h4>
           <p>{{ uploading.subtitle }}</p>
-          <div class="dashboard__form__uploading__body__btns">
+          <div v-if="uploading.completed" class="dashboard__form__uploading__body__btns">
             <router-link to="/dashboard" class="btn btn--std btn--blue">GO TO Dashboard</router-link>
           </div>
         </div>

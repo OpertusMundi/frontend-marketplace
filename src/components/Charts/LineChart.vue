@@ -27,7 +27,8 @@ export default class LineChart extends Vue {
       series: [{
         color: '#BCBCBC',
         showInLegend: false,
-        data: [3, 3.2, 4.3, 4.5, 5],
+        // data: [3, 3.2, 4.3, 4.5, 5],
+        data: [],
         states: {
           hover: {
             lineWidth: 0,

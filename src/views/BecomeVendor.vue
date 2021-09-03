@@ -368,6 +368,7 @@
                   <div class="wrapper-cells">
                     <div><span>Vat Number: </span> <span> {{ this.vendorData.companyNumber }} </span></div>
                     <div><span>Name: </span> <span> {{ this.vendorData.name }} </span></div>
+                    <div><span>Email: </span> <span> {{ this.vendorData.email }} </span></div>
                     <div v-if="this.vendorData.siteUrl"><span>Website: </span> <span> {{ this.vendorData.siteUrl }} </span></div>
                     <div><span>Country: </span> <span> {{ this.vendorData.headquartersAddress.country }} </span></div>
                     <div><span>Region: </span> <span> {{ this.vendorData.headquartersAddress.region }} </span></div>
