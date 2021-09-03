@@ -116,7 +116,16 @@ export default class App extends Vue {
     if (wasPreviouslyAuthenticated && !isNowAuthenticated) {
       const name = 'Home';
 
-      if (this.$route.name === 'RegistrationSuccess' || this.$route.name === 'RegistrationFailure') return;
+      // todo
+      const excludeRedirectionToHome = [
+        'RegistrationSuccess',
+        'RegistrationFailure',
+        'PayInRedirection',
+      ];
+
+      console.log('handle auth change', this.$route.name);
+
+      if (excludeRedirectionToHome.includes(this.$route.name as string)) return;
 
       if (this.$route.name !== name) this.$router.push({ name });
     }
@@ -150,12 +159,12 @@ export default class App extends Vue {
               store.commit('setUserData', profileResponse.result);
             } else {
               console.log('unsuccessful profile fetching');
-              this.logout();
+              // this.logout();
             }
           })
           .catch((error: AxiosError) => {
             console.log('getProfile error', error);
-            this.logout();
+            // this.logout();
           });
       })
       .catch((err) => {
