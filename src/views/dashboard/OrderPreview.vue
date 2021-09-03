@@ -22,11 +22,12 @@
       <div class="info-table">
         <span class="info-table__field info-table__field--large">Asset</span><span class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
-        <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span>
+        <!-- <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span> -->
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
-        <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ order.totalPrice }}</span>
-        <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span>
-        <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span>
+        <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
+        <!-- <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span> -->
+        <span class="info-table__field">Contract</span><span class="info-table__value"><button class="btn btn--std btn--blue">download</button></span>
+        <!-- <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span> -->
       </div>
 
     </div>
@@ -109,6 +110,7 @@ export default class DashboardPurchases extends Vue {
 </script>
 <style lang="scss">
 @import "@/assets/styles/_dashboard.scss";
+@import "@/assets/styles/_btns.scss";
 @import "@/assets/styles/dashboard/_order-purchase-preview.scss";
 @import "@/assets/styles/abstracts/_spacings.scss";
 </style>
