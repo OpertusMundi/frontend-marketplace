@@ -460,7 +460,23 @@ export default class Checkout extends Vue {
       console.log('payin response', payInResponse);
       if (payInResponse.success) {
         console.log('successful payin!');
-        this.$router.push('/order-thankyou');
+
+        this.cartApi.clear().then((clearCartResponse) => {
+          if (clearCartResponse.success) {
+            store.commit('setCartItems', []);
+            console.log('cleared items from cart');
+
+            const redirectUrl = payInResponse.result.secureModeRedirectURL;
+            if (redirectUrl) {
+              console.log('redirecting to secure mode url', redirectUrl);
+              window.location.href = redirectUrl;
+            } else {
+              this.$router.push('/order-thankyou');
+            }
+          } else {
+            console.log('error clearing cart', clearCartResponse);
+          }
+        });
       } else {
         console.log('payin error');
       }

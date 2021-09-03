@@ -232,6 +232,11 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "thankyou" */ '../views/orders/Thankyou.vue'),
   },
   {
+    path: '/webhooks/payins/:payInKey',
+    name: 'PayInRedirection',
+    component: (): Promise<any> => import(/* webpackChunkName: "payIn" */ '../views/orders/PayInRedirection.vue'),
+  },
+  {
     path: '/signin',
     name: 'Login',
     component: (): Promise<any> => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
