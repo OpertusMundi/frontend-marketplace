@@ -43,6 +43,7 @@ export default class PayInRedirection extends Vue {
   }
 
   getPayIn(payInKey: string): void {
+    console.log('key', payInKey);
     store.commit('setLoading', true);
     this.consumerPayInApi.getPayIn(payInKey).then((response) => {
       if (response.success) {
@@ -53,7 +54,8 @@ export default class PayInRedirection extends Vue {
           { status: EnumTransactionStatus.CREATED, title: 'Order created' },
         ];
 
-        const title = cases.find((x) => x.status === response.result.status);
+        // eslint-disable-next-line
+        const title = cases.find((x) => x.status === response.result.status)!.title;
         Vue.set(this.infoPage, 'title', title);
       } else {
         console.log('error getting pay in', response);
