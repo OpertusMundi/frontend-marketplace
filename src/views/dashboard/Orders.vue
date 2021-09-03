@@ -73,7 +73,7 @@ export default class DashboardOrders extends Vue {
       'ALL',
       EnumOrderStatus.CREATED,
       EnumOrderStatus.CHARGED,
-      EnumOrderStatus.PENDING,
+      EnumOrderStatus.ASSET_REGISTRATION,
       EnumOrderStatus.CANCELLED,
       EnumOrderStatus.REFUNDED,
       EnumOrderStatus.SUCCEEDED,
