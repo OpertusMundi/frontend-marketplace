@@ -57,6 +57,8 @@ export default class PayInRedirection extends Vue {
         Vue.set(this.infoPage, 'title', title);
       } else {
         console.log('error getting pay in', response);
+        const title = 'Order failed';
+        Vue.set(this.infoPage, 'title', title);
       }
       store.commit('setLoading', false);
     }).catch((err) => {
