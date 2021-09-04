@@ -7,7 +7,7 @@
         <div class="p-xs-30">
           <h4>CRS list</h4>
           <div style="max-height: 300px; overflow-y: auto">
-            <ul style="text-align: left">
+            <ul v-if="resources[1] && resources[1].crs && resources[1].crs" style="text-align: left">
               <li v-for="crs in resources[1].crs" :key="crs">{{ crs }}</li>
             </ul>
           </div>
@@ -24,7 +24,7 @@
         <div class="p-xs-30">
           <h4>All output formats</h4>
           <div style="max-height: 300px; overflow-y: auto">
-            <ul style="text-align: left">
+            <ul v-if="resources[1] && resources[1].outputFormats" style="text-align: left">
               <li v-for="format in resources[1].outputFormats" :key="format">{{ format }}</li>
             </ul>
           </div>
@@ -50,10 +50,11 @@
       </div> -->
 
       <div class="asset__section__head__main_information asset__section__head__main_information--includes-buttons" v-if="isUserAuthenticated && resources[1]">
-        <p v-if="resources[1].crs.length < 5"><strong>CRS:</strong> {{ resources[1].crs.join(', ') }}</p>
-        <p v-else><strong>CRS:</strong> {{ resources[1].crs.slice(0, 5).join(', ') }}... <button @click="onShowWholeCrsList" class="btn btn--std btn--outlinedark">show all</button></p>
-        <p><strong>ATTRIBUTION:</strong> {{ resources[1].attribution }}</p>
-        <p><strong>TYPE:</strong> {{ resources[1].serviceType }}</p>
+        <p v-if="resources[1].crs && resources[1].crs.length < 5"><strong>CRS:</strong> {{ resources[1].crs.join(', ') }}</p>
+        <p v-if="resources[1].crs && resources[1].crs.length >= 5"><strong>CRS:</strong> {{ resources[1].crs.slice(0, 5).join(', ') }}... <button @click="onShowWholeCrsList" class="btn btn--std btn--outlinedark">show all</button></p>
+        <p v-if="!resources[1].crs"><strong>CRS: </strong></p>
+        <p><strong>ATTRIBUTION:</strong> {{ resources[1].attribution ? resources[1].attribution : '' }}</p>
+        <p><strong>TYPE:</strong> {{ resources[1].serviceType ? resources[1].serviceType : '' }}</p>
       </div>
 
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
@@ -82,9 +83,9 @@
         <ul class="asset__section__tabs asset__section__tabs__service_details">
 
           <!-- COVERAGE -->
-          <li v-if="activeTab == 1 && resources[1] && resources[1].bbox">
+          <li v-if="activeTab == 1">
             <p>Contains visualisation of the coverage on a map</p>
-            <div class="tab_maps-map mt-xs-20">
+            <div v-if="resources[1] && resources[1].bbox" class="tab_maps-map mt-xs-20">
               <l-map
                 ref="mapMbr"
                 :bounds="getMapBoundsFromGeoJson(resources[1].bbox)"
@@ -101,6 +102,7 @@
                 </l-geo-json>
               </l-map>
             </div>
+            <h5 v-else>No map to show</h5>
           </li>
 
           <!-- DETAILS -->
@@ -109,20 +111,23 @@
             <hr>
             <h3>General</h3>
             <div class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons" v-if="resources[1]">
-              <p><strong>Identifier</strong>{{ resources[1].id }}</p>
-              <p><strong>Scale</strong>{{ `1:${resources[1].maxScale}` }} - {{ `1:${resources[1].minScale}` }}</p>
+              <p><strong>Identifier</strong>{{ resources[1].id ? resources[1].id : '' }}</p>
+              <p v-if="!resources[1].maxScale && !resources[1].minScale">Scale </p>
+              <p v-if="resources[1].maxScale && !resources[1].minScale">Max scale {{ resources[1].maxScale }}</p>
+              <p v-if="!resources[1].maxScale && resources[1].minScale">Min scale {{ resources[1].minScale }}</p>
+              <p v-if="resources[1].maxScale && resources[1].minScale"><strong>Scale</strong>{{ `1:${resources[1].maxScale}` }} - {{ `1:${resources[1].minScale}` }}</p>
               <p v-if="resources[1].outputFormats.length < 3"><strong>Output formats</strong> {{ resources[1].outputFormats.join(', ') }}</p>
               <p v-else><strong>Output formats</strong> <span>{{ resources[1].outputFormats.slice(0, 3).join(', ') }}... <button @click="onShowWholeOutputFormatsList" class="btn btn--std btn--outlinedark">show all</button></span></p>
             </div>
             <hr>
             <h3>Attributes</h3>
             <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons">
-              <p><strong>queryable</strong><span>{{ resources[1].attributes.queryable }}</span></p>
-              <p><strong>cascaded</strong><span>{{ resources[1].attributes.cascaded }}</span></p>
-              <p><strong>opaque</strong><span>{{ resources[1].attributes.opaque }}</span></p>
-              <p><strong>noSubsets</strong><span>{{ resources[1].attributes.noSubsets }}</span></p>
-              <p><strong>fixedWidth</strong><span>{{ resources[1].attributes.fixedWidth }}</span></p>
-              <p><strong>fixedHeight</strong><span>{{ resources[1].attributes.fixedHeight }}</span></p>
+              <p><strong>queryable</strong><span>{{ resources[1].attributes.queryable ? resources[1].attributes.queryable : '' }}</span></p>
+              <p><strong>cascaded</strong><span>{{ resources[1].attributes.cascaded ? resources[1].attributes.cascaded : '' }}</span></p>
+              <p><strong>opaque</strong><span>{{ resources[1].attributes.opaque ? resources[1].attributes.opaque : '' }}</span></p>
+              <p><strong>noSubsets</strong><span>{{ resources[1].attributes.noSubsets ? resources[1].attributes.noSubsets : '' }}</span></p>
+              <p><strong>fixedWidth</strong><span>{{ resources[1].attributes.fixedWidth ? resources[1].attributes.fixedWidth : '' }}</span></p>
+              <p><strong>fixedHeight</strong><span>{{ resources[1].attributes.fixedHeight ? resources[1].attributes.fixedHeight : '' }}</span></p>
             </div>
           </li>
         </ul>
@@ -190,6 +195,8 @@ export default class ApiLayerProfiler extends Vue {
 
   mapConfig: any;
 
+  isMapBBox: boolean;
+
   isExpanded: boolean;
 
   modalToShow: string;
@@ -205,6 +212,8 @@ export default class ApiLayerProfiler extends Vue {
     this.activeTab = 1;
 
     this.isExpanded = false;
+
+    this.isMapBBox = !!this.resources[1] && !!(this.resources[1] as ServiceResource).bbox;
 
     this.modalToShow = '';
 
@@ -235,7 +244,7 @@ export default class ApiLayerProfiler extends Vue {
   @Watch('activeTab', { immediate: true })
   onActiveTabChange(activeTab: number): void {
     // if tab is maps-tab
-    if (activeTab === 1 && this.isUserAuthenticated) {
+    if (activeTab === 1 && this.isMapBBox && this.isUserAuthenticated) {
       this.setMinMaxZoomLevels();
     }
   }
