@@ -121,7 +121,8 @@
             </div>
             <hr>
             <h3>Attributes</h3>
-            <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons">
+            <!-- <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons"> -->
+            <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table">
               <p><strong>queryable</strong><span>{{ resources[1].attributes.queryable ? resources[1].attributes.queryable : '' }}</span></p>
               <p><strong>cascaded</strong><span>{{ resources[1].attributes.cascaded ? resources[1].attributes.cascaded : '' }}</span></p>
               <p><strong>opaque</strong><span>{{ resources[1].attributes.opaque ? resources[1].attributes.opaque : '' }}</span></p>
