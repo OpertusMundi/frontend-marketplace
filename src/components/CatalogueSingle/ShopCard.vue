@@ -48,13 +48,13 @@
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }} %</span>
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
                 </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__table">
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
                     <label :for="`prepaid_tier_pcwp_${i}`">
-                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                      <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls, </span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
                   <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
@@ -69,7 +69,7 @@
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
-                    <span>{{ discount.count }} calls</span><span>{{ discount.discount }} %</span>
+                    <span>{{ discount.count }} calls</span><span>{{ discount.discount }}% discount</span>
                   </div>
                 </div>
               </div>
@@ -79,13 +79,13 @@
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }} %</span>
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
                 </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__table">
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
-                    <label :for="`prepaid_tier_pcwp_${i}`">
-                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                    <label :for="`prepaid_tier_prwp_${i}`">
+                      <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
                   <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
@@ -105,7 +105,7 @@
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
-                    <span>{{ discount.count }} rows</span><span>{{ discount.discount }} %</span>
+                    <span>{{ discount.count }} rows</span><span>{{ discount.discount }}% discount</span>
                   </div>
                 </div>
               </div>
