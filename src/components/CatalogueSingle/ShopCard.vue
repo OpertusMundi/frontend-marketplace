@@ -47,10 +47,19 @@
               Subscription, fixed price per call<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table">
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }} %</span>
+                </div>
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                    <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
+                    <label :for="`prepaid_tier_pcwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                    </label>
                   </div>
+                  <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                    <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -69,11 +78,25 @@
               Subscription, fixed price per row<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table">
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }} %</span>
+                </div>
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__table">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                    <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
+                    <label :for="`prepaid_tier_pcwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                    </label>
+                  </div>
+                  <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                    <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
+                  </div> -->
+                </div>
+                <!-- <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
                     <span>{{ prePaidTier.count }} rows</span><span>{{ prePaidTier.discount }} %</span>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
             <div v-if="pr_model.model.type === 'PER_ROW_WITH_BLOCK_RATE'">
@@ -166,7 +189,7 @@ import {
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import CartApi from '@/service/cart';
 import { CatalogueItem } from '@/model';
-import { BasePricingModelCommand } from '@/model/pricing-model';
+import { BasePricingModelCommand, EnumPricingModel } from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
 import store from '@/store';
 
@@ -182,6 +205,8 @@ export default class ShopCard extends Vue {
 
   selectedPricingModel: BasePricingModelCommand | null;
 
+  selectedPrepaidTierIndex: number;
+
   isSelectAreasModalOn: boolean;
 
   cartErrors: string;
@@ -194,6 +219,7 @@ export default class ShopCard extends Vue {
     console.log('shopcard item', this.catalogueItem);
 
     this.selectedPricingModel = null;
+    this.selectedPrepaidTierIndex = 0;
     this.isSelectAreasModalOn = false;
     this.cartErrors = '';
     this.selectedPricingModel = this.catalogueItem.pricingModels[0].model;
@@ -221,6 +247,13 @@ export default class ShopCard extends Vue {
       pricingModelKey: this.selectedPricingModel.key!,
       parameters: {},
     };
+
+    if ([EnumPricingModel.PER_CALL_WITH_PREPAID, EnumPricingModel.PER_ROW_WITH_PREPAID].includes(this.selectedPricingModel.type)) {
+      cartItem.parameters.prePaidTier = this.selectedPrepaidTierIndex;
+    }
+
+    if (this.selectedPrepaidTierIndex !== null) cartItem.parameters.prePaidTier = this.selectedPrepaidTierIndex;
+
     this.cartApi.addItem(cartItem)
       // .then((cartResponse: ServerResponse<Cart>) => {
       .then((cartResponse) => {
