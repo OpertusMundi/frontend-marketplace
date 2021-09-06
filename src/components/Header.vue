@@ -159,7 +159,7 @@
                       </div>
                     </div>
                     <div class="header__submenu__block">
-                      <h4 class="header__submenu__block__title">Benefits for vendors</h4>
+                      <h4 class="header__submenu__block__title">Benefits for users</h4>
                       <div class="header__submenu__block__text">
                         <ul>
                           <li>View, discover, compare and purchase geospatial data assets</li>
@@ -188,13 +188,23 @@
                     <div class="header__submenu__items">
                       <p>topio services</p>
                       <ul>
-                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/api"><img src="@/assets/images/t-icon.svg" alt="" /> API</router-link></li>
-                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/drive-2"><img src="@/assets/images/t-icon.svg" alt="" /> Notebooks</router-link></li>
-                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/maps"><img src="@/assets/images/t-icon.svg" alt="" /> Maps</router-link></li>
+                        <li @click="showSubmenuUse = !showSubmenuUse">
+                          <router-link to="/vas/api"><img src="@/assets/images/t-icon.svg" alt="" /> API</router-link>
+                        </li>
+                        <li @click="showSubmenuUse = !showSubmenuUse">
+                          <router-link to="/vas/drive-2"><img src="@/assets/images/t-icon.svg" alt="" /> Notebooks</router-link>
+                        </li>
+                        <li @click="showSubmenuUse = !showSubmenuUse">
+                          <router-link to="/vas/maps"><img src="@/assets/images/t-icon.svg" alt="" /> Maps</router-link>
+                        </li>
                         <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">ALL SERVICES</router-link></li>
                       </ul>
-                      <hr>
-                      <p @click="showSubmenuUse = !showSubmenuUse"><router-link to="/documentation">HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg></router-link></p>
+                      <hr />
+                      <p @click="showSubmenuUse = !showSubmenuUse">
+                        <router-link to="/documentation"
+                          >HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
+                        ></router-link>
+                      </p>
                     </div>
                   </div>
                 </div>
