@@ -15,7 +15,8 @@
       </div>
       <div class="asset_card__center asset_card__center--short">
         <div class="asset_card__title">{{ item.asset.title }}</div>
-        <div class="asset_card__price">{{ `${item.pricingModel.quotation.totalPrice}€` }}</div>
+        <!-- <div v-if="item.pricingModel.model.type === 'PER_CALL_WITH_BLOCK_RATE' || item.pricingModel.model.type === 'PER_CALL_WITH_BLOCK_RATE'" class="asset_card__price"></div> -->
+        <div class="asset_card__price">{{ item.pricingModel.quotation ? `${item.pricingModel.quotation.totalPrice}€` : '' }}</div>
         <!-- <div class="asset_card__top__right"><span>PURCHASE STATUS</span></div> -->
       </div>
       <div class="asset_card__bottom">
