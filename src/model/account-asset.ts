@@ -8,6 +8,13 @@ export enum EnumConsumerAssetSortField {
   UPDATE_ELIGIBILITY = 'UPDATE_ELIGIBILITY',
 }
 
+export enum EnumConsumerSubSortField {
+  ADDED_ON = 'ADDED_ON',
+  UPDATED_ON = 'UPDATED_ON',
+  TITLE = 'TITLE',
+  PUBLISHER = 'PUBLISHER',
+}
+
 enum EnumAccountAssetSource {
   PURCHASE = 'PURCHASE',
   UPDATE = 'UPDATE',
@@ -65,6 +72,10 @@ export interface AccountSubscription {
    * First asset topic category if any exist
    */
   segment: EnumTopicCategory;
+  /**
+   * Catalogue item
+   */
+  item: CatalogueItem;
 }
 
 export interface ConsumerAccountSubscription extends AccountSubscription {

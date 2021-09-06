@@ -27,7 +27,6 @@ export default class ProviderAssetsApi extends Api {
       });
   }
 
-
   /**
    * Delete asset.
    *
