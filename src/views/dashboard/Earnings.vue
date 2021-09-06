@@ -6,14 +6,61 @@
       </div>
     </div>
     <div>
-      <hr class="mt-xs-50 mb-xs-50 seperator-transaction-history">
+      <div class="stats-cards">
+        <div class="stats-cards__cont">
+          <div class="stats-card">
+            <router-link to="/dashboard/analytics" class="stats-card__more">MORE ANALYTICS</router-link>
+            <div class="stats-card__upper">
+              <h3 class="stats-card__title">Total earnings</h3>
+            </div>
+            <div class="stats-card__totals">
+              <div class="stats-card__totals__head">
+                <ul>
+                  <li>
+                    Total
+                  </li>
+                  <li>
+                    Data files
+                  </li>
+                  <li>
+                    Your APIs
+                  </li>
+                  <li>
+                    Topio APIs
+                  </li>
+                </ul>
+              </div>
+              <div class="stats-card__totals__amounts">
+                <ul>
+                  <li><span>€</span>87.478</li>
+                  <li><span>€</span>53.487</li>
+                  <li><span>€</span>30.000</li>
+                  <li><span>€</span>4.000</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-cards__cont">
+          <div class="stats-card">
+            <div class="stats-card__upper">
+              <h3 class="stats-card__title">Earnings</h3>
+              <router-link :to="{ name: 'Analytics' }">MORE ANALYTICS <img src="@/assets/images/icons/right_arrow.svg" alt=""/></router-link>
+            </div>
+            <div class="stats-card__chart">
+              <sales-line-chart :cardHeading="'Earnings'" :salesQueryMetricType="'SUM_SALES'" :symbol="'Sale in €'" :symbolTitle="'Earnings'"></sales-line-chart>
+            </div>
+          </div>
+        </div>
+        <div class="stats-cards__cont"></div>
+      </div>
+
+      <hr class="mt-xs-50 mb-xs-50 seperator-transaction-history" />
       <h2 class="mb-xs-30">Transaction history</h2>
       <div class="filters">
         <div class="filters__block">
           <p class="filters__title">
-            <template v-if="!$store.getters.isLoading">
-              {{ totalOrders }} TRANSACTIONS
-            </template>
+            <template v-if="!$store.getters.isLoading"> {{ totalOrders }} TRANSACTIONS </template>
           </p>
         </div>
         <div class="filters__block">
@@ -41,11 +88,13 @@ import OrderCard from '@/components/Orders/OrderCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import { Order } from '@/model/request';
 import store from '@/store';
+import SalesLineChart from '@/components/Aanalytics/SalesLineChart.vue';
 
 @Component({
   components: {
     OrderCard,
     Pagination,
+    SalesLineChart,
   },
 })
 export default class Earnings extends Vue {
@@ -128,7 +177,8 @@ export default class Earnings extends Vue {
 }
 </script>
 <style lang="scss">
-@import "@/assets/styles/abstracts/_spacings.scss";
-@import "@/assets/styles/_dashboard.scss";
-@import "@/assets/styles/_filters.scss";
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/_dashboard.scss';
+@import '@/assets/styles/_filters.scss';
+@import '@/assets/styles/_stats.scss';
 </style>

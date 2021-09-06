@@ -1,66 +1,21 @@
 <template>
-  <div class="graphcard">
-    <div class="graphcard__head">
-      <div class="graphcard__head__data">
-        <div class="graphcard__head__data__left">
-          <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
-        </div>
-        <div class="graphcard__head__data__right">
-          <ul>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
-            </li>
-            <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+  <div class="line_chart">
+    <div class="line_chart__head">
+      <div class="line_chart__head__filters">
+        <div class="line_chart__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
         </div>
-        <div class="graphcard__head__filters__time">
+        <div class="line_chart__head__filters__time">
           <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
         </div>
       </div>
     </div>
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
-    <table class="data_table" v-if="chartOptions">
-      <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="placeholder" v-else></div>
   </div>
 </template>
 <script lang="ts">
@@ -100,6 +55,8 @@ export default class SalesLineGraphCard extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
+  datesSelect: any;
+
   draftAssetApi: DraftAssetApi;
 
   assets: AssetDraft[];
@@ -128,6 +85,8 @@ export default class SalesLineGraphCard extends Vue {
 
   constructor() {
     super();
+
+    this.datesSelect = [{ date: 'today' }, { date: 'last week' }, { date: 'last month' }, { date: 'last 3 months' }, { date: 'last 6 months' }, { date: 'last year' }];
 
     this.draftAssetApi = new DraftAssetApi();
 
@@ -224,6 +183,7 @@ export default class SalesLineGraphCard extends Vue {
 
     return {
       chart: {
+        height: '250px',
         type: 'areaspline',
         zoomType: 'x',
       },
@@ -231,7 +191,7 @@ export default class SalesLineGraphCard extends Vue {
         enabled: false,
       },
       title: {
-        text: '',
+        text: null,
       },
 
       xAxis: {
@@ -243,7 +203,7 @@ export default class SalesLineGraphCard extends Vue {
         gridLineWidth: 1,
         gridLineColor: '#6C6C6C',
         title: {
-          text: this.symbolTitle,
+          text: null,
         },
       },
       legend: {
@@ -515,6 +475,7 @@ export default class SalesLineGraphCard extends Vue {
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
+@import '@/assets/styles/graphs/_line-chart.scss';
 @import '@/assets/styles/graphs/_table.scss';
 .multiselect__option--highlight {
   background: none !important;

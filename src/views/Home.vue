@@ -5,12 +5,13 @@
         <shape></shape>
         <div class="homepage__hero__content">
           <h1 class="homepage__hero__content__title">Explore. Trade. Use. <span>Geodata.</span></h1>
+          <h2>The new geodata marketplace for Europe</h2>
           <search></search>
-          <div class="homepage__hero__content__text">
+          <!-- <div class="homepage__hero__content__text">
             <p>
               A top-class, trusted and secure marketplace for proprietary geospatial data all across Europe.
             </p>
-          </div>
+          </div> -->
         </div>
       </section>
       <div v-if="pagedata">
