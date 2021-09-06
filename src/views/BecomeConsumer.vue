@@ -80,70 +80,70 @@
                     </div>
                   </validation-provider>
 
-                  <div class="form-group-checkbox mb-xs-30">
+                  <!-- <div class="form-group-checkbox mb-xs-30">
                     <input type="checkbox" v-model="includeAddress" id="terms">
                     <label for="terms">Add address</label>
+                  </div> -->
+
+                  <!-- <div v-if="includeAddress"> -->
+                  <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                    <div class="form-group">
+                      <label for="ba_address_line_1">Address Line 1 *</label>
+                      <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" v-model="consumerData.address.line1">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <validation-provider v-slot="{ errors }" name="Address Line 2">
+                    <div class="form-group">
+                      <label for="ba_address_line_2">Address Line 2</label>
+                      <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" v-model="consumerData.address.line2">
+                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    </div>
+                  </validation-provider>
+
+                  <div class="wrapper-50-50">
+                    <validation-provider v-slot="{ errors }" name="Country" rules="required">
+                      <div class="form-group">
+                        <!-- <label for="ba_country">Country *</label> -->
+                        <!-- <select class="form-group__select" name="ba_country" id="ba_country" v-model="consumerData.address.country">
+                          <option v-for="country in countries" :key="country"> {{country}} </option>
+                        </select> -->
+                        <div class="form-group">
+                          <label for="multiselect_country_residence">Country *</label>
+                          <multiselect id="multiselect_country_residence" @input="onSelectAddressCountry" v-model="selectedAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country of residence" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+                        </div>
+                      </div>
+                    </validation-provider>
+
+                    <validation-provider v-slot="{ errors }" name="Region" rules="required">
+                      <div class="form-group">
+                        <label for="ba_region">Region *</label>
+                        <input type="text" class="form-group__text" name="ba_region" id="ba_region" v-model="consumerData.address.region">
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      </div>
+                    </validation-provider>
                   </div>
 
-                  <div v-if="includeAddress">
-                    <validation-provider v-slot="{ errors }" name="Address Line 1" rules="required">
+                  <div class="wrapper-50-50">
+                    <validation-provider v-slot="{ errors }" name="City" rules="required">
                       <div class="form-group">
-                        <label for="ba_address_line_1">Address Line 1 *</label>
-                        <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" v-model="consumerData.address.line1">
+                        <label for="ba_city">City *</label>
+                        <input type="text" class="form-group__text" name="ba_city" id="ba_city" v-model="consumerData.address.city">
                         <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                       </div>
                     </validation-provider>
 
-                    <validation-provider v-slot="{ errors }" name="Address Line 2">
+                    <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
                       <div class="form-group">
-                        <label for="ba_address_line_2">Address Line 2</label>
-                        <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" v-model="consumerData.address.line2">
+                        <label for="ba_postal_code">ZIP code *</label>
+                        <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" v-model="consumerData.address.postalCode">
                         <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                       </div>
                     </validation-provider>
-
-                    <div class="wrapper-50-50">
-                      <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                        <div class="form-group">
-                          <!-- <label for="ba_country">Country *</label> -->
-                          <!-- <select class="form-group__select" name="ba_country" id="ba_country" v-model="consumerData.address.country">
-                            <option v-for="country in countries" :key="country"> {{country}} </option>
-                          </select> -->
-                          <div class="form-group">
-                            <label for="multiselect_country_residence">Country *</label>
-                            <multiselect id="multiselect_country_residence" @input="onSelectAddressCountry" v-model="selectedAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country of residence" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
-                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                          </div>
-                        </div>
-                      </validation-provider>
-
-                      <validation-provider v-slot="{ errors }" name="Region" rules="required">
-                        <div class="form-group">
-                          <label for="ba_region">Region *</label>
-                          <input type="text" class="form-group__text" name="ba_region" id="ba_region" v-model="consumerData.address.region">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                        </div>
-                      </validation-provider>
-                    </div>
-
-                    <div class="wrapper-50-50">
-                      <validation-provider v-slot="{ errors }" name="City" rules="required">
-                        <div class="form-group">
-                          <label for="ba_city">City *</label>
-                          <input type="text" class="form-group__text" name="ba_city" id="ba_city" v-model="consumerData.address.city">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                        </div>
-                      </validation-provider>
-
-                      <validation-provider v-slot="{ errors }" name="Postal Code" rules="required">
-                        <div class="form-group">
-                          <label for="ba_postal_code">ZIP code *</label>
-                          <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" v-model="consumerData.address.postalCode">
-                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                        </div>
-                      </validation-provider>
-                    </div>
                   </div>
+                  <!-- </div> -->
 
                 </div>
                 <div v-if="accountType === 'PROFESSIONAL'">
@@ -316,7 +316,7 @@ export default class BecomeConsumer extends Vue {
     step4: InstanceType<typeof ValidationObserver>,
   }
 
-  includeAddress: boolean;
+  // includeAddress: boolean;
 
   totalSteps = 3;
 
@@ -336,7 +336,7 @@ export default class BecomeConsumer extends Vue {
     this.selectedCountryOfResidence = null;
     this.selectedAddressCountry = null;
 
-    this.includeAddress = false;
+    // this.includeAddress = false;
 
     this.accountType = EnumMangopayUserType.INDIVIDUAL;
 
@@ -356,20 +356,20 @@ export default class BecomeConsumer extends Vue {
     this.initConsumerData();
   }
 
-  @Watch('includeAddress')
-  onOptionIncludeAddressChange(includeAddress): void {
-    if (!includeAddress) {
-      (this.consumerData as ConsumerIndividualCommand).address = {
-        line1: '',
-        line2: '',
-        city: '',
-        region: '',
-        postalCode: '',
-        country: '',
-      }
-      this.selectedAddressCountry = null;
-    }
-  }
+  // @Watch('includeAddress')
+  // onOptionIncludeAddressChange(includeAddress): void {
+  //   if (!includeAddress) {
+  //     (this.consumerData as ConsumerIndividualCommand).address = {
+  //       line1: '',
+  //       line2: '',
+  //       city: '',
+  //       region: '',
+  //       postalCode: '',
+  //       country: '',
+  //     }
+  //     this.selectedAddressCountry = null;
+  //   }
+  // }
 
   // mounted(): void {
   //   console.log(store.getters.getProfile);

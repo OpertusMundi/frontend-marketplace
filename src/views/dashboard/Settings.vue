@@ -335,7 +335,7 @@
           </li>
 
           <li
-            v-if="!includeTabDueToRole('ROLE_PROVIDER') && !includeTabDueToRole('ROLE_CONSUMER')">
+            v-if="!includeTabDueToRole('ROLE_CONSUMER')">
             <router-link v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'" to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
             <button disabled v-if="$store.getters.getProfile.consumer.draft && $store.getters.getProfile.consumer.draft.status === 'SUBMITTED'" class="btn btn--std btn--outlinedark">pending consumer role...</button>
           </li>
