@@ -20,7 +20,8 @@
             <data-profiling-and-samples v-if="catalogueItem.type !== 'SERVICE'" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
             <api-layer-profiler v-if="catalogueItem.type === 'SERVICE'" :mode="mode" :catalogueItem="catalogueItem"></api-layer-profiler>
 
-            <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata>
+            <!-- <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata> -->
+            <metadata :catalogueItem="catalogueItem"></metadata>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -60,7 +61,7 @@ import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableO
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
 import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
-import ApiMetadata from '../components/CatalogueSingle/ApiMetadata.vue';
+import Metadata from '../components/CatalogueSingle/Metadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 
 @Component({
@@ -76,7 +77,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     RelatedAssets,
     ApiUsageExample,
     ApiLayerProfiler,
-    ApiMetadata,
+    Metadata,
     SelectAreas,
   },
 })
