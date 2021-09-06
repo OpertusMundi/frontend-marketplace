@@ -8,7 +8,7 @@
         <div class="asset_card__top__left">
           <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="item.asset.type === 'VECTOR'">
           <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="item.asset.type === 'RASTER'">
-          <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="item.asset.type === 'API'">
+          <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="item.asset.type === 'SERVICE'">
           <span class="asset_card__type">{{ item.asset.type }}</span>
         </div>
         <!-- <div class="asset_card__top__right"><span>asset status</span></div> -->
@@ -39,6 +39,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { CartItem } from '@/model/cart';
+import { EnumAssetType } from '@/model/enum';
 // import moment from 'moment';
 
 @Component
@@ -47,15 +48,15 @@ export default class CartCard extends Vue {
 
   // TODO
   getColor(): string {
-    const color = '#358F8B';
-    // let color = '#358F8B';
-    // if (this.asset.command && this.asset.command.type === 'VECTOR') {
-    //   color = '#358F8B';
-    // } else if (this.asset.command && this.asset.command.type === 'SERVICE') {
-    //   color = '#6F43B5';
-    // } else if (this.asset.command && this.asset.command.type === 'RASTER') {
-    //   color = '#197196';
-    // }
+    // const color = '#358F8B';
+    let color = '#358F8B';
+    if (this.item.asset.type && this.item.asset.type === EnumAssetType.VECTOR) {
+      color = '#358F8B';
+    } else if (this.item.asset.type && this.item.asset.type === EnumAssetType.SERVICE) {
+      color = '#6F43B5';
+    } else if (this.item.asset.type && this.item.asset.type === EnumAssetType.RASTER) {
+      color = '#197196';
+    }
     return color;
   }
 

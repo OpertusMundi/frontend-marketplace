@@ -264,6 +264,7 @@
                     color: $secondColor;
                 }
                 &__discounts {
+                    margin-top: 20px;
                     display: flex;
                     &__table {
                         margin-left: 20px;
@@ -274,6 +275,14 @@
                         span {
                             font-size: 13px !important;
                             white-space: nowrap;
+                        }
+                    }
+                    &__radio_selections {
+                        label {
+                            margin-bottom: 5px;
+                            span {
+                                font-size: em(18);
+                            }
                         }
                     }
                 }
@@ -568,6 +577,7 @@
                 }
                 &--includes-buttons {
                     strong { line-height: 35px; }
+                    span { line-height: 35px; }
                 }
             }
             &__term_container {

@@ -44,7 +44,7 @@
         </template>
 
         <template v-slot:footer>
-          <button class="btn--std btn--blue ml-xs-20" @click="onSubmitNewCard">submit files</button>
+          <button class="btn--std btn--blue ml-xs-20" @click="onSubmitNewCard">submit card</button>
         </template>
       </modal>
 
