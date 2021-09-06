@@ -71,12 +71,12 @@
                     </span>
                     <span v-if="pricingModel.type === 'FIXED_PER_ROWS'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.totalPriceExcludingTax }}€, minimum rows: {{ pricingModel.minRows }} <br>
+                      {{ pricingModel.price }}€, minimum rows: {{ pricingModel.minRows }} <br>
                       <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
                     </span>
                     <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.totalPriceExcludingTax }}€, minimum percent: {{ pricingModel.minPercent }} <br>
+                      {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br>
                       <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
                     </span>
                     <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">

@@ -73,7 +73,7 @@
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
                       <label for="fpr_price">Price</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
@@ -116,7 +116,7 @@
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
                       <label for="ffp_price">Price</label>
-                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
+                      <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
