@@ -80,7 +80,7 @@ import SpatialApi from '@/service/spatial';
 import moment from 'moment';
 
 @Component
-export default class TermsAndRestrictions extends Vue {
+export default class Metadata extends Vue {
   @Prop({ required: true }) private catalogueItem!: CatalogueItem;
 
   spatialApi: SpatialApi;

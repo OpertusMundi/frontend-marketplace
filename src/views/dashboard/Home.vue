@@ -19,7 +19,9 @@
           </div>
         </div>
         <div class="col-md-6">
-          <h3 class="mb-xs-20">Active subscriptions</h3>
+          <h3 class="mb-xs-20">Latest active subscriptions</h3>
+          <p v-if="latestActiveSubscriptions && latestActiveSubscriptions.length === 0">No active subscriptions</p>
+          <horizontal-card v-for="subscription in latestActiveSubscriptions" v-bind:key="subscription.serviceId" :title="subscription.item.title" price="" subtitle="" link="#" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
         </div>
       </div>
       <div class="row">
@@ -118,9 +120,11 @@ import BarChart from '@/components/Charts/BarChart.vue';
 import LineChart from '@/components/Charts/LineChart.vue';
 import OrderCard from '@/components/Orders/OrderCard.vue';
 import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
+import HorizontalCard from '@/components/HorizontalCard.vue';
 import ProviderAssetsApi from '@/service/provider-assets';
 import ProviderOrderApi from '@/service/provider-order';
 import ConsumerOrderApi from '@/service/consumer-order';
+import ConsumerApi from '@/service/consumer';
 import store from '@/store';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType } from '@/model/enum';
@@ -129,6 +133,8 @@ import { Sorting } from '@/model/request';
 import { ConsumerOrder, EnumOrderSortField, ProviderOrder } from '@/model/order';
 import SalesLineChart from '@/components/Aanalytics/SalesLineChart.vue';
 import SalesBarChart from '@/components/Aanalytics/SalesBarChart.vue';
+import { ConsumerAccountSubscription, EnumConsumerSubSortField } from '@/model/account-asset';
+import moment from 'moment';
 
 @Component({
   components: {
@@ -136,6 +142,7 @@ import SalesBarChart from '@/components/Aanalytics/SalesBarChart.vue';
     LineChart,
     OrderCard,
     PurchaseCard,
+    HorizontalCard,
     SalesLineChart,
     SalesBarChart,
   },
@@ -149,6 +156,8 @@ export default class DashboardHome extends Vue {
 
   consumerOrderApi: ConsumerOrderApi;
 
+  consumerApi: ConsumerApi;
+
   isProvider: boolean;
 
   isConsumer: boolean;
@@ -158,6 +167,8 @@ export default class DashboardHome extends Vue {
   latestOrders: ProviderOrder[] | null;
 
   latestPurchases: ConsumerOrder[] | null;
+
+  latestActiveSubscriptions: ConsumerAccountSubscription[] | null;
 
   latestMessages: any[];
 
@@ -169,12 +180,15 @@ export default class DashboardHome extends Vue {
 
   isLoadingLatestPurchases: boolean;
 
+  isLoadingLatestActiveSubscriptions: boolean;
+
   constructor() {
     super();
 
     this.providerAssetsApi = new ProviderAssetsApi();
     this.providerOrderApi = new ProviderOrderApi();
     this.consumerOrderApi = new ConsumerOrderApi();
+    this.consumerApi = new ConsumerApi();
 
     this.fullName = '';
 
@@ -184,12 +198,14 @@ export default class DashboardHome extends Vue {
     this.itemsNum = null;
     this.latestOrders = null;
     this.latestPurchases = null;
+    this.latestActiveSubscriptions = null;
     this.latestMessages = [];
     this.latestFavourites = [];
 
     this.isLoadingItemsNum = false;
     this.isLoadingLatestOrders = false;
     this.isLoadingLatestPurchases = false;
+    this.isLoadingLatestActiveSubscriptions = false;
   }
 
   created(): void {
@@ -200,11 +216,14 @@ export default class DashboardHome extends Vue {
       this.setNumberOfItems();
       this.setLatestOrders();
     }
-    if (this.isConsumer) this.setLatestPurchases();
+    if (this.isConsumer) {
+      this.setLatestPurchases();
+      this.setLatestActiveSubscriptions();
+    }
   }
 
   get isLoading(): boolean {
-    if (this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases) {
+    if (this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions) {
       return true;
     }
     return false;
@@ -270,6 +289,29 @@ export default class DashboardHome extends Vue {
       }
       this.isLoadingLatestPurchases = false;
     });
+  }
+
+  setLatestActiveSubscriptions(): void {
+    this.isLoadingLatestActiveSubscriptions = true;
+
+    const order: Sorting<EnumConsumerSubSortField> = {
+      id: EnumConsumerSubSortField.ADDED_ON,
+      order: 'DESC',
+    };
+
+    this.consumerApi.findAllSubscriptions(null, 0, 3, order).then((response) => {
+      const { data } = response;
+
+      if (data.success) {
+        this.latestActiveSubscriptions = data.result.items;
+        console.log('latest active', this.latestActiveSubscriptions);
+      }
+      this.isLoadingLatestActiveSubscriptions = false;
+    });
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('MMM Do YYYY');
   }
 }
 </script>

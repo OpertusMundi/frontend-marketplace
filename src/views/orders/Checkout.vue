@@ -142,7 +142,8 @@
                             <div class="control_indicator"></div>
                           </label>
                         </div>
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                        <!-- <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div> -->
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">Card is required</span></div>
                       </div>
                     </validation-provider>
                   </div>
