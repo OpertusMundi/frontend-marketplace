@@ -9,7 +9,7 @@
       <div class="stats-cards">
         <div class="stats-cards__cont">
           <div class="stats-card">
-            <a href="#" class="stats-card__more">MORE ANALYTICS</a>
+            <router-link to="/dashboard/analytics" class="stats-card__more">MORE ANALYTICS</router-link>
             <div class="stats-card__upper">
               <h3 class="stats-card__title">Total earnings</h3>
             </div>
