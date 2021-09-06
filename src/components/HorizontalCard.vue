@@ -1,7 +1,9 @@
 <template>
   <router-link :to="link" class="horizontalcard">
-    <div class="horizontalcard__view"><span>{{ linkText }}</span></div>
-      <div class="horizontalcard__inner">
+    <div class="horizontalcard__view">
+      <span>{{ linkText }}</span>
+    </div>
+    <div class="horizontalcard__inner">
       <!-- <div class="horizontalcard__top">
         <div class="horizontalcard__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>asset type</span><span>Environment, Natural resources</span></div>
         <div class="horizontalcard__top__right"><span>asset status</span></div>
@@ -10,7 +12,9 @@
         <!-- <div class="horizontalcard__title">{{ `Purchase #${index}` }}</div> -->
         <div class="horizontalcard__title">{{ title }}</div>
         <!-- <div class="horizontalcard__price">Order Placed</div> -->
-        <div class="horizontalcard__top__right horizontalcard__top__right--blue"><span>{{ topRight }}</span></div>
+        <div class="horizontalcard__top__right horizontalcard__top__right--blue">
+          <span>{{ topRight }}</span>
+        </div>
       </div>
       <div class="horizontalcard__middle">{{ subtitle }}</div>
       <div class="horizontalcard__bottom">
@@ -22,8 +26,7 @@
           <div class="horizontalcard__bottom__left__info" v-html="infoText"></div>
         </div>
         <div class="horizontalcard__bottom__right">
-          <!-- <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt=""> -->
-          <!-- <div class="horizontalcard__price">324234</div> -->
+          <div class="horizontalcard__price">324234</div>
         </div>
       </div>
     </div>
@@ -47,11 +50,13 @@ export default class HorizontalCard extends Vue {
 
   @Prop({ required: true }) readonly infoText!: string;
 
+  @Prop({ required: false }) readonly price!: string;
+
   formatDate(date: string): string {
     return moment(date).format('MMM Do YY');
   }
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_horizontalcard.scss";
+@import '@/assets/styles/_horizontalcard.scss';
 </style>

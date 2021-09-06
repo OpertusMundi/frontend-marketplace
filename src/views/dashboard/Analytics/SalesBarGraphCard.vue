@@ -35,7 +35,7 @@
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[3]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
@@ -185,14 +185,14 @@ export default class SalesBarGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    // this.assetsQuery = newVal.map((a) => a.key); //TODO: get the PID of asset
-    this.assetsQuery = ['topio.the-company.1.VECTOR', 'topio.the-company.2.VECTOR', 'topio.the-company.3.VECTOR'];
+    this.assetsQuery = newVal.map((a) => a.assetPublished);
+    this.assetsQuery = this.assetsQuery.filter((el) => el);
     this.getAnalytics();
   }
 
   async getAssets(): Promise<any> {
     const query = {
-      status: [EnumDraftStatus.PUBLISHED, EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING],
+      status: [EnumDraftStatus.PUBLISHED],
     };
     const pageRequest = {
       page: 0,

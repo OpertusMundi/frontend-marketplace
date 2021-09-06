@@ -188,7 +188,7 @@ export default class ViewsMapGraphCard extends Vue {
 
   async getAssets(): Promise<any> {
     const query = {
-      status: [EnumDraftStatus.PUBLISHED, EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING],
+      status: [EnumDraftStatus.PUBLISHED],
     };
     const pageRequest = {
       page: 0,

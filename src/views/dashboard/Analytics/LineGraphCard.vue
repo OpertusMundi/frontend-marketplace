@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>Number of asset views</h3>
-          <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt=""> Download Data</a>
+          <a href="#"><img src="@/assets/images/icons/dashboard/download_btn.svg" alt="" /> Download Data</a>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
         <div class="graphcard__head__data__right">
@@ -17,38 +17,17 @@
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect
-            v-model="asset1"
-            :options="assets"
-            :searchable="true"
-            :close-on-select="true"
-            :show-labels="false"
-            label="title"
-            placeholder="Select asset">
+          <multiselect v-model="asset1" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect
-            v-model="asset2"
-            :options="assets"
-            :searchable="true"
-            :close-on-select="true"
-            :show-labels="false"
-            label="title"
-            placeholder="Select asset">
+          <multiselect v-model="asset2" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect
-            v-model="asset3"
-            :options="assets"
-            :searchable="true"
-            :close-on-select="true"
-            :show-labels="false"
-            label="title"
-            placeholder="Select asset">
+          <multiselect v-model="asset3" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
@@ -118,18 +97,9 @@ export default class DashboardAnalyticsGraphCard extends Vue {
     // executeAssetQuery
   }
 
-  async getAssets():Promise<any> {
+  async getAssets(): Promise<any> {
     const query = {
-      status: [
-        EnumDraftStatus.PUBLISHED,
-        EnumDraftStatus.DRAFT,
-        EnumDraftStatus.SUBMITTED,
-        EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-        EnumDraftStatus.HELPDESK_REJECTED,
-        EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-        EnumDraftStatus.PROVIDER_REJECTED,
-        EnumDraftStatus.POST_PROCESSING,
-      ],
+      status: [EnumDraftStatus.PUBLISHED],
     };
     const pageRequest = {
       page: 0,
@@ -150,9 +120,9 @@ export default class DashboardAnalyticsGraphCard extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/graphs/_graphcard.scss";
-  @import "@/assets/styles/graphs/_linegraph.scss";
-  .multiselect__option--highlight {
-    background: none!important;
-  }
+@import '@/assets/styles/graphs/_graphcard.scss';
+@import '@/assets/styles/graphs/_linegraph.scss';
+.multiselect__option--highlight {
+  background: none !important;
+}
 </style>
