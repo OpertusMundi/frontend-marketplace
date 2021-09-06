@@ -50,14 +50,14 @@
     <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
-          <th class="data_table__header"></th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ upperCaseTransform(name) }}</th>
+          <th class="data_table__header">Asset</th>
+          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.name">
+        <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
           <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ value }}</td>
+          <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value }}</td>
         </tr>
       </tbody>
     </table>
@@ -185,8 +185,7 @@ export default class SalesBarGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.map((a) => a.assetPublished);
-    this.assetsQuery = this.assetsQuery.filter((el) => el);
+    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
     this.getAnalytics();
   }
 
@@ -291,21 +290,25 @@ export default class SalesBarGraphCard extends Vue {
             data.push(0);
           }
         });
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
         const assetObj = {
-          name: assetName,
+          name: assetTitle?.title,
           showInLegend: true,
           data,
         };
         series.push(assetObj);
       });
     } else {
-      const data = this.analyticsData?.points.map((a) => a.value);
-      const assetObj = {
-        name: this.assetsQuery[0],
-        showInLegend: true,
-        data,
-      };
-      series.push(assetObj);
+      this.assetsQuery.forEach((assetName) => {
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const data = this.analyticsData?.points.map((a) => a.value);
+        const assetObj = {
+          name: assetTitle?.title,
+          showInLegend: true,
+          data,
+        };
+        series.push(assetObj);
+      });
     }
     return series;
   }
@@ -324,7 +327,6 @@ export default class SalesBarGraphCard extends Vue {
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
-@import '@/assets/styles/graphs/_linegraph.scss';
 @import '@/assets/styles/graphs/_table.scss';
 .multiselect__option--highlight {
   background: none !important;

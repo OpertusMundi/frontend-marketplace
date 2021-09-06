@@ -1,0 +1,54 @@
+.bar_chart {
+  .multiselect__content {
+    width: 99%;
+  }
+  .multiselect__option {
+    padding: 5px;
+  }
+  .highcharts-container {
+    margin-top: 0;
+  }
+  &__head {
+    &__filters {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+      &__assets {
+        display: flex;
+        flex-direction: column;
+        flex: 0 1 100%;
+        .multiselect {
+          color: $darkColor;
+          margin-bottom: 5px;
+          &__tags {
+            border-radius: 10px;
+          }
+          &__tags-wrap {
+            position: relative;
+          }
+          &__single {
+            font-size: em(16);
+            font-weight: 500;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+          &__content-wrapper {
+            height: 248px;
+          }
+        }
+      }
+      &__time {
+        display: flex;
+        flex: 0 1 100%;
+        .mx-datepicker-range.mx-datepicker-range.mx-datepicker {
+          width: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+  }
+}
+.placeholder {
+  height: 250px;
+}

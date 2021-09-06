@@ -6,7 +6,7 @@
 
     <!-- USER / CONSUMER -->
     <div v-if="!isProvider">
-    <!-- <div> -->
+      <!-- <div> -->
       <div class="row mb-md-100">
         <div class="col-md-6">
           <h3 class="mb-xs-20">Latest purchases</h3>
@@ -37,7 +37,7 @@
     <!-- PROVIDER -->
     <div v-else>
       <div class="stats-cards">
-      <!-- <div class="stats-cards"> -->
+        <!-- <div class="stats-cards"> -->
         <div class="stats-cards__cont stats-cards__cont--double">
           <div class="stats-card">
             <div class="stats-card__upper">
@@ -75,19 +75,20 @@
         <div class="stats-cards__cont">
           <div class="stats-card">
             <div class="stats-card__upper">
-              <h3 class="stats-card__title">Sales</h3>
-              <a href="#">VIEW ALL <img src="@/assets/images/icons/right_arrow.svg" alt=""></a>
+              <h3 class="stats-card__title">Earnings</h3>
+              <router-link :to="{ name: 'Analytics' }">MORE ANALYTICS <img src="@/assets/images/icons/right_arrow.svg" alt=""/></router-link>
             </div>
             <div class="stats-card__chart">
-              <bar-chart></bar-chart>
+              <sales-line-chart :cardHeading="'Earnings'" :salesQueryMetricType="'SUM_SALES'" :symbol="'Sale in €'" :symbolTitle="'Earnings'"></sales-line-chart>
             </div>
           </div>
         </div>
         <div class="stats-cards__cont">
           <div class="stats-card">
             <div class="stats-card__upper">
-              <h3 class="stats-card__title">Trust status</h3>
-              <div class="stats-card__filter">
+              <h3 class="stats-card__title">Viewer market segments</h3>
+              <router-link :to="{ name: 'Analytics' }">MORE ANALYTICS <img src="@/assets/images/icons/right_arrow.svg" alt=""/></router-link>
+              <!-- <div class="stats-card__filter">
                 <div class="ds_select">
                   <select name="version">
                     <option value="" default selected>ALL TIME</option>
@@ -96,10 +97,10 @@
                     <option value="">LAST YEAR</option>
                   </select>
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="stats-card__chart">
-              <line-chart></line-chart>
+              <sales-bar-chart :cardHeading="'Market Segment Sales'" :salesQueryMetricType="'SUM_SALES'" :symbol="'€'" :symbolTitle="'Sale in €'"></sales-bar-chart>
             </div>
           </div>
         </div>
@@ -126,6 +127,8 @@ import { EnumAssetType } from '@/model/enum';
 import { EnumRole } from '@/model/role';
 import { Sorting } from '@/model/request';
 import { ConsumerOrder, EnumOrderSortField, ProviderOrder } from '@/model/order';
+import SalesLineChart from '@/components/Aanalytics/SalesLineChart.vue';
+import SalesBarChart from '@/components/Aanalytics/SalesBarChart.vue';
 
 @Component({
   components: {
@@ -133,6 +136,8 @@ import { ConsumerOrder, EnumOrderSortField, ProviderOrder } from '@/model/order'
     LineChart,
     OrderCard,
     PurchaseCard,
+    SalesLineChart,
+    SalesBarChart,
   },
 })
 export default class DashboardHome extends Vue {
@@ -269,9 +274,9 @@ export default class DashboardHome extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_stats.scss";
-  @import "@/assets/styles/_btns.scss";
-  @import "@/assets/styles/_select.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
-  @import "~flexboxgrid/css/flexboxgrid.min.css";
+@import '@/assets/styles/_stats.scss';
+@import '@/assets/styles/_btns.scss';
+@import '@/assets/styles/_select.scss';
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '~flexboxgrid/css/flexboxgrid.min.css';
 </style>

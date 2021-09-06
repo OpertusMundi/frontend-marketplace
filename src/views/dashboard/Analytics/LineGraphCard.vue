@@ -121,7 +121,6 @@ export default class DashboardAnalyticsGraphCard extends Vue {
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
-@import '@/assets/styles/graphs/_linegraph.scss';
 .multiselect__option--highlight {
   background: none !important;
 }
