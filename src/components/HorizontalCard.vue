@@ -25,8 +25,8 @@
           </div> -->
           <div class="horizontalcard__bottom__left__info" v-html="infoText"></div>
         </div>
-        <div class="horizontalcard__bottom__right">
-          <div class="horizontalcard__price">324234</div>
+        <div class="horizontalcard__bottom__right" v-if="price">
+          <div class="horizontalcard__price">{{ price }}</div>
         </div>
       </div>
     </div>
