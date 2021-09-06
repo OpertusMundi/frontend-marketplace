@@ -177,7 +177,29 @@
                 </div>
               </transition>
             </li>
-            <li @click="toggleMobileMenu"><router-link to="/vas">Use</router-link></li>
+            <li @click="toggleMobileMenu">
+              <a href="#" @click.prevent="showSubmenu3">Use</a>
+              <transition name="fade" mode="out-in">
+                <div class="arrow-up arrow-up--white" v-if="showSubmenuUse"></div>
+              </transition>
+              <transition name="fade" mode="out-in">
+                <div class="header__submenu header__submenu--small" v-if="showSubmenuUse">
+                  <div class="header__submenu__wrapper">
+                    <div class="header__submenu__items">
+                      <p>topio services</p>
+                      <ul>
+                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/api"><img src="@/assets/images/t-icon.svg" alt="" /> API</router-link></li>
+                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/drive-2"><img src="@/assets/images/t-icon.svg" alt="" /> Notebooks</router-link></li>
+                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas/maps"><img src="@/assets/images/t-icon.svg" alt="" /> Maps</router-link></li>
+                        <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">ALL SERVICES</router-link></li>
+                      </ul>
+                      <hr>
+                      <p @click="showSubmenuUse = !showSubmenuUse"><router-link to="/documentation">HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg></router-link></p>
+                    </div>
+                  </div>
+                </div>
+              </transition>
+            </li>
             <li @click="toggleMobileMenu"><router-link to="/about">About</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/faq">FAQ</router-link></li>
             <li @click="toggleMobileMenu"><router-link to="/catalogue">Explore Assets</router-link></li>
@@ -316,6 +338,8 @@ export default class Header extends Vue {
 
   showSubmenuBuy = false;
 
+  showSubmenuUse = false;
+
   showSearch = false;
 
   showSearchModal = false;
@@ -355,16 +379,20 @@ export default class Header extends Vue {
 
   showSubmenu1(): void {
     this.showSubmenuSell = !this.showSubmenuSell;
-    if (this.showSubmenuBuy) {
-      this.showSubmenuBuy = !this.showSubmenuBuy;
-    }
+    this.showSubmenuBuy = false;
+    this.showSubmenuUse = false;
   }
 
   showSubmenu2(): void {
     this.showSubmenuBuy = !this.showSubmenuBuy;
-    if (this.showSubmenuSell) {
-      this.showSubmenuSell = !this.showSubmenuSell;
-    }
+    this.showSubmenuSell = false;
+    this.showSubmenuUse = false;
+  }
+
+  showSubmenu3(): void {
+    this.showSubmenuUse = !this.showSubmenuUse;
+    this.showSubmenuBuy = false;
+    this.showSubmenuSell = false;
   }
 
   bgColor(): void {

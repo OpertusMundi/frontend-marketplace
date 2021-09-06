@@ -30,7 +30,7 @@
     @media(max-width: 576px) { 
       flex: 0 1 100%;
     }
-    &:hover {
+    &.active {
       .notebooks-item__inner {
         height: calc(100% - 55px);
         border-color: $secondColor;
@@ -96,6 +96,9 @@
           font-weight: 500;
           letter-spacing: 0.03em;
       }
+      a {
+        color: #fff;
+      }
     }
 
     &__top {
@@ -104,7 +107,7 @@
       justify-content: space-between;
     }
     &__title {
-      font-size: em(30);
+      font-size: em(20);
       font-weight: 700;
     }
     &__specs {
@@ -121,6 +124,25 @@
       font-size: em(15);
       font-weight: 500;
       cursor: pointer;
+      i {
+        font-style: normal;
+        animation-name: blinkdot;
+        animation-duration: 1.4s;
+        animation-iteration-count: infinite;
+        animation-fill-mode: both;
+        padding-left: 2px;
+        &:nth-child(2) {
+          animation-delay: .2s;
+        }
+        &:nth-child(3) {
+          animation-delay: .4s;
+        }
+      }
+      @keyframes blinkdot {
+        0% { opacity: .2; }
+        20% { opacity: 1; }
+        100% { opacity: .2; }
+      }
     }
     &__bottom {
       p {
@@ -132,6 +154,9 @@
         color: $secondColor;
         font-size: em(14);
         padding-top: 15px;
+      }
+      &__error {
+        color: rgb(247, 57, 57)!important;
       }
     }
   }
