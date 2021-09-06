@@ -123,12 +123,12 @@
             <h3>Attributes</h3>
             <!-- <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons"> -->
             <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table">
-              <p><strong>queryable</strong><span>{{ resources[1].attributes.queryable ? resources[1].attributes.queryable : '' }}</span></p>
-              <p><strong>cascaded</strong><span>{{ resources[1].attributes.cascaded ? resources[1].attributes.cascaded : '' }}</span></p>
-              <p><strong>opaque</strong><span>{{ resources[1].attributes.opaque ? resources[1].attributes.opaque : '' }}</span></p>
-              <p><strong>noSubsets</strong><span>{{ resources[1].attributes.noSubsets ? resources[1].attributes.noSubsets : '' }}</span></p>
-              <p><strong>fixedWidth</strong><span>{{ resources[1].attributes.fixedWidth ? resources[1].attributes.fixedWidth : '' }}</span></p>
-              <p><strong>fixedHeight</strong><span>{{ resources[1].attributes.fixedHeight ? resources[1].attributes.fixedHeight : '' }}</span></p>
+              <p><strong>queryable</strong><span>{{ 'queryable' in resources[1].attributes && resources[1].attributes.queryable !== null ? resources[1].attributes.queryable : '' }}</span></p>
+              <p><strong>cascaded</strong><span>{{ 'cascaded' in resources[1].attributes && resources[1].attributes.cascaded !== null ? resources[1].attributes.cascaded : '' }}</span></p>
+              <p><strong>opaque</strong><span>{{ 'opaque' in resources[1].attributes && resources[1].attributes.opaque !== null ? resources[1].attributes.opaque : '' }}</span></p>
+              <p><strong>noSubsets</strong><span>{{ 'noSubsets' in resources[1].attributes && resources[1].attributes.noSubsets !== null ? resources[1].attributes.noSubsets : '' }}</span></p>
+              <p><strong>fixedWidth</strong><span>{{ 'fixedWidth' in resources[1].attributes && resources[1].attributes.fixedWidth !== null ? resources[1].attributes.fixedWidth : '' }}</span></p>
+              <p><strong>fixedHeight</strong><span>{{ 'fixedHeight' in resources[1].attributes && resources[1].attributes.fixedHeight !== null ? resources[1].attributes.fixedHeight : '' }}</span></p>
             </div>
           </li>
         </ul>
