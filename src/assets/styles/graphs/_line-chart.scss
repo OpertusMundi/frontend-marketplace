@@ -1,4 +1,13 @@
 .line_chart {
+  .multiselect__content {
+    width: 99%;
+  }
+  .multiselect__option {
+    padding: 5px;
+  }
+  .highcharts-container {
+    margin-top: 0;
+  }
   &__head {
     &__filters {
       display: flex;
@@ -10,6 +19,7 @@
         flex: 0 1 100%;
         .multiselect {
           color: $darkColor;
+          margin-bottom: 5px;
           &__tags {
             border-radius: 10px;
           }
