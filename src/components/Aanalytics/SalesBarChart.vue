@@ -1,40 +1,21 @@
 <template>
-  <div class="graphcard">
-    <div class="graphcard__head">
-      <div class="graphcard__head__data">
-        <div class="graphcard__head__data__left">
-          <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
-        </div>
-      </div>
-      <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+  <div class="bar_chart">
+    <div class="bar_chart__head">
+      <div class="bar_chart__head__filters">
+        <div class="bar_chart__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
         </div>
-        <div class="graphcard__head__filters__time">
+        <div class="bar_chart__head__filters__time">
           <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
         </div>
       </div>
     </div>
-    <highcharts v-if="chartOptions" :constructorType="'mapChart'" class="hc" :options="chartOptions" ref="chart"></highcharts>
-    <table class="data_table" v-if="chartOptions">
-      <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in tableData" class="data_table__header" :key="`segment_name_${index}`">{{ name.country }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="data_table__row">
-          <td class="data_table__data">Asset Name</td>
-          <td class="data_table__data" v-for="value in tableData" :key="value.id">{{ formatValue(value.views) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
+    <div class="placeholder" v-else></div>
   </div>
 </template>
 <script lang="ts">
@@ -51,14 +32,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
+  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
-import Highcharts from 'highcharts';
-import HighchartsMapModule from 'highcharts/modules/map';
-import mapData from '@highcharts/map-collection/custom/world.geo.json';
-
-HighchartsMapModule(Highcharts);
 
 @Component({
   components: {
@@ -69,14 +45,14 @@ HighchartsMapModule(Highcharts);
     highcharts: Chart,
   },
 })
-export default class ViewsMapGraphCard extends Vue {
-  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
-
-  @Prop({ default: '' }) private cardHeading!: string;
+export default class SalesBarGraphCard extends Vue {
+  @Prop({ default: null }) private salesQueryMetricType!: EnumSalesQueryMetric;
 
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
+
+  @Prop({ default: '' }) private cardHeading!: string;
 
   draftAssetApi: DraftAssetApi;
 
@@ -90,6 +66,8 @@ export default class ViewsMapGraphCard extends Vue {
 
   assetsQuery: string[];
 
+  segmentsNames: string[];
+
   chartOptions: any | null;
 
   temporalUnit: EnumTemporalUnit;
@@ -99,14 +77,6 @@ export default class ViewsMapGraphCard extends Vue {
   temporalUnitMax: string;
 
   seriesData: any;
-
-  tableData: any;
-
-  assetQueryMetricType: EnumAssetQueryMetric;
-
-  countryCode?: string[];
-
-  groupData: any;
 
   constructor() {
     super();
@@ -125,6 +95,8 @@ export default class ViewsMapGraphCard extends Vue {
 
     this.assetsQuery = [];
 
+    this.segmentsNames = [];
+
     this.temporalUnitMin = '';
 
     this.temporalUnitMax = '';
@@ -132,14 +104,6 @@ export default class ViewsMapGraphCard extends Vue {
     this.temporalUnit = EnumTemporalUnit.DAY;
 
     this.seriesData = [];
-
-    this.tableData = [];
-
-    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
-
-    this.countryCode = [];
-
-    this.groupData = [];
   }
 
   async mounted(): Promise<any> {
@@ -148,32 +112,27 @@ export default class ViewsMapGraphCard extends Vue {
   }
 
   getAnalytics(): void {
-    const assetsViewsQuery: AssetQuery = {
+    const segmentQuery: SalesQuery = {
       segments: {
-        enabled: false,
+        enabled: true,
       },
       assets: this.assetsQuery,
-      metric: this.assetQueryMetricType,
-      source: this.assetSourceEnum,
+      metric: this.salesQueryMetricType,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
         max: this.temporalUnitMax,
       },
-      areas: {
-        enabled: true,
-        codes: this.countryCode,
-      },
     };
 
-    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
-        this.formatSeries();
-        this.tableData = this.tableCountries();
+        this.segmentsNames = this.formatSegmentsNames();
+        this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
       }
     });
@@ -181,8 +140,7 @@ export default class ViewsMapGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    // this.assetsQuery = newVal.map((a) => a.key); //TODO: get the PID of asset
-    this.assetsQuery = ['topio.the-company.1.VECTOR'];
+    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
     this.getAnalytics();
   }
 
@@ -211,70 +169,104 @@ export default class ViewsMapGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
+    // const name = 'Sales per segment';
     return {
-      chart: {
-        map: mapData,
-      },
       credits: {
         enabled: false,
       },
+      chart: {
+        type: 'column',
+        height: '250px',
+      },
+      plotOptions: {
+        series: {
+          borderWidth: 0.5,
+          borderColor: 'white',
+          borderRadius: 6,
+        },
+      },
+      showInLegend: true,
+      colors: ['#190AFF', '#358F8B', '#A843B5'],
       title: {
         text: '',
       },
-      subtitle: {
-        text: '',
-      },
-      mapNavigation: {
-        enabled: true,
-        buttonOptions: {
-          alignTo: 'spacingBox',
+      xAxis: {
+        categories: this.segmentsNames,
+        labels: {
+          allowOverlap: true,
+          autoRotationLimit: 0,
+          style: {
+            fontFamily: 'Roboto',
+            fontSize: '10px',
+          },
         },
       },
-      colorAxis: {
-        minColor: '#F4F4FD',
-        maxColor: '#07006F',
+      yAxis: {
         min: 0,
-      },
-      series: [
-        {
-          name: 'Map',
-          states: {
-            hover: {
-              color: '#A843B5',
-            },
-          },
-          dataLabels: {
-            enabled: false,
-            format: '{point.name}',
-          },
-          allAreas: true,
-          data: this.seriesData,
+        gridLineWidth: 0,
+        title: {
+          text: this.symbolTitle,
         },
-      ],
+      },
+      tooltip: {
+        shadow: false,
+        borderWidth: 0,
+        backgroundColor: 'transparent',
+        valueSuffix: this.symbol,
+        style: {
+          color: '#190AFF',
+          fontFamily: 'Roboto',
+          fontSize: '13px',
+        },
+        formatter: (a) => {
+          const point = a.chart.hoverPoint;
+          return this.symbol === '' ? `${point.y} <br>${point.category}` : `${point.y}€ <br>${point.category}`;
+        },
+      },
+      series: this.seriesData,
     };
   }
 
-  formatSeries(): any {
-    const result: any[] = Object.values(
-      this.analyticsData.points.reduce((acc, object: any) => {
-        const entry = object.location.code.toLowerCase();
-        (acc[entry] || (acc[entry] = [entry, 0]))[1] += object.value;
-        return acc;
-      }, {}),
-    );
-    this.seriesData = result;
+  formatSegmentsNames(): string[] {
+    let names: Array<any> = [];
+    names = [...new Map(this.analyticsData.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
+    return names;
   }
 
-  tableCountries(): any {
-    const tableData: Array<any> = [];
-    this.seriesData.forEach((element) => {
-      const tableObject = {
-        country: element[0].toUpperCase(),
-        views: element[1],
-      };
-      tableData.push(tableObject);
-    });
-    return tableData;
+  formatSeries(): any[] {
+    const series: Array<any> = [];
+    if (this.assetsQuery?.length > 1) {
+      this.assetsQuery.forEach((assetName) => {
+        const data: Array<number> = [];
+        this.segmentsNames.forEach((segName) => {
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
+          if (value.length > 0) {
+            data.push(value[0]);
+          } else {
+            data.push(0);
+          }
+        });
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetObj = {
+          name: assetTitle?.title,
+          showInLegend: true,
+          data,
+        };
+        series.push(assetObj);
+      });
+    } else {
+      this.assetsQuery.forEach((assetName) => {
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const data = this.analyticsData?.points.map((a) => a.value);
+        const assetObj = {
+          name: assetTitle?.title,
+          showInLegend: true,
+          data,
+        };
+        series.push(assetObj);
+      });
+    }
+    return series;
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
@@ -284,15 +276,15 @@ export default class ViewsMapGraphCard extends Vue {
     }
   }
 
-  formatValue(value: string): any {
-    const regex = value.toString();
-    return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
+  upperCaseTransform(value: string): any {
+    return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
   }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+@import '@/assets/styles/graphs/_bar-chart.scss';
 .multiselect__option--highlight {
   background: none !important;
 }
