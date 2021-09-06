@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`order/${ order.key }`" class="asset_card asset_card__order">
+  <router-link :to="`/dashboard/order/${ order.key }`" class="asset_card asset_card__order">
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW ORDER</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
