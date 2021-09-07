@@ -103,9 +103,23 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
+              <!-- <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
                 <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
+              </div> -->
+
+              <!-- TODO: the following is just dummy inputs. should be changed to the commented out (up) when API Gateway is ready for Service types -->
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WMS`">
+                <label :for="`format_WMS`"> WMS </label>
+              </div>
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WFS`">
+                <label :for="`format_WFS`"> WFS </label>
+              </div>
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_DATA_API`">
+                <label :for="`format_WFS`"> Data API </label>
               </div>
             </div>
 
