@@ -130,12 +130,6 @@ export default class DashboardPurchases extends Vue {
         store.commit('setLoading', false);
       });
     });
-
-    // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {
-    //   console.log('pdf', response.data);
-    //   const blob = new Blob([(response as any).data], {type: "application/pdf"});
-    //   FileSaver.saveAs(blob, "filename");
-    // });
   }
 }
 </script>
