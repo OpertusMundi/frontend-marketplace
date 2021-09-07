@@ -164,7 +164,7 @@ export default class ConsumerPayInApi extends Api {
   public async createFreePayIn(orderKey: string): Promise<ServerResponse<ConsumerPayIn>> {
     const url = `/action/consumer/payins/free/${orderKey}`;
 
-    return this.put<void, ServerResponse<ConsumerPayIn>>(url)
+    return this.post<void, ServerResponse<ConsumerPayIn>>(url)
       .then((response: AxiosServerResponse<ConsumerPayIn>) => {
         const { data } = response;
 

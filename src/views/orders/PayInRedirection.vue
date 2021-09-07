@@ -32,7 +32,7 @@ export default class PayInRedirection extends Vue {
 
     this.consumerPayInApi = new ConsumerPayInApi();
 
-    this.infoPage = { title: '', btnText: 'VIEW ORDER', btnLink: '/dashboard/orders' };
+    this.infoPage = { title: '', btnText: 'VIEW ORDER', btnLink: '' };
   }
 
   mounted():void {
@@ -57,6 +57,14 @@ export default class PayInRedirection extends Vue {
         // eslint-disable-next-line
         const title = cases.find((x) => x.status === response.result.status)!.title;
         Vue.set(this.infoPage, 'title', title);
+
+        if (response.result.items && 'order' in response.result.items[0]) {
+          const purchaseLink = `/dashboard/purchase/${response.result.items[0].order.key}`;
+          Vue.set(this.infoPage, 'btnLink', purchaseLink);
+        } else {
+          const subscriptionsLink = '/dashboard/subscriptions';
+          Vue.set(this.infoPage, 'btnLink', subscriptionsLink);
+        }
       } else {
         console.log('error getting pay in', response);
         const title = 'Order failed';

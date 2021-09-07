@@ -69,6 +69,14 @@ export enum EnumOrderStatus {
 
 interface OrderItem {
   /**
+   * Asset id
+   */
+  assetId?: string;
+  /**
+   * Asset version
+   */
+  assetVersion?: string;
+  /**
    * Index of the specific item in the order
    */
   index: number;

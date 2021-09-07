@@ -103,9 +103,23 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
+              <!-- <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
                 <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
                 <label :for="`format_${format.id}`"> {{format.name}} </label>
+              </div> -->
+
+              <!-- TODO: the following is just dummy inputs. should be changed to the commented out (up) when API Gateway is ready for Service types -->
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WMS`">
+                <label :for="`format_WMS`"> WMS </label>
+              </div>
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WFS`">
+                <label :for="`format_WFS`"> WFS </label>
+              </div>
+              <div class="checkbox-group mb-xs-5">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_DATA_API`">
+                <label :for="`format_WFS`"> Data API </label>
               </div>
             </div>
 
@@ -178,21 +192,21 @@
                     <div class="form-group mt-xs-10">
                       <label class="control control-radio">
                         Box overlaps with asset geometry
-                        <input type="radio" name="asset_type" checked />
+                        <input v-model="filters.spatialOperation" value="INTERSECTS" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
                     <div class="form-group">
                       <label class="control control-radio">
                         Box fully contains asset geometry
-                        <input type="radio" name="asset_type" />
+                        <input v-model="filters.spatialOperation" value="CONTAINS" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
                     <div class="form-group">
                       <label class="control control-radio">
                         Box is fully covered by asset geometry
-                        <input type="radio" name="asset_type" />
+                        <input v-model="filters.spatialOperation" value="WITHIN" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
@@ -390,13 +404,14 @@ import SpatialApi from '@/service/spatial';
 import {
   CatalogueQueryResponse, CatalogueQuery, CatalogueItem,
 } from '@/model';
-import { EnumAssetType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import {
   CatalogueItemDetails,
   ElasticCatalogueQuery,
   EnumTopicCategory,
   EnumElasticSearchSortField,
   EnumDatasetSize,
+  EnumSpatialOperation,
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
 // import { Configuration } from '@/model/configuration';
@@ -481,6 +496,7 @@ interface Filters {
   scaleValues: number[],
   crsList: FilterCRS[],
   mapCoverageSelectionBBox: string,
+  spatialOperation: EnumSpatialOperation,
   priceMin: number | null,
   priceMax: number | null,
   numberOfFeatures: FilterNumberOfFeatures,
@@ -646,14 +662,19 @@ export default class Catalogue extends Vue {
       timeTo: '23:59 PM',
     };
 
-    this.filters.formats = { vector: [], raster: [], api: [] };
-    // this.formats = {
-    //   vector: [{ id: 'shp', name: 'Shapefile', isChecked: false }, { id: 'geoPackage', name: 'GeoPackage', isChecked: false }, { id: 'geoJson', name: 'GeoJSON', isChecked: false }],
-    //   raster: [{ id: 'png', name: 'PNG', isChecked: false }, { id: 'jpeg', name: 'JPEG', isChecked: false }, { id: 'tiff', name: 'Tiff', isChecked: false }],
-    //   api: [{ id: 'wms', name: 'WMS', isChecked: false }, { id: 'wfs', name: 'WFS', isChecked: false }, { id: 'wcs', name: 'WCS', isChecked: false }, { id: 'wmts', name: 'WMTS', isChecked: false }, { id: 'wps', name: 'WPS', isChecked: false }, { id: 'wcps', name: 'WCPS', isChecked: false }],
-    // };
+    this.filters.formats = {
+      vector: [], // loaded from config
+      raster: [], // loaded from config
+      api: [
+        { id: EnumSpatialDataServiceType.WMS, name: 'WMS', isChecked: false },
+        { id: EnumSpatialDataServiceType.WFS, name: 'WFS', isChecked: false },
+        { id: EnumSpatialDataServiceType.DATA_API, name: 'Data API', isChecked: false },
+      ],
+    };
 
     this.filters.mapCoverageSelectionBBox = '';
+
+    this.filters.spatialOperation = EnumSpatialOperation.INTERSECTS;
 
     this.mapCoverageDrawMode = false;
 
@@ -726,7 +747,6 @@ export default class Catalogue extends Vue {
 
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
-    this.filters.formats.api = availableFormats.filter((x) => x.category === EnumAssetType.SERVICE).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
     this.filters.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
     this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
   }
@@ -1286,6 +1306,7 @@ export default class Catalogue extends Vue {
       filterSet.topLeftY = parseFloat(maxY);
       filterSet.bottomRightX = parseFloat(maxX);
       filterSet.bottomRightY = parseFloat(minY);
+      filterSet.spatialOperation = filters.spatialOperation;
     }
 
     // PRICE

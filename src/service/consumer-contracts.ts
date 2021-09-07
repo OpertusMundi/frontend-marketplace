@@ -9,6 +9,8 @@ export default class ConsumerContractsApi extends Api {
   public async printContract(key: string, index: number): Promise<AxiosServerResponse<BinaryType>> {
     const url = `/action/contract/consumer/order/${key}?index=${index}`;
 
-    return this.get<ServerResponse<BinaryType>>(url);
+    return this.post<void, ServerResponse<BinaryType>>(url, null, {
+      responseType: 'blob',
+    });
   }
 }
