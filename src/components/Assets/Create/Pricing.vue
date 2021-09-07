@@ -50,12 +50,16 @@
                 <validation-observer ref="refPricingModelDetails">
                   <!-- free -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FREE'">
+                    <h3 class="mb-xs-20">Free asset</h3>
                   </div>
                   <!-- fixed -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED'">
+                    <h3>Current and all past versions, as well as new versions for a set period</h3>
+                    <p class="mt-xs-20">Your product is available for purchase by prospective clients in its current, past, and future versions. Clients automatically get access to newer versions of the product whenever they become available and for a period you define. This is the preferred option for products updated relatively frequently.</p>
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
-                      <label for="fixed_price">Price</label>
+                      <label for="fixed_price">Your price</label>
+                      <div class="pricing__subnote">This is the price prospective clients will pay for purchasing your product.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].totalPriceExcludingTax" type="number" class="form-group__text" id="fixed_price" name="fixed_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -63,6 +67,7 @@
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required">
                     <div class="form-group">
                       <label for="number_of_years">Number of years</label>
+                      <div class="pricing__subnote">This is the period in years during which prospective clients have access to new versions of your product. After the end of this period, they cannot receive any new versions and must purchase the asset again.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].yearsOfUpdates" type="number" class="form-group__text" id="number_of_years" name="number_of_years">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -70,9 +75,12 @@
                   </div>
                   <!-- fixed per rows -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED_PER_ROWS'">
+                    <h3>Asset subset with pricing per rows</h3>
+                    <p class="mt-xs-20">Your product is available for purchase by prospective clients in a piecewise manner if it comprises at least 5,000 rows. Clients can select and purchase only a subset of your product by defining the area of interest (e.g., country, city) they are interested in. You will be remunerated based on the number of rows provided, with a guaranteed minimum per purchase.Optionally, you can also define discounts to incentivize consumers in purchasing more rows of your product.</p>
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
-                      <label for="fpr_price">Price</label>
+                      <label for="fpr_price">Your price</label>
+                      <div class="pricing__subnote">This is the price prospective clients will pay per 1,000 rows of your product.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="fpr_price" name="fpr_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -80,6 +88,7 @@
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required">
                     <div class="form-group">
                       <label for="min_rows">Minimum rows</label>
+                      <div class="pricing__subnote">This is the minimum number of rows a client can purchase per transaction.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].minRows" type="number" class="form-group__text" id="min_rows" name="min_rows">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -113,16 +122,22 @@
                   </div>
                   <!-- fixed for population -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED_FOR_POPULATION'">
+                    <h3>Asset subset with pricing per population</h3>
+                    <p class="mt-xs-20"><span>Your product is available for purchase by prospective clients in a piecewise manner. Clients can select and purchase only a subset of your product by defining the area of interest (e.g., country, city) they are interested in. You will be remunerated based on the population coverage in the selected area, with a guaranteed minimum per purchase.</span>
+                    <br><br><span class="mt-xs-10">Optionally, you can also define discounts to incentivize consumers in purchasing larger subsets of your product.</span>
+                    <br><br><span class="mt-xs-10">The density of the population is calculated based on the most recent Eurostat census data (2011), the geographical coverage of your file, and the geographical area selected by the user. For example, if your asset covers the entire Europe and a user selects an area covering only the cities of London and Paris, the population coverage is calculated by dividing the total population of Europe with the sum of the populations of London and Paris.</span></p>
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
                     <div class="form-group">
-                      <label for="ffp_price">Price</label>
+                      <label for="ffp_price">Your price per 10,000 people</label>
+                      <div class="pricing__subnote">This is the price prospective clients in case they purchase the entire asset.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].price" type="number" class="form-group__text" id="ffp_price" name="ffp_price">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required">
                     <div class="form-group">
-                      <label for="min_percentage">Minimum population percentage</label>
+                      <label for="min_percentage">Minimum population</label>
+                      <div class="pricing__subnote">This is the minimum population percentage of the entire asset clients can purchase per transaction. For example, if a user selects an area with only 5% population coverage, and you have set a minimum of 10%, the price will be calculated based on the minimum of 10%.</div>
                       <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].minPercent" type="number" class="form-group__text" id="min_percentage" name="min_percentage">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
@@ -466,4 +481,12 @@ export default class Pricing extends Vue {
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
+</style>
+<style lang="scss">
+// todo: refactoring
+.pricing__subnote {
+  color: #6C6C6C;
+  font-size: em(13);
+  margin-bottom: 15px;
+}
 </style>
