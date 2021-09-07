@@ -53,6 +53,10 @@ export interface AccountAsset {
 
 export interface AccountSubscription {
   /**
+   * Subscription key
+   */
+  key: string;
+  /**
    * Service PID
    */
   service: string;
