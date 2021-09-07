@@ -53,7 +53,7 @@
                 <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
                     <label :for="`prepaid_tier_pcwp_${i}`">
-                      <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
+                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_PREPAID'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
                       <span>{{ prePaidTier.count }} calls, </span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
@@ -84,7 +84,7 @@
                 <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
                     <label :for="`prepaid_tier_prwp_${i}`">
-                      <input type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
+                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
                       <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
