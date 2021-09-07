@@ -175,7 +175,7 @@
                     <div v-if="!isAllContractsAccepted()">
                       <h3>Contract review</h3>
                       <hr>
-                      <button class="btn btn--std btn--blue">download contract</button>
+                      <button class="btn btn--std btn--blue" @click="onDownloadContract">download contract</button>
                       <div class="d-flex justify-content-end mt-xs-50">
                         <button class="btn btn--std btn--outlinedark" @click="onDeclineContract">decline</button>
                         <button class="btn btn--std btn--dark ml-xs-20" @click="onContractAccept">accept</button>
@@ -287,6 +287,7 @@ import { Cart } from '@/model/cart';
 import store from '@/store';
 import { ServerResponse } from '@/model';
 import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
+import { saveAs } from 'file-saver';
 
 extend('required', required);
 extend('email', email);
@@ -449,6 +450,30 @@ export default class Checkout extends Vue {
     if (this.currentStep >= 1) {
       this.currentStep -= 1;
     }
+  }
+
+  onDownloadContract(): void {
+    store.commit('setLoading', true);
+    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1).then((response) => {
+      console.log('pdf', response.data);
+      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
+
+      const assetId = this.cart ? this.cart.items[this.currentItemToReviewContract].asset.id : '';
+      this.catalogueApi.findOne(assetId).then((assetResponse) => {
+        const title = (assetResponse.result as CatalogueItemDetails).contract.title.replaceAll(' ', '_');
+        saveAs(blob, title);
+        store.commit('setLoading', false);
+      }).catch((err) => {
+        console.log('err', err);
+        store.commit('setLoading', false);
+      });
+    });
+
+    // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {
+    //   console.log('pdf', response.data);
+    //   const blob = new Blob([(response as any).data], {type: "application/pdf"});
+    //   FileSaver.saveAs(blob, "filename");
+    // });
   }
 
   submitCheckout(): void {
