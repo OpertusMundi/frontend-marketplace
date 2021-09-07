@@ -108,4 +108,16 @@ export default class ConsumerApi extends Api {
 
     return this.get<ServerResponse<PageResult<ConsumerAccountSubscription>>>(url);
   }
+
+  /**
+   * Get registered subscription
+   *
+   * @param key
+   * @returns
+   */
+  public async getSubscription(key: string): Promise<AxiosServerResponse<ConsumerAccountSubscription>> {
+    const url = `/action/consumer/subscriptions/${key}`;
+
+    return this.get<ServerResponse<ConsumerAccountSubscription>>(url);
+  }
 }
