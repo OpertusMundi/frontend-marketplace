@@ -411,7 +411,7 @@ export default class Header extends Vue {
     this.pollNotifications();
   }
 
-  beforeUmnount(): void {
+  beforeDestroy(): void {
     console.log('unmounted navbar');
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
   }
