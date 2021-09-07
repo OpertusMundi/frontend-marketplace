@@ -242,7 +242,8 @@
     &__variations {
       &__row {
         display: flex;
-        align-items: center;
+        // align-items: center;
+        align-items: flex-start;
         margin-bottom: 15px;
         label {
           display: block;
@@ -257,6 +258,7 @@
         }
         input {
           transition: color 0.2s ease;
+          margin-top: 3px; // TODO
         }
         input:checked + label {
           color: $secondColor;

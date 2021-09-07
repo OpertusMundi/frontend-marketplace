@@ -33,7 +33,7 @@ export default class NotificationApi extends Api {
   }
 
   public async readNotification(key: string): Promise<ServerResponse<Notification>> {
-    const url = `/action/notification/${key}`;
+    const url = `/action/notifications/${key}`;
 
     return this.put<unknown, ServerResponse<Notification>>(url, null)
       .then((response: AxiosServerResponse<Notification>) => {

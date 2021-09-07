@@ -229,16 +229,48 @@
             </svg>
           </a>
         </div>
-        <div class="header__notif" v-if="$route.meta.layout == 'dashboard'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
-            <g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)">
-              <g id="Group_1974" data-name="Group 1974">
-                <path id="Path_8972" data-name="Path 8972" d="M690.591,494.182c-.247,0-1.488-.037-1.658-.757a5.909,5.909,0,0,1,.035-1.77,46.892,46.892,0,0,0,.242-4.918c0-4.294-3.156-7.068-8.041-7.072h-.011c-4.885,0-8.041,2.778-8.041,7.072a46.583,46.583,0,0,0,.242,4.918,5.943,5.943,0,0,1,.035,1.77c-.17.72-1.412.757-1.659.757-1.58,0-2.727,1.344-2.727,3.2a2.863,2.863,0,0,0,2.727,2.918H674.6a.982.982,0,0,0,0-1.965h-2.862a.9.9,0,0,1-.762-.953c0-.613.236-1.231.762-1.231,1.9,0,3.236-.85,3.571-2.272a7.175,7.175,0,0,0,.008-2.407,44.586,44.586,0,0,1-.232-4.731c0-3.765,3.14-5.106,6.081-5.107s6.082,1.342,6.082,5.107a44.489,44.489,0,0,1-.233,4.729,7.187,7.187,0,0,0,.009,2.41c.335,1.421,1.669,2.271,3.57,2.271.63,0,.762.669.762,1.231a.9.9,0,0,1-.762.953H687.73a.982.982,0,0,0,0,1.965h2.861a2.863,2.863,0,0,0,2.727-2.918C693.318,495.17,691.949,494.182,690.591,494.182Z" fill="#333" />
-                <path id="Path_8973" data-name="Path 8973" d="M683.939,498.944a.982.982,0,0,0-.982.983,1.773,1.773,0,1,1-3.546,0,.983.983,0,1,0-1.965,0,3.738,3.738,0,1,0,7.476,0A.983.983,0,0,0,683.939,498.944Z" fill="#333" />
+        <!-- <div class="header__notif" v-if="$route.meta.layout == 'dashboard'" @mouseover="showNotifications = true" @mouseleave="showNotifications = false"> -->
+        <div class="header__notif" v-if="$store.getters.isAuthenticated" @mouseover="showNotifications = true" @mouseleave="showNotifications = false">
+          <div class="user_menu">
+            <svg v-if="$route.meta.layout == 'dashboard'" xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
+              <g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)">
+                <g id="Group_1974" data-name="Group 1974">
+                  <path id="Path_8972" data-name="Path 8972" d="M690.591,494.182c-.247,0-1.488-.037-1.658-.757a5.909,5.909,0,0,1,.035-1.77,46.892,46.892,0,0,0,.242-4.918c0-4.294-3.156-7.068-8.041-7.072h-.011c-4.885,0-8.041,2.778-8.041,7.072a46.583,46.583,0,0,0,.242,4.918,5.943,5.943,0,0,1,.035,1.77c-.17.72-1.412.757-1.659.757-1.58,0-2.727,1.344-2.727,3.2a2.863,2.863,0,0,0,2.727,2.918H674.6a.982.982,0,0,0,0-1.965h-2.862a.9.9,0,0,1-.762-.953c0-.613.236-1.231.762-1.231,1.9,0,3.236-.85,3.571-2.272a7.175,7.175,0,0,0,.008-2.407,44.586,44.586,0,0,1-.232-4.731c0-3.765,3.14-5.106,6.081-5.107s6.082,1.342,6.082,5.107a44.489,44.489,0,0,1-.233,4.729,7.187,7.187,0,0,0,.009,2.41c.335,1.421,1.669,2.271,3.57,2.271.63,0,.762.669.762,1.231a.9.9,0,0,1-.762.953H687.73a.982.982,0,0,0,0,1.965h2.861a2.863,2.863,0,0,0,2.727-2.918C693.318,495.17,691.949,494.182,690.591,494.182Z" fill="#333" />
+                  <path id="Path_8973" data-name="Path 8973" d="M683.939,498.944a.982.982,0,0,0-.982.983,1.773,1.773,0,1,1-3.546,0,.983.983,0,1,0-1.965,0,3.738,3.738,0,1,0,7.476,0A.983.983,0,0,0,683.939,498.944Z" fill="#333" />
+                </g>
+                <!-- <circle id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333" /> -->
+                <circle v-if="showNotificationBadge()" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#ff0000" />
+                <circle v-if="!showNotificationBadge() && $route.meta.layout == 'dashboard'" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333" />
+                <circle v-if="!showNotificationBadge() && $route.meta.layout != 'dashboard'" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#fff" />
               </g>
-              <circle id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333" />
-            </g>
-          </svg>
+            </svg>
+            <svg v-if="$route.meta.layout != 'dashboard'" xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
+              <g id="Group_1975" data-name="Group 1975" transform="translate(-669.008 -477.688)">
+                <g id="Group_1974" data-name="Group 1974">
+                  <path id="Path_8972" data-name="Path 8972" d="M690.591,494.182c-.247,0-1.488-.037-1.658-.757a5.909,5.909,0,0,1,.035-1.77,46.892,46.892,0,0,0,.242-4.918c0-4.294-3.156-7.068-8.041-7.072h-.011c-4.885,0-8.041,2.778-8.041,7.072a46.583,46.583,0,0,0,.242,4.918,5.943,5.943,0,0,1,.035,1.77c-.17.72-1.412.757-1.659.757-1.58,0-2.727,1.344-2.727,3.2a2.863,2.863,0,0,0,2.727,2.918H674.6a.982.982,0,0,0,0-1.965h-2.862a.9.9,0,0,1-.762-.953c0-.613.236-1.231.762-1.231,1.9,0,3.236-.85,3.571-2.272a7.175,7.175,0,0,0,.008-2.407,44.586,44.586,0,0,1-.232-4.731c0-3.765,3.14-5.106,6.081-5.107s6.082,1.342,6.082,5.107a44.489,44.489,0,0,1-.233,4.729,7.187,7.187,0,0,0,.009,2.41c.335,1.421,1.669,2.271,3.57,2.271.63,0,.762.669.762,1.231a.9.9,0,0,1-.762.953H687.73a.982.982,0,0,0,0,1.965h2.861a2.863,2.863,0,0,0,2.727-2.918C693.318,495.17,691.949,494.182,690.591,494.182Z" fill="#fff" />
+                  <path id="Path_8973" data-name="Path 8973" d="M683.939,498.944a.982.982,0,0,0-.982.983,1.773,1.773,0,1,1-3.546,0,.983.983,0,1,0-1.965,0,3.738,3.738,0,1,0,7.476,0A.983.983,0,0,0,683.939,498.944Z" fill="#fff" />
+                </g>
+                <!-- <circle id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333" /> -->
+                <circle v-if="showNotificationBadge()" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#ff0000" />
+                <circle v-if="!showNotificationBadge() && $route.meta.layout == 'dashboard'" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#333" />
+                <circle v-if="!showNotificationBadge() && $route.meta.layout != 'dashboard'" id="Ellipse_209" data-name="Ellipse 209" cx="4.896" cy="4.896" r="4.896" transform="translate(680.747 477.688)" fill="#fff" />
+              </g>
+            </svg>
+            <transition name="fade" mode="out-in">
+              <div class="user_menu__dropdown user_menu__dropdown--large" v-show="showNotifications">
+                <ul>
+                  <li v-if="!notifications.length"><span>No notifications</span></li>
+                  <li v-for="(notification, i) in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
+                    <router-link to="">
+                      <span :class="{'notification--unread': !notification.read}">{{ notification.text }}</span><br>
+                      <small>{{ getTimeFromNow(notification.createdAt) }}</small>
+                      <hr v-if="i != notifications.length - 1">
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+            </transition>
+          </div>
         </div>
         <div class="header__cart">
           <router-link to="/cart">
@@ -327,8 +359,11 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import store from '@/store';
 import AccountApi from '@/service/account';
+import NotificationApi from '@/service/notification';
 import Search from '@/components/Search.vue';
 import { ServerResponse, LogoutResult } from '@/model';
+import { Notification } from '@/model/notification';
+import moment from 'moment';
 
 @Component({
   components: { Search },
@@ -342,7 +377,15 @@ export default class Header extends Vue {
 
   showUserMenu = false;
 
+  showNotifications = false;
+
+  notifications: Notification[];
+
+  pollTimeoutRef: ReturnType<typeof setTimeout> | null;
+
   accountApi: AccountApi;
+
+  notificationApi: NotificationApi;
 
   showSubmenuSell = false;
 
@@ -358,10 +401,56 @@ export default class Header extends Vue {
     super();
 
     this.accountApi = new AccountApi();
+    this.notificationApi = new NotificationApi();
+
+    this.notifications = [];
+    this.pollTimeoutRef = null;
   }
 
   mounted(): void {
     window.addEventListener('scroll', this.handleScroll);
+    this.pollNotifications();
+  }
+
+  beforeDestroy(): void {
+    console.log('unmounted navbar');
+    if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+  }
+
+  pollNotifications(): void {
+    if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+    if (store.getters.isAuthenticated) {
+      this.notificationApi.find(0, 5, null, null, null).then((response) => {
+        this.notifications = response.result.items;
+        console.log(this.notifications);
+        this.pollTimeoutRef = setTimeout(() => {
+          this.pollNotifications();
+        }, 30000);
+      });
+    } else {
+      this.notifications = [];
+    }
+  }
+
+  onSelectNotification(id: string): void {
+    console.log(id);
+    this.notificationApi.readNotification(id).then((response) => {
+      if (response.success) {
+        console.log('marked notification as read');
+        this.pollNotifications();
+      } else {
+        console.log('error marking notification as read');
+      }
+    });
+  }
+
+  showNotificationBadge(): boolean {
+    if (this.notifications && this.notifications.some((x) => !x.read)) return true;
+    return false;
+  }
+
+  getTimeFromNow(t: string): string {
+    return moment(t).fromNow(false);
   }
 
   cartCount(): number {
