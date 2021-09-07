@@ -25,17 +25,27 @@
                 <input type="radio" name="creation_type" v-model="creationType" value="EXISTING_API" />
                 <div class="control_indicator"></div>
               </label>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <div class="errors" v-if="errors">
+                <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+              </div>
             </div>
           </validation-provider>
         </div>
         <!-- MIDDLE  -->
-        <div class="col-md-4">
-          <div v-if="creationType === 'PUBLISHED_ASSET'" class="dashboard__form__step__title">
+        <div class="col-md-4" v-if="creationType === 'PUBLISHED_ASSET'">
+          <div class="dashboard__form__step__title">
             <p>Select one of your published data files</p>
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
             </div>
+          </div>
+        </div>
+        <!-- INHALT WORKING HERE -->
+        <div class="col-md-4" v-if="creationType === 'TOPIO_DRIVE'">
+          <div class="dashboard__form__step__title">
+            <p>Select one data file from your topio Drive</p>
+            <p v-html="`${fileApi.name}`"></p>
+            <file-topio-drive :fileApi.sync="fileApi"></file-topio-drive>
           </div>
         </div>
 
@@ -62,7 +72,9 @@
                 <input type="radio" name="api_type" v-model="serviceTypeLocal" value="DATA_API" />
                 <div class="control_indicator"></div>
               </label>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <div class="errors" v-if="errors">
+                <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+              </div>
             </div>
           </validation-provider>
         </div>
@@ -72,10 +84,7 @@
 </template>
 <script lang="ts">
 import {
-  Component,
-  Vue,
-  Prop,
-  Watch,
+  Component, Vue, Prop, Watch,
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
@@ -83,7 +92,8 @@ import ProviderAssetsApi from '@/service/provider-assets';
 import AssetApiDetailsCard from '@/components/Assets/AssetApiDetailsCard.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
-import { CatalogueItem, CatalogueItemCommand } from '@/model/catalogue';
+import { CatalogueItem, CatalogueItemCommand, DraftApiFromFileCommand } from '@/model/catalogue';
+import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
 
 extend('required', required);
 
@@ -99,6 +109,7 @@ enum CreationType {
     ValidationProvider,
     ValidationObserver,
     AssetApiDetailsCard,
+    FileTopioDrive,
   },
 })
 export default class ApiDetails extends Vue {
@@ -107,6 +118,10 @@ export default class ApiDetails extends Vue {
   @Prop({ required: true }) private serviceType!: EnumSpatialDataServiceType | null;
 
   @Prop({ required: true }) private selectedPublishedAssetForApiCreation!: CatalogueItem | null;
+
+  @Prop({ required: true }) private apiCreationType!: CreationType | null;
+
+  @Prop({ required: true }) private selectedPublishedFileForApiCreation!: DraftApiFromFileCommand | null;
 
   providerAssetsApi: ProviderAssetsApi;
 
@@ -118,14 +133,18 @@ export default class ApiDetails extends Vue {
 
   publishedAssets: CatalogueItem[];
 
+  fileApi: any | null;
+
   selectedPublishedAssetForApiCreationLocal: CatalogueItem | null;
 
   $refs!: {
-    refObserver: InstanceType<typeof ValidationObserver>,
-  }
+    refObserver: InstanceType<typeof ValidationObserver>;
+  };
 
   constructor() {
     super();
+
+    this.fileApi = {};
 
     this.providerAssetsApi = new ProviderAssetsApi();
 
@@ -138,6 +157,18 @@ export default class ApiDetails extends Vue {
 
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
     console.log('local', this.selectedPublishedAssetForApiCreationLocal);
+  }
+
+  @Watch('fileApi', { deep: true })
+  onFileApiChange(fileApi: any | null): void {
+    console.log('file api changed', fileApi);
+    this.$emit('update:selectedPublishedFileForApiCreation', fileApi);
+  }
+
+  @Watch('creationType', { deep: true })
+  onCreationTypeChange(creationType: CreationType): void {
+    console.log('creation type changed', creationType);
+    this.$emit('update:apiCreationType', creationType);
   }
 
   @Watch('assetLocal', { deep: true })
@@ -166,16 +197,19 @@ export default class ApiDetails extends Vue {
       pageRequest: { page: 0, size: 1000 },
       sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
     };
-    this.providerAssetsApi.find(query).then((response) => {
-      if (response.success) {
-        console.log('successfully fetched provider assets', response);
-        this.publishedAssets = response.result.items;
-      } else {
-        console.log('error fetching provider assets', response);
-      }
-    }).catch((err) => {
-      console.log('err', (err));
-    });
+    this.providerAssetsApi
+      .find(query)
+      .then((response) => {
+        if (response.success) {
+          console.log('successfully fetched provider assets', response);
+          this.publishedAssets = response.result.items;
+        } else {
+          console.log('error fetching provider assets', response);
+        }
+      })
+      .catch((err) => {
+        console.log('err', err);
+      });
   }
 
   onSelectPublishedAsset(asset: CatalogueItem): void {
@@ -184,6 +218,6 @@ export default class ApiDetails extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_assets.scss";
-  @import "~flexboxgrid/css/flexboxgrid.min.css";
+@import '@/assets/styles/_assets.scss';
+@import '~flexboxgrid/css/flexboxgrid.min.css';
 </style>
