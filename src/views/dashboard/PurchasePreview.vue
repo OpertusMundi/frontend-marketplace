@@ -119,7 +119,7 @@ export default class DashboardPurchases extends Vue {
       console.log('pdf', response.data);
       const blob = new Blob([(response as any).data], { type: 'application/pdf' });
 
-      const assetId = this.order.items[0].item;
+      const assetId = this.order.items[0].assetId ? this.order.items[0].assetId : '';
       console.log('asset id', assetId, this.order);
       this.catalogueApi.findOne(assetId).then((assetResponse) => {
         const title = (assetResponse.result as CatalogueItemDetails).contract.title.replaceAll(' ', '_');
