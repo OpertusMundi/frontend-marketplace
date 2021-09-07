@@ -55,3 +55,4 @@ export interface CatalogueHarvestNotification extends Notification {
 }
 
 export type NotificationQueryResponse = ServerResponse<QueryResultPage<Notification>>;
+export { Notification };

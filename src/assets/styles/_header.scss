@@ -407,6 +407,10 @@
         @media(max-width:992px){
             margin-right: 0;
         }
+        .notification--unread {
+            color: $secondColor;
+            font-weight: bold;
+        }
     }
 
     &__cart {
@@ -538,6 +542,9 @@
         width: 150px;
         top: 100%;
         padding-top: 15px;
+        &--large {
+            width: 340px !important;
+        }
         ul {
             position: relative;
             width: 100%;
