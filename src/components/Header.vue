@@ -259,6 +259,7 @@
             <transition name="fade" mode="out-in">
               <div class="user_menu__dropdown user_menu__dropdown--large" v-show="showNotifications">
                 <ul>
+                  <li v-if="!notifications.length"><span>No notifications</span></li>
                   <li v-for="(notification, i) in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                     <router-link to="">
                       <span :class="{'notification--unread': !notification.read}">{{ notification.text }}</span><br>
@@ -418,13 +419,17 @@ export default class Header extends Vue {
 
   pollNotifications(): void {
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
-    this.notificationApi.find(0, 5, null, null, null).then((response) => {
-      this.notifications = response.result.items;
-      console.log(this.notifications);
-      this.pollTimeoutRef = setTimeout(() => {
-        this.pollNotifications();
-      }, 30000);
-    });
+    if (store.getters.isAuthenticated) {
+      this.notificationApi.find(0, 5, null, null, null).then((response) => {
+        this.notifications = response.result.items;
+        console.log(this.notifications);
+        this.pollTimeoutRef = setTimeout(() => {
+          this.pollNotifications();
+        }, 30000);
+      });
+    } else {
+      this.notifications = [];
+    }
   }
 
   onSelectNotification(id: string): void {
@@ -440,7 +445,7 @@ export default class Header extends Vue {
   }
 
   showNotificationBadge(): boolean {
-    if (this.notifications.some((x) => !x.read)) return true;
+    if (this.notifications && this.notifications.some((x) => !x.read)) return true;
     return false;
   }
 
