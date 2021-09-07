@@ -178,21 +178,21 @@
                     <div class="form-group mt-xs-10">
                       <label class="control control-radio">
                         Box overlaps with asset geometry
-                        <input type="radio" name="asset_type" checked />
+                        <input v-model="filters.spatialOperation" value="INTERSECTS" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
                     <div class="form-group">
                       <label class="control control-radio">
                         Box fully contains asset geometry
-                        <input type="radio" name="asset_type" />
+                        <input v-model="filters.spatialOperation" value="CONTAINS" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
                     <div class="form-group">
                       <label class="control control-radio">
                         Box is fully covered by asset geometry
-                        <input type="radio" name="asset_type" />
+                        <input v-model="filters.spatialOperation" value="WITHIN" type="radio" name="asset_type" />
                         <div class="control_indicator"></div>
                       </label>
                     </div>
@@ -397,6 +397,7 @@ import {
   EnumTopicCategory,
   EnumElasticSearchSortField,
   EnumDatasetSize,
+  EnumSpatialOperation,
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
 // import { Configuration } from '@/model/configuration';
@@ -481,6 +482,7 @@ interface Filters {
   scaleValues: number[],
   crsList: FilterCRS[],
   mapCoverageSelectionBBox: string,
+  spatialOperation: EnumSpatialOperation,
   priceMin: number | null,
   priceMax: number | null,
   numberOfFeatures: FilterNumberOfFeatures,
@@ -654,6 +656,8 @@ export default class Catalogue extends Vue {
     // };
 
     this.filters.mapCoverageSelectionBBox = '';
+
+    this.filters.spatialOperation = EnumSpatialOperation.INTERSECTS;
 
     this.mapCoverageDrawMode = false;
 
@@ -1286,6 +1290,7 @@ export default class Catalogue extends Vue {
       filterSet.topLeftY = parseFloat(maxY);
       filterSet.bottomRightX = parseFloat(maxX);
       filterSet.bottomRightY = parseFloat(minY);
+      filterSet.spatialOperation = filters.spatialOperation;
     }
 
     // PRICE
