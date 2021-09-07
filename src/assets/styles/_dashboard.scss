@@ -289,5 +289,37 @@
     .btn {
       margin-left: 10px;
     }
+
+    &__settings {
+      position: relative;
+      > a {
+        display: block;
+        min-width: 30px;
+        text-align: right;
+      }
+      &__options {
+        position: absolute;
+        background: #fff;
+        right: 0;
+        top: 100%;
+        border-radius: 5px;
+        padding: 6px 10px;
+        border: 1px solid $secondColor;
+        li {
+          margin-bottom: 5px;
+          &:last-child {
+            margin-bottom: 2px;
+          }
+        }
+        a {
+          white-space: nowrap;
+          font-size: 0.8em;
+          color: $mainFontColor;
+          &:hover {
+            color: $secondColor;
+          }
+        }
+      }
+    }
   }
 }
