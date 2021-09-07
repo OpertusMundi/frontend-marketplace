@@ -476,57 +476,61 @@ export default class Checkout extends Vue {
     // });
   }
 
+  // TODO: refactoring
   submitCheckout(): void {
     store.commit('setLoading', true);
     const cardPayIn: CardDirectPayInCommand = {
       // eslint-disable-next-line
       cardId: this.selectedCard!,
     };
-    this.consumerPayInApi.createCardDirectPayIn(this.orderKey, cardPayIn).then((payInResponse) => {
-      console.log('payin response', payInResponse);
-      if (payInResponse.success) {
-        console.log('successful payin!');
+    if (this.cart && this.cart.totalPrice === 0) { // FREE PAYIN
+      this.consumerPayInApi.createFreePayIn(this.orderKey).then((payInResponse) => {
+        console.log('payin response', payInResponse);
+        if (payInResponse.success) {
+          console.log('successful free payin!');
 
-        this.cartApi.clear().then((clearCartResponse) => {
-          if (clearCartResponse.success) {
-            store.commit('setCartItems', []);
-            console.log('cleared items from cart');
-
-            const redirectUrl = payInResponse.result.secureModeRedirectURL;
-            if (redirectUrl) {
-              console.log('redirecting to secure mode url', redirectUrl);
-              window.location.href = redirectUrl;
+          this.cartApi.clear().then((clearCartResponse) => {
+            if (clearCartResponse.success) {
+              store.commit('setCartItems', []);
+              console.log('cleared items from cart');
+              this.$router.push(`/order-thankyou/${this.orderKey}`);
             } else {
-              this.$router.push('/order-thankyou');
+              console.log('error clearing cart', clearCartResponse);
             }
-          } else {
-            console.log('error clearing cart', clearCartResponse);
-          }
-        });
-      } else {
-        console.log('payin error');
-      }
-      store.commit('setLoading', false);
-    });
-    // this.consumerPayInApi.checkout().then((checkoutResponse) => {
-    //   console.log('checkout response', checkoutResponse);
-    //   if (checkoutResponse.success) {
-    //     const orderKey = checkoutResponse.result.key;
-    //     const cardPayIn: CardDirectPayInCommand = {
-    //       // eslint-disable-next-line
-    //       cardId: this.selectedCard!,
-    //     };
-    //     this.consumerPayInApi.createCardDirectPayIn(orderKey, cardPayIn).then((payInResponse) => {
-    //       console.log('payin response', payInResponse);
-    //       if (payInResponse.success) {
-    //         console.log('successfull payin!');
-    //         this.$router.push('/order-thankyou');
-    //       } else {
-    //         console.log('payin error');
-    //       }
-    //     });
-    //   }
-    // });
+          });
+        } else {
+          console.log('payin error');
+        }
+        store.commit('setLoading', false);
+      });
+    } else { // ORDINARY PAYIN (MANGOPAY)
+      this.consumerPayInApi.createCardDirectPayIn(this.orderKey, cardPayIn).then((payInResponse) => {
+        console.log('payin response', payInResponse);
+        if (payInResponse.success) {
+          console.log('successful payin!');
+
+          this.cartApi.clear().then((clearCartResponse) => {
+            if (clearCartResponse.success) {
+              store.commit('setCartItems', []);
+              console.log('cleared items from cart');
+
+              const redirectUrl = payInResponse.result.secureModeRedirectURL;
+              if (redirectUrl) {
+                console.log('redirecting to secure mode url', redirectUrl);
+                window.location.href = redirectUrl;
+              } else {
+                this.$router.push(`/order-thankyou/${this.orderKey}`);
+              }
+            } else {
+              console.log('error clearing cart', clearCartResponse);
+            }
+          });
+        } else {
+          console.log('payin error');
+        }
+        store.commit('setLoading', false);
+      });
+    }
   }
 }
 </script>
