@@ -357,6 +357,9 @@ router.beforeEach((to, from, next) => {
     store.commit('setLoading', true);
   }
 
+  // Save last route to store
+  if (from.name) store.commit('setLastRouteName', from.name);
+
   const role = to.meta?.requiresRole;
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {

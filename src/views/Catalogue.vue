@@ -415,96 +415,21 @@ import {
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
 // import { Configuration } from '@/model/configuration';
+import { Filters, FilterCRS } from '@/model/catalogue-filters';
 import store from '@/store';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
 // import { AxiosError } from 'axios';
+import VueSlider from 'vue-slider-component';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-shades';
-import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
 import epsgList from '../service/lists/epsg';
 import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
-
-interface FilterType {
-  id: EnumAssetType,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-interface FilterTopic {
-  id: EnumTopicCategory,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-interface FilterUpdated {
-  dateFrom: string,
-  dateTo: string,
-  timeFrom: string,
-  timeTo: string,
-}
-
-interface FilterFormats {
-  api: { id: string, name: string, isChecked: boolean }[],
-  vector: { id: string, name: string, isChecked: boolean }[],
-  raster: { id: string, name: string, isChecked: boolean }[],
-}
-
-interface FilterCRS {
-  code: string,
-  description: string,
-  isChecked?: boolean,
-}
-
-interface FilterNumberOfFeatures {
-  isSmallChecked: boolean,
-  isMediumChecked: boolean,
-  isLargeChecked: boolean,
-}
-
-interface FilterLanguage {
-  code: string,
-  name: string,
-  isChecked: boolean,
-}
-
-interface FilterLicense {
-  id: string,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-// interface crs {
-//   code: string,
-//   description: string,
-//   isChecked?: boolean
-// }
-
-interface Filters {
-  types: FilterType[],
-  formats: FilterFormats,
-  updated: FilterUpdated,
-  topics: FilterTopic[],
-  scaleValues: number[],
-  crsList: FilterCRS[],
-  mapCoverageSelectionBBox: string,
-  spatialOperation: EnumSpatialOperation,
-  priceMin: number | null,
-  priceMax: number | null,
-  numberOfFeatures: FilterNumberOfFeatures,
-  attributes: string[],
-  vendors: string[],
-  languages: FilterLanguage[],
-  licenses: FilterLicense[],
-}
 
 @Component({
   components: {
@@ -739,6 +664,10 @@ export default class Catalogue extends Vue {
 
   mounted(): void {
     // this.searchAssets();
+    // console.log('lalala', store.getters.getLastRouteName);
+
+    if (store.getters.getLastRouteName === 'CatalogueSingle') this.filtersApplied = store.getters.getLastAppliedFilters;
+
     this.searchUsingFilters(true);
 
     this.configurationApi.getConfiguration().then((configResponse) => {
@@ -1359,6 +1288,7 @@ export default class Catalogue extends Vue {
       this.queryResultsCount = advancedQueryResponse.result.count;
       this.queryCurrentPage = advancedQueryResponse.result.pageRequest.page;
       if (!byAlteringCurrentFilterState) this.filtersApplied = cloneDeep(this.filters);
+      store.commit('setLastAppliedFilters', cloneDeep(this.filtersApplied));
       store.commit('setLoading', false);
     }).catch((err) => {
       console.log('err', err);
