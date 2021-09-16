@@ -75,6 +75,10 @@ export interface ElasticCatalogueQuery {
    */
   type: EnumAssetType[];
   /**
+   * The type of the spatial data service. This filter selects only assets of type SERVICE
+   */
+  serviceType: EnumSpatialDataServiceType[];
+  /**
    * The file format, physical medium, or dimensions of the resource e.g. ESRI Shapefile
    */
   format: string[];

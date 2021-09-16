@@ -103,23 +103,9 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <!-- <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
-                <label :for="`format_${format.id}`"> {{format.name}} </label>
-              </div> -->
-
-              <!-- TODO: the following is just dummy inputs. should be changed to the commented out (up) when API Gateway is ready for Service types -->
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WMS`">
-                <label :for="`format_WMS`"> WMS </label>
-              </div>
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WFS`">
-                <label :for="`format_WFS`"> WFS </label>
-              </div>
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_DATA_API`">
-                <label :for="`format_WFS`"> Data API </label>
+              <div class="checkbox-group mb-xs-5" v-for="serviceType in filters.serviceTypes" :key="serviceType.id">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${serviceType.id}`" v-model="serviceType.isChecked">
+                <label :for="`format_${serviceType.id}`"> {{serviceType.name}} </label>
               </div>
             </div>
 
@@ -361,7 +347,6 @@
       </div>
 
       <div class="assets__top-info">
-        <!-- <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6> -->
         <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
           {{ filter.label }}
           <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
@@ -590,12 +575,28 @@ export default class Catalogue extends Vue {
     this.filters.formats = {
       vector: [], // loaded from config
       raster: [], // loaded from config
-      api: [
-        { id: EnumSpatialDataServiceType.WMS, name: 'WMS', isChecked: false },
-        { id: EnumSpatialDataServiceType.WFS, name: 'WFS', isChecked: false },
-        { id: EnumSpatialDataServiceType.DATA_API, name: 'Data API', isChecked: false },
-      ],
     };
+
+    this.filters.serviceTypes = [
+      {
+        id: EnumSpatialDataServiceType.WMS,
+        name: 'WMS',
+        pillLabel: 'WMS',
+        isChecked: false,
+      },
+      {
+        id: EnumSpatialDataServiceType.WFS,
+        name: 'WFS',
+        pillLabel: 'WFS',
+        isChecked: false,
+      },
+      {
+        id: EnumSpatialDataServiceType.DATA_API,
+        name: 'Data API',
+        pillLabel: 'Data API',
+        isChecked: false,
+      },
+    ];
 
     this.filters.mapCoverageSelectionBBox = '';
 
@@ -767,9 +768,12 @@ export default class Catalogue extends Vue {
           .find((x) => x.id === filterName);
         // eslint-disable-next-line
         option!.isChecked = false;
-
         break;
       }
+      case 'serviceType':
+        // eslint-disable-next-line
+        filters.serviceTypes.find((x) => x.id === filterName)!.isChecked = false;
+        break;
       case 'coverage': {
         this.onClearArea(fromAppliedFilters);
         break;
@@ -861,6 +865,11 @@ export default class Catalogue extends Vue {
     // FORMAT
     result = result.concat(
       Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
+    );
+
+    // SERVICE TYPE
+    result = result.concat(
+      filters.serviceTypes.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'serviceType', filterName: x.id })),
     );
 
     // SCALE
@@ -1190,10 +1199,6 @@ export default class Catalogue extends Vue {
       filterSet.type = filters.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
     }
 
-    // if (this.getSelectedFilters().some((x) => x.category === 'type')) {
-    //   filters.type = this.getSelectedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
-    // }
-
     // UPDATED
     // TODO: check format
     if (filters.updated.dateFrom) {
@@ -1211,6 +1216,11 @@ export default class Catalogue extends Vue {
     // FORMAT
     if (Object.values(filters.formats).flat().some((x) => x.isChecked)) {
       filterSet.format = Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
+    }
+
+    // SERVICE TYPE
+    if (filters.serviceTypes.some((x) => x.isChecked)) {
+      filterSet.serviceType = filters.serviceTypes.filter((x) => x.isChecked).map((x) => x.id as EnumSpatialDataServiceType);
     }
 
     // CRS

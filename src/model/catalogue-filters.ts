@@ -1,5 +1,5 @@
 import { EnumSpatialOperation, EnumTopicCategory } from "./catalogue";
-import { EnumAssetType } from "./enum";
+import { EnumAssetType, EnumSpatialDataServiceType } from "./enum";
 
 interface FilterType {
     id: EnumAssetType,
@@ -23,9 +23,15 @@ interface FilterUpdated {
 }
 
 interface FilterFormats {
-    api: { id: string, name: string, isChecked: boolean }[],
     vector: { id: string, name: string, isChecked: boolean }[],
     raster: { id: string, name: string, isChecked: boolean }[],
+}
+
+interface FilterServiceType {
+    id: EnumSpatialDataServiceType,
+    name: string,
+    pillLabel: string,
+    isChecked: boolean,
 }
 
 interface FilterCRS {
@@ -56,6 +62,7 @@ interface FilterLicense {
 interface Filters {
     types: FilterType[],
     formats: FilterFormats,
+    serviceTypes: FilterServiceType[],
     updated: FilterUpdated,
     topics: FilterTopic[],
     scaleValues: number[],
