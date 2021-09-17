@@ -232,6 +232,12 @@ const routes: RouteConfig[] = [
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardfanalytics" */ '../views/dashboard/Analytics/Analytics.vue'),
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
       },
+      {
+        path: 'notifications',
+        name: 'Notifications',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardnotifications" */ '../views/dashboard/Notifications.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
     ],
   },
   {

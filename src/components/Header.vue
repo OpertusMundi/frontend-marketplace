@@ -260,13 +260,14 @@
               <div class="user_menu__dropdown user_menu__dropdown--large" v-show="showNotifications">
                 <ul>
                   <li v-if="!notifications.length"><span>No notifications</span></li>
-                  <li v-for="(notification, i) in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
+                  <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                     <router-link to="">
                       <span :class="{'notification--unread': !notification.read}">{{ notification.text }}</span><br>
                       <small>{{ getTimeFromNow(notification.createdAt) }}</small>
-                      <hr v-if="i != notifications.length - 1">
+                      <hr>
                     </router-link>
                   </li>
+                  <li class="user_menu__dropdown__btn_view_all"><router-link to="/dashboard/notifications">VIEW ALL</router-link></li>
                 </ul>
               </div>
             </transition>
@@ -423,6 +424,7 @@ export default class Header extends Vue {
       this.notificationApi.find(0, 5, null, null, null).then((response) => {
         this.notifications = response.result.items;
         console.log(this.notifications);
+        store.commit('setNotificationsCount', response.result.count);
         this.pollTimeoutRef = setTimeout(() => {
           this.pollNotifications();
         }, 30000);

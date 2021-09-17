@@ -7,6 +7,7 @@ import Config from './modules/config.module';
 import Shop from './modules/shop.module';
 import Router from './modules/router.module';
 import CatalogueFilters from './modules/catalogue-filters.module';
+import Notifications from './modules/notifications.module';
 
 Vue.use(Vuex);
 
@@ -19,6 +20,7 @@ const store = new Vuex.Store({
     shop: Shop,
     router: Router,
     catalogueFilters: CatalogueFilters,
+    notifications: Notifications,
   },
   plugins: [createPersistedState({
     // paths: ['user'],

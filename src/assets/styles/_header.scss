@@ -545,6 +545,11 @@
         &--large {
             width: 340px !important;
         }
+        &__btn_view_all {
+            cursor: default;
+            text-align: center;
+            font-size: em(15);
+        }
         ul {
             position: relative;
             width: 100%;
