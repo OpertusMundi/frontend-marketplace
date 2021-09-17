@@ -2,7 +2,7 @@ import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { AxiosResponse } from 'axios';
-import { NotificationQueryResponse } from '@/model/notification';
+import { EnumNotificationSortField, NotificationQueryResponse } from '@/model/notification';
 
 export default class NotificationApi extends Api {
   constructor() {
@@ -10,7 +10,8 @@ export default class NotificationApi extends Api {
   }
 
   public async find(
-    page = 0, size = 10, dateFrom: string | null = null, dateTo: string | null = null, read: boolean | null = null,
+    page = 0, size = 10, dateFrom: string | null = null, dateTo: string | null = null,
+    read: boolean | null = null, orderBy = EnumNotificationSortField.SEND_AT, order: 'ASC' | 'DESC' = 'DESC',
   ): Promise<NotificationQueryResponse> {
     const params = {
       page,
@@ -22,7 +23,7 @@ export default class NotificationApi extends Api {
 
     const keyValues = Object.keys(params).filter((k) => !!params[k]).map((k) => `${k}=${params[k]}`);
 
-    const url = `/action/notifications?${keyValues.join('&')}`;
+    const url = `/action/notifications?${keyValues.join('&')}&orderBy=${orderBy}&order=${order}`;
 
     return this.get<NotificationQueryResponse>(url)
       .then((response: AxiosResponse<NotificationQueryResponse>) => {
