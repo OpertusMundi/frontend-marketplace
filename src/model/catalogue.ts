@@ -75,6 +75,10 @@ export interface ElasticCatalogueQuery {
    */
   type: EnumAssetType[];
   /**
+   * The type of the spatial data service. This filter selects only assets of type `SERVICE`
+   */
+  serviceType: EnumSpatialDataServiceType[];
+  /**
    * The file format, physical medium, or dimensions of the resource e.g. ESRI Shapefile
    */
   format: string[];
@@ -90,6 +94,10 @@ export interface ElasticCatalogueQuery {
    * Maximum price (excluding VAT)
    */
   maxPrice: number;
+  /**
+   * Used for declaring free datasets
+   */
+  freeDataset: boolean | null;
   /**
    * The temporal extent of the resource (start date) with YYYY-MM-DD format e.g. 2020-06-01
    */
@@ -111,6 +119,14 @@ export interface ElasticCatalogueQuery {
    * Maximum scale value
    */
   maxScale: number;
+  /**
+   * Distinct scale values
+   */
+  scales: number[];
+  /**
+   * Used for declaring open datasets
+   */
+  openDataset: boolean | null;
   /**
    * Automated metadata attributes
    */
