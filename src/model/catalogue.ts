@@ -75,7 +75,7 @@ export interface ElasticCatalogueQuery {
    */
   type: EnumAssetType[];
   /**
-   * The type of the spatial data service. This filter selects only assets of type SERVICE
+   * The type of the spatial data service. This filter selects only assets of type `SERVICE`
    */
   serviceType: EnumSpatialDataServiceType[];
   /**
@@ -94,6 +94,10 @@ export interface ElasticCatalogueQuery {
    * Maximum price (excluding VAT)
    */
   maxPrice: number;
+  /**
+   * Used for declaring free datasets
+   */
+  freeDataset: boolean | null;
   /**
    * The temporal extent of the resource (start date) with YYYY-MM-DD format e.g. 2020-06-01
    */
@@ -115,6 +119,14 @@ export interface ElasticCatalogueQuery {
    * Maximum scale value
    */
   maxScale: number;
+  /**
+   * Distinct scale values
+   */
+  scales: number[];
+  /**
+   * Used for declaring open datasets
+   */
+  openDataset: boolean | null;
   /**
    * Automated metadata attributes
    */
@@ -872,6 +884,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * Contract details
    */
   contract: Contract;
+  /**
+   * True if the item is already added to the user's favorite list
+   */
+  favorite: boolean;
   /**
    * Ingestion information. Only visible to the owners (publishers) of the asset.
    * The array contains an element for each ingested resource. The resource can

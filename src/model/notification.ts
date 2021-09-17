@@ -3,10 +3,15 @@ import { ServerResponse } from '@/model/response';
 import { EnumCatalogueType } from '@/model/catalogue';
 
 export enum EnumNotificationEventType {
+  CATALOGUE_ASSET_UNPUBLISHED = 'CATALOGUE_ASSET_UNPUBLISHED',
   CATALOGUE_HARVEST_COMPLETED = 'CATALOGUE_HARVEST_COMPLETED',
 }
 
-interface Notification {
+export enum EnumNotificationSortField {
+  SEND_AT = 'SEND_AT',
+}
+
+export interface Notification {
   /**
    * Notification unique identifier
    */
@@ -55,4 +60,3 @@ export interface CatalogueHarvestNotification extends Notification {
 }
 
 export type NotificationQueryResponse = ServerResponse<QueryResultPage<Notification>>;
-export { Notification };
