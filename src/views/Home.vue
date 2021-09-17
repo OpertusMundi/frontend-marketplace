@@ -180,7 +180,7 @@
               </transition>
               <img :src="pagedata.video_thumbnail.url" class="homepage__video__thumbnail" />
               <div class="homepage__video__wrapper" v-if="isVideoClicked" :class="{'homepage__video__wrapper--hidden': !isVideoStarted}">
-                <youtube :fitParent="true" :video-id="'9xwazD5SyVg'" :player-vars="{autoplay: 1}" @playing="onVideoStarted" ref="refYoutube"></youtube>
+                <youtube :fitParent="true" :video-id="'7LqfkkDDWyg'" :player-vars="{autoplay: 1}" @playing="onVideoStarted" ref="refYoutube"></youtube>
               </div>
             </div>
           </div>
