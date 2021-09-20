@@ -58,44 +58,24 @@
           <transition name="fade" mode="out-in">
           <div class="dashboard__form__steps__inner">
 
-            <!-- ASSET TYPE -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
-            <!-- </transition> -->
+            <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
 
-            <!-- METADATA -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
-              <api-details ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
-            <!-- </transition> -->
+            <template v-if="assetMainType !== 'API'">
+              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
+              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 3"></contract>
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
+              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep === 5"></delivery>
+            </template>
 
-            <!-- CONTRACT -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
-              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
-            <!-- </transition> -->
+            <template v-if="assetMainType === 'API'">
+              <api-details ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :serviceType="serviceType" v-if="currentStep === 2"></api-details>
+              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 3"></api-metadata>
+              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
+              <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+            </template>
 
-            <!-- PRICING -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType !== 'API' && currentStep == 4"></pricing>
-              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
-            <!-- </transition> -->
-
-            <!-- DELIVERY -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="assetMainType !== 'API' && currentStep == 5"></delivery>
-              <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType === 'API' && currentStep === 5"></contract>
-            <!-- </transition> -->
-
-            <!-- PAYOUT -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <payout ref="step6" v-if="currentStep == 6"></payout>
-            <!-- </transition> -->
-
-            <!-- REVIEW -->
-            <!-- <transition name="fade" mode="out-in"> -->
-              <review ref="step7" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
-            <!-- </transition> -->
+            <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
+            <review ref="step7" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
 
             <div class="dashboard__form__errors" v-if="uploading.errors.length">
               <ul>
@@ -230,6 +210,8 @@ export default class CreateAsset extends Vue {
 
   selectedPublishedAssetForApiCreation: CatalogueItem | null;
 
+  selectedPayoutMethod: 'through_platform' | 'external_means' | 'credit_debit' | null;
+
   // contract: string;
 
   totalSteps = 7;
@@ -273,7 +255,7 @@ export default class CreateAsset extends Vue {
 
     this.isEditingExistingDraft = false;
 
-    // this.contract = '';
+    this.selectedPayoutMethod = null;
 
     this.uploading = {
       status: false,
@@ -417,15 +399,9 @@ export default class CreateAsset extends Vue {
   }
 
   isButtonSaveDraftShown(): boolean {
-    if (!this.assetMainType) {
-      return false;
-    }
-    if (!this.asset.pricingModels.length || this.selectedPricingModelForEditing !== null) {
-      return false;
-    }
-    if (!this.asset.title || !this.asset.type || !this.asset.format || !this.asset.version) {
-      return false;
-    }
+    if (!this.assetMainType) return false;
+    if (this.selectedPricingModelForEditing !== null) return false;
+    if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
     return true;
   }
 
@@ -449,80 +425,6 @@ export default class CreateAsset extends Vue {
 
   // todo: needs refactoring
   async submitFormForService(): Promise<void> {
-    // old
-    // this.fixDataForSubmitting();
-    // const config: AxiosRequestConfig = {
-    //   onUploadProgress: (progressEvent: any): void => {
-    //     const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-    //     if (totalLength !== null) {
-    //       this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
-    //     }
-    //   },
-    // };
-    // const draftAssetResponse: ServerResponse<AssetDraft> | void = this.isEditingExistingDraft ? await this.draftAssetApi.update(this.assetId, this.asset) : await this.draftAssetApi.create(this.asset, config);
-    // // const isDraftCreated = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.success : false;
-    // const draftAssetKey = draftAssetResponse && draftAssetResponse.success ? draftAssetResponse.result.key : '';
-    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-    // console.log(submitResponse);
-    // if (submitResponse.success) {
-    //   this.uploading.status = true;
-    //   this.uploading.completed = true;
-    //   this.uploading.title = 'Service created!';
-    //   this.uploading.subtitle = '';
-    // } else {
-    //   console.log('error submitting service');
-    // }
-
-    // refactored
-
-    // this.fixDataForSubmitting();
-
-    // let draftAssetResponse: ServerResponse<AssetDraft>;
-    // let draftAssetKey = '';
-    // try {
-    //   if (this.isEditingExistingDraft) {
-    //     console.log('editing existing draft');
-    //     draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-    //   } else {
-    //     console.log('new draft');
-    //     const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-    //     const draftApi: DraftApiFromAssetCommand = {
-    //       type: EnumDraftCommandType.ASSET,
-    //       pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-    //       title: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.title : '',
-    //       version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
-    //       serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-    //     };
-    //     draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
-    //     this.asset.parentId = draftAssetResponse.result.command.parentId;
-    //   }
-    //   draftAssetKey = draftAssetResponse.result.key;
-    //   console.log('create draft success', draftAssetResponse);
-    // } catch (err) {
-    //   // eslint-disable-next-line
-    //   alert(`Error: ${err.message}`);
-    //   throw new Error(err.message);
-    // }
-    // if (!draftAssetResponse.success) {
-    //   console.log('error', draftAssetResponse);
-    //   // eslint-disable-next-line
-    //   alert(`Error: ${draftAssetResponse.messages}`);
-    //   return;
-    // }
-
-    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-    // console.log(submitResponse);
-    // if (submitResponse.success) {
-    //   this.uploading.status = true;
-    //   this.uploading.completed = true;
-    //   this.uploading.title = 'Service created!';
-    //   this.uploading.subtitle = '';
-    // } else {
-    //   console.log('error submitting service');
-    // }
-
-    // refactored 2
-
     this.fixDataForSubmitting();
 
     let draftAssetResponse: ServerResponse<AssetDraft>;
