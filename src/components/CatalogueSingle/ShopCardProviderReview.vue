@@ -164,6 +164,7 @@ import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import CartApi from '@/service/cart';
 import { CatalogueItemCommand } from '@/model';
 import { BasePricingModelCommand } from '@/model/pricing-model';
+import store from '@/store';
 
 @Component({
   components: {
@@ -232,17 +233,19 @@ export default class ShopCardProviderReview extends Vue {
   }
 
   getCoverageRestrictions(): string[] {
-    if (!this.selectedPricingModel?.coverageRestrictionContinents && !this.selectedPricingModel?.coverageRestrictionCountries) return [];
-    if (!this.selectedPricingModel.coverageRestrictionContinents) return this.selectedPricingModel.coverageRestrictionCountries;
-    if (!this.selectedPricingModel.coverageRestrictionCountries) return this.selectedPricingModel.coverageRestrictionContinents;
-    return (this.selectedPricingModel?.coverageRestrictionContinents as string[]).concat(this.selectedPricingModel?.coverageRestrictionCountries as string[]);
+    const continents = this.selectedPricingModel?.coverageRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase());
+    const countries = this.selectedPricingModel?.coverageRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[];
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
   }
 
   getConsumerRestrictions(): string[] {
-    if (!this.selectedPricingModel?.consumerRestrictionContinents && !this.selectedPricingModel?.consumerRestrictionCountries) return [];
-    if (!this.selectedPricingModel.consumerRestrictionContinents) return this.selectedPricingModel.consumerRestrictionCountries;
-    if (!this.selectedPricingModel.consumerRestrictionCountries) return this.selectedPricingModel.consumerRestrictionContinents;
-    return (this.selectedPricingModel?.consumerRestrictionContinents as string[]).concat(this.selectedPricingModel?.consumerRestrictionCountries as string[]);
+    const continents = this.selectedPricingModel?.consumerRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase());
+    const countries = this.selectedPricingModel?.consumerRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[];
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
   }
 }
 </script>

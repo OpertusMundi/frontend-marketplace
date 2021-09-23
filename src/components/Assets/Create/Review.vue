@@ -25,7 +25,7 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
-                  <li v-if="asset.language"><strong>Language:</strong>{{ asset.language }}</li>
+                  <li v-if="asset.language"><strong>Language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === asset.language).name || '' }}</li>
                   <li v-if="asset.publisherName"><strong>Editor:</strong>{{ asset.publisherName }}</li>
                   <li v-if="asset.publisherEmail"><strong>Editor’s email:</strong>{{ asset.publisherEmail }}</li>
                   <li v-if="asset.metadataPointOfContactName"><strong>Maintenance manager:</strong>{{ asset.metadataPointOfContactName }}</li>
@@ -34,7 +34,7 @@
                   <!-- <li><strong>Identifier:</strong>{{ asset.language }}</li> -->
                   <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
                   <li v-if="asset.abstractText"><strong>Asset short description:</strong>{{ asset.abstractText }}</li>
-                  <li v-if="asset.metadataLanguage"><strong>Metadata language:</strong>{{ asset.metadataLanguage }}</li>
+                  <li v-if="asset.metadataLanguage"><strong>Metadata language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === asset.metadataLanguage).name || '' }}</li>
                   <li v-if="asset.metadataDate"><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
                   <li v-if="asset.scale"><strong>Scale:</strong>{{ asset.scale }}</li>
                 </ul>

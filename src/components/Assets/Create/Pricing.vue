@@ -332,7 +332,7 @@ export default class Pricing extends Vue {
       },
     ];
 
-    this.menusData.countries = store.getters.getConfig.configuration.europeCountries;
+    this.menusData.countries = store.getters.getConfig.configuration.countries;
 
     this.pricingModelsLocal = [];
 

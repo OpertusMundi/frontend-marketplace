@@ -303,7 +303,7 @@ export default class Metadata extends Vue {
   }
 
   formatDate(date: string): string {
-    return moment(date).format('DD MMM YYYY');
+    return date ? moment(date).format('DD MMM YYYY') : '';
   }
 
   getEpsgFullName(code: string): void {
