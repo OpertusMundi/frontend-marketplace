@@ -9,7 +9,7 @@
           <div class="form-group">
             <label class="control control-radio">
               Data File
-              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="datafile" />
+              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="DATA_FILE" />
               <div class="control_indicator"></div>
             </label>
             <label class="control control-radio">
@@ -19,7 +19,7 @@
             </label>
             <label class="control control-radio">
               Collection
-              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="collection" />
+              <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="COLLECTION" />
               <div class="control_indicator"></div>
             </label>
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>

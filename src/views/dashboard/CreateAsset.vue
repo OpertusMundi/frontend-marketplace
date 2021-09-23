@@ -126,7 +126,6 @@ import VueCardFormat from 'vue-credit-card-validation';
 // import { AxiosError, AxiosRequestConfig } from 'axios';
 import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
-import moment from 'moment';
 import { AssetDraft } from '@/model/draft';
 import {
   CatalogueItem,
@@ -135,7 +134,7 @@ import {
   DraftApiFromAssetCommand,
   EnumDraftCommandType,
 } from '@/model/catalogue';
-import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
+import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
@@ -202,7 +201,7 @@ export default class CreateAsset extends Vue {
 
   asset: CatalogueItemCommand;
 
-  assetMainType: string; // Data File / API / Collection
+  assetMainType: EnumAssetTypeCategory; // Data File / API / Collection
 
   serviceType: null | EnumSpatialDataServiceType;
 
@@ -241,7 +240,7 @@ export default class CreateAsset extends Vue {
       fileExtension: '',
     };
 
-    this.assetMainType = '';
+    this.assetMainType = '' as EnumAssetTypeCategory;
 
     this.serviceType = null;
 
@@ -355,11 +354,11 @@ export default class CreateAsset extends Vue {
         });
       }
 
-      // todo: use Enum (Enums may have to be fixed to include NetCDF)
+      // todo (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
-        this.assetMainType = 'datafile';
-      } else if (this.asset.type as string === 'SERVICE') {
-        this.assetMainType = 'API';
+        this.assetMainType = EnumAssetTypeCategory.DATA_FILE;
+      } else if (this.asset.type as string === EnumAssetType.SERVICE) {
+        this.assetMainType = EnumAssetTypeCategory.API;
       } else {
         // todo
         console.log('other main type');
@@ -382,7 +381,7 @@ export default class CreateAsset extends Vue {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
-          if (this.assetMainType === 'API') {
+          if (this.assetMainType === EnumAssetTypeCategory.API) {
             this.submitFormForService();
           } else {
             this.submitForm();
@@ -400,35 +399,72 @@ export default class CreateAsset extends Vue {
 
   isButtonSaveDraftShown(): boolean {
     if (!this.assetMainType) return false;
-    if (this.selectedPricingModelForEditing !== null) return false;
-    if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+
+    if (this.assetMainType === EnumAssetTypeCategory.DATA_FILE) {
+      if (this.selectedPricingModelForEditing !== null) return false;
+      if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+    }
+
+    if (this.assetMainType === EnumAssetTypeCategory.API) {
+      if (!this.selectedPublishedAssetForApiCreation) return false;
+      if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
+    }
+
+    if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) return false;
+
     return true;
   }
 
   onSaveDraft(): void {
-    if (this.fileToUpload.isFileSelected) {
-      this.modalToShow = 'saveDraftFileAlert';
-      return;
+    if (this.assetMainType === EnumAssetTypeCategory.DATA_FILE) {
+      if (this.fileToUpload.isFileSelected) {
+        this.modalToShow = 'saveDraftFileAlert';
+        return;
+      }
+      this.submitForm(true);
     }
-    this.submitForm(true);
+    if (this.assetMainType === EnumAssetTypeCategory.API) {
+      this.submitFormForService(true);
+    }
   }
 
   onCancelDraft(): void {
     this.$router.push('/dashboard/assets');
   }
 
-  // TODO: check if this method can be removed (not required)
-  fixDataForSubmitting(): void {
-    // fix dates format
-    this.asset.metadataDate = moment(this.asset.metadataDate).format('YYYY-MM-DD');
-  }
-
   // todo: needs refactoring
-  async submitFormForService(): Promise<void> {
-    this.fixDataForSubmitting();
-
+  async submitFormForService(isDraft = false): Promise<void> {
     let draftAssetResponse: ServerResponse<AssetDraft>;
     let draftAssetKey = '';
+
+    if (isDraft) {
+      try {
+        if (this.isEditingExistingDraft) {
+          console.log('save draft - edit existing draft');
+          draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+          // todo
+        } else {
+          console.log('create draft');
+          const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+          const draftApi: DraftApiFromAssetCommand = {
+            type: EnumDraftCommandType.ASSET,
+            pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+            title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
+            version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+          };
+          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+          // todo
+        }
+        if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
+        return;
+      } catch (err) {
+        console.error(err.message);
+        // eslint-disable-next-line
+        alert('Error (check console)');
+      }
+    }
+
     // let asset: CatalogueItemCommand;
     try {
       if (this.isEditingExistingDraft) {
@@ -452,6 +488,7 @@ export default class CreateAsset extends Vue {
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);
     } catch (err) {
+      console.error(err.message);
       // eslint-disable-next-line
       alert(`Error: ${err.message}`);
       throw new Error(err.message);
@@ -504,15 +541,11 @@ export default class CreateAsset extends Vue {
     // this.uploading.status = true;
     // this.uploading.errors = [];
 
-    this.fixDataForSubmitting();
-
     const config: AxiosRequestConfig = {
       onUploadProgress: (progressEvent: any): void => {
         const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
         if (totalLength !== null) {
-          // this.uploading.percentage = (Math.round((progressEvent.loaded * 100) / totalLength));
-          console.log('percentage', Math.round((progressEvent.loaded * 100) / totalLength));
-          Vue.set(this.uploading, 'percentage', Math.round((progressEvent.loaded * 100) / totalLength));
+          this.showUploadingProgress(Math.round((progressEvent.loaded * 100) / totalLength));
         }
       },
     };
@@ -531,6 +564,7 @@ export default class CreateAsset extends Vue {
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);
     } catch (err) {
+      console.error(err.message);
       // eslint-disable-next-line
       alert(`Error: ${err.message}`);
       throw new Error(err.message);
@@ -545,10 +579,7 @@ export default class CreateAsset extends Vue {
     // UPLOAD ADDITIONAL RESOURCES FILES
     if (!isDraft && this.additionalResourcesToUpload.length) {
       console.log('upload additional resources');
-      Vue.set(this.uploading, 'status', true);
-      Vue.set(this.uploading, 'errors', []);
-      Vue.set(this.uploading, 'completed', false);
-      Vue.set(this.uploading, 'title', 'Your additional metadata resources are being uploaded');
+      this.showUploadingMessage(false, 'Your additional metadata resources are being uploaded');
 
       for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
         let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
@@ -558,6 +589,7 @@ export default class CreateAsset extends Vue {
           this.asset = uploadAdditionalResourceResponse.result.command;
           console.log('upload additional resource success', uploadAdditionalResourceResponse);
         } catch (err) {
+          console.error(err.message);
           // eslint-disable-next-line
           alert(`Error: ${err.message}`);
           throw new Error(err.message);
@@ -573,10 +605,7 @@ export default class CreateAsset extends Vue {
 
     // UPLOAD RESOURCE
     if (!isDraft && this.fileToUpload.isFileSelected) {
-      Vue.set(this.uploading, 'status', true);
-      Vue.set(this.uploading, 'errors', []);
-      Vue.set(this.uploading, 'completed', false);
-      Vue.set(this.uploading, 'title', 'Your resource is being uploaded');
+      this.showUploadingMessage(false, 'Your resource is being uploaded');
 
       let uploadResource: ServerResponse<AssetDraft>;
       try {
@@ -584,6 +613,7 @@ export default class CreateAsset extends Vue {
         this.asset = uploadResource.result.command;
         console.log('upload resource success', uploadResource);
       } catch (err) {
+        console.error(err.message);
         // eslint-disable-next-line
         alert(`Error: ${err.message}`);
         throw new Error(err.message);
@@ -598,23 +628,15 @@ export default class CreateAsset extends Vue {
 
     // SUBMIT
     if (isDraft) {
-      Vue.set(this.uploading, 'status', true);
-      Vue.set(this.uploading, 'completed', true);
-      Vue.set(this.uploading, 'title', 'Draft saved!');
-      Vue.set(this.uploading, 'subtitle', '');
+      this.showUploadingMessage(true, 'Draft saved!');
     } else {
       let submitResponse: ServerResponse<AssetDraft>;
       try {
         submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-        Vue.set(this.uploading, 'status', true);
-        Vue.set(this.uploading, 'completed', true);
-        Vue.set(this.uploading, 'title', 'Asset created!');
-        Vue.set(this.uploading, 'subtitle', '');
-        // this.uploading.status = true;
-        // this.uploading.completed = true;
-        // this.uploading.subtitle = '';
+        this.showUploadingMessage(true, 'Asset created!');
         console.log('submit success', submitResponse);
       } catch (err) {
+        console.error(err.message);
         // eslint-disable-next-line
         alert(`Error: ${err.message}`);
         throw new Error(err.message);
@@ -627,14 +649,16 @@ export default class CreateAsset extends Vue {
     }
   }
 
-  // todo
-  // onError(response: ServerResponse<AssetDraft>): void {
-  //   this.uploading.errors = response.messages;
-  //   setTimeout(() => {
-  //     this.uploading.errors = [];
-  //   }, 10000);
-  //   this.uploading.status = false;
-  // }
+  showUploadingMessage(completed: boolean, title: string, subtitle?: string): void {
+    Vue.set(this.uploading, 'status', true);
+    Vue.set(this.uploading, 'completed', completed);
+    Vue.set(this.uploading, 'title', title);
+    Vue.set(this.uploading, 'subtitle', subtitle || '');
+  }
+
+  showUploadingProgress(percentage: number): void {
+    Vue.set(this.uploading, 'percentage', percentage);
+  }
 }
 </script>
 <style lang="scss">
