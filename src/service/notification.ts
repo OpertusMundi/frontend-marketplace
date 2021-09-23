@@ -23,7 +23,7 @@ export default class NotificationApi extends Api {
       read,
     };
 
-    const keyValues = Object.keys(params).filter((k) => !!params[k]).map((k) => `${k}=${params[k]}`);
+    const keyValues = Object.keys(params).filter((k) => !!params[k] || params[k] === false).map((k) => `${k}=${params[k]}`);
 
     const url = `${baseUri}?${keyValues.join('&')}&orderBy=${orderBy}&order=${order}`;
 

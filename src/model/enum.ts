@@ -14,6 +14,12 @@ export enum EnumAssetType {
   VECTOR = 'VECTOR',
 }
 
+export enum EnumAssetTypeCategory {
+  DATA_FILE = 'DATA_FILE',
+  API = 'API',
+  COLLECTION = 'COLLECTION',
+}
+
 export enum EnumSpatialDataServiceType {
   TMS = 'TMS',
   WMS = 'WMS',

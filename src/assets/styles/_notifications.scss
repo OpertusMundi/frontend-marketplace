@@ -1,0 +1,46 @@
+.notification {
+    &__card {
+        background: #fff;
+        padding: 5px 10px;
+        margin-bottom: 30px;
+        border-radius: 7px;
+        display: flex;
+        cursor: pointer;
+
+        &--unread {
+            color: $secondColor;
+        }
+
+        &__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        &__main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 10px;
+        }
+
+        &__title {
+            font-weight: bold;
+            font-size: em(16);
+        }
+
+        &__text {
+            margin-top: 2px;
+            font-size: em(16);
+        }
+
+        &__moment {
+            font-size: em(12);
+            margin-top: 5px;
+        }
+    }
+
+    &__btn_mark_all_as_read {
+        cursor: pointer;
+    }
+}

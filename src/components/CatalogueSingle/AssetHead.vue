@@ -116,11 +116,6 @@ export default class AssetHead extends Vue {
     }
   }
 
-  // @Watch('catalogueItem', { deep: true, immediate: true })
-  // onCatalogueItemLoaded(): void {
-  //   this.selectedVersion = this.catalogueItem.version;
-  // }
-
   acceptDraft(): void {
     const { key } = this.$route.params;
     console.log('key', key);

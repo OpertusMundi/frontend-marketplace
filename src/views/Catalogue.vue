@@ -103,23 +103,9 @@
 
             <div :class="{ 'checkbox-group-disabled': !shownFormatCategories().includes('api') }" class="flex-grow-1">
               <h3 class="format-category-title">API</h3>
-              <!-- <div class="checkbox-group mb-xs-5" v-for="format in filters.formats.api" :key="format.id">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${format.id}`" v-model="format.isChecked">
-                <label :for="`format_${format.id}`"> {{format.name}} </label>
-              </div> -->
-
-              <!-- TODO: the following is just dummy inputs. should be changed to the commented out (up) when API Gateway is ready for Service types -->
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WMS`">
-                <label :for="`format_WMS`"> WMS </label>
-              </div>
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_WFS`">
-                <label :for="`format_WFS`"> WFS </label>
-              </div>
-              <div class="checkbox-group mb-xs-5">
-                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_DATA_API`">
-                <label :for="`format_WFS`"> Data API </label>
+              <div class="checkbox-group mb-xs-5" v-for="serviceType in filters.serviceTypes" :key="serviceType.id">
+                <input :disabled="!shownFormatCategories().includes('api')" type="checkbox" class="mr-xs-10" :id="`format_${serviceType.id}`" v-model="serviceType.isChecked">
+                <label :for="`format_${serviceType.id}`"> {{serviceType.name}} </label>
               </div>
             </div>
 
@@ -361,7 +347,6 @@
       </div>
 
       <div class="assets__top-info">
-        <!-- <h6 v-if="queryResultsCount !== null">{{ queryResultsCount }} ASSETS</h6> -->
         <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
           {{ filter.label }}
           <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
@@ -415,96 +400,21 @@ import {
 } from '@/model/catalogue';
 import { Order } from '@/model/request';
 // import { Configuration } from '@/model/configuration';
+import { Filters, FilterCRS } from '@/model/catalogue-filters';
 import store from '@/store';
 import moment from 'moment';
 import { cloneDeep } from 'lodash';
 // import { AxiosError } from 'axios';
+import VueSlider from 'vue-slider-component';
 import Datepicker from 'vuejs-datepicker';
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-shades';
-import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/antd.css';
 import epsgList from '../service/lists/epsg';
 import countries from '../service/lists/countries';
 import nuts from '../service/lists/nuts';
-
-interface FilterType {
-  id: EnumAssetType,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-interface FilterTopic {
-  id: EnumTopicCategory,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-interface FilterUpdated {
-  dateFrom: string,
-  dateTo: string,
-  timeFrom: string,
-  timeTo: string,
-}
-
-interface FilterFormats {
-  api: { id: string, name: string, isChecked: boolean }[],
-  vector: { id: string, name: string, isChecked: boolean }[],
-  raster: { id: string, name: string, isChecked: boolean }[],
-}
-
-interface FilterCRS {
-  code: string,
-  description: string,
-  isChecked?: boolean,
-}
-
-interface FilterNumberOfFeatures {
-  isSmallChecked: boolean,
-  isMediumChecked: boolean,
-  isLargeChecked: boolean,
-}
-
-interface FilterLanguage {
-  code: string,
-  name: string,
-  isChecked: boolean,
-}
-
-interface FilterLicense {
-  id: string,
-  name: string,
-  pillLabel: string,
-  isChecked: boolean,
-}
-
-// interface crs {
-//   code: string,
-//   description: string,
-//   isChecked?: boolean
-// }
-
-interface Filters {
-  types: FilterType[],
-  formats: FilterFormats,
-  updated: FilterUpdated,
-  topics: FilterTopic[],
-  scaleValues: number[],
-  crsList: FilterCRS[],
-  mapCoverageSelectionBBox: string,
-  spatialOperation: EnumSpatialOperation,
-  priceMin: number | null,
-  priceMax: number | null,
-  numberOfFeatures: FilterNumberOfFeatures,
-  attributes: string[],
-  vendors: string[],
-  languages: FilterLanguage[],
-  licenses: FilterLicense[],
-}
 
 @Component({
   components: {
@@ -665,12 +575,28 @@ export default class Catalogue extends Vue {
     this.filters.formats = {
       vector: [], // loaded from config
       raster: [], // loaded from config
-      api: [
-        { id: EnumSpatialDataServiceType.WMS, name: 'WMS', isChecked: false },
-        { id: EnumSpatialDataServiceType.WFS, name: 'WFS', isChecked: false },
-        { id: EnumSpatialDataServiceType.DATA_API, name: 'Data API', isChecked: false },
-      ],
     };
+
+    this.filters.serviceTypes = [
+      {
+        id: EnumSpatialDataServiceType.WMS,
+        name: 'WMS',
+        pillLabel: 'WMS',
+        isChecked: false,
+      },
+      {
+        id: EnumSpatialDataServiceType.WFS,
+        name: 'WFS',
+        pillLabel: 'WFS',
+        isChecked: false,
+      },
+      {
+        id: EnumSpatialDataServiceType.DATA_API,
+        name: 'Data API',
+        pillLabel: 'Data API',
+        isChecked: false,
+      },
+    ];
 
     this.filters.mapCoverageSelectionBBox = '';
 
@@ -739,6 +665,10 @@ export default class Catalogue extends Vue {
 
   mounted(): void {
     // this.searchAssets();
+    // console.log('lalala', store.getters.getLastRouteName);
+
+    if (store.getters.getLastRouteName === 'CatalogueSingle') this.filtersApplied = store.getters.getLastAppliedFilters;
+
     this.searchUsingFilters(true);
 
     this.configurationApi.getConfiguration().then((configResponse) => {
@@ -838,9 +768,12 @@ export default class Catalogue extends Vue {
           .find((x) => x.id === filterName);
         // eslint-disable-next-line
         option!.isChecked = false;
-
         break;
       }
+      case 'serviceType':
+        // eslint-disable-next-line
+        filters.serviceTypes.find((x) => x.id === filterName)!.isChecked = false;
+        break;
       case 'coverage': {
         this.onClearArea(fromAppliedFilters);
         break;
@@ -932,6 +865,11 @@ export default class Catalogue extends Vue {
     // FORMAT
     result = result.concat(
       Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => ({ label: x.name, category: 'format', filterName: x.id })),
+    );
+
+    // SERVICE TYPE
+    result = result.concat(
+      filters.serviceTypes.filter((x) => x.isChecked).map((x) => ({ label: x.pillLabel, category: 'serviceType', filterName: x.id })),
     );
 
     // SCALE
@@ -1261,10 +1199,6 @@ export default class Catalogue extends Vue {
       filterSet.type = filters.types.filter((x) => x.isChecked).map((x) => x.id as EnumAssetType);
     }
 
-    // if (this.getSelectedFilters().some((x) => x.category === 'type')) {
-    //   filters.type = this.getSelectedFilters().filter((x) => x.category === 'type').map((x) => (x.filterName as EnumAssetType));
-    // }
-
     // UPDATED
     // TODO: check format
     if (filters.updated.dateFrom) {
@@ -1282,6 +1216,11 @@ export default class Catalogue extends Vue {
     // FORMAT
     if (Object.values(filters.formats).flat().some((x) => x.isChecked)) {
       filterSet.format = Object.values(filters.formats).flat().filter((x) => x.isChecked).map((x) => x.id);
+    }
+
+    // SERVICE TYPE
+    if (filters.serviceTypes.some((x) => x.isChecked)) {
+      filterSet.serviceType = filters.serviceTypes.filter((x) => x.isChecked).map((x) => x.id as EnumSpatialDataServiceType);
     }
 
     // CRS
@@ -1359,6 +1298,7 @@ export default class Catalogue extends Vue {
       this.queryResultsCount = advancedQueryResponse.result.count;
       this.queryCurrentPage = advancedQueryResponse.result.pageRequest.page;
       if (!byAlteringCurrentFilterState) this.filtersApplied = cloneDeep(this.filters);
+      store.commit('setLastAppliedFilters', cloneDeep(this.filtersApplied));
       store.commit('setLoading', false);
     }).catch((err) => {
       console.log('err', err);

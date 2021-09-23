@@ -170,15 +170,18 @@
         <section class="homepage__video">
           <div class="m_container">
             <div class="homepage__video__placeholder" data-aos="fade-up" data-aos-delay="400">
-              <div class="homepage__video__overlay" :class="[isClicked ? 'hidden' : 'shownk']" @click.once="videoClicked()">
-                <button class="homepage__video__button">
-                  <img src="@/assets/images/icons/home/video-btn.svg" />
-                </button>
-                <img :src="pagedata.video_thumbnail.url" class="homepage__video__thumbnail" />
+              <button class="homepage__video__button" @click.once="videoClicked" v-if="!isVideoClicked">
+                <img src="@/assets/images/icons/home/video-btn.svg" />
+              </button>
+              <transition name="fade" mode="out-in">
+                <div class="homepage__video__loader" v-if="isVideoClicked && !isVideoStarted">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 95" style="enable-background:new 0 0 95 95" xml:space="preserve"><circle class="st0" cx="47.5" cy="47.5" r="25" fill="#190AFF"/><path class="st0" d="M47.5 95c-6.9 0-13.9-1.5-20.3-4.6C15.7 85 7 75.4 2.8 63.5-6 38.8 6.9 11.6 31.5 2.8 36.7.9 42 0 47.5 0c2.4 0 4.8.2 7.1.5 1.4.2 2.3 1.5 2.1 2.9-.2 1.4-1.5 2.3-2.8 2.1-2.1-.3-4.3-.5-6.4-.5-4.9 0-9.7.8-14.3 2.5C11.1 15.4-.4 39.7 7.5 61.8 11.3 72.5 19 81.1 29.3 85.9c10.3 4.9 21.8 5.4 32.5 1.6 22.1-7.9 33.6-32.2 25.7-54.3-.5-1.3.2-2.7 1.5-3.2s2.7.2 3.2 1.5c8.8 24.7-4.1 51.9-28.8 60.7-5.1 1.9-10.5 2.8-15.9 2.8z" fill="#190AFF"/><path class="st0" d="M76 27.5c-7.4 0-13.5-6.1-13.5-13.5S68.6.5 76 .5 89.5 6.6 89.5 14 83.4 27.5 76 27.5zm0-22c-4.7 0-8.5 3.8-8.5 8.5s3.8 8.5 8.5 8.5 8.5-3.8 8.5-8.5-3.8-8.5-8.5-8.5z" fill="#190AFF"/></svg>
+                </div>
+              </transition>
+              <img :src="pagedata.video_thumbnail.url" class="homepage__video__thumbnail" />
+              <div class="homepage__video__wrapper" v-if="isVideoClicked" :class="{'homepage__video__wrapper--hidden': !isVideoStarted}">
+                <youtube :fitParent="true" :video-id="'7LqfkkDDWyg'" :player-vars="{autoplay: 1}" @playing="onVideoStarted" ref="refYoutube"></youtube>
               </div>
-              <video class="homepage__video__player" controls ref="videoplayer">
-                <source :src="pagedata.video_file.url" type="video/mp4" />
-              </video>
             </div>
           </div>
         </section>
@@ -207,6 +210,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import Shape from '@/components/Shape.vue';
 import Search from '@/components/Search.vue';
 import AOS from 'aos';
+import VueYoutube from 'vue-youtube';
 import 'aos/dist/aos.css';
 import $ from '@/assets/scripts/jquery_cs';
 import slider from '@/assets/scripts/slider';
@@ -214,13 +218,17 @@ import axios from 'axios';
 import store from '@/store';
 import { Configuration } from '@/model';
 
+Vue.use(VueYoutube);
+
 @Component({
   components: { Shape, Search },
 })
 export default class Header extends Vue {
   searchResultsActive = false;
 
-  isClicked: boolean;
+  isVideoClicked: boolean;
+
+  isVideoStarted: boolean;
 
   videoElem: any;
 
@@ -232,7 +240,8 @@ export default class Header extends Vue {
     super();
 
     this.pagedata = null;
-    this.isClicked = false;
+    this.isVideoClicked = false;
+    this.isVideoStarted = false;
     this.videoElem = null;
     this.wpUrl = '';
   }
@@ -293,9 +302,13 @@ export default class Header extends Vue {
   };
 
   videoClicked(): void {
-    this.isClicked = true;
-    this.videoElem = this.$refs.videoplayer;
-    this.videoElem.play();
+    this.isVideoClicked = true;
+    // this.videoElem = this.$refs.videoplayer;
+    // this.videoElem.play();
+  }
+
+  onVideoStarted(): void {
+    this.isVideoStarted = true;
   }
 
   async getPageData(): Promise<void> {
