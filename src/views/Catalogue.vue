@@ -135,25 +135,29 @@
 
           <!-- SCALE -->
           <div class="tab tab-scale" v-show="filterMenuItemSelected == 'scale'">
-            <div class="ml-xs-20 mr-xs-20" @click="onScaleSliderClick">
+            <!-- <div class="ml-xs-20 mr-xs-20" @click="onScaleSliderClick">
               <vue-slider :processStyle="{ background: isScaleSliderDisabled()? 'whitesmoke' : '#1a0aff' }" :dotSize="isScaleSliderDisabled()? 0 : 16" :disabled="isScaleSliderDisabled()" v-model="filters.scaleValues" :data="scaleSliderOptions" :data-value="'id'" :data-label="'name'" :adsorb="true" :tooltip="'none'" :height="2" :marks="false" :direction="'rtl'" />
-            </div>
+            </div> -->
 
-            <div class="mt-xs-40 min-max-container">
+            <div class="min-max-container">
               <div class="min-max-input-item">
-                <label for="scaleSelectedMin">Minimum Scale</label>
+                <label for="scaleSelectedMin" class="mb-xs-10">Minimum Scale</label>
                 <div>
                   <span>1 : </span>
                   <input :min="scaleMax" :value="filters.scaleValues[1]" @input="validateMinMaxInput('maxScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMin">
                 </div>
               </div>
               <div class="min-max-input-item ml-xs-20">
-                <label for="scaleSelectedMax">Maximum Scale</label>
+                <label for="scaleSelectedMax" class="mb-xs-10">Maximum Scale</label>
                 <div>
                   <span>1 : </span>
                   <input :max="scaleMin" :value="filters.scaleValues[0]" @input="validateMinMaxInput('minScale', $event.target.value)" class="form-group__text min-max-scale-input" type="number" id="scaleSelectedMax">
                 </div>
               </div>
+            </div>
+            <p class="mt-xs-20 mb-xs-10"><label class="ml-xs-20 grayed">Common scales</label></p>
+            <div class="common_scales">
+              <div class="common_scales__btn" :class="{'common_scales__btn--selected': scale.isChecked}" v-for="scale in filters.fixedScales" :key="scale.id" @click="togglePopularScale(scale.id)">{{ scale.label }}</div>
             </div>
 
           </div>
@@ -482,7 +486,7 @@ export default class Catalogue extends Vue {
 
   // scaleValues: number[];
 
-  scaleSliderOptions: {id: number, name: string}[];
+  // scaleSliderOptions: {id: number, name: string}[];
 
   scaleMin: number;
 
@@ -611,15 +615,23 @@ export default class Catalogue extends Vue {
     this.scaleMin = 10;
     this.scaleMax = 10000000;
     this.filters.scaleValues = [this.scaleMin, this.scaleMax];
-    this.scaleSliderOptions = [
-      { id: 10, name: '1 : 10' },
-      { id: 100, name: '1 : 100' },
-      { id: 1000, name: '1 : 1.000' },
-      { id: 10000, name: '1 : 10.000' },
-      { id: 100000, name: '1 : 100.000' },
-      { id: 1000000, name: '1 : 1.000.000' },
-      { id: 10000000, name: '1 : 10.000.000' },
+    this.filters.fixedScales = [
+      { id: 10000, label: '1:10.000', isChecked: false },
+      { id: 25000, label: '1:25.000', isChecked: false },
+      { id: 50000, label: '1:50.000', isChecked: false },
+      { id: 100000, label: '1:100.000', isChecked: false },
+      { id: 500000, label: '1:500.000', isChecked: false },
     ];
+
+    // this.scaleSliderOptions = [
+    //   { id: 10, name: '1 : 10' },
+    //   { id: 100, name: '1 : 100' },
+    //   { id: 1000, name: '1 : 1.000' },
+    //   { id: 10000, name: '1 : 10.000' },
+    //   { id: 100000, name: '1 : 100.000' },
+    //   { id: 1000000, name: '1 : 1.000.000' },
+    //   { id: 10000000, name: '1 : 10.000.000' },
+    // ];
 
     this.filters.priceMin = null;
     this.filters.priceMax = null;
@@ -787,6 +799,11 @@ export default class Catalogue extends Vue {
         filters.scaleValues = [this.scaleMin, this.scaleMax];
         break;
       }
+      case 'fixedScale': {
+        // eslint-disable-next-line
+        filters.fixedScales.find((x) => `${x.id}` === filterName)!.isChecked = false;
+        break;
+      }
       case 'numberOfFeatures': {
         filters.numberOfFeatures = { isSmallChecked: false, isMediumChecked: false, isLargeChecked: false };
         break;
@@ -879,6 +896,11 @@ export default class Catalogue extends Vue {
         category: 'scale',
       });
     }
+
+    // FIXED SCALES
+    result = result.concat(
+      filters.fixedScales.filter((x) => x.isChecked).map((x) => ({ label: x.label, category: 'fixedScale', filterName: `${x.id}` })),
+    );
 
     // CRS
     result = result.concat(
@@ -981,17 +1003,22 @@ export default class Catalogue extends Vue {
     return res;
   }
 
-  isScaleSliderDisabled(): boolean {
-    if (this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[0]) && this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[1])) {
-      return false;
-    }
-    return true;
-  }
+  // isScaleSliderDisabled(): boolean {
+  //   if (this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[0]) && this.scaleSliderOptions.map((x) => x.id).includes(this.filters.scaleValues[1])) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
-  onScaleSliderClick(): void {
-    if (this.isScaleSliderDisabled()) {
-      this.filters.scaleValues = [this.scaleMin, this.scaleMax];
-    }
+  // onScaleSliderClick(): void {
+  //   if (this.isScaleSliderDisabled()) {
+  //     this.filters.scaleValues = [this.scaleMin, this.scaleMax];
+  //   }
+  // }
+
+  togglePopularScale(id: number): void {
+    // eslint-disable-next-line
+    this.filters.fixedScales.find((x) => x.id === id)!.isChecked = !this.filters.fixedScales.find((x) => x.id === id)!.isChecked;
   }
 
   // we use this method cause formatter of vuejs-datepicker lib is buggy
@@ -1236,6 +1263,11 @@ export default class Catalogue extends Vue {
     }
     if (selectedMaxScale !== this.scaleMax) {
       filterSet.maxScale = selectedMaxScale;
+    }
+
+    // POPULAR SCALES
+    if (filters.fixedScales.some((x) => x.isChecked)) {
+      filterSet.scales = filters.fixedScales.filter((x) => x.isChecked).map((x) => x.id);
     }
 
     // COVERAGE
