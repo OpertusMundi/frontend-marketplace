@@ -6,13 +6,14 @@
     </div>
     <div class="asset__head__title">
       <h1>{{ catalogueItem.title }}</h1>
-      <a v-if="mode === 'catalogue'" href="#" class="asset__head__favorites">
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 33 31" style="enable-background:new 0 0 33 31;" xml:space="preserve">
-          <path style="fill:#FFFFFF;"
-                d="M16.5,30.7l-3.2-2.9C5.6,20.8,0.4,16.1,0.4,9.9c0-5.2,4.1-9.3,9.3-9.3c2.5,0,4.9,1,6.8,2.7c1.8-1.7,4.2-2.7,6.8-2.7c5.2,0,9.3,4.1,9.3,9.3c0,6.1-5.1,10.8-12.9,18L16.5,30.7z M9.7,2.6c-4.1,0-7.3,3.2-7.3,7.3c0,5.2,4.9,9.7,12.2,16.5l1.8,1.6l1.8-1.6c7.4-6.8,12.2-11.2,12.2-16.5c0-4.1-3.2-7.3-7.3-7.3c-2.3,0-4.5,1.1-6,2.8l-0.8,0.9l-0.8-0.9C14.2,3.7,12,2.6,9.7,2.6z"/>
-          <path style="fill:#FFFFFF;" d="M16.5,29.4l-2.2-2C6.6,20.3,1.4,15.7,1.4,9.9c0-4.7,3.6-8.3,8.3-8.3c2.6,0,5.1,1.2,6.8,3.2c1.7-2,4.1-3.2,6.8-3.2c4.7,0,8.3,3.6,8.3,8.3c0,5.8-5.1,10.4-12.9,17.5L16.5,29.4z"/>
-        </svg>
-      </a>
+      <template v-if="mode === 'catalogue'">
+        <a v-if="catalogueItem.favorite" href="#" class="asset__head__favorites">
+          <img v-if="catalogueItem.favorite" src="@/assets/images/icons/favorite_icon--filled.svg" alt="">
+        </a>
+        <a v-else href="#" @click.prevent="onAddToFavorites(catalogueItem.id)">
+          <img src="@/assets/images/icons/favorite_icon.svg" alt="">
+        </a>
+      </template>
       <div v-if="mode === 'review'">
         <button class="btn btn--std btn--outlineblue" @click="acceptDraft">accept</button>
         <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">reject</button>
@@ -64,9 +65,13 @@ import {
 import moment from 'moment';
 import DraftAssetApi from '@/service/draft';
 import SpatialApi from '@/service/spatial';
+import FavoriteApi from '@/service/favorite';
 import { CatalogueItem } from '@/model';
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 import Modal from '@/components/Modal.vue';
+import { CatalogueItemDetails } from '@/model/catalogue';
+import store from '@/store';
+import { EnumFavoriteType, FavoriteAssetCommand } from '@/model/favorite';
 
 @Component({
   components: {
@@ -80,13 +85,15 @@ import Modal from '@/components/Modal.vue';
   },
 })
 export default class AssetHead extends Vue {
-  @Prop({ required: true }) private catalogueItem!: CatalogueItem;
+  @Prop({ required: true }) private catalogueItem!: CatalogueItem | CatalogueItemDetails;
 
   @Prop({ required: true }) private mode!: string;
 
   draftAssetApi: DraftAssetApi;
 
   spatialApi: SpatialApi;
+
+  favoriteApi: FavoriteApi;
 
   // selectedVersion: string;
 
@@ -99,6 +106,7 @@ export default class AssetHead extends Vue {
 
     this.draftAssetApi = new DraftAssetApi();
     this.spatialApi = new SpatialApi();
+    this.favoriteApi = new FavoriteApi();
 
     // this.selectedVersion = '';
 
@@ -135,6 +143,28 @@ export default class AssetHead extends Vue {
       console.log('rejected');
       // todo
       this.$router.push('/dashboard');
+    });
+  }
+
+  onAddToFavorites(pid: string): void {
+    console.log('add to favorites');
+    store.commit('setLoading', true);
+
+    const assetData: FavoriteAssetCommand = {
+      pid,
+      type: EnumFavoriteType.ASSET,
+    };
+
+    this.favoriteApi.add(assetData).then((response) => {
+      if (response.success) {
+        console.log('added to favorites');
+        this.$emit('reloadAsset');
+      } else {
+        console.log('error adding to favorites', response);
+      }
+    }).catch((err) => {
+      console.log('error adding to favorites', err);
+      store.commit('setLoading', false);
     });
   }
 }
