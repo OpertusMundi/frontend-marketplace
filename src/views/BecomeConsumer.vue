@@ -39,42 +39,50 @@
                 <div v-if="accountType === 'INDIVIDUAL'">
                   <validation-provider v-slot="{ errors }" name="First Name" rules="required">
                     <div class="form-group">
-                      <label for="last_name">First Name</label>
+                      <label for="last_name">First Name *</label>
                       <input disabled type="text" class="form-group__text" name="first_name" id="first_name" v-model="consumerData.firstName">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
                   <validation-provider v-slot="{ errors }" name="VAT Number" rules="required">
                     <div class="form-group">
-                      <label for="last_name">Last Name</label>
+                      <label for="last_name">Last Name *</label>
                       <input disabled type="text" class="form-group__text" name="last_name" id="last_name" v-model="consumerData.lastName">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
                   <validation-provider v-slot="{ errors }" name="Email" rules="required">
                     <div class="form-group">
-                      <label for="email">Email</label>
+                      <label for="email">Email *</label>
                       <input disabled type="text" class="form-group__text" name="email" id="email" v-model="consumerData.email">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
-                  <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
+                  <!-- <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                     <div class="form-group">
                       <label for="birthdate">Birthdate *</label>
                       <input type="date" class="form-group__text" name="birthdate" id="birthdate" v-model="consumerData.birthdate">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
+                  </validation-provider> -->
+                  <!-- datepicker -->
+                  <validation-provider name="Birthdate" rules="required">
+                    <div class="form-group">
+                      <label for="">Birthdate *</label>
+                      <datepicker input-class="form-group__text" :value="consumerData.birthdate" @input="consumerData.birthdate = formatDate($event)"></datepicker>
+                    </div>
                   </validation-provider>
+                  <!--  -->
                   <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
                     <div class="form-group">
-                      <label for="multiselect_nationality">Nationality</label>
+                      <label for="multiselect_nationality">Nationality *</label>
                       <multiselect id="multiselect_nationality" @input="onSelectNationality" v-model="selectedNationality" :options="countries" label="name" track-by="code" placeholder="Select nationality" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
                   <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                     <div class="form-group">
-                      <label for="multiselect_country_residence">Country of residence</label>
+                      <label for="multiselect_country_residence">Country of residence *</label>
                       <multiselect id="multiselect_country_residence" @input="onSelectCountryOfResidence" v-model="selectedCountryOfResidence" :options="countries" label="name" track-by="code" placeholder="Select country of residence" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
@@ -252,8 +260,10 @@ import {
   localize,
 } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
+import Datepicker from 'vuejs-datepicker';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
+import moment from 'moment';
 import store from '@/store';
 
 extend('required', required);
@@ -282,6 +292,7 @@ extend('phoneNumber', phoneNumber);
     ValidationObserver,
     VuePhoneNumberInput,
     Multiselect,
+    Datepicker,
   },
   filters: {
     // input format: yyyy-mm-dd
@@ -403,6 +414,10 @@ export default class BecomeConsumer extends Vue {
       // TODO
       (this.consumerData as ConsumerProfessionalCommand) = {} as ConsumerProfessionalCommand;
     }
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('YYYY-MM-DD');
   }
 
   onSelectNationality(): void {
