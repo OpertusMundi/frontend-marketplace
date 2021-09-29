@@ -42,8 +42,8 @@
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
             <li @click="createNewDraftFromPublished">Edit</li>
-            <li @click="createService('WMS')">Create WMS</li>
-            <li @click="createService('WFS')">Create WFS</li>
+            <li v-if="asset.type !== 'SERVICE'" @click="createService('WMS')">Create WMS</li>
+            <li v-if="asset.type !== 'SERVICE'" @click="createService('WFS')">Create WFS</li>
             <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
