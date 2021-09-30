@@ -711,7 +711,18 @@
     &__card {
       display: flex;
 
-      img {
+      div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        a {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      > img {
         border: solid 2px $darkColor;
         border-radius: 50%;
       }
