@@ -83,6 +83,7 @@ interface Filters {
     vendors: string[],
     languages: FilterLanguage[],
     licenses: FilterLicense[],
+    isOpen: boolean,
 }
 
 export { Filters, FilterCRS };
