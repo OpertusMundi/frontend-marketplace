@@ -885,9 +885,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    */
   contract: Contract;
   /**
-   * True if the item is already added to the user's favorite list
+   * The favorite record unique key, if the asset is already added to
+   * the user's favorite list
    */
-  favorite: boolean;
+  favorite: string | null;
   /**
    * Ingestion information. Only visible to the owners (publishers) of the asset.
    * The array contains an element for each ingested resource. The resource can

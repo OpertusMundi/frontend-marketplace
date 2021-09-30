@@ -556,6 +556,12 @@ export interface Provider {
    * verified.
    */
   email: string | null;
+  /**
+   * The favorite record unique key, if the provider is already added to
+   * the user's favorite list. For performance reasons, this value is returned
+   * only when the provider object is loaded as a part of a catalogue item response.
+   */
+  favorite: string | null;
   /*
    * Provider registration date in ISO format e.g. 2020-06-10T16:01:04.991+03:00
    */

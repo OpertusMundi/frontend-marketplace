@@ -1,4 +1,5 @@
 import { Provider } from './account';
+import { CatalogueItemDetails } from './catalogue';
 
 export enum EnumFavoriteSortField {
   CREATED_ON = 'CREATED_ON',
@@ -24,13 +25,11 @@ export interface FavoriteProviderCommand extends FavoriteCommand {
 
 export interface Favorite {
   key: string;
-  title: string;
   type: EnumFavoriteType;
 }
 
 export interface FavoriteAsset extends Favorite {
-  assetId: string;
-  assetVersion: string;
+  asset: CatalogueItemDetails;
 }
 
 export interface FavoriteProvider extends Favorite {
