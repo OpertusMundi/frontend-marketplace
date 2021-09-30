@@ -6,7 +6,7 @@
     <div class="s_container">
       <div class="asset__inner">
         <div class="asset__content" v-if="isItemLoaded">
-          <asset-head :catalogueItem="catalogueItem" :mode="mode"></asset-head>
+          <asset-head :catalogueItem="catalogueItem" :mode="mode" @reloadAsset="loadAsset('catalogue')"></asset-head>
 
           <div class="asset__sections">
 
@@ -28,6 +28,8 @@
 
           <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
           <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
+
+          <vendor-information :catalogueItem="catalogueItem"></vendor-information>
 
           <other-available-options :catalogueItem="catalogueItem"></other-available-options>
         </div>
@@ -57,6 +59,7 @@ import TermsAndRestrictions from '../components/CatalogueSingle/TermsAndRestrict
 import DataProfilingAndSamples from '../components/CatalogueSingle/DataProfilingAndSamples.vue';
 import ShopCard from '../components/CatalogueSingle/ShopCard.vue';
 import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProviderReview.vue';
+import VendorInformation from '../components/CatalogueSingle/VendorInformation.vue';
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
@@ -73,6 +76,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     DataProfilingAndSamples,
     ShopCard,
     ShopCardProviderReview,
+    VendorInformation,
     OtherAvailableOptions,
     RelatedAssets,
     ApiUsageExample,

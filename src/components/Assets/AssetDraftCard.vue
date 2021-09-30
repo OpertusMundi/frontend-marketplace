@@ -41,10 +41,10 @@
       <transition name="fade" mode="out-in">
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
-            <li>Publish</li>
-            <li>Edit</li>
-            <li @click="createService('WMS')">Create WMS</li>
-            <li @click="createService('WFS')">Create WFS</li>
+            <!-- <li>Publish</li>
+            <li>Edit</li> -->
+            <!-- <li @click="createService('WMS')">Create WMS</li>
+            <li @click="createService('WFS')">Create WFS</li> -->
             <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
@@ -68,8 +68,8 @@ import {
   RowPrePaidPricingModelCommand,
 } from '@/model/pricing-model';
 import moment from 'moment';
-import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
-import store from '@/store';
+// import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
+// import store from '@/store';
 
 @Component
 export default class AssetDraftCard extends Vue {
@@ -183,29 +183,29 @@ export default class AssetDraftCard extends Vue {
     return res;
   }
 
-  createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {
-    console.log('create Service');
-    store.commit('setLoading', true);
-    const draftApi: DraftApiFromAssetCommand = {
-      type: EnumDraftCommandType.ASSET,
-      pid: this.asset.assetPublished,
-      title: this.asset.title,
-      version: this.asset.version,
-      serviceType,
-    };
-    this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
-      if (createApiResponse.success) {
-        console.log('service draft created successfully!!', createApiResponse);
-        const { key } = createApiResponse.result;
-        store.commit('setLoading', false);
-        this.$emit('serviceDraftCreated', { key, serviceType });
-        // console.log(`/dashboard/assets/create/${key}`);
-        // this.$router.push(`/dashboard/assets/create/${key}`);
-      } else {
-        console.log('error creating service draft', createApiResponse);
-      }
-    });
-  }
+  // createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {
+  //   console.log('create Service');
+  //   store.commit('setLoading', true);
+  //   const draftApi: DraftApiFromAssetCommand = {
+  //     type: EnumDraftCommandType.ASSET,
+  //     pid: this.asset.assetPublished,
+  //     title: this.asset.title,
+  //     version: this.asset.version,
+  //     serviceType,
+  //   };
+  //   this.draftAssetApi.createApi(draftApi).then((createApiResponse) => {
+  //     if (createApiResponse.success) {
+  //       console.log('service draft created successfully!!', createApiResponse);
+  //       const { key } = createApiResponse.result;
+  //       store.commit('setLoading', false);
+  //       this.$emit('serviceDraftCreated', { key, serviceType });
+  //       // console.log(`/dashboard/assets/create/${key}`);
+  //       // this.$router.push(`/dashboard/assets/create/${key}`);
+  //     } else {
+  //       console.log('error creating service draft', createApiResponse);
+  //     }
+  //   });
+  // }
 
   deleteAsset(): void {
     this.$emit('delete', this.asset.assetPublished);

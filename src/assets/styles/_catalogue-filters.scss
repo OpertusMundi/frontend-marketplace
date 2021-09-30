@@ -378,3 +378,21 @@ small {
     outline: none;
     box-shadow: 1px 1px 2px rgb(134, 134, 134);
 }
+
+.common_scales {
+    display: inline-flex;
+    &__btn {
+        border: solid 1px $darkColor;
+        border-radius: 5px;
+        color: $darkColor;
+        padding: 5px 10px;
+        margin-right: 10px;
+        font-size: em(16);
+        font-weight: 500;
+        cursor: pointer;
+        &--selected {
+            border: solid 1px $secondColor;
+            color: $secondColor;
+        }
+    }
+}

@@ -79,7 +79,8 @@ export default class App extends Vue {
 
     this.noHeader = ['Login', 'Register'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
-    this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
+    // this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
+    this.noLoaderRoutes = ['Home'];
   }
 
   @Watch('$route', { immediate: true, deep: true })

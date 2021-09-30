@@ -34,6 +34,12 @@ interface FilterServiceType {
     isChecked: boolean,
 }
 
+interface PopularScale {
+    id: number,
+    label: string,
+    isChecked: boolean,
+}
+
 interface FilterCRS {
     code: string,
     description: string,
@@ -66,6 +72,7 @@ interface Filters {
     updated: FilterUpdated,
     topics: FilterTopic[],
     scaleValues: number[],
+    fixedScales: PopularScale[],
     crsList: FilterCRS[],
     mapCoverageSelectionBBox: string,
     spatialOperation: EnumSpatialOperation,

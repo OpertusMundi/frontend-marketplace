@@ -29,7 +29,7 @@ export default class FavoriteApi extends Api {
     const { id: field, order } = sorting;
 
     const endpoint = baseUri;
-    const query = `page=${page}&size=${size}&orderBy=${field}&order=${order}type=${type || ''}`;
+    const query = `page=${page}&size=${size}&orderBy=${field}&order=${order}&type=${type || ''}`;
     const url = `${endpoint}?${query}`;
 
     return this.get<ServerResponse<PageResult<Favorite>>>(url);

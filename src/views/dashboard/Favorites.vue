@@ -9,37 +9,156 @@
     <div class="collection">
       <div class="collection__menu">
         <ul>
-          <li class="active"><a href="#" @click.prevent="">Assets</a></li>
-          <li><a href="#" @click.prevent="">Vendors</a></li>
+          <li :class="{'active': selectedTab === 'ASSET'}"><a href="#" @click.prevent="selectTab('ASSET')">Assets</a></li>
+          <li :class="{'active': selectedTab === 'PROVIDER'}"><a href="#" @click.prevent="selectTab('PROVIDER')">Vendors</a></li>
         </ul>
       </div>
 
-      <div class="collection__total"><p>0 assets</p></div>
+      <!-- ASSETS -->
+      <div v-if="selectedTab === 'ASSET'">
+        <div class="collection__total"><p>{{ assetsPagination.itemsTotal }} assets</p></div>
 
-      <div class="collection__main">
+        <asset-favorite-card v-for="asset in assets" :key="asset.key" :asset="asset"></asset-favorite-card>
 
-        <div class="more__bottom">
-          <div class="more__bottom__block">
-            <!-- <a href="#"> <p>LOAD MORE</p><p><svg xmlns="http://www.w3.org/2000/svg" width="17.404" height="25.65" viewBox="0 0 17.404 25.65"><path id="Path_2292" data-name="Path 2292" d="M-1105.012-7721.223l11.469 14.086 11.871-14.086" transform="translate(-7704.786 1106.175) rotate(90)" fill="none" stroke="#333" stroke-width="3"></path></svg></p> </a> -->
-          </div>
+        <div class="collection__main">
+          <pagination :currentPage="assetsPagination.currentPage" :itemsPerPage="assetsPagination.itemsPerPage" :itemsTotal="assetsPagination.itemsTotal" @pageSelection="onSelectPage('ASSET', $event)" class="mt-xs-30"></pagination>
         </div>
-
       </div>
+
+      <!-- VENDORS -->
+      <div v-if="selectedTab === 'PROVIDER'">
+        <div class="collection__total"><p>{{ providersPagination.itemsTotal }} assets</p></div>
+
+        <p v-for="provider in providers" :key="provider.key">provider</p>
+
+        <div class="collection__main">
+          <pagination :currentPage="providersPagination.currentPage" :itemsPerPage="providersPagination.itemsPerPage" :itemsTotal="providersPagination.itemsTotal" @pageSelection="onSelectPage('PROVIDER', $event)" class="mt-xs-30"></pagination>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import CatalogueCard from '@/components/Catalogue/Card.vue';
+import {
+  Component,
+  Vue,
+  Watch,
+} from 'vue-property-decorator';
+import AssetFavoriteCard from '@/components/Favorites/AssetFavoriteCard.vue';
+import Pagination from '@/components/Pagination.vue';
+import {
+  EnumFavoriteSortField,
+  EnumFavoriteType,
+  FavoriteAsset,
+  FavoriteProvider,
+} from '@/model/favorite';
+import FavoriteApi from '@/service/favorite';
+import { Sorting } from '@/model/request';
+import store from '@/store';
+
+interface PaginationData {
+  currentPage: number,
+  itemsPerPage: number,
+  itemsTotal: number,
+}
 
 @Component({
-  components: { CatalogueCard },
+  components: { AssetFavoriteCard, Pagination },
 })
 export default class DashboardFavorites extends Vue {
+  favoriteApi: FavoriteApi;
+
+  selectedTab: EnumFavoriteType;
+
+  assets: FavoriteAsset[];
+
+  providers: FavoriteProvider[];
+
+  assetsPagination: PaginationData = {
+    currentPage: 0,
+    itemsPerPage: 10,
+    itemsTotal: 0,
+  };
+
+  providersPagination: PaginationData = {
+    currentPage: 0,
+    itemsPerPage: 10,
+    itemsTotal: 0,
+  }
+
+  constructor() {
+    super();
+
+    this.favoriteApi = new FavoriteApi();
+
+    this.selectedTab = EnumFavoriteType.ASSET;
+
+    this.assets = [];
+
+    this.providers = [];
+  }
+
+  @Watch('selectedTab', { immediate: true })
+  onTabSelection(selectedTab: EnumFavoriteType): void {
+    switch (selectedTab) {
+      case EnumFavoriteType.ASSET: {
+        this.loadFavorites(selectedTab, this.assetsPagination.currentPage, this.assetsPagination.itemsPerPage);
+        break;
+      }
+      case EnumFavoriteType.PROVIDER: {
+        this.loadFavorites(selectedTab, this.providersPagination.currentPage, this.providersPagination.itemsPerPage);
+        break;
+      }
+      default:
+    }
+  }
+
+  selectTab(tab: EnumFavoriteType): void {
+    this.selectedTab = tab;
+  }
+
+  onSelectPage(tab: EnumFavoriteType, page: number): void {
+    const itemsPerPage = {
+      ASSET: this.assetsPagination.itemsPerPage,
+      PROVIDER: this.providersPagination.itemsPerPage,
+    };
+    this.loadFavorites(tab, page, itemsPerPage[tab]);
+  }
+
+  loadFavorites(type: EnumFavoriteType, page: number, size: number): void {
+    store.commit('setLoading', true);
+
+    const sorting: Sorting<EnumFavoriteSortField> = { id: EnumFavoriteSortField.TITLE, order: 'ASC' };
+
+    this.favoriteApi.find(type, page, size, sorting).then((response) => {
+      const { data } = response;
+
+      switch (type) {
+        case EnumFavoriteType.ASSET: {
+          this.assets = data.result.items as FavoriteAsset[];
+          Vue.set(this.assetsPagination, 'currentPage', data.result.pageRequest.page);
+          Vue.set(this.assetsPagination, 'itemsTotal', data.result.count);
+          break;
+        }
+        case EnumFavoriteType.PROVIDER: {
+          this.providers = data.result.items as FavoriteProvider[];
+          Vue.set(this.providersPagination, 'currentPage', data.result.pageRequest.page);
+          Vue.set(this.providersPagination, 'itemsTotal', data.result.count);
+          break;
+        }
+        default:
+      }
+    }).catch((err) => {
+      console.log('error fetching favorite assets', err);
+    }).finally(() => {
+      store.commit('setLoading', false);
+    });
+  }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/_collection.scss";
-  @import "@/assets/styles/_messages.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
 </style>
