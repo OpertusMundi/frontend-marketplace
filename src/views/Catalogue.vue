@@ -686,41 +686,22 @@ export default class Catalogue extends Vue {
   }
 
   mounted(): void {
-    // this.searchAssets();
-    // console.log('lalala', store.getters.getLastRouteName);
-
     if (store.getters.getLastRouteName === 'CatalogueSingle') this.filtersApplied = store.getters.getLastAppliedFilters;
 
-    this.searchUsingFilters(true);
+    if (this.$route.params.filterShortcut) {
+      store.commit('setLoading', true);
+      this.onToggleFilterShortcut(this.$route.params.filterShortcut);
+    } else {
+      this.searchUsingFilters(true);
+    }
 
-    this.configurationApi.getConfiguration().then((configResponse) => {
-      this.filters.languages = configResponse.result.europeLanguages.map((x) => ({ ...x, isChecked: false }));
-    });
+    this.filters.languages = store.getters.getConfig.configuration.europeLanguages.map((x) => ({ ...x, isChecked: false }));
 
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
     this.filters.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
     this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
   }
-
-  // searchAssets(): void {
-  //   this.queryResults = [];
-  //   // this.catalogQuery.query = this.query;
-  //   // this.catalogueApi.find(this.query)
-  //   this.catalogueApi.find(this.catalogQuery)
-  //     .then((queryResponse: CatalogueQueryResponse) => {
-  //       if (queryResponse.success) {
-  //         this.queryResults = queryResponse.result.items;
-  //         this.queryResultsCount = queryResponse.result.count;
-  //         this.queryCurrentPage = queryResponse.result.pageRequest.page;
-  //       }
-  //       store.commit('setLoading', false);
-  //     })
-  //     .catch((error: AxiosError) => {
-  //       console.log(error);
-  //       store.commit('setLoading', false);
-  //     });
-  // }
 
   onSelectPage(i: number): void {
     console.log('page', i);
