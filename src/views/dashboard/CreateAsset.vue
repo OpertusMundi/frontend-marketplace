@@ -75,7 +75,7 @@
             </template>
 
             <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
-            <review ref="step7" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+            <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
 
             <div class="dashboard__form__errors" v-if="uploading.errors.length">
               <ul>
@@ -315,6 +315,7 @@ export default class CreateAsset extends Vue {
       type: '' as EnumAssetType,
       userOnlyForVas: false,
       version: '',
+      vettingRequired: false,
       geometry: {
         type: 'Polygon',
         coordinates: [
@@ -377,6 +378,7 @@ export default class CreateAsset extends Vue {
 
   nextStep():void {
     console.log('a', this.asset);
+    console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
@@ -605,6 +607,7 @@ export default class CreateAsset extends Vue {
 
     // UPLOAD RESOURCE
     if (!isDraft && this.fileToUpload.isFileSelected) {
+      console.log('upload resource');
       this.showUploadingMessage(false, 'Your resource is being uploaded');
 
       let uploadResource: ServerResponse<AssetDraft>;

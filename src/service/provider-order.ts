@@ -60,4 +60,41 @@ export default class ProviderOrderApi extends Api {
 
     return this.get<ServerResponse<PageResult<ProviderOrder>>>(url);
   }
+
+  /**
+   *  Accept or Reject an Order with vetting required
+   *
+   * @param orderKey
+   * @param accepted
+   * @param rejectionReason
+   */
+  public async acceptOrRejectOrder(orderKey: string, accepted: boolean, rejectionReason?: string): Promise<ServerResponse<ProviderOrder>> {
+    const url = `/action/provider/orders/${orderKey}`;
+
+    const command = accepted ? { rejected: false } : { rejected: true, reason: rejectionReason };
+
+    return this.put<{ rejected: boolean, reason?: string }, ServerResponse<ProviderOrder>>(url, command)
+      .then((response: AxiosServerResponse<ProviderOrder>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  /**
+   * Confirm Order shipping
+   *
+   * @param orderKey
+   * @returns
+   */
+  public async confirmShipping(orderKey: string): Promise<ServerResponse<ProviderOrder>> {
+    const url = `/action/provider/orders/${orderKey}/shipping`;
+
+    return this.put<void, ServerResponse<ProviderOrder>>(url)
+      .then((response: AxiosServerResponse<ProviderOrder>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
 }

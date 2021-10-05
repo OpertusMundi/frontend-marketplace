@@ -177,6 +177,10 @@ interface Order {
    * User friendly reference code for support
    */
   referenceNumber: string;
+  /**
+   * True if consumer vetting is required
+   */
+  vettingRequired: boolean;
 }
 
 export interface ConsumerOrder extends Order {

@@ -1,5 +1,9 @@
 <template>
   <div class="dashboard__inner order_preview">
+    <!-- MODALS -->
+    <modal :modalId="'modalRejectOrder'" :show="modalToShow === 'rejectOrder'" @dismiss="modalToShow = ''" @submit="rejectOrder" :title="'Reject order?'" :inputs="[{id: 'reason', name: 'reason', type: 'text'}]"></modal>
+    <!-- END OF MODALS -->
+
     <div class="dashboard__head dashboard__head--column">
       <router-link to="/dashboard/orders"><a href="#" class="asset__head__breadcrumps"><svg class="mr-xs-10" xmlns="http://www.w3.org/2000/svg" width="6.938" height="9.904" viewBox="0 0 6.938 9.904"><path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l4.383,5.283,3.273-3.961h0l1.092-1.322" transform="translate(-7254.398 -472.947) rotate(90)" fill="none" stroke="#333" stroke-width="1.5"/></svg>BACK</a></router-link>
       <div class="dashboard__head__helpers mt-xs-30 mb-xs-50">
@@ -8,14 +12,18 @@
     </div>
 
     <div v-if="!$store.getters.isLoading">
-      <step-progress-bar :currentStep="getCurrentStep(order.status)"></step-progress-bar>
+      <step-progress-bar :steps="getSteps()"></step-progress-bar>
 
-      <h3>{{ getStatusDescription(order.status) }}</h3>
-
-      <!--
-        TODO: if step 1, ask provider to accept/reject request (implemented in wireframe, not yet in API)
-        also, we should consider having 1 view for order/purchase preview instead of 2 if template differences are few/minor
-      -->
+      <div v-if="order.status === 'PENDING_PROVIDER_APPROVAL'">
+        <h4 class="mb-xs-20">You received a new pucrhase request</h4>
+        <button @click="onAcceptOrRejectOrder(true)" class="btn btn--std btn--blue">accept</button>
+        <button @click="modalToShow = 'rejectOrder'" class="btn btn--std btn--blue">reject</button>
+      </div>
+      <div v-else-if="order.status === 'PENDING_PROVIDER_SEND_CONFIRMATION'" class="mt-xs-50">
+        <h4 class="mb-xs-20">Update order status?</h4>
+        <button @click="onOrderShippedConfirmation" class="btn btn--std btn--blue">Order is Shipped</button>
+      </div>
+      <h3 v-else>{{ getStatusDescription(order.status) }}</h3>
 
       <hr>
 
@@ -38,10 +46,13 @@ import moment from 'moment';
 import ProviderOrderApi from '@/service/provider-order';
 import { EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
+import Modal from '@/components/Modal.vue';
+import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
 
 @Component({
   components: {
     StepProgressBar,
+    Modal,
   },
 })
 export default class DashboardPurchases extends Vue {
@@ -49,12 +60,16 @@ export default class DashboardPurchases extends Vue {
 
   order: Order;
 
+  modalToShow: string;
+
   constructor() {
     super();
 
     this.providerOrderApi = new ProviderOrderApi();
 
     this.order = {} as Order;
+
+    this.modalToShow = '';
   }
 
   mounted(): void {
@@ -77,27 +92,12 @@ export default class DashboardPurchases extends Vue {
     });
   }
 
-  getCurrentStep(status: EnumOrderStatus): number {
-    const steps = {
-      CREATED: 1,
-      CHARGED: 2,
-      PENDING: 3,
-      SUCCEEDED: 4,
-    };
-    return steps[status] ? steps[status] : 0;
+  getSteps(): { status: EnumOrderStatus, label: string, completed: boolean, active: boolean }[] {
+    return getOrderSteps(this.order);
   }
 
   getStatusDescription(status: EnumOrderStatus): string {
-    // todo: check descriptions
-    const descriptions = {
-      CREATED: 'Order created. Awaiting vendor\'s approval.',
-      CHARGED: 'PayIn created. Awaiting payment receival.',
-      PENDING: 'Order payment has been received, asset delivery/subscription registration is pending.',
-      CANCELLED: 'Order has been cancelled.',
-      REFUNDED: 'Order has been cancelled and PayIn has been refunded.',
-      SUCCEEDED: 'Order has been completed.',
-    };
-    return descriptions[status];
+    return getOrderStatusDescription(status);
   }
 
   formatDate(date: string): string {
@@ -124,6 +124,43 @@ export default class DashboardPurchases extends Vue {
     //     store.commit('setLoading', false);
     //   });
     // });
+  }
+
+  onOrderShippedConfirmation(): void {
+    store.commit('setLoading', true);
+
+    this.providerOrderApi.confirmShipping(this.order.key).then((response) => {
+      if (response.success) {
+        this.order = response.result;
+      } else {
+        console.log('error updating order status to shipped', response);
+      }
+    }).catch((err) => {
+      console.log('error', err);
+    }).finally(() => {
+      store.commit('setLoading', false);
+    });
+  }
+
+  onAcceptOrRejectOrder(accepted: boolean, reason?: string): void {
+    store.commit('setLoading', true);
+    this.providerOrderApi.acceptOrRejectOrder(this.order.key, accepted, reason).then((response) => {
+      if (response.success) {
+        this.order = response.result;
+      } else {
+        console.log('error', response);
+      }
+    }).catch((err) => {
+      console.log('error', err);
+    }).finally(() => {
+      store.commit('setLoading', true);
+    });
+  }
+
+  // eslint-disable-next-line
+  rejectOrder(data: any): void {
+    const reason = data.inputValues[0].value;
+    this.onAcceptOrRejectOrder(false, reason);
   }
 }
 </script>
