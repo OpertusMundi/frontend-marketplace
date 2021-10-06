@@ -103,4 +103,40 @@
             color:#fff;
         }
     }
+
+    &--checkbox-type {
+        border: solid 1px $darkColor;
+        border-radius: 5px;
+        color: $darkColor;
+        padding: 5px 10px;
+        margin-right: 10px;
+        font-size: em(16);
+        font-weight: 500;
+        cursor: pointer;
+        &:last-child {
+            margin-right: 0;
+        }
+        &--selected {
+            border: solid 1px $secondColor;
+            color: $secondColor;
+        }
+    }
+
+    &--filter-shortcut {
+        border: solid 1px $darkColor;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        color: $darkColor;
+        background: $lightBgColor;
+        padding: 8px 13px;
+        margin-right: 10px;
+        font-size: em(16);
+        font-weight: 500;
+        cursor: pointer;
+
+        svg {
+            margin-right: 7px;
+        }
+    }
 }

@@ -8,7 +8,8 @@
     </div>
 
     <div v-if="!$store.getters.isLoading">
-      <step-progress-bar :currentStep="getCurrentStep(order.status)"></step-progress-bar>
+      <!-- <step-progress-bar :currentStep="getCurrentStep(order.status)"></step-progress-bar> -->
+      <step-progress-bar :steps="getSteps()"></step-progress-bar>
 
       <h3>{{ getStatusDescription(order.status) }}</h3>
 
@@ -38,6 +39,7 @@ import CatalogueApi from '@/service/catalogue';
 import { EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
 import { CatalogueItemDetails } from '@/model/catalogue';
+import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
 import { saveAs } from 'file-saver';
 
 @Component({
@@ -84,27 +86,12 @@ export default class DashboardPurchases extends Vue {
     });
   }
 
-  getCurrentStep(status: EnumOrderStatus): number {
-    const steps = {
-      CREATED: 1,
-      CHARGED: 2,
-      PENDING: 3,
-      SUCCEEDED: 4,
-    };
-    return steps[status] ? steps[status] : 0;
+  getSteps(): { status: EnumOrderStatus, label: string, completed: boolean, active: boolean }[] {
+    return getOrderSteps(this.order);
   }
 
   getStatusDescription(status: EnumOrderStatus): string {
-    // todo: check descriptions
-    const descriptions = {
-      CREATED: 'Order created. Awaiting vendor\'s approval.',
-      CHARGED: 'PayIn created. Awaiting payment receival.',
-      PENDING: 'Order payment has been received, asset delivery/subscription registration is pending.',
-      CANCELLED: 'Order has been cancelled.',
-      REFUNDED: 'Order has been cancelled and PayIn has been refunded.',
-      SUCCEEDED: 'Order has been completed.',
-    };
-    return descriptions[status];
+    return getOrderStatusDescription(status);
   }
 
   formatDate(date: string): string {

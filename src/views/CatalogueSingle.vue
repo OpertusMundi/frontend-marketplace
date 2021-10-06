@@ -29,7 +29,7 @@
           <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
           <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
 
-          <vendor-information :catalogueItem="catalogueItem"></vendor-information>
+          <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
 
           <other-available-options :catalogueItem="catalogueItem"></other-available-options>
         </div>

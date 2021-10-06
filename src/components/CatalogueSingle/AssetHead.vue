@@ -7,11 +7,11 @@
     <div class="asset__head__title">
       <h1>{{ catalogueItem.title }}</h1>
       <template v-if="mode === 'catalogue'">
-        <a v-if="catalogueItem.favorite" href="#" class="asset__head__favorites">
-          <img v-if="catalogueItem.favorite" src="@/assets/images/icons/favorite_icon--filled.svg" alt="">
+        <a v-if="!catalogueItem.favorite" href="#" @click.prevent="onAddToFavorites(catalogueItem.id)">
+          <img src="@/assets/images/icons/favorites/favorite_icon.svg" alt="">
         </a>
-        <a v-else href="#" @click.prevent="onAddToFavorites(catalogueItem.id)">
-          <img src="@/assets/images/icons/favorite_icon.svg" alt="">
+        <a v-else href="#" class="asset__head__favorites" @click.prevent="onRemoveFromFavorites(catalogueItem.favorite)">
+          <img v-if="catalogueItem.favorite" src="@/assets/images/icons/favorites/favorite_icon--filled.svg" alt="">
         </a>
       </template>
       <div v-if="mode === 'review'">
@@ -161,9 +161,26 @@ export default class AssetHead extends Vue {
         this.$emit('reloadAsset');
       } else {
         console.log('error adding to favorites', response);
+        store.commit('setLoading', false);
       }
     }).catch((err) => {
       console.log('error adding to favorites', err);
+      store.commit('setLoading', false);
+    });
+  }
+
+  onRemoveFromFavorites(assetKey: string): void {
+    store.commit('setLoading', true);
+
+    this.favoriteApi.remove(assetKey).then((response) => {
+      if (response.success) {
+        this.$emit('reloadAsset');
+      } else {
+        console.log('error removing from favorites', response);
+        store.commit('setLoading', false);
+      }
+    }).catch((err) => {
+      console.log('error removing from favorites', err);
       store.commit('setLoading', false);
     });
   }

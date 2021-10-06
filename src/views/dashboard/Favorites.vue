@@ -16,9 +16,9 @@
 
       <!-- ASSETS -->
       <div v-if="selectedTab === 'ASSET'">
-        <div class="collection__total"><p>{{ assetsPagination.itemsTotal }} assets</p></div>
+        <div class="collection__total"><p>{{ assetsPagination.itemsTotal }} {{ assetsPagination.itemsTotal === 1? 'asset' : 'assets' }}</p></div>
 
-        <asset-favorite-card v-for="asset in assets" :key="asset.key" :asset="asset"></asset-favorite-card>
+        <asset-favorite-card v-for="asset in assets" :key="asset.key" :asset="asset" @reload="onTabSelection('ASSET')"></asset-favorite-card>
 
         <div class="collection__main">
           <pagination :currentPage="assetsPagination.currentPage" :itemsPerPage="assetsPagination.itemsPerPage" :itemsTotal="assetsPagination.itemsTotal" @pageSelection="onSelectPage('ASSET', $event)" class="mt-xs-30"></pagination>
@@ -27,9 +27,9 @@
 
       <!-- VENDORS -->
       <div v-if="selectedTab === 'PROVIDER'">
-        <div class="collection__total"><p>{{ providersPagination.itemsTotal }} assets</p></div>
+        <div class="collection__total"><p>{{ providersPagination.itemsTotal }} {{ providersPagination.itemsTotal === 1 ? 'vendor' : 'vendors' }}</p></div>
 
-        <p v-for="provider in providers" :key="provider.key">provider</p>
+        <vendor-favorite-card v-for="provider in providers" :key="provider.key" :provider="provider" @reload="onTabSelection('PROVIDER')"></vendor-favorite-card>
 
         <div class="collection__main">
           <pagination :currentPage="providersPagination.currentPage" :itemsPerPage="providersPagination.itemsPerPage" :itemsTotal="providersPagination.itemsTotal" @pageSelection="onSelectPage('PROVIDER', $event)" class="mt-xs-30"></pagination>
@@ -47,6 +47,7 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import AssetFavoriteCard from '@/components/Favorites/AssetFavoriteCard.vue';
+import VendorFavoriteCard from '@/components/Favorites/VendorFavoriteCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import {
   EnumFavoriteSortField,
@@ -65,7 +66,7 @@ interface PaginationData {
 }
 
 @Component({
-  components: { AssetFavoriteCard, Pagination },
+  components: { AssetFavoriteCard, VendorFavoriteCard, Pagination },
 })
 export default class DashboardFavorites extends Vue {
   favoriteApi: FavoriteApi;
@@ -135,6 +136,12 @@ export default class DashboardFavorites extends Vue {
     this.favoriteApi.find(type, page, size, sorting).then((response) => {
       const { data } = response;
 
+      // check if should navigate to previous page due to item removal
+      if (data.result.items.length === 0 && data.result.pageRequest.page > 0) {
+        this.loadFavorites(type, page - 1, size);
+        return;
+      }
+
       switch (type) {
         case EnumFavoriteType.ASSET: {
           this.assets = data.result.items as FavoriteAsset[];
@@ -150,9 +157,9 @@ export default class DashboardFavorites extends Vue {
         }
         default:
       }
+      store.commit('setLoading', false);
     }).catch((err) => {
       console.log('error fetching favorite assets', err);
-    }).finally(() => {
       store.commit('setLoading', false);
     });
   }

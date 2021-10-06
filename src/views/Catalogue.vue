@@ -4,9 +4,17 @@
       <div class="assets__head">
         <h1>Assets</h1>
       </div>
-      <div class="form-group catalogue_search">
-        <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
-        <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
+      <div class="d-flex space-between">
+        <div class="form-group catalogue_search">
+          <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
+          <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
+        </div>
+        <div class="d-inline-flex align-items-center">
+          <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.isOpen}" @click="onToggleFilterShortcut('OPEN')">Open</div>
+          <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'VECTOR').isChecked}" @click="onToggleFilterShortcut('VECTOR')">Vector</div>
+          <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'RASTER').isChecked}" @click="onToggleFilterShortcut('RASTER')">Raster</div>
+          <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'SERVICE').isChecked}" @click="onToggleFilterShortcut('SERVICE')">APIs</div>
+        </div>
       </div>
 
       <!-- FILTERS MENU TAB-BAR -->
@@ -156,8 +164,8 @@
               </div>
             </div>
             <p class="mt-xs-20 mb-xs-10"><label class="ml-xs-20 grayed">Common scales</label></p>
-            <div class="common_scales">
-              <div class="common_scales__btn" :class="{'common_scales__btn--selected': scale.isChecked}" v-for="scale in filters.fixedScales" :key="scale.id" @click="togglePopularScale(scale.id)">{{ scale.label }}</div>
+            <div class="d-inline-flex">
+              <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': scale.isChecked}" v-for="scale in filters.fixedScales" :key="scale.id" @click="togglePopularScale(scale.id)">{{ scale.label }}</div>
             </div>
 
           </div>
@@ -606,6 +614,8 @@ export default class Catalogue extends Vue {
 
     this.filters.spatialOperation = EnumSpatialOperation.INTERSECTS;
 
+    this.filters.isOpen = false;
+
     this.mapCoverageDrawMode = false;
 
     this.mapCoverageSelectionRectangle = null;
@@ -676,41 +686,22 @@ export default class Catalogue extends Vue {
   }
 
   mounted(): void {
-    // this.searchAssets();
-    // console.log('lalala', store.getters.getLastRouteName);
-
     if (store.getters.getLastRouteName === 'CatalogueSingle') this.filtersApplied = store.getters.getLastAppliedFilters;
 
-    this.searchUsingFilters(true);
+    if (this.$route.params.filterShortcut) {
+      store.commit('setLoading', true);
+      this.onToggleFilterShortcut(this.$route.params.filterShortcut);
+    } else {
+      this.searchUsingFilters(true);
+    }
 
-    this.configurationApi.getConfiguration().then((configResponse) => {
-      this.filters.languages = configResponse.result.europeLanguages.map((x) => ({ ...x, isChecked: false }));
-    });
+    this.filters.languages = store.getters.getConfig.configuration.europeLanguages.map((x) => ({ ...x, isChecked: false }));
 
     const availableFormats = store.getters.getConfig.configuration.asset.fileTypes.map((x) => ({ format: x.format, category: x.category }));
     console.log('formats', availableFormats);
     this.filters.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
     this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
   }
-
-  // searchAssets(): void {
-  //   this.queryResults = [];
-  //   // this.catalogQuery.query = this.query;
-  //   // this.catalogueApi.find(this.query)
-  //   this.catalogueApi.find(this.catalogQuery)
-  //     .then((queryResponse: CatalogueQueryResponse) => {
-  //       if (queryResponse.success) {
-  //         this.queryResults = queryResponse.result.items;
-  //         this.queryResultsCount = queryResponse.result.count;
-  //         this.queryCurrentPage = queryResponse.result.pageRequest.page;
-  //       }
-  //       store.commit('setLoading', false);
-  //     })
-  //     .catch((error: AxiosError) => {
-  //       console.log(error);
-  //       store.commit('setLoading', false);
-  //     });
-  // }
 
   onSelectPage(i: number): void {
     console.log('page', i);
@@ -725,6 +716,24 @@ export default class Catalogue extends Vue {
 
   selectFilterMoreSubmenuItem(filterItem: string): void {
     this.filterMoreSubmenuItemSelected = filterItem;
+  }
+
+  onToggleFilterShortcut(filter: EnumAssetType | string): void {
+    switch (filter) {
+      case EnumAssetType.VECTOR:
+      case EnumAssetType.RASTER:
+      case EnumAssetType.SERVICE:
+        // eslint-disable-next-line
+        this.filters.types.find((x) => x.id === filter)!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;
+        break;
+      case 'OPEN':
+        this.filters.isOpen = !this.filters.isOpen;
+        break;
+      default:
+    }
+
+    // todo: check
+    this.searchUsingFilters(false);
   }
 
   removeFilter(fromAppliedFilters: boolean, category: string, filterName?: string): void {
@@ -826,6 +835,10 @@ export default class Catalogue extends Vue {
           // eslint-disable-next-line
           x.isChecked = false;
         });
+        break;
+      }
+      case 'open': {
+        filters.isOpen = false;
         break;
       }
       default:
@@ -970,6 +983,11 @@ export default class Catalogue extends Vue {
         label: `Licenses: ${this.getInputsAsOneLabel(filters.licenses.filter((x) => x.isChecked).map((x) => x.pillLabel))}`,
         category: 'license',
       });
+    }
+
+    // OPEN
+    if (filters.isOpen) {
+      result.push({ label: 'Open', category: 'open' });
     }
 
     return result;
@@ -1315,6 +1333,11 @@ export default class Catalogue extends Vue {
     // LICENSE
     if (filters.licenses.some((x) => x.isChecked)) {
       filterSet.license = filters.licenses.filter((x) => x.isChecked).map((x) => x.id);
+    }
+
+    // OPEN
+    if (filters.isOpen) {
+      filterSet.openDataset = true;
     }
 
     console.log(filterSet);

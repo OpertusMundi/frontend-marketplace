@@ -36,7 +36,8 @@
               </validation-provider>
             </div>
             <div class="col-md-6">
-              <div v-if="deliveryMethod === 'DIGITAL_PLATFORM'">
+              <!-- <div v-if="deliveryMethod === 'DIGITAL_PLATFORM'"> -->
+              <div>
                 <h1>Upload Asset</h1>
                 <input type="file" @change="readFile($event)">
 

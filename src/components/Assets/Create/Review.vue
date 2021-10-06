@@ -115,12 +115,12 @@
               <div class="form-group mt-xs-20">
                 <label class="control control-radio">
                   Yes, I want to approve a purchase first
-                  <input type="radio" name="vetting_true" v-model="vettingOption" :value="true" />
+                  <input type="radio" name="vetting_true" v-model="vettingRequiredLocal" :value="true" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   No, I do not want to approve a purchase first
-                  <input type="radio" name="vetting_false" v-model="vettingOption" :value="false" />
+                  <input type="radio" name="vetting_false" v-model="vettingRequiredLocal" :value="false" />
                   <div class="control_indicator"></div>
                 </label>
               </div>
@@ -137,7 +137,12 @@
   </validation-observer>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+  Prop,
+  Watch,
+} from 'vue-property-decorator';
 import { CatalogueItemCommand } from '@/model';
 import { ValidationObserver } from 'vee-validate';
 import ContractApi from '@/service/provider-contract';
@@ -151,9 +156,11 @@ import store from '@/store';
 export default class Review extends Vue {
   @Prop({ required: true }) private asset!: CatalogueItemCommand;
 
+  @Prop({ required: true }) private vettingRequired!: boolean;
+
   contractApi: ContractApi;
 
-  vettingOption: boolean;
+  vettingRequiredLocal: boolean;
 
   contractTitle: string;
 
@@ -162,12 +169,18 @@ export default class Review extends Vue {
 
     this.contractApi = new ContractApi();
 
-    this.vettingOption = false;
+    this.vettingRequiredLocal = this.vettingRequired;
     this.contractTitle = '';
   }
 
   created(): void {
     this.setContractTitle();
+  }
+
+  @Watch('vettingRequiredLocal')
+  onVettingRequiredLocalChange(vettingRequired: boolean): void {
+    console.log('vetting', vettingRequired);
+    this.$emit('update:vettingRequired', vettingRequired);
   }
 
   goToStep(step: number): void {
