@@ -214,7 +214,7 @@
               </label>
               <div class="mt-xs-10 mb-xs-20 ml-xs-40 d-flex flex-column" v-if="additionalResourcesOption === 'upload_files'">
                 <span v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="mb-xs-10">{{ resource.resourceCommand.fileName }}</span>
-                <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILE</button></div>
+                <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILES</button></div>
               </div>
               <label class="control control-radio">
                 External link
@@ -436,8 +436,8 @@ export default class Metadata extends Vue {
   onAdditionalResourcesOptionChange(): void {
     console.log('artu', this.additionalResourcesOption);
     if (this.additionalResourcesOption === 'upload_files') {
+      // this.additionalUriResource = { uri: '', text: '', type: EnumAssetAdditionalResource.URI };
       this.assetLocal.additionalResources = [];
-      this.additionalUriResource = { uri: '', text: '', type: EnumAssetAdditionalResource.URI };
     }
     if (this.additionalResourcesOption === 'external_link') {
       this.additionalResourcesToUploadLocal = [];
@@ -492,7 +492,40 @@ export default class Metadata extends Vue {
       },
     }));
 
-    console.log(this.additionalResourcesToUploadLocal);
+    this.additionalResourcesToUploadLocal.reduceRight((_, x, i) => {
+      const numSuffix = this.additionalResourcesToUploadLocal.filter((y, j) => y.file.name === x.file.name && j < i).length;
+
+      this.additionalResourcesToUploadLocal[i] = numSuffix ? {
+        ...x,
+        resourceCommand: {
+          ...x.resourceCommand,
+          fileName: x.file.name.split('.').map((y, j) => (j === x.file.name.split('.').length - 2 ? `${y}(${numSuffix})` : y)).join('.'),
+        },
+      } : x;
+
+      return _;
+    }, null);
+
+    // // rename duplicate files
+    // this.additionalResourcesToUploadLocal.reduceRight((_, x, i) => {
+    //   const numSuffix = this.additionalResourcesToUploadLocal.filter((y, j) => y.file.name === x.file.name && j < i).length;
+    //   // this.additionalResourcesToUploadLocal[i] = numSuffix ? { ...x, file: { ...x.file, name: `${x.file.name}(${numSuffix + 1})` } } : x;
+
+    //   if (numSuffix) {
+    //     try {
+    //       const newFileName = x.file.name.split('.').map((y, j) => (j === x.file.name.split('.').length - 2 ? `${y}_${numSuffix + 1}` : y)).join('.');
+    //       const newFile = new File([x.file], newFileName);
+    //       this.additionalResourcesToUploadLocal[i].file = newFile;
+    //     } catch (err) {
+    //       // eslint-disable-next-line
+    //       alert('Browser does not support file creation'); // todo
+    //     }
+    //   }
+    //   return _;
+    // }, null);
+
+    console.log('artul', this.additionalResourcesToUploadLocal);
+    this.numberOfAdditionalResourcesFiles = 1;
     this.modalToShow = '';
   }
 }
