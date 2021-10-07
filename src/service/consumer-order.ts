@@ -57,4 +57,21 @@ export default class ConsumerOrderApi extends Api {
 
     return this.get<ServerResponse<PageResult<ConsumerOrder>>>(url);
   }
+
+  /**
+   * Confirm order delivery
+   *
+   * @param orderKey
+   * @returns
+   */
+  public async confirmDelivery(orderKey: string): Promise<ServerResponse<ConsumerOrder>> {
+    const url = `/action/consumer/orders/${orderKey}/delivery`;
+
+    return this.put<void, ServerResponse<ConsumerOrder>>(url)
+      .then((response: AxiosServerResponse<ConsumerOrder>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
 }
