@@ -353,7 +353,7 @@
           </div>
           <div class="filter-side-menu-bottom">
             <button class="btn--std btn--outlineblue" @click="closeFilters()">CANCEL</button>
-            <button @click="searchUsingFilters(false)" class="btn--std btn--blue">APPLY FILTERS</button>
+            <button @click="searchUsingFilters(false, true)" class="btn--std btn--blue">APPLY FILTERS</button>
           </div>
         </div>
       </div>
@@ -733,7 +733,7 @@ export default class Catalogue extends Vue {
     }
 
     // todo: check
-    this.searchUsingFilters(false);
+    this.searchUsingFilters(false, true);
   }
 
   removeFilter(fromAppliedFilters: boolean, category: string, filterName?: string): void {
@@ -845,7 +845,7 @@ export default class Catalogue extends Vue {
     }
 
     if (fromAppliedFilters) {
-      this.searchUsingFilters(true);
+      this.searchUsingFilters(true, true);
       this.removeFilter(false, category, filterName);
     }
   }
@@ -1200,7 +1200,8 @@ export default class Catalogue extends Vue {
     this.closeFilters();
     store.commit('setLoading', true);
     // this.searchAssets();
-    this.searchUsingFilters(true);
+
+    this.searchUsingFilters(true, true);
   }
 
   // eslint-disable-next-line
@@ -1210,7 +1211,7 @@ export default class Catalogue extends Vue {
     return moment(date).format('YYYY-MM-DD');
   }
 
-  searchUsingFilters(byAlteringCurrentFilterState: boolean): void {
+  searchUsingFilters(byAlteringCurrentFilterState: boolean, goToFirstPage = false): void {
     this.closeFilters();
     store.commit('setLoading', true);
 
@@ -1223,7 +1224,7 @@ export default class Catalogue extends Vue {
     filterSet.text = this.catalogQuery.query;
 
     // PAGE PARAMS
-    filterSet.page = this.catalogQuery.page;
+    filterSet.page = goToFirstPage ? 0 : this.catalogQuery.page;
     filterSet.size = this.catalogQuery.size;
 
     const orderOptions = [
