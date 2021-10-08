@@ -2,7 +2,7 @@
   <div class="asset__vendor_info">
     <div class="s_container">
       <div class="asset__related__content">
-        <div class="asset__related__content__right">
+        <div class="asset__related__content__right" v-if="catalogueItem && catalogueItem.publisher">
           <h6>About the vendor</h6>
           <div class="asset__vendor_info__card">
             <img :src="'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage" alt="" height="80" width="80">

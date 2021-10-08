@@ -291,7 +291,7 @@ export default class CreateAsset extends Vue {
       creationDate: '',
       dateEnd: '',
       dateStart: '',
-      deliveryMethod: 'NONE' as EnumDeliveryMethod,
+      deliveryMethod: '' as EnumDeliveryMethod,
       format: '',
       ingested: false,
       keywords: [],
