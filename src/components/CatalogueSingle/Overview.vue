@@ -14,7 +14,16 @@
             <li v-for="suitableFor in catalogueItem.suitableFor" v-bind:key="`${suitableFor}_suitable`">{{ suitableFor }}</li>
           </ul>
           <h5 v-if="catalogueItem.additionalResources">Additional resources:</h5>
-          <a v-for="(additionalResources, index) in catalogueItem.additionalResources" v-bind:key="`${index}_aditional_r`" :href="additionalResources.uri" target="_blank" style="display:block">{{ additionalResources.text }}</a>
+          <!-- <a v-for="(additionalResources, index) in catalogueItem.additionalResources" v-bind:key="`${index}_aditional_r`" :href="additionalResources.uri" target="_blank" style="display:block">{{ additionalResources.text }}</a> -->
+          <div v-for="(additionalResource, index) in catalogueItem.additionalResources" :key="`${index}_aditional_r`">
+            <template v-if="additionalResource.type === 'URI'">
+              <a :href="additionalResource.uri" target="_blank" style="display: block">{{ additionalResource.text }}</a>
+            </template>
+            <template v-if="additionalResource.type === 'FILE'">
+              <a href="#" @click.prevent="onDownloadAdditionalResource(additionalResource.id, additionalResource.fileName)" style="display: block">{{ additionalResource.fileName }}</a>
+              <small>{{ additionalResource.description }}</small>
+            </template>
+          </div>
         </div>
         <div class="asset__section__overview__right">
           <h5>Asset Info</h5>
@@ -45,15 +54,59 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import ProviderAssetsApi from '@/service/provider-assets';
+import DraftAssetApi from '@/service/draft';
 import { CatalogueItem } from '@/model';
 import moment from 'moment';
+import { saveAs } from 'file-saver';
 
 @Component
 export default class Overview extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
+  @Prop({ required: true }) readonly mode!: string;
+
+  providerAssetsApi: ProviderAssetsApi;
+
+  draftAssetApi: DraftAssetApi;
+
+  constructor() {
+    super();
+
+    this.providerAssetsApi = new ProviderAssetsApi();
+    this.draftAssetApi = new DraftAssetApi();
+  }
+
   formatDate(date: string): string {
     return moment(date).format('DD MMM. YYYY');
+  }
+
+  onDownloadAdditionalResource(key: string, fileName: string): void {
+    switch (this.mode) {
+      case 'catalogue': {
+        const pid = this.$route.params.id;
+
+        this.providerAssetsApi.downloadAdditionalResource(pid, key).then((response) => {
+          const blob = new Blob([(response as any).data]);
+
+          saveAs(blob, fileName);
+        });
+
+        break;
+      }
+      case 'review': {
+        const assetKey = this.$route.params.key;
+
+        this.draftAssetApi.downloadAdditionalResource(assetKey, key).then((response) => {
+          const blob = new Blob([(response as any).data]);
+
+          saveAs(blob, fileName);
+        });
+
+        break;
+      }
+      default:
+    }
   }
 }
 </script>

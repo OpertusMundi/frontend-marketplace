@@ -37,4 +37,16 @@ export default class ProviderAssetsApi extends Api {
 
     return this.delete<ServerResponse<void>>(url);
   }
+
+  /**
+   * Downloads an additional resource file
+   *
+   * @param pid
+   * @param resourceKey
+   */
+  public async downloadAdditionalResource(pid: string, resourceKey: string): Promise<AxiosServerResponse<BinaryType>> {
+    const url = `/action/assets/${pid}/additional-resources/${resourceKey}`;
+
+    return this.get(url, { responseType: 'blob' });
+  }
 }

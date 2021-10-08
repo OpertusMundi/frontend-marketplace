@@ -10,7 +10,7 @@
 
           <div class="asset__sections">
 
-            <overview :catalogueItem="catalogueItem"></overview>
+            <overview :mode="mode" :catalogueItem="catalogueItem"></overview>
 
             <!-- <api-usage-example v-if="catalogueItem && catalogueItem.type === 'SERVICE'"></api-usage-example> -->
 

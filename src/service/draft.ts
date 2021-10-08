@@ -283,4 +283,16 @@ export default class DraftAssetApi extends Api {
       return data;
     });
   }
+
+  /**
+   * Downloads an additional resource file
+   *
+   * @param draftKey
+   * @param resourceKey
+   */
+  public async downloadAdditionalResource(draftKey: string, resourceKey: string): Promise<AxiosServerResponse<BinaryType>> {
+    const url = `/action/drafts/${draftKey}/additional-resources/${resourceKey}`;
+
+    return this.get(url, { responseType: 'blob' });
+  }
 }
