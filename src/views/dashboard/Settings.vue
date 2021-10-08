@@ -14,7 +14,7 @@
       <modal :show="modalToShow == 'mobileNumber'" @dismiss="modalToShow = ''" @submit="onSubmitTopioAccountField" :title="'Change your mobile number'" :modalId="'mobile'" :inputs="[{id: 'mobile', name: 'Mobile number', value: userData.profile.mobile, type: 'text'}]"></modal>
 
       <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
-      <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
+      <modal :show="modalToShow == 'companyImage'" @dismiss="modalToShow = ''" @submit="onSubmitProviderOptionalField" :title="'Change your company image'" :modalId="'companyImage'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
       <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: getCurrentOrDraftValue('companyNumber'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: getCurrentOrDraftValue('companyType'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', value: getCurrentOrDraftValue('email'), type: 'text'}]"></modal>
@@ -399,6 +399,11 @@
                 <div class="tabs__tab__list__item"><strong>Company name</strong></div>
                 <div class="tabs__tab__list__item right">{{ getCurrentOrDraftValue('name') }}</div>
                 <div class="tabs__tab__list__item"><button :disabled="!canEditMangoPayRelatedField()" @click="modalToShow = 'companyName'" class="btn btn--std btn--outlinedark">EDIT</button></div>
+                <div class="tabs__tab__list__line"></div>
+
+                <div class="tabs__tab__list__item"><strong>Company Logo</strong></div>
+                <div class="tabs__tab__list__item right avatar"><img :src="'data:' + userData.profile.provider.current.logoImageMimeType + ';base64, ' + userData.profile.provider.current.logoImage" :height="80" :width="80" alt="user image"></div>
+                <div class="tabs__tab__list__item"><button @click="modalToShow = 'companyImage'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                 <div class="tabs__tab__list__line"></div>
 
                 <div class="tabs__tab__list__item"><strong>VAT number</strong></div>
@@ -861,6 +866,7 @@ import {
   CustomerIndividual,
   CustomerProfessional,
   EnumCustomerType,
+  ProviderProfileCommand,
 } from '@/model/account';
 import { Card, CardRegistration } from '@/model/payin';
 import {
@@ -1277,6 +1283,40 @@ export default class DashboardHome extends Vue {
     this.passwordNewVerify = '';
     this.passwordChanged = false;
     this.passwordCurrentError = false;
+    this.modalToShow = '';
+  }
+
+  // eslint-disable-next-line
+  onSubmitProviderOptionalField(modalData): void {
+    const data: ProviderProfileCommand = {
+      additionalInfo: this.userData.profile.provider.current?.additionalInfo || '',
+      companyType: this.userData.profile.provider.current?.additionalInfo || '',
+      logoImage: this.userData.profile.provider.current?.logoImage || '',
+      logoImageMimeType: this.userData.profile.provider.current?.logoImageMimeType || '',
+      siteUrl: this.userData.profile.provider.current?.siteUrl || '',
+      phone: this.userData.profile.provider.current?.phone || '',
+    };
+
+    switch (modalData.modalId) {
+      case 'companyImage':
+        const imgString = modalData.inputValues[0].value.split(',')[1];
+        const imgType = modalData.inputValues[0].value.split(';')[0].split('data:')[1];
+        data.logoImage = imgString;
+        data.logoImageMimeType = imgType;
+        break;
+      default:
+    }
+
+    this.providerApi.updateProfile(data).then((response) => {
+      if (response.success) {
+        this.loadUserData();
+      } else {
+        console.log('err', response);
+      }
+    }).catch((err) => {
+      console.log('err', err);
+    });
+
     this.modalToShow = '';
   }
 

@@ -1,11 +1,27 @@
 import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
-import { ProviderProfessionalCommand, Profile } from '@/model/account';
+import { ProviderProfessionalCommand, Profile, ProviderProfileCommand } from '@/model/account';
 
 export default class ProviderApi extends Api {
   constructor() {
     super({ withCredentials: true });
+  }
+
+  /**
+   * Update optional properties of a provider's profile.
+   *
+   * @param command
+   */
+  public async updateProfile(command: ProviderProfileCommand): Promise<ServerResponse<Profile>> {
+    const url = '/action/provider/profile';
+
+    return this.post<ProviderProfileCommand, ServerResponse<Profile>>(url, command)
+      .then((response: AxiosServerResponse<Profile>) => {
+        const { data } = response;
+
+        return data;
+      });
   }
 
   /**
