@@ -135,7 +135,7 @@ import {
   EnumDraftCommandType,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
-import { AssetFileAdditionalResourceCommand } from '@/model/asset';
+import { AssetFileAdditionalResourceCommand, FileResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
 import Metadata from '@/components/Assets/Create/Metadata.vue';
@@ -158,6 +158,15 @@ extend('regex', regex);
 extend('credit_card', (value) => Vue.prototype.$cardFormat.validateCardNumber(value));
 extend('credit_card_exp', (value) => Vue.prototype.$cardFormat.validateCardExpiry(value));
 extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(value));
+
+interface FileToUpload {
+  isFileSelected: boolean,
+  file: File,
+  fileName: string,
+  fileExtension: string,
+  crs: string,
+  encoding: string,
+}
 
 @Component({
   components: {
@@ -219,7 +228,7 @@ export default class CreateAsset extends Vue {
 
   additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
-  fileToUpload: {isFileSelected: boolean, file: File, fileName: string, fileExtension: string};
+  fileToUpload: FileToUpload;
 
   uploading:any;
 
@@ -238,6 +247,8 @@ export default class CreateAsset extends Vue {
       file: {} as File,
       fileName: '',
       fileExtension: '',
+      crs: '',
+      encoding: '',
     };
 
     this.assetMainType = '' as EnumAssetTypeCategory;
@@ -612,7 +623,16 @@ export default class CreateAsset extends Vue {
 
       let uploadResource: ServerResponse<AssetDraft>;
       try {
-        uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, { fileName: this.fileToUpload.fileName, format: this.asset.format }, config);
+        const fileInfo: FileResourceCommand = {
+          fileName: this.fileToUpload.fileName,
+          format: this.asset.format,
+        };
+        if (this.fileToUpload.encoding) fileInfo.encoding = this.fileToUpload.encoding;
+        // todo: currently, file CRS is ignored (when support for multiple resources is implemented, we should consider adding a CRS for each resource)
+
+        console.log('file info', fileInfo);
+
+        uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, fileInfo, config);
         this.asset = uploadResource.result.command;
         console.log('upload resource success', uploadResource);
       } catch (err) {

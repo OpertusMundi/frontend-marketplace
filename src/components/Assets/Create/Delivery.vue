@@ -50,6 +50,11 @@
                     </div>
                   </validation-provider>
                 </div>
+
+                <div v-if="fileToUploadLocal.isFileSelected" class="form-group mt-xs-20">
+                  <label for="fileEncoding">Encoding</label>
+                  <input class="form-group__text" id="fileEncoding" type="text" placeholder="(optional)" v-model="fileToUploadLocal.encoding">
+                </div>
               </div>
             </div>
           </div>
@@ -129,6 +134,8 @@ interface FileToUpload {
   file: File,
   fileName: string,
   fileExtension: string,
+  crs: string,
+  encoding: string,
 }
 
 @Component({
@@ -177,4 +184,5 @@ export default class Delivery extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
 </style>
