@@ -8,6 +8,7 @@ import {
   EnumOrderStatus,
   EnumOrderSortField,
   ProviderOrder,
+  OrderShippingCommand,
 } from '@/model/order';
 
 /**
@@ -82,15 +83,16 @@ export default class ProviderOrderApi extends Api {
   }
 
   /**
-   * Confirm Order shipping
+   * Confirm order shipping
    *
    * @param orderKey
+   * @param command
    * @returns
    */
-  public async confirmShipping(orderKey: string): Promise<ServerResponse<ProviderOrder>> {
+  public async confirmShipping(orderKey: string, command?: OrderShippingCommand): Promise<ServerResponse<ProviderOrder>> {
     const url = `/action/provider/orders/${orderKey}/shipping`;
 
-    return this.put<void, ServerResponse<ProviderOrder>>(url)
+    return this.put<OrderShippingCommand, ServerResponse<ProviderOrder>>(url, command || {})
       .then((response: AxiosServerResponse<ProviderOrder>) => {
         const { data } = response;
 

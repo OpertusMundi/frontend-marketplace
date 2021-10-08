@@ -1,4 +1,4 @@
-import { EnumSpatialDataServiceType } from '@/model/enum';
+import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 
 export enum EnumResourceType {
   FILE = 'FILE',
@@ -8,12 +8,6 @@ export enum EnumResourceType {
 export enum EnumAssetAdditionalResource {
   FILE = 'FILE',
   URI = 'URI'
-}
-
-export enum EnumAssetSourceType {
-  NETCDF = 'NETCDF',
-  RASTER = 'RASTER',
-  VECTOR = 'VECTOR',
 }
 
 export interface AssetFileAdditionalResource {
@@ -92,7 +86,15 @@ export interface FileResource extends Resource {
   /**
    * Asset category computed from the file format
    */
-  category: EnumAssetSourceType;
+  category: EnumAssetType;
+  /**
+   * Geometry data CRS e.g. EPSG:4326
+   */
+  crs: string | null;
+  /**
+   * File encoding e.g. UTF-8
+   */
+  encoding: string | null;
   /**
    * File name
    */
@@ -171,18 +173,26 @@ export interface ServiceResource extends Resource {
   /**
    * Resource minimum scale denominator
    */
-  minScale:number;
+  minScale: number;
   /**
    * Resource maximum scale denominator
    */
-  maxScale:number;
+  maxScale: number;
   /**
    * Resource tile sets
    */
-  tileSets:unknown[];
+  tileSets: unknown[];
 }
 
 export interface FileResourceCommand {
+  /**
+   * Geometry data CRS e.g. EPSG:4326
+   */
+  crs?: string;
+  /**
+   * File encoding e.g. UTF-8
+   */
+  encoding?: string;
   /**
    * File name. If not set, the name of uploaded file is used
    */

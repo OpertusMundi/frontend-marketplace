@@ -1,4 +1,4 @@
-import { EnumAssetSourceType } from '@/model/asset';
+import { EnumAssetType } from './enum';
 import { PricingModelSettings } from '@/model/pricing-model';
 
 export enum EnumAuthProvider {
@@ -20,7 +20,7 @@ interface AssetFileType {
   /**
    * File type category
    */
-  category: EnumAssetSourceType,
+  category: EnumAssetType,
   /**
    * Allowed file extensions
    */

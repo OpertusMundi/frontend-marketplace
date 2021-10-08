@@ -9,8 +9,11 @@ export enum EnumContinent {
 }
 
 export enum EnumAssetType {
+  BUNDLE = 'BUNDLE',
+  NETCDF = 'NETCDF',
   RASTER = 'RASTER',
   SERVICE = 'SERVICE',
+  TABULAR = 'TABULAR',
   VECTOR = 'VECTOR',
 }
 

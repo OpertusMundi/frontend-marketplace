@@ -200,3 +200,14 @@ export interface ProviderOrder extends Order {
    */
   items: ProviderOrderItem[];
 }
+
+export interface OrderShippingCommand {
+  /**
+   * Optional postage company tracker URL
+   */
+  trackerUrl?: string;
+  /**
+   * Optional provider reference URL
+   */
+  referenceUrl?: string;
+}

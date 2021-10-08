@@ -433,7 +433,7 @@ export interface Metadata {
    * resource unique identifier
    */
   key: string;
-  assetType: 'NetCDF' | 'vector' | 'raster';
+  assetType: 'NetCDF' | 'vector' | 'raster' | 'tabular';
 }
 
 export type Sample = { [prop: string]: (string | number)[] };
@@ -803,6 +803,10 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Id of an entity responsible for making the resource available
    */
   publisherId: string;
+  /*
+   * Asset statistics
+   */
+  statistics: CatalogueItemStatistics;
 }
 
 export enum EnumContractIcon {
@@ -899,10 +903,6 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * A list of resources of the dataset
    */
   resources: Resource[];
-  /*
-   * Asset statistics
-   */
-  statistics: CatalogueItemStatistics;
   /**
    * A list of all item versions
    */
@@ -994,6 +994,14 @@ export interface DraftApiFromFileCommand extends DraftApiCommand {
    * Path to user's file system
    */
   path: string;
+  /**
+   * Geometry data CRS e.g. EPSG:4326
+   */
+  crs?: string;
+  /**
+   * File encoding e.g. UTF-8
+   */
+  encoding?: string;
   /**
    * File format
    */
