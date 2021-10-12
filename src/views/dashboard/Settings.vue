@@ -1298,12 +1298,13 @@ export default class DashboardHome extends Vue {
     };
 
     switch (modalData.modalId) {
-      case 'companyImage':
+      case 'companyImage': {
         const imgString = modalData.inputValues[0].value.split(',')[1];
         const imgType = modalData.inputValues[0].value.split(';')[0].split('data:')[1];
         data.logoImage = imgString;
         data.logoImageMimeType = imgType;
         break;
+      }
       default:
     }
 
