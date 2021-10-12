@@ -16,10 +16,10 @@
       </div>
       <div class="asset_card__center">
         <div class="asset_card__title">{{ asset.title }}</div>
-        <div class="asset_card__price" v-if="getPriceOrMinimumPrice().value">
-          <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
-          {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€ </span>
-          <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
+        <div class="asset_card__price" v-if="price().value">
+          <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
+          {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
+          <small v-if="price().suffix">{{ price().suffix}}</small>
         </div>
       </div>
       <div class="asset_card__bottom">
@@ -45,7 +45,7 @@ import {
   CatalogueItem,
 } from '@/model';
 import moment from 'moment';
-import { EnumPricingModel } from '@/model/pricing-model';
+import getPriceOrMinimumPrice from '@/helper/cards';
 
 @Component
 export default class CatalogueCard extends Vue {
@@ -71,58 +71,8 @@ export default class CatalogueCard extends Vue {
     return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
   }
 
-  getPriceOrMinimumPrice(): {prefix: string, value: string, suffix: string} {
-    const res = { prefix: '', value: '', suffix: '' };
-
-    res.prefix = this.asset.pricingModels.length > 1 || (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.pricingModels[0].model.type)) ? 'FROM' : '';
-
-    let minPrice = Infinity;
-    for (let i = 0; i < this.asset.pricingModels.length; i += 1) {
-      const x = this.asset.pricingModels[i];
-      if (x.model.type === EnumPricingModel.FREE) {
-        minPrice = 0;
-        res.value = 'FREE';
-        res.suffix = '';
-        break;
-      }
-      if (x.model.type === EnumPricingModel.FIXED && x.model.totalPriceExcludingTax < minPrice) {
-        minPrice = x.model.totalPriceExcludingTax;
-        res.value = `${x.model.totalPriceExcludingTax}`;
-        res.suffix = '';
-      }
-      if (x.model.type === EnumPricingModel.FIXED_PER_ROWS && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = '1,000 rows';
-      }
-      if (x.model.type === EnumPricingModel.FIXED_FOR_POPULATION && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = '10,000 people';
-      }
-      if (x.model.type === EnumPricingModel.PER_CALL_WITH_PREPAID && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = 'per call';
-      }
-      if (x.model.type === EnumPricingModel.PER_CALL_WITH_BLOCK_RATE && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = 'per call';
-      }
-      if (x.model.type === EnumPricingModel.PER_ROW_WITH_PREPAID && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = 'per row';
-      }
-      if (x.model.type === EnumPricingModel.PER_ROW_WITH_BLOCK_RATE && x.model.price < minPrice) {
-        minPrice = x.model.price;
-        res.value = `${x.model.price}`;
-        res.suffix = 'per row';
-      }
-    }
-
-    return res;
+  price(): {prefix: string, value: string, suffix: string} {
+    return getPriceOrMinimumPrice(this.asset);
   }
 }
 </script>

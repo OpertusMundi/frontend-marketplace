@@ -19,10 +19,10 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price" v-if="getPriceOrMinimumPrice().value">
-            <small v-if="getPriceOrMinimumPrice().prefix">{{ getPriceOrMinimumPrice().prefix + ' ' }}</small>
-            {{ getPriceOrMinimumPrice().value }}<span v-if="getPriceOrMinimumPrice().value !== 'FREE'">€ </span>
-            <small v-if="getPriceOrMinimumPrice().suffix">{{ getPriceOrMinimumPrice().suffix}}</small>
+          <div class="asset_card__price" v-if="price().value">
+            <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
+            {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
+            <small v-if="price().suffix">{{ price().suffix}}</small>
           </div>
         </div>
         <div class="asset_card__bottom">
@@ -57,16 +57,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
-import {
-  CallBlockRatePricingModelCommand,
-  CallPrePaidPricingModelCommand,
-  EnumPricingModel,
-  FixedPopulationPricingModelCommand,
-  FixedPricingModelCommand,
-  FixedRowPricingModelCommand,
-  RowBlockRatePricingModelCommand,
-  RowPrePaidPricingModelCommand,
-} from '@/model/pricing-model';
+import getPriceOrMinimumPrice from '@/helper/cards';
 import moment from 'moment';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
 // import store from '@/store';
@@ -127,60 +118,8 @@ export default class AssetDraftCard extends Vue {
     return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
   }
 
-  getPriceOrMinimumPrice(): {prefix: string, value: string, suffix: string} {
-    const res = { prefix: '', value: '', suffix: '' };
-
-    if (!this.asset.command) return { prefix: '', value: '', suffix: '' };
-
-    res.prefix = this.asset.command.pricingModels.length > 1 || (this.asset.command.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(this.asset.command.pricingModels[0].type))) ? 'FROM' : '';
-
-    let minPrice = Infinity;
-    for (let i = 0; i < this.asset.command.pricingModels.length; i += 1) {
-      const x = this.asset.command.pricingModels[i];
-      if (x.type === EnumPricingModel.FREE) {
-        minPrice = 0;
-        res.value = 'FREE';
-        res.suffix = '';
-        break;
-      }
-      if (x.type === EnumPricingModel.FIXED && (x as FixedPricingModelCommand).totalPriceExcludingTax < minPrice) {
-        minPrice = (x as FixedPricingModelCommand).totalPriceExcludingTax;
-        res.value = `${(x as FixedPricingModelCommand).totalPriceExcludingTax}`;
-        res.suffix = '';
-      }
-      if (x.type === EnumPricingModel.FIXED_PER_ROWS && (x as FixedRowPricingModelCommand).price < minPrice) {
-        minPrice = (x as FixedRowPricingModelCommand).price;
-        res.value = `${(x as FixedRowPricingModelCommand).price}`;
-        res.suffix = '1,000 rows';
-      }
-      if (x.type === EnumPricingModel.FIXED_FOR_POPULATION && (x as FixedPopulationPricingModelCommand).price < minPrice) {
-        minPrice = (x as FixedPopulationPricingModelCommand).price;
-        res.value = `${(x as FixedPopulationPricingModelCommand).price}`;
-        res.suffix = '10,000 people';
-      }
-      if (x.type === EnumPricingModel.PER_CALL_WITH_PREPAID && (x as CallPrePaidPricingModelCommand).price < minPrice) {
-        minPrice = (x as CallPrePaidPricingModelCommand).price;
-        res.value = `${(x as CallPrePaidPricingModelCommand).price}`;
-        res.suffix = 'per call';
-      }
-      if (x.type === EnumPricingModel.PER_CALL_WITH_BLOCK_RATE && (x as CallBlockRatePricingModelCommand).price < minPrice) {
-        minPrice = (x as CallBlockRatePricingModelCommand).price;
-        res.value = `${(x as CallBlockRatePricingModelCommand).price}`;
-        res.suffix = 'per call';
-      }
-      if (x.type === EnumPricingModel.PER_ROW_WITH_PREPAID && (x as RowPrePaidPricingModelCommand).price < minPrice) {
-        minPrice = (x as RowPrePaidPricingModelCommand).price;
-        res.value = `${(x as RowPrePaidPricingModelCommand).price}`;
-        res.suffix = 'per row';
-      }
-      if (x.type === EnumPricingModel.PER_ROW_WITH_BLOCK_RATE && (x as RowBlockRatePricingModelCommand).price < minPrice) {
-        minPrice = (x as RowBlockRatePricingModelCommand).price;
-        res.value = `${(x as RowBlockRatePricingModelCommand).price}`;
-        res.suffix = 'per row';
-      }
-    }
-
-    return res;
+  price(): { prefix: string, value: string, suffix: string } {
+    return getPriceOrMinimumPrice(this.asset.command);
   }
 
   // createService(serviceType: 'WMS' | 'WFS' | 'DATA_API'): void {

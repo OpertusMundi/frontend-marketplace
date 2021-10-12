@@ -16,19 +16,19 @@
                 <label class="control control-radio">
                   By the platform
                   <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'DIGITAL_PLATFORM'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PLATFORM" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   Digital Provider
                   <span>Digital Provider</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'DIGITAL_PROVIDER'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PROVIDER" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   Physical Provider
                   <span>Physical Provider.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" :value="'PHYSICAL_PROVIDER'" />
+                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
                   <div class="control_indicator"></div>
                 </label>
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>

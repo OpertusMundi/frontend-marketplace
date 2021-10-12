@@ -605,3 +605,33 @@ export interface Consumer {
    */
   country: string;
 }
+
+/**
+ * Provider optional topio fields
+ */
+export interface ProviderProfileCommand {
+  /**
+   * Additional provider's info
+   */
+  additionalInfo: string;
+  /**
+   * Company type description
+   */
+  companyType: string;
+  /**
+   * Company logo image using Base64 encoding
+   */
+  logoImage: string;
+  /**
+   * Company log image MIME type
+   */
+  logoImageMimeType: string;
+  /**
+   * Provider contact phone
+   */
+  phone: string;
+  /**
+   * Provider site URL
+   */
+  siteUrl: string;
+}

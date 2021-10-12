@@ -152,31 +152,6 @@
       <!-- <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li> -->
       <li><strong>Delivered from: </strong>{{ catalogueItem.publisher.name }}</li>
     </ul>
-    <div class="asset-owner">
-      <div class="asset-owner__inner">
-        <div class="asset-owner__inner__logo" v-if="catalogueItem.publisher.logoImageMimeType && catalogueItem.publisher.logoImage">
-          <img :src="'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage" :alt="`image for ${catalogueItem.publisher.name}`">
-        </div>
-        <div class="asset-owner__inner__info">
-          <div class="asset-owner__inner__info__name">
-            <!-- <a href="#">{{ catalogueItem.publisher.name }}</a> -->
-            <a href="#">
-              <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 33 31" style="enable-background:new 0 0 33 31;" xml:space="preserve">
-                <path style="fill:#FFFFFF;"
-                d="M16.5,30.7l-3.2-2.9C5.6,20.8,0.4,16.1,0.4,9.9c0-5.2,4.1-9.3,9.3-9.3c2.5,0,4.9,1,6.8,2.7c1.8-1.7,4.2-2.7,6.8-2.7c5.2,0,9.3,4.1,9.3,9.3c0,6.1-5.1,10.8-12.9,18L16.5,30.7z M9.7,2.6c-4.1,0-7.3,3.2-7.3,7.3c0,5.2,4.9,9.7,12.2,16.5l1.8,1.6l1.8-1.6c7.4-6.8,12.2-11.2,12.2-16.5c0-4.1-3.2-7.3-7.3-7.3c-2.3,0-4.5,1.1-6,2.8l-0.8,0.9l-0.8-0.9C14.2,3.7,12,2.6,9.7,2.6z"/>
-                <path style="fill:#FFFFFF;" d="M16.5,29.4l-2.2-2C6.6,20.3,1.4,15.7,1.4,9.9c0-4.7,3.6-8.3,8.3-8.3c2.6,0,5.1,1.2,6.8,3.2c1.7-2,4.1-3.2,6.8-3.2c4.7,0,8.3,3.6,8.3,8.3c0,5.8-5.1,10.4-12.9,17.5L16.5,29.4z"/>
-              </svg>
-            </a>
-          </div>
-          <!-- <div class="rating rating--dark">
-            <span v-for="index in 5" v-bind:key="`${index}_rating`" :class="{ 'active' : index <= catalogueItem.publisher.rating }">★</span>
-            <i>{{catalogueItem.publisher.rating ? catalogueItem.publisher.rating : '- '}}/5</i>
-          </div> -->
-          <!-- <div class="asset-owner__inner__info__country">{{ catalogueItem.publisher.city }}, {{ catalogueItem.publisher.country }}</div> -->
-          <!-- <div class="asset-owner__inner__info__date">Joined {{ catalogueItem.publisher.joinedAt | format_date }}</div> -->
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script lang="ts">

@@ -11,7 +11,11 @@
       <!-- <step-progress-bar :currentStep="getCurrentStep(order.status)"></step-progress-bar> -->
       <step-progress-bar :steps="getSteps()"></step-progress-bar>
 
-      <h3>{{ getStatusDescription(order.status) }}</h3>
+      <div v-if="order.status === 'PENDING_CONSUMER_RECEIVE_CONFIRMATION'" class="mt-xs-50">
+        <h4 class="mb-xs-20">Update order status?</h4>
+        <button @click="onOrderDeliveredConfirmation" class="btn btn--std btn--blue">Order is Delivered</button>
+      </div>
+      <h3 v-else>{{ getStatusDescription(order.status) }}</h3>
 
       <hr>
 
@@ -116,6 +120,22 @@ export default class DashboardPurchases extends Vue {
         console.log('err', err);
         store.commit('setLoading', false);
       });
+    });
+  }
+
+  onOrderDeliveredConfirmation(): void {
+    store.commit('setLoading', true);
+
+    this.consumerOrderApi.confirmDelivery(this.order.key).then((response) => {
+      if (response.success) {
+        this.order = response.result;
+      } else {
+        console.log('err', response);
+      }
+    }).catch((err) => {
+      console.log('err', err);
+    }).finally(() => {
+      store.commit('setLoading', false);
     });
   }
 }
