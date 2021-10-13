@@ -411,6 +411,10 @@ interface BaseCatalogueItem {
    * Version of the resource
    */
   version: string;
+  /**
+   * True if consumer vetting is required
+   */
+  vettingRequired: boolean;
 }
 
 export interface CatalogueItemStatistics {
@@ -948,10 +952,6 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * Metadata fields to be hidden by vendor
    */
   visibility?: string[];
-  /**
-   * True if consumer vetting is required
-   */
-  vettingRequired?: boolean;
 }
 
 export enum EnumDraftCommandType {
