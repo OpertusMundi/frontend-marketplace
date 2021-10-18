@@ -1,15 +1,17 @@
 <template>
-   <validation-observer ref="refObserver">
-      <div class="dashboard__form__step">
-         <validation-provider v-slot="{ errors }" name="ContractType" rules="required">
-            <div class="form-group">
-               <label for="multiselect_type">Master Contract</label>
-               <multiselect id="multiselect_type"  @input="onChange" v-model="contractType1" :options="masterContracts" label="title" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select contract type"></multiselect>
-               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-            </div>
-         </validation-provider>
-      </div>
-   </validation-observer>
+  <validation-observer ref="refObserver">
+    <div class="dashboard__form__step">
+      <validation-provider v-slot="{ errors }" name="ContractType" rules="required">
+        <div class="form-group">
+          <label for="multiselect_type">Master Contract</label>
+          <multiselect id="multiselect_type" @input="onChange" v-model="contractType1" :options="masterContracts" label="title" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select contract type"></multiselect>
+          <div class="errors" v-if="errors">
+            <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+          </div>
+        </div>
+      </validation-provider>
+    </div>
+  </validation-observer>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
@@ -31,7 +33,7 @@ extend('required', required);
   },
 })
 export default class ContractTypeSelect extends Vue {
-   @Prop({ required: true }) private contractType!: MasterContract | null;
+  @Prop({ required: true }) private contractType!: MasterContract | null;
 
   masterContracts: MasterContract[];
 
@@ -42,7 +44,7 @@ export default class ContractTypeSelect extends Vue {
   constructor() {
     super();
 
-    this.contractType1 = null;
+    this.contractType1 = this.contractType;
     this.masterContracts = [];
     this.providerContractApi = new ProviderContractApi();
   }
@@ -56,7 +58,7 @@ export default class ContractTypeSelect extends Vue {
   }
 
   getMasterContracts(): void {
-    const sortOrder: Sorting <EnumMasterContractSortField> = {
+    const sortOrder: Sorting<EnumMasterContractSortField> = {
       id: EnumMasterContractSortField.TITLE,
       order: 'DESC',
     };
