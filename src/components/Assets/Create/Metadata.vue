@@ -206,28 +206,42 @@
             <h3>Additional Resources</h3>
             <p>Provide any additional files for the documentation of your asset.</p>
 
-            <div class="form-group mt-xs-20">
-              <label class="control control-radio">
-                Upload files
-                <input type="radio" name="asset_type" v-model="additionalResourcesOption" value="upload_files" />
-                <div class="control_indicator"></div>
-              </label>
+            <div class="collection__menu mt-xs-20">
+              <ul>
+                <li :class="{'active': additionalResourceSelectedTab === 'upload_file'}"><a href="#" @click.prevent="additionalResourceSelectedTab = 'upload_file'">Files</a></li>
+                <li :class="{'active': additionalResourceSelectedTab === 'external_link'}"><a href="#" @click.prevent="additionalResourceSelectedTab = 'external_link'">External links</a></li>
+              </ul>
+            </div>
+
+            <div class="mt-xs-10 mb-xs-20 d-flex flex-column" v-if="additionalResourceSelectedTab === 'upload_file'">
+              <span v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="mb-xs-10">{{ resource.resourceCommand.fileName }}</span>
+              <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILES</button></div>
+            </div>
+
+            <div class="form-group" v-if="additionalResourceSelectedTab === 'external_link'">
+              <div v-for="(additionalUriResource, i) in additionalUriResources" :key="i">
+                <label for="additional_resources_link">Add a link</label>
+                <input id="additional_resources_link" type="text" class="form-group__text" placeholder="https://" v-model="additionalUriResource.uri">
+                <label for="additional_resources_link_text">Displayed text for URI</label>
+                <textarea id="additional_resources_link_text" type="text" class="form-group__text" :disabled="!additionalUriResource.uri" v-model="additionalUriResource.text"></textarea>
+              </div>
+              <button class="btn btn--std btn--dark" :disabled="isAddAdditionalUriResourceDisabled()" @click="onAddAdditionalUriResource">ADD MORE</button>
+            </div>
+
+            <!-- <div class="form-group mt-xs-20">
+              <h4>Upload files</h4>
               <div class="mt-xs-10 mb-xs-20 ml-xs-40 d-flex flex-column" v-if="additionalResourcesOption === 'upload_files'">
                 <span v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="mb-xs-10">{{ resource.resourceCommand.fileName }}</span>
                 <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILES</button></div>
               </div>
-              <label class="control control-radio">
-                External link
-                <input type="radio" name="asset_type" v-model="additionalResourcesOption" value="external_link" />
-                <div class="control_indicator"></div>
-              </label>
+              <h4>External links</h4>
               <div v-if="additionalResourcesOption === 'external_link'" class="form-group ml-xs-40">
                 <label for="additional_resources_link">Add a link</label>
                 <input id="additional_resources_link" type="text" class="form-group__text" placeholder="https://" v-model="additionalUriResource.uri">
                 <label for="additional_resources_link_text">Displayed text for URI</label>
                 <textarea id="additional_resources_link_text" type="text" class="form-group__text" :disabled="!additionalUriResource.uri" v-model="additionalUriResource.text"></textarea>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -280,9 +294,11 @@ export default class Metadata extends Vue {
 
   numberOfAdditionalResourcesFiles: number;
 
-  additionalResourcesOption: string;
+  // additionalResourcesOption: string;
 
-  additionalUriResource: AssetUriAdditionalResource;
+  additionalResourceSelectedTab: string;
+
+  additionalUriResources: AssetUriAdditionalResource[];
 
   scalesForDisplay: string[];
 
@@ -324,19 +340,27 @@ export default class Metadata extends Vue {
 
     this.numberOfAdditionalResourcesFiles = 1;
 
-    this.additionalResourcesOption = '';
+    // this.additionalResourcesOption = '';
 
-    if (this.assetLocal.additionalResources.length && this.assetLocal.additionalResources[0].type === EnumAssetAdditionalResource.URI) {
-      const [uriResource] = this.assetLocal.additionalResources;
-      this.additionalUriResource = uriResource;
-      this.additionalResourcesOption = 'external_link';
-    } else {
-      this.additionalUriResource = {
-        uri: '',
-        text: '',
-        type: EnumAssetAdditionalResource.URI,
-      };
-    }
+    this.additionalResourceSelectedTab = 'upload_file';
+
+    this.additionalUriResources = this.assetLocal.additionalResources.filter((x) => x.type === EnumAssetAdditionalResource.URI).length
+      ? this.assetLocal.additionalResources.filter((x) => x.type === EnumAssetAdditionalResource.URI) as AssetUriAdditionalResource[]
+      : [{ uri: '', text: '', type: EnumAssetAdditionalResource.URI }];
+
+    // this.additionalUriResources = [];
+
+    // if (this.assetLocal.additionalResources.length && this.assetLocal.additionalResources[0].type === EnumAssetAdditionalResource.URI) {
+    //   const [uriResource] = this.assetLocal.additionalResources;
+    //   this.additionalUriResource = uriResource;
+    //   this.additionalResourcesOption = 'external_link';
+    // } else {
+    //   this.additionalUriResource = {
+    //     uri: '',
+    //     text: '',
+    //     type: EnumAssetAdditionalResource.URI,
+    //   };
+    // }
 
     this.scalesForDisplay = this.assetLocal.scales.map((x) => x.description);
 
@@ -423,27 +447,37 @@ export default class Metadata extends Vue {
     this.$emit('update:additionalResourcesToUpload', this.additionalResourcesToUploadLocal);
   }
 
-  @Watch('additionalUriResource', { deep: true })
-  onAdditionalUriResourceChange(): void {
-    Vue.set(this.assetLocal, 'additionalResources', [this.additionalUriResource]);
-
-    if (!this.additionalUriResource.uri) {
-      this.additionalUriResource.text = '';
+  @Watch('additionalUriResources', { deep: true })
+  onAdditionalUriResourcesChange(): void {
+    if (this.additionalUriResources.some((x) => !x.uri && x.text)) {
+      this.additionalUriResources = this.additionalUriResources.map((x) => (x.uri ? x : { ...x, text: '' }));
     }
+
+    const additionalUriResourcesWithoutEmptyOnes = this.additionalUriResources.filter((x) => x.uri);
+    Vue.set(this.assetLocal, 'additionalResources', additionalUriResourcesWithoutEmptyOnes);
   }
 
-  @Watch('additionalResourcesOption', { deep: false })
-  onAdditionalResourcesOptionChange(): void {
-    console.log('artu', this.additionalResourcesOption);
-    if (this.additionalResourcesOption === 'upload_files') {
-      // this.additionalUriResource = { uri: '', text: '', type: EnumAssetAdditionalResource.URI };
-      this.assetLocal.additionalResources = [];
-    }
-    if (this.additionalResourcesOption === 'external_link') {
-      this.additionalResourcesToUploadLocal = [];
-      this.numberOfAdditionalResourcesFiles = 1;
-    }
-  }
+  // @Watch('additionalUriResource', { deep: true })
+  // onAdditionalUriResourceChange(): void {
+  //   Vue.set(this.assetLocal, 'additionalResources', [this.additionalUriResource]);
+
+  //   if (!this.additionalUriResource.uri) {
+  //     this.additionalUriResource.text = '';
+  //   }
+  // }
+
+  // @Watch('additionalResourcesOption', { deep: false })
+  // onAdditionalResourcesOptionChange(): void {
+  //   console.log('artu', this.additionalResourcesOption);
+  //   if (this.additionalResourcesOption === 'upload_files') {
+  //     // this.additionalUriResource = { uri: '', text: '', type: EnumAssetAdditionalResource.URI };
+  //     this.assetLocal.additionalResources = [];
+  //   }
+  //   if (this.additionalResourcesOption === 'external_link') {
+  //     this.additionalResourcesToUploadLocal = [];
+  //     this.numberOfAdditionalResourcesFiles = 1;
+  //   }
+  // }
 
   populateAvailableFormatsForSelectedType(): void {
     const selectedType = this.asset.type;
@@ -480,6 +514,19 @@ export default class Metadata extends Vue {
     this.assetLocal.keywords = this.assetLocal.keywords.filter((x) => x.keyword !== keyword);
   }
 
+  onAddAdditionalUriResource(): void {
+    this.additionalUriResources.push({
+      uri: '',
+      text: '',
+      type: EnumAssetAdditionalResource.URI,
+    });
+  }
+
+  isAddAdditionalUriResourceDisabled(): boolean {
+    if (this.additionalUriResources.some((x) => !x.uri)) return true;
+    return false;
+  }
+
   onSubmitAdditionalResourcesFiles(): void {
     const files = [...this.$el.querySelectorAll('.input-additional-resource-file')].map((x) => (x as any).files[0]);
     const comments = [...this.$el.querySelectorAll('.input-additional-resource-comments')].map((x) => (x as any).value);
@@ -506,24 +553,6 @@ export default class Metadata extends Vue {
       return _;
     }, null);
 
-    // // rename duplicate files
-    // this.additionalResourcesToUploadLocal.reduceRight((_, x, i) => {
-    //   const numSuffix = this.additionalResourcesToUploadLocal.filter((y, j) => y.file.name === x.file.name && j < i).length;
-    //   // this.additionalResourcesToUploadLocal[i] = numSuffix ? { ...x, file: { ...x.file, name: `${x.file.name}(${numSuffix + 1})` } } : x;
-
-    //   if (numSuffix) {
-    //     try {
-    //       const newFileName = x.file.name.split('.').map((y, j) => (j === x.file.name.split('.').length - 2 ? `${y}_${numSuffix + 1}` : y)).join('.');
-    //       const newFile = new File([x.file], newFileName);
-    //       this.additionalResourcesToUploadLocal[i].file = newFile;
-    //     } catch (err) {
-    //       // eslint-disable-next-line
-    //       alert('Browser does not support file creation'); // todo
-    //     }
-    //   }
-    //   return _;
-    // }, null);
-
     console.log('artul', this.additionalResourcesToUploadLocal);
     this.numberOfAdditionalResourcesFiles = 1;
     this.modalToShow = '';
@@ -534,4 +563,5 @@ export default class Metadata extends Vue {
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
+  @import "@/assets/styles/_collection.scss";
 </style>
