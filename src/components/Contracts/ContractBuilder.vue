@@ -5,13 +5,7 @@
         <div class="contract-builder__index">
           <h4>Document Outline</h4>
           <ul>
-            <li
-              v-for="section in masterContract.sections"
-              v-bind:key="section.id"
-              :style="{ paddingLeft: 0.1 * section.indent + 'em' }"
-              class="contract-builder__index__item"
-              :class="{ 'active' : selectedSection.id == section.id }"
-            >
+            <li v-for="section in masterContract.sections" v-bind:key="section.id" :style="{ paddingLeft: 0.1 * section.indent + 'em' }" class="contract-builder__index__item" :class="{ active: selectedSection.id == section.id }">
               <a href="#" @click.prevent>Section {{ section.index }} {{ section.title }}</a>
             </li>
           </ul>
@@ -25,18 +19,14 @@
               <button class="btn btn--std btn--dark" :disabled="!isValid()" @click="finish" v-if="lastSection()">FINISH</button>
             </div>
             <div class="contract-builder__main__content">
-              <div
-                class="contract-builder__options"
-                v-if="this.selectedSection.dynamic && this.selectedSection.variable">
+              <div class="contract-builder__options" v-if="this.selectedSection.dynamic && this.selectedSection.variable">
                 <label class="control control-radio" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`">
                   <strong v-html="option.bodyHtml"></strong>
                   <input type="radio" v-model="selectedSectionValue" :value="index" />
                   <div class="control_indicator"></div>
                 </label>
               </div>
-              <div
-                class="contract-builder__options"
-                v-else-if="this.selectedSection.optional && this.selectedSection.variable">
+              <div class="contract-builder__options" v-else-if="this.selectedSection.optional && this.selectedSection.variable">
                 <div class="contract-builder__option" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`" v-html="option.bodyHtml"></div>
                 <label class="control control-radio">
                   DISCART
@@ -49,10 +39,7 @@
                   <div class="control_indicator"></div>
                 </label>
               </div>
-              <div
-                v-else
-                class="contract-builder__options"
-                v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`">
+              <div v-else class="contract-builder__options" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`">
                 <div class="contract-builder__option" v-html="option.bodyHtml"></div>
               </div>
             </div>
@@ -60,19 +47,16 @@
         </div>
       </div>
       <validation-provider name="Contract Template data" rules="required">
-        <input type="hidden" v-model="templateFilled">
+        <input type="hidden" v-model="templateFilled" />
       </validation-provider>
     </div>
   </validation-observer>
 </template>
 <script lang="ts">
 import {
-  Component,
-  Vue,
-  Watch,
-  Prop,
+  Component, Vue, Watch, Prop,
 } from 'vue-property-decorator';
-import { MasterContract } from '@/model/provider-contract';
+import { MasterContract, ProviderTemplateContract } from '@/model/provider-contract';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import ProviderContractApi from '@/service/provider-contract';
@@ -86,9 +70,13 @@ extend('required', required);
   },
 })
 export default class ContractBuilder extends Vue {
-  @Prop({ required: true }) readonly masterContractType!: MasterContract;
+  @Prop({ required: true }) readonly selectedMasterContract!: MasterContract;
+
+  @Prop({ default: null }) readonly draftTemplateContract!: ProviderTemplateContract;
 
   @Prop({ required: true }) readonly templateContractFilled!: boolean;
+
+  @Prop({ default: false }) readonly isDraft!: boolean;
 
   @Prop({ required: true }) readonly templateContract!: any;
 
@@ -122,13 +110,13 @@ export default class ContractBuilder extends Vue {
   }
 
   created(): void {
-    if (this.masterContractType) {
+    if (this.selectedMasterContract) {
       this.getMasterContract();
     }
   }
 
-  @Watch('masterContractType')
-  masterContractTypeChange(): void {
+  @Watch('selectedMasterContract')
+  selectedMasterContractChange(): void {
     this.getMasterContract();
   }
 
@@ -177,7 +165,7 @@ export default class ContractBuilder extends Vue {
     });
   }
 
-  isValid():boolean {
+  isValid(): boolean {
     if ((this.selectedSection.dynamic && this.selectedSection.variable) || (this.selectedSection.optional && this.selectedSection.variable)) {
       if (this.selectedSectionValue === null) return false;
     }
@@ -185,7 +173,7 @@ export default class ContractBuilder extends Vue {
   }
 
   saveSection(): void {
-    const selectedOptions:any = {
+    const selectedOptions: any = {
       masterSectionId: this.selectedSection.id,
       optional: this.selectedSection.optional,
       option: 0,
@@ -236,17 +224,27 @@ export default class ContractBuilder extends Vue {
   }
 
   getMasterContract(): void {
-    this.providerContractApi.findOneMasterContract(this.masterContractType.key).then((response) => {
-      if (response.success) {
-        this.masterContract = response.result;
-        // this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
+    if (this.draftTemplateContract) {
+      if (this.draftTemplateContract.masterContract) {
+        this.masterContract = this.draftTemplateContract.masterContract;
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
         this.initTemplateContract();
         [this.selectedSection] = this.masterContract.sections;
-      } else {
-        // TODO: handle error
       }
-    });
+    } else {
+      this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
+        if (response.success) {
+          this.masterContract = response.result;
+          this.$emit('update:selectedMasterContract', this.masterContract);
+          // this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
+          this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
+          this.initTemplateContract();
+          [this.selectedSection] = this.masterContract.sections;
+        } else {
+          // TODO: handle error
+        }
+      });
+    }
   }
 
   initTemplateContract(): void {
@@ -260,5 +258,5 @@ export default class ContractBuilder extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_contract-builder.scss";
+@import '@/assets/styles/_contract-builder.scss';
 </style>
