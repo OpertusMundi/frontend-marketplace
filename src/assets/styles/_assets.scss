@@ -420,16 +420,16 @@
             color: $secondColor;
             border-color: transparent;
           }
-          &__option {
-            &--selected {
-              background-color: transparent;
-              color: $darkColor;
-            }
-            &--highlight {
-              background-color: $lightBgColor;
-              color: $secondColor;
-            }
-          }
+          // &__option {
+          //   &--selected {
+          //     background-color: transparent;
+          //     color: $darkColor;
+          //   }
+          //   &--highlight {
+          //     background-color: $lightBgColor;
+          //     color: $secondColor;
+          //   }
+          // }
         }
       }
 
@@ -1001,11 +1001,11 @@
         }
       }
     }
-    .multiselect__option--selected & {
-      #{$ac}__inner {
-        border-color: var(--color);
-      }
-    }
+    // .multiselect__option--selected & {
+    //   #{$ac}__inner {
+    //     border-color: var(--color);
+    //   }
+    // }
   }
   &--nohover {
     &:hover {
