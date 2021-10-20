@@ -25,7 +25,8 @@
               <p><strong>Resource locator:</strong><span>{{ catalogueItem.resourceLocator }}</span></p>
               <p><strong>Version:</strong><span>{{ catalogueItem.version }}</span></p>
               <!-- <p><strong>Data coupled resource</strong><span>{{  }}</span></p> -->
-              <p><strong>Parent identifier (PID):</strong><span>{{ catalogueItem.parentId }}</span></p>
+              <!-- todo: check following -->
+              <p><strong>Parent identifier (PID):</strong><span>{{ catalogueItem.parentId || catalogueItem.parentDataSourceId }}</span></p>
             </div>
           </li>
           <li v-if="activeTab == 2">
@@ -76,12 +77,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { CatalogueItem } from '@/model';
+import { CatalogueItemDetails } from '@/model/catalogue';
 import SpatialApi from '@/service/spatial';
 import moment from 'moment';
 
 @Component
 export default class Metadata extends Vue {
-  @Prop({ required: true }) private catalogueItem!: CatalogueItem;
+  @Prop({ required: true }) private catalogueItem!: CatalogueItem | CatalogueItemDetails;
 
   spatialApi: SpatialApi;
 
