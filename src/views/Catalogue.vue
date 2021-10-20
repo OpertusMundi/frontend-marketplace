@@ -556,13 +556,13 @@ export default class Catalogue extends Vue {
     this.filters.types = [
       {
         id: EnumAssetType.VECTOR,
-        name: 'Vector dataset',
+        name: 'Vector',
         pillLabel: 'Vector',
         isChecked: false,
       },
       {
         id: EnumAssetType.RASTER,
-        name: 'Raster dataset',
+        name: 'Raster',
         pillLabel: 'Raster',
         isChecked: false,
       },
@@ -570,6 +570,24 @@ export default class Catalogue extends Vue {
         id: EnumAssetType.SERVICE,
         name: 'API',
         pillLabel: 'API',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.TABULAR,
+        name: 'Tabular',
+        pillLabel: 'Tabular',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.NETCDF,
+        name: 'NetCDF',
+        pillLabel: 'NetCDF',
+        isChecked: false,
+      },
+      {
+        id: EnumAssetType.BUNDLE,
+        name: 'Bundle',
+        pillLabel: 'Bundle',
         isChecked: false,
       },
     ];
@@ -995,11 +1013,11 @@ export default class Catalogue extends Vue {
 
   shownFormatCategories(): string[] {
     // eslint-disable-next-line
-    const isVectorChecked = this.filters.types.find((x) => x.name === 'Vector dataset')!.isChecked;
+    const isVectorChecked = this.filters.types.find((x) => x.id === EnumAssetType.VECTOR)!.isChecked;
     // eslint-disable-next-line
-    const isRasterChecked = this.filters.types.find((x) => x.name === 'Raster dataset')!.isChecked;
+    const isRasterChecked = this.filters.types.find((x) => x.id === EnumAssetType.RASTER)!.isChecked;
     // eslint-disable-next-line
-    const isApiChecked = this.filters.types.find((x) => x.name === 'API')!.isChecked;
+    const isApiChecked = this.filters.types.find((x) => x.id === EnumAssetType.SERVICE)!.isChecked;
 
     let res: string[] = [];
 
