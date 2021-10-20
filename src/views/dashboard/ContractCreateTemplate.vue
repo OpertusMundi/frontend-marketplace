@@ -3,8 +3,9 @@
     <div class="dashboard__inner__steps">
       <div class="dashboard__head">
         <h1>Create contract template</h1>
-        <div class="dashboard__head__helpers">
-          <button href="#" class="btn btn--outlineblue" @click="saveDraft">SAVE DRAFT</button>
+        <div class="dashboard__head__helpers" v-if="currentStep == 2">
+          <button href="#" class="btn btn--outlinedark" @click="deleteDraft">DELETE DRAFT</button>
+          <button href="#" class="btn btn--outlineblue" @click="saveDraft">{{ isNewDraft ? 'SAVE DRAFT' : 'UPDATE DRAFT' }}</button>
         </div>
       </div>
 
@@ -19,7 +20,7 @@
             <div class="dashboard__form__steps__inner">
               <!-- steps here -->
               <contract-type-select ref="step1" v-show="currentStep == 1" :selectedMasterContract.sync="selectedMasterContract"></contract-type-select>
-              <contract-builder ref="step2" :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-show="currentStep == 2"></contract-builder>
+              <contract-builder ref="step2" :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-if="currentStep == 2"></contract-builder>
               <contract-details ref="step3" :templateContract.sync="templateContract" v-show="currentStep == 3"></contract-details>
             </div>
           </transition>
@@ -84,9 +85,12 @@ export default class ContractCreateTemplate extends Vue {
 
   templateContractFilled: boolean;
 
+  isNewDraft: boolean;
+
   constructor() {
     super();
 
+    this.isNewDraft = false;
     this.totalSteps = 3;
     this.currentStep = 1;
     this.selectedMasterContract = null;
@@ -102,6 +106,9 @@ export default class ContractCreateTemplate extends Vue {
     };
   }
 
+  mounted(): void {
+    store.commit('setLoading', false);
+  }
   // created(): void {
   //   this.getMasterContracts();
   // }
@@ -121,6 +128,8 @@ export default class ContractCreateTemplate extends Vue {
     if (this.$route.query.key) {
       const draftKey: string = this.$route.query.key as string;
       this.getDraft(draftKey);
+    } else {
+      this.isNewDraft = true;
     }
   }
 
@@ -155,6 +164,7 @@ export default class ContractCreateTemplate extends Vue {
       if (response.success) {
         console.log('FIND ONE DRAFT', response.result);
         this.draftTemplateContract = response.result;
+
         if (this.draftTemplateContract.masterContract) {
           this.selectedMasterContract = this.draftTemplateContract.masterContract;
         }
@@ -166,6 +176,7 @@ export default class ContractCreateTemplate extends Vue {
   publishDraft(): void {
     store.commit('setLoading', true);
     this.providerContractApi.createDraft(this.templateContract).then((response) => {
+      console.log(this.templateContract, 'ON PUBLISH');
       store.commit('setLoading', false);
       if (response.success) {
         store.commit('setLoading', true);
@@ -180,24 +191,55 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   saveDraft(): void {
-    const index: number = Math.floor(Math.random() * 100);
-    console.log(this.templateContract.sections, 'template sections');
-    console.log(this.selectedMasterContract?.sections, 'master sections before');
-    const masterSections: any = this.selectedMasterContract?.sections.splice(this.templateContract.sections.length);
-    console.log(masterSections, 'master sections after');
-    this.templateContract.sections = [...this.templateContract.sections, ...masterSections];
-    console.log(this.templateContract.sections);
-    this.templateContract.title = `Title No: ${index}`;
-    this.templateContract.subtitle = `Subtitle No: ${index}`;
+    // store.commit('setLoading', true);
+    console.log(this.selectedMasterContract, 'selected master contract on SAVE DRAFT');
+    console.log(this.templateContract, 'TEMPLATE CONTRACT SAVED DRAFT   before');
+    const masterSections: any = this.selectedMasterContract?.sections.slice(this.templateContract.sections.length);
+    console.log(masterSections, 'MASTER SECTIONS');
+    const map = masterSections.map((obj: { id: number; optional: boolean }) => ({
+      masterSectionId: obj.id,
+      optional: obj.optional,
+      option: null,
+      subOption: null,
+    }));
+    console.log(masterSections, 'MASTER SECTIONS');
+    this.templateContract.sections = [...this.templateContract.sections, ...map];
+    console.log(this.templateContract, 'TEMPLATE CONTRACT SAVED DRAFT');
+    if (this.isNewDraft) {
+      // const index: number = Math.floor(Math.random() * 100);
+      // this.templateContract.title = `Title No: ${index}`;
+      // this.templateContract.subtitle = `Subtitle No: ${index}`;
+      this.providerContractApi.createDraft(this.templateContract).then((response) => {
+        store.commit('setLoading', false);
+        console.log(this.templateContract, response, 'RESPONSE');
+        if (response.success) {
+          store.commit('setLoading', false);
+          console.log('SUCCESS');
+          this.$router.push('/dashboard/contracts');
+        }
+      });
+    } else if (!this.isNewDraft) {
+      this.providerContractApi.updateDraft(this.$route.query.key as string, this.templateContract).then((response) => {
+        store.commit('setLoading', false);
+        console.log(this.templateContract, response, 'RESPONSE');
+        if (response.success) {
+          store.commit('setLoading', false);
+          console.log('SUCCESS');
+          this.$router.push('/dashboard/contracts');
+        }
+      });
+    }
+  }
+
+  deleteDraft(): void {
+    console.log(this.templateContract);
     store.commit('setLoading', true);
-    this.providerContractApi.createDraft(this.templateContract).then((response) => {
-      store.commit('setLoading', false);
-      console.log(this.templateContract, response, 'RESPONSE');
+    this.providerContractApi.deleteDraft(this.draftTemplateContract?.key as string).then((response) => {
       if (response.success) {
         store.commit('setLoading', false);
-        console.log('SUCCESS');
         this.$router.push('/dashboard/contracts');
       }
+      console.log(response);
     });
   }
 
