@@ -56,7 +56,7 @@
 import {
   Component, Vue, Watch, Prop,
 } from 'vue-property-decorator';
-import { MasterContract } from '@/model/provider-contract';
+import { MasterContract, ProviderTemplateContract } from '@/model/provider-contract';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import ProviderContractApi from '@/service/provider-contract';
@@ -70,9 +70,13 @@ extend('required', required);
   },
 })
 export default class ContractBuilder extends Vue {
-  @Prop({ required: true }) readonly masterContractType!: MasterContract;
+  @Prop({ required: true }) readonly selectedMasterContract!: MasterContract;
+
+  @Prop({ default: null }) readonly draftTemplateContract!: ProviderTemplateContract;
 
   @Prop({ required: true }) readonly templateContractFilled!: boolean;
+
+  @Prop({ default: false }) readonly isDraft!: boolean;
 
   @Prop({ required: true }) readonly templateContract!: any;
 
@@ -106,13 +110,13 @@ export default class ContractBuilder extends Vue {
   }
 
   created(): void {
-    if (this.masterContractType) {
+    if (this.selectedMasterContract) {
       this.getMasterContract();
     }
   }
 
-  @Watch('masterContractType')
-  masterContractTypeChange(): void {
+  @Watch('selectedMasterContract')
+  selectedMasterContractChange(): void {
     this.getMasterContract();
   }
 
@@ -220,17 +224,27 @@ export default class ContractBuilder extends Vue {
   }
 
   getMasterContract(): void {
-    this.providerContractApi.findOneMasterContract(this.masterContractType.key).then((response) => {
-      if (response.success) {
-        this.masterContract = response.result;
-        // this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
+    if (this.draftTemplateContract) {
+      if (this.draftTemplateContract.masterContract) {
+        this.masterContract = this.draftTemplateContract.masterContract;
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
         this.initTemplateContract();
         [this.selectedSection] = this.masterContract.sections;
-      } else {
-        // TODO: handle error
       }
-    });
+    } else {
+      this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
+        if (response.success) {
+          this.masterContract = response.result;
+          this.$emit('update:selectedMasterContract', this.masterContract);
+          // this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
+          this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
+          this.initTemplateContract();
+          [this.selectedSection] = this.masterContract.sections;
+        } else {
+          // TODO: handle error
+        }
+      });
+    }
   }
 
   initTemplateContract(): void {

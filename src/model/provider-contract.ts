@@ -37,7 +37,7 @@ export interface MasterSection {
   dynamic: boolean;
   options: string[];
   styledOptions: string[];
-  subOptions: { [key: number]: SubOption[] }
+  subOptions: { [key: number]: SubOption[] };
   summary?: string[];
   icons?: string[];
   descriptionOfChange: string;
@@ -47,7 +47,7 @@ export interface MasterContract {
   createdAt: string;
   key: string;
   modifiedAt: string;
-  sections: MasterSection[],
+  sections: MasterSection[];
   subtitle?: string;
   title: string;
   version: string;

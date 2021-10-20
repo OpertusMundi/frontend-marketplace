@@ -5,8 +5,7 @@ import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
 import {
-  EnumMasterContractSortField, MasterContract,
-  EnumProviderContractSortField, ProviderTemplateContract, ProviderTemplateContractCommand,
+  EnumMasterContractSortField, MasterContract, EnumProviderContractSortField, ProviderTemplateContract, ProviderTemplateContractCommand,
 } from '@/model/provider-contract';
 
 /**
@@ -30,9 +29,7 @@ export default class ContractApi extends Api {
    * @param sorting
    * @returns
    */
-  public async findAllMasterContracts(
-    title: string | null = null, page = 0, size = 10, sorting: Sorting<EnumMasterContractSortField>,
-  ): Promise<AxiosPageResponse<MasterContract>> {
+  public async findAllMasterContracts(title: string | null = null, page = 0, size = 10, sorting: Sorting<EnumMasterContractSortField>): Promise<AxiosPageResponse<MasterContract>> {
     const { id: field, order } = sorting;
 
     const endpoint = `${this.basePath}/master`;
@@ -52,12 +49,11 @@ export default class ContractApi extends Api {
   public async findOneMasterContract(key: string): Promise<ServerResponse<MasterContract>> {
     const url = `${this.basePath}/master/${key}`;
 
-    return this.get<ServerResponse<MasterContract>>(url)
-      .then((response: AxiosServerResponse<MasterContract>) => {
-        const { data } = response;
+    return this.get<ServerResponse<MasterContract>>(url).then((response: AxiosServerResponse<MasterContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -68,9 +64,7 @@ export default class ContractApi extends Api {
    * @param sorting
    * @returns
    */
-  public async findAllDrafts(
-    page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>,
-  ): Promise<AxiosPageResponse<ProviderTemplateContract>> {
+  public async findAllDrafts(page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>): Promise<AxiosPageResponse<ProviderTemplateContract>> {
     const { id: field, order } = sorting;
 
     const endpoint = `${this.basePath}/drafts`;
@@ -89,12 +83,11 @@ export default class ContractApi extends Api {
   public async findOneDraft(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/drafts/${key}`;
 
-    return this.get<ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.get<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -106,12 +99,11 @@ export default class ContractApi extends Api {
   public async createDraft(command: ProviderTemplateContractCommand): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/drafts`;
 
-    return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -124,12 +116,11 @@ export default class ContractApi extends Api {
   public async updateDraft(key: string, command: ProviderTemplateContractCommand): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/drafts/${key}`;
 
-    return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -141,12 +132,11 @@ export default class ContractApi extends Api {
   public async deleteDraft(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/drafts/${key}`;
 
-    return this.delete<ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.delete<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -159,12 +149,11 @@ export default class ContractApi extends Api {
   public async publishDraft(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/drafts/${key}`;
 
-    return this.put<unknown, ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.put<unknown, ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -175,9 +164,7 @@ export default class ContractApi extends Api {
    * @param sorting
    * @returns
    */
-  public async findAllTemplates(
-    page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>,
-  ): Promise<AxiosPageResponse<ProviderTemplateContract>> {
+  public async findAllTemplates(page = 0, size = 10, sorting: Sorting<EnumProviderContractSortField>): Promise<AxiosPageResponse<ProviderTemplateContract>> {
     const { id: field, order } = sorting;
 
     const endpoint = `${this.basePath}/templates`;
@@ -196,12 +183,11 @@ export default class ContractApi extends Api {
   public async findOneTemplate(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/templates/${key}`;
 
-    return this.get<ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.get<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -213,12 +199,11 @@ export default class ContractApi extends Api {
   public async deactivate(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/templates/${key}`;
 
-    return this.delete<ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.delete<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 
   /**
@@ -230,11 +215,10 @@ export default class ContractApi extends Api {
   public async createDraftFromTemplate(key: string): Promise<ServerResponse<ProviderTemplateContract>> {
     const url = `${this.basePath}/history/${key}`;
 
-    return this.post<unknown, ServerResponse<ProviderTemplateContract>>(url)
-      .then((response: AxiosServerResponse<ProviderTemplateContract>) => {
-        const { data } = response;
+    return this.post<unknown, ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
+      const { data } = response;
 
-        return data;
-      });
+      return data;
+    });
   }
 }

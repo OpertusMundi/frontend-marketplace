@@ -33,7 +33,7 @@ extend('required', required);
   },
 })
 export default class ContractTypeSelect extends Vue {
-  @Prop({ required: true }) private contractType!: MasterContract | null;
+  @Prop({ required: true }) private selectedMasterContract!: MasterContract | null;
 
   masterContracts: MasterContract[];
 
@@ -44,7 +44,7 @@ export default class ContractTypeSelect extends Vue {
   constructor() {
     super();
 
-    this.contractType1 = this.contractType;
+    this.contractType1 = null;
     this.masterContracts = [];
     this.providerContractApi = new ProviderContractApi();
   }
@@ -54,7 +54,7 @@ export default class ContractTypeSelect extends Vue {
   }
 
   onChange(): void {
-    this.$emit('update:contractType', this.contractType1);
+    this.$emit('update:selectedMasterContract', this.contractType1);
   }
 
   getMasterContracts(): void {

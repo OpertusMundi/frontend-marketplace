@@ -18,8 +18,8 @@
           <transition name="fade" mode="out-in">
             <div class="dashboard__form__steps__inner">
               <!-- steps here -->
-              <contract-type-select ref="step1" v-show="currentStep == 1" :contractType.sync="contractType"></contract-type-select>
-              <contract-builder ref="step2" :masterContractType="contractType" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-show="currentStep == 2"></contract-builder>
+              <contract-type-select ref="step1" v-show="currentStep == 1" :selectedMasterContract.sync="selectedMasterContract"></contract-type-select>
+              <contract-builder ref="step2" :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-show="currentStep == 2"></contract-builder>
               <contract-details ref="step3" :templateContract.sync="templateContract" v-show="currentStep == 3"></contract-details>
             </div>
           </transition>
@@ -39,7 +39,9 @@ import { required } from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
 import ProviderContractApi from '@/service/provider-contract';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import { EnumMasterContractSortField, MasterContract, ProviderTemplateContractCommand } from '@/model/provider-contract';
+import {
+  EnumMasterContractSortField, MasterContract, ProviderTemplateContract, ProviderTemplateContractCommand,
+} from '@/model/provider-contract';
 import { Sorting } from '@/model/request';
 import ContractBuilder from '@/components/Contracts/ContractBuilder.vue';
 import ContractTypeSelect from '@/components/Contracts/ContractTypeSelect.vue';
@@ -76,7 +78,9 @@ export default class ContractCreateTemplate extends Vue {
 
   templateContract: ProviderTemplateContractCommand;
 
-  contractType: MasterContract | null;
+  draftTemplateContract: ProviderTemplateContract | null;
+
+  selectedMasterContract: MasterContract | null;
 
   templateContractFilled: boolean;
 
@@ -85,15 +89,8 @@ export default class ContractCreateTemplate extends Vue {
 
     this.totalSteps = 3;
     this.currentStep = 1;
-    this.contractType = {
-      createdAt: '',
-      key: '',
-      modifiedAt: '',
-      sections: [],
-      subtitle: '',
-      title: '',
-      version: '',
-    };
+    this.selectedMasterContract = null;
+    this.draftTemplateContract = null;
     this.masterContracts = [];
     this.providerContractApi = new ProviderContractApi();
     this.templateContractFilled = false;
@@ -105,54 +102,26 @@ export default class ContractCreateTemplate extends Vue {
     };
   }
 
-  created(): void {
-    // this.getMasterContracts();
-  }
+  // created(): void {
+  //   this.getMasterContracts();
+  // }
+
+  // getMasterContracts(): void {
+  //   const sortOrder: Sorting <EnumMasterContractSortField> = {
+  //     id: EnumMasterContractSortField.TITLE,
+  //     order: 'DESC',
+  //   };
+  //   this.providerContractApi.findAllMasterContracts(null, 0, 50, sortOrder).then((response) => {
+  //     this.masterContracts = response.data.result.items;
+  //   });
+  // }
 
   @Watch('$route', { immediate: true, deep: true })
   checkQuery(): void {
     if (this.$route.query.key) {
       const draftKey: string = this.$route.query.key as string;
       this.getDraft(draftKey);
-    } else {
-      this.getMasterContracts();
     }
-  }
-
-  @Watch('contractType')
-  constractType(): void {
-    console.log(this.contractType, 'watch contract type');
-  }
-
-  @Watch('templateContract', { immediate: true, deep: true })
-  templateContractWatch(): void {
-    console.log(this.templateContract, 'WATCH TEMPLATE CONTRACT');
-  }
-
-  getMasterContracts(): void {
-    const sortOrder: Sorting<EnumMasterContractSortField> = {
-      id: EnumMasterContractSortField.TITLE,
-      order: 'DESC',
-    };
-    this.providerContractApi.findAllMasterContracts(null, 0, 50, sortOrder).then((response) => {
-      this.masterContracts = response.data.result.items;
-    });
-  }
-
-  getDraft(draftKey: string): void {
-    this.providerContractApi.findOneDraft(draftKey).then((response) => {
-      if (response.success) {
-        console.log('FIND ONE DRAFT', response.result);
-
-        this.contractType!.createdAt = response.result.masterContract!.createdAt as string;
-        this.contractType!.key = response.result.masterContract?.key as string;
-        this.contractType!.modifiedAt = response.result.masterContract?.modifiedAt as string;
-        this.contractType!.subtitle = response.result.masterContract?.subtitle as string;
-        this.contractType!.title = response.result.masterContract?.title as string;
-        this.contractType!.version = response.result.masterContract?.version as string;
-        this.contractType!.sections = response.result.masterContract?.sections as any;
-      }
-    });
   }
 
   goToStep(step: number): void {
@@ -181,6 +150,19 @@ export default class ContractCreateTemplate extends Vue {
     });
   }
 
+  getDraft(draftKey: string): void {
+    this.providerContractApi.findOneDraft(draftKey).then((response) => {
+      if (response.success) {
+        console.log('FIND ONE DRAFT', response.result);
+        this.draftTemplateContract = response.result;
+        if (this.draftTemplateContract.masterContract) {
+          this.selectedMasterContract = this.draftTemplateContract.masterContract;
+        }
+        this.currentStep = 2;
+      }
+    });
+  }
+
   publishDraft(): void {
     store.commit('setLoading', true);
     this.providerContractApi.createDraft(this.templateContract).then((response) => {
@@ -199,6 +181,12 @@ export default class ContractCreateTemplate extends Vue {
 
   saveDraft(): void {
     const index: number = Math.floor(Math.random() * 100);
+    console.log(this.templateContract.sections, 'template sections');
+    console.log(this.selectedMasterContract?.sections, 'master sections before');
+    const masterSections: any = this.selectedMasterContract?.sections.splice(this.templateContract.sections.length);
+    console.log(masterSections, 'master sections after');
+    this.templateContract.sections = [...this.templateContract.sections, ...masterSections];
+    console.log(this.templateContract.sections);
     this.templateContract.title = `Title No: ${index}`;
     this.templateContract.subtitle = `Subtitle No: ${index}`;
     store.commit('setLoading', true);
