@@ -84,6 +84,7 @@ import AssetApiDetailsCard from '@/components/Assets/AssetApiDetailsCard.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { CatalogueItem, CatalogueItemCommand } from '@/model/catalogue';
+import store from '@/store';
 
 extend('required', required);
 
@@ -160,9 +161,12 @@ export default class ApiDetails extends Vue {
   }
 
   created(): void {
+    console.log('selectedPublishedAsset', this.selectedPublishedAssetForApiCreationLocal);
+
+    store.commit('setLoading', true);
     const query: ProviderDraftQuery = {
       q: '',
-      type: EnumAssetType.SERVICE,
+      type: EnumAssetType.VECTOR,
       pageRequest: { page: 0, size: 1000 },
       sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
     };
@@ -175,6 +179,8 @@ export default class ApiDetails extends Vue {
       }
     }).catch((err) => {
       console.log('err', (err));
+    }).finally(() => {
+      store.commit('setLoading', false);
     });
   }
 
