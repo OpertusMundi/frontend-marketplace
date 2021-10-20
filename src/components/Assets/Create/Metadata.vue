@@ -178,7 +178,7 @@
           <validation-provider v-slot="{ errors }" name="Scales">
             <div class="form-group">
               <label for="multiselect_scales">Scales</label>
-              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
+              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :disabled="isSpatialMetadataHidden" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -192,7 +192,7 @@
           <validation-provider v-slot="{ errors }" name="Reference system">
             <div class="form-group">
               <label for="ajax">Reference system</label>
-              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
+              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :disabled="isSpatialMetadataHidden" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -267,6 +267,7 @@ import { CatalogueItemCommand } from '@/model';
 import { EnumTopicCategory } from '@/model/catalogue';
 import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
+import { EnumAssetType } from '@/model/enum';
 
 extend('required', required);
 
@@ -324,6 +325,8 @@ export default class Metadata extends Vue {
   selectedEpsg: { code: string, name: string };
 
   isLoadingEpsg: boolean;
+
+  isSpatialMetadataHidden: boolean;
 
   // TODO: currently, URIs are stored in asset.additionalResources and FILES are uploaded as additional resources on asset submit
 
@@ -383,6 +386,8 @@ export default class Metadata extends Vue {
 
     this.isLoadingEpsg = false;
 
+    this.isSpatialMetadataHidden = false;
+
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
@@ -437,9 +442,18 @@ export default class Metadata extends Vue {
     this.$emit('update:asset', asset);
   }
 
-  @Watch('assetLocal.type', { immediate: false }) onAssetMainTypeChange(): void {
+  @Watch('assetLocal.type', { immediate: false })
+  onAssetMainTypeChange(type: EnumAssetType): void {
     this.assetLocal.format = '';
     this.populateAvailableFormatsForSelectedType();
+
+    if (type === EnumAssetType.TABULAR) {
+      this.isSpatialMetadataHidden = true;
+      this.assetLocal.scales = [];
+      this.assetLocal.referenceSystem = '';
+      return;
+    }
+    this.isSpatialMetadataHidden = false;
   }
 
   @Watch('additionalResourcesToUploadLocal', { deep: true })
