@@ -176,9 +176,9 @@
             </div>
           </validation-provider>
           <validation-provider v-slot="{ errors }" name="Scales">
-            <div class="form-group">
+            <div class="form-group" v-show="!isSpatialMetadataHidden">
               <label for="multiselect_scales">Scales</label>
-              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :disabled="isSpatialMetadataHidden" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
+              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -190,9 +190,9 @@
             </div>
           </validation-provider> -->
           <validation-provider v-slot="{ errors }" name="Reference system">
-            <div class="form-group">
+            <div class="form-group" v-show="!isSpatialMetadataHidden">
               <label for="ajax">Reference system</label>
-              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :disabled="isSpatialMetadataHidden" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
+              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
@@ -450,6 +450,8 @@ export default class Metadata extends Vue {
     if (type === EnumAssetType.TABULAR) {
       this.isSpatialMetadataHidden = true;
       this.assetLocal.scales = [];
+      this.selectedEpsg = { name: '', code: '' };
+      this.epsgList = [];
       this.assetLocal.referenceSystem = '';
       return;
     }
