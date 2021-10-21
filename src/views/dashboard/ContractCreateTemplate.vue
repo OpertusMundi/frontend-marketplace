@@ -197,8 +197,8 @@ export default class ContractCreateTemplate extends Vue {
     const masterSections: any = this.selectedMasterContract?.sections.slice(this.templateContract.sections.length);
     const map = masterSections.map((obj: { id: number; optional: boolean }) => ({
       masterSectionId: obj.id,
-      optional: obj.optional,
-      option: null,
+      optional: null,
+      option: undefined,
       subOption: null,
     }));
     this.templateContract.sections = [...this.templateContract.sections, ...map];
