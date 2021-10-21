@@ -92,7 +92,7 @@ export default class ContractBuilder extends Vue {
 
   keepCurrentSection: boolean;
 
-  selectedSectionValue: number | null;
+  selectedSectionValue: any | null;
 
   currentSelectionValid: boolean;
 
@@ -174,7 +174,7 @@ export default class ContractBuilder extends Vue {
     const selectedOptions: any = {
       masterSectionId: this.selectedSection.id,
       optional: this.selectedSection.optional,
-      option: 0,
+      option: null,
       subOption: null,
     };
     console.log(this.selectedSectionValue, this.selectedSection, 'SELECTED DECTION VALUE');
@@ -182,8 +182,23 @@ export default class ContractBuilder extends Vue {
       selectedOptions.optional = false;
       selectedOptions.option = this.selectedSectionValue;
     } else if (this.selectedSection.optional && this.selectedSection.variable) {
-      selectedOptions.optional = this.selectedSectionValue;
-      selectedOptions.option = 0;
+      selectedOptions.optional = true;
+      const value = this.convertBoolean(this.selectedSectionValue);
+      console.log(value, 'METHOD BOOLENA');
+      selectedOptions.option = this.convertBoolean(this.selectedSectionValue);
+      // if (this.selectedSectionValue !== null) {
+      //   selectedOptions.optional = true;
+      //   selectedOptions.option = this.selectedSectionValue ? 1 : 0;
+      //   console.log('INSIDE IF TO POST is NULLLLLLLLL', this.selectedSectionValue);
+      // } else {
+      //   selectedOptions.optional = true;
+      //   selectedOptions.option = null;
+      //   this.selectedSectionValue = null;
+      //   console.log('IS NULLLLLLLLL V MODEL');
+      // }
+      // selectedOptions.option = this.convertBoolean(this.selectedSectionValue);
+
+      console.log('if optional', selectedOptions.option, this.selectedSectionValue ? 1 : 0, this.convertBoolean(this.selectedSectionValue));
     }
     this.selectedSectionValue = null;
     const selectionExists = this.templateContractC.sections.find((o) => o.masterSectionId === this.selectedSection.id);
@@ -191,6 +206,20 @@ export default class ContractBuilder extends Vue {
       this.templateContractC.sections = this.templateContractC.sections.filter((item) => item.masterSectionId !== this.selectedSection.id);
     }
     this.templateContractC.sections.push(selectedOptions);
+    console.log(this.templateContract, 'PUSHED');
+  }
+
+  convertBoolean(value: boolean): number | null {
+    switch (value) {
+      case null:
+        return null;
+      case true:
+        return 1;
+      case false:
+        return 0;
+      default:
+        return null;
+    }
   }
 
   loadSelectedSectionValue(): void {
@@ -198,9 +227,24 @@ export default class ContractBuilder extends Vue {
     if (selectionExists) {
       if (this.selectedSection.dynamic && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.option;
+        console.log(this.selectedSectionValue, 'EXIST OPTION IF IF IF IF');
       } else if (this.selectedSection.optional && this.selectedSection.variable) {
-        this.selectedSectionValue = selectionExists.optional;
+        this.selectedSectionValue = this.convertValue(selectionExists.option);
+        console.log(this.selectedSectionValue, selectionExists.option, 'EXIST OPTION INSIDE ELSE IF');
       }
+    }
+  }
+
+  convertValue(value: number): boolean | null {
+    switch (value) {
+      case null:
+        return null;
+      case 0:
+        return false;
+      case 1:
+        return true;
+      default:
+        return null;
     }
   }
 
@@ -224,16 +268,21 @@ export default class ContractBuilder extends Vue {
 
   getMasterContract(): void {
     if (this.draftTemplateContract) {
+      // Draft contract
       if (this.draftTemplateContract.masterContract) {
         this.masterContract = this.draftTemplateContract.masterContract;
         console.log(this.masterContract, 'is draft bri');
+        this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
+        console.log(this.masterContract, 'is draft bri AFTER SORTING');
+
         this.initTemplateContract();
         [this.selectedSection] = this.masterContract.sections;
         this.templateContractC.sections = this.draftTemplateContract.sections;
-        console.log(this.masterContract, 'MASTER CONTRACT DRAFT');
+        console.log(this.masterContract, this.templateContractC, 'MASTER CONTRACT DRAFT');
       }
     } else {
+      // New contract
       this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
         if (response.success) {
           this.masterContract = response.result;
@@ -249,22 +298,6 @@ export default class ContractBuilder extends Vue {
         }
       });
     }
-  }
-
-  findMasterContract(): void {
-    this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
-      if (response.success) {
-        this.masterContract = response.result;
-        this.$emit('update:selectedMasterContract', this.masterContract);
-        this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
-        this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
-
-        this.initTemplateContract();
-        [this.selectedSection] = this.masterContract.sections;
-      } else {
-        // TODO: handle error
-      }
-    });
   }
 
   initTemplateContract(): void {
