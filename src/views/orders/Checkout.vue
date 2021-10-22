@@ -154,17 +154,32 @@
             <!-- STEP 2 - Legal Representative -->
             <validation-observer ref="step2">
               <div class="dashboard__form__step dashboard__form__step--full-width" v-if="currentStep == 2">
-                <div class="row">
+                <div v-if="isVettingRequired" class="row flex align-items-center justify-content-center">
+                  <h3>A purchase request has been sent to vendor. Approval is pending.</h3>
+                </div>
+                <div v-else class="row">
                   <div class="col-md-5">
                     <h3>Contracts list</h3>
                     <hr>
-                    <div v-if="cart">
+                    <div v-if="mode === 'CART_CHECKOUT' && cart">
                       <div v-for="(cartItem, i) in cart.items" :key="cartItem.id">
                         <div class="checkout__info_table" :class="{'checkout__info_table--text-blue': currentItemToReviewContract === i}">
                           <span><strong>Asset: </strong></span><span>{{ cartItem.asset.title }}</span>
                           <!-- <span><strong>Vendor: </strong></span><span>{{ cartItem.asset.publisherName }}</span> -->
                           <span><strong>Date of purchase: </strong></span><span>{{ formatDate(cartItem.addedAt) }}</span>
                           <span><strong>Price: </strong></span><span>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</span>
+                        </div>
+                        <div class="d-flex justify-content-end" v-if="i < currentItemToReviewContract">&#10003; Contract accepted</div>
+                        <hr>
+                      </div>
+                    </div>
+                    <div v-if="mode === 'ACCEPTED_ORDER_CHECKOUT' && order">
+                      <div v-for="(item, i) in order.items" :key="item.item">
+                        <div class="checkout__info_table" :class="{'checkout__info_table--text-blue': currentItemToReviewContract === i}">
+                          <span><strong>Asset: </strong></span><span>{{ item.description }}</span>
+                          <!-- <span><strong>Vendor: </strong></span><span>{{ cartItem.asset.publisherName }}</span> -->
+                          <span><strong>Date of purchase: </strong></span><span>{{ formatDate(order.createdOn) }}</span>
+                          <span><strong>Price: </strong></span><span>{{ item.totalPrice === 0 ? 'FREE' : `${item.totalPrice}€` }}</span>
                         </div>
                         <div class="d-flex justify-content-end" v-if="i < currentItemToReviewContract">&#10003; Contract accepted</div>
                         <hr>
@@ -221,36 +236,69 @@
                   <div class="col-md-4">
                     <h3>Payment</h3>
                     <hr>
-                    <div v-for="cartItem in cart.items" :key="cartItem.id" class="checkout__payment__payment_card">
-                      <div class="checkout__payment__payment_card__top">
-                        <h4>{{ cartItem.asset.title }}</h4>
-                        <h4>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</h4>
+                    <template v-if="mode === 'CART_CHECKOUT'">
+                      <div v-for="cartItem in cart.items" :key="cartItem.id" class="checkout__payment__payment_card">
+                        <div class="checkout__payment__payment_card__top">
+                          <h4>{{ cartItem.asset.title }}</h4>
+                          <h4>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</h4>
+                        </div>
+                        <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Vendor:</strong> {{ cartItem.asset.publisherName }}</span></p>
+                        <p class="d-flex align-items-center">
+                          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
+                          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
+                          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="cartItem.asset.type === 'TABULAR'">
+                          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">
+                          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">
+                          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">
+                          <span v-if="cartItem.asset.type === 'VECTOR'">Vector dataset</span>
+                          <span v-if="cartItem.asset.type === 'RASTER'">Raster dataset</span>
+                          <span v-if="cartItem.asset.type === 'TABULAR'">Tabular dataset</span>
+                          <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">WMS</span>
+                          <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">WFS</span>
+                          <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">Data API</span>
+                        </p>
                       </div>
-                      <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Vendor:</strong> {{ cartItem.asset.publisherName }}</span></p>
-                      <p class="d-flex align-items-center">
-                        <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
-                        <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
-                        <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="cartItem.asset.type === 'TABULAR'">
-                        <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">
-                        <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">
-                        <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">
-                        <span v-if="cartItem.asset.type === 'VECTOR'">Vector dataset</span>
-                        <span v-if="cartItem.asset.type === 'RASTER'">Raster dataset</span>
-                        <span v-if="cartItem.asset.type === 'TABULAR'">Tabular dataset</span>
-                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">WMS</span>
-                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">WFS</span>
-                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">Data API</span>
-                      </p>
-                    </div>
+                    </template>
+
+                    <template v-if="mode === 'ACCEPTED_ORDER_CHECKOUT'">
+                      <div v-for="item in order.items" :key="item.item" class="checkout__payment__payment_card">
+                        <div class="checkout__payment__payment_card__top">
+                          <h4>{{ item.description }}</h4>
+                          <h4>{{ item.totalPrice === 0 ? 'FREE' : `${item.totalPrice}€` }}</h4>
+                        </div>
+                        <p><span><strong>Version:</strong> {{ item.assetVersion }}</span> <span><strong>Vendor:</strong> {{ item.provider.name }}</span></p>
+                        <p class="d-flex align-items-center">
+                          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="item.type === 'VECTOR'">
+                          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="item.type === 'RASTER'">
+                          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="item.type === 'TABULAR'">
+                          <!-- todo: bug, spatialDataServiceType is not returned from API -->
+                          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'WMS'">
+                          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'WFS'">
+                          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'DATA_API'">
+                          <span v-if="item.type === 'VECTOR'">Vector dataset</span>
+                          <span v-if="item.type === 'RASTER'">Raster dataset</span>
+                          <span v-if="item.type === 'TABULAR'">Tabular dataset</span>
+                          <!-- todo: bug, spatialDataServiceType is not returned from API -->
+                          <span v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'WMS'">WMS</span>
+                          <span v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'WFS'">WFS</span>
+                          <span v-if="item.type === 'SERVICE' && item.spatialDataServiceType === 'DATA_API'">Data API</span>
+                        </p>
+                      </div>
+                    </template>
+
                     <div class="checkout__payment__bottom_fields">
                       <div>
-                        <span>Subtotal:</span><span>{{ `${cart.totalPrice}€` }}</span>
+                        <span>Subtotal:</span>
+                        <span v-if="mode === 'CART_CHECKOUT'">{{ `${cart.totalPrice}€` }}</span>
+                        <span v-if="mode === 'ACCEPTED_ORDER_CHECKOUT'">{{ `${order.totalPrice}€` }}</span>
                       </div>
                       <div>
                         <span>Discount coupon:</span><input type="text" class="form-group__text" name="discount_coupon" id="discount_coupon">
                       </div>
                       <div>
-                        <span><strong>Total:</strong></span><h3>{{ `${cart.totalPrice}€` }}</h3>
+                        <span><strong>Total:</strong></span>
+                        <h3 v-if="mode === 'CART_CHECKOUT'">{{ `${cart.totalPrice}€` }}</h3>
+                        <h3 v-if="mode === 'ACCEPTED_ORDER_CHECKOUT'">{{ `${order.totalPrice}€` }}</h3>
                       </div>
                     </div>
                   </div>
@@ -262,7 +310,9 @@
         </div>
         <div class="dashboard__form__navbuttons">
           <button class="btn--std btn--blue" @click.prevent="previousStep()" v-if="currentStep > 1">previous</button>
-          <button class="btn btn--std btn--blue" :disabled="currentStep === 2 && !isAllContractsAccepted()" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'place order' : 'next' }}</button>
+
+          <router-link v-if="mode === 'CART_CHECKOUT' && currentStep === 2 && isVettingRequired" to="/dashboard/purchases" class="btn btn--std btn--blue">VIEW PURCHASES</router-link>
+          <button v-else class="btn btn--std btn--blue" :disabled="currentStep === 2 && !isAllContractsAccepted()" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'place order' : 'next' }}</button>
         </div>
       </div>
     </div>
@@ -284,6 +334,7 @@ import Multiselect from 'vue-multiselect';
 import moment from 'moment';
 import Modal from '@/components/Modal.vue';
 import ConsumerPayInApi from '@/service/consumer-payin';
+import ConsumerOrderApi from '@/service/consumer-order';
 import CartApi from '@/service/cart';
 import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
@@ -293,10 +344,16 @@ import { Cart } from '@/model/cart';
 import store from '@/store';
 import { ServerResponse } from '@/model';
 import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
+import { ConsumerOrder } from '@/model/order';
 import { saveAs } from 'file-saver';
 
 extend('required', required);
 extend('email', email);
+
+enum EnumMode {
+  CART_CHECKOUT = 'CART_CHECKOUT',
+  ACCEPTED_ORDER_CHECKOUT = 'ACCEPTED_ORDER_CHECKOUT',
+}
 
 @Component({
   components: {
@@ -313,7 +370,11 @@ export default class Checkout extends Vue {
 
   consumerContractsApi: ConsumerContractsApi;
 
+  consumerOrderApi: ConsumerOrderApi;
+
   catalogueApi: CatalogueApi;
+
+  mode: EnumMode;
 
   totalSteps: number;
 
@@ -329,6 +390,8 @@ export default class Checkout extends Vue {
 
   orderKey: string;
 
+  order: ConsumerOrder | null;
+
   availableCards: Card[] | null;
 
   selectedCard: string | null;
@@ -336,6 +399,8 @@ export default class Checkout extends Vue {
   selectedShippingCountry: string;
 
   cart: Cart | null;
+
+  isVettingRequired: boolean;
 
   currentItemToReviewContract: number;
 
@@ -345,9 +410,12 @@ export default class Checkout extends Vue {
     super();
 
     this.consumerPayInApi = new ConsumerPayInApi();
+    this.consumerOrderApi = new ConsumerOrderApi();
     this.cartApi = new CartApi();
     this.consumerContractsApi = new ConsumerContractsApi();
     this.catalogueApi = new CatalogueApi();
+
+    this.mode = {} as EnumMode;
 
     this.totalSteps = 3;
     this.currentStep = 1;
@@ -356,18 +424,63 @@ export default class Checkout extends Vue {
     this.useDifferentShippingInfo = false;
     // this.countries = ['Greece', 'Spain', 'Germany'];
     this.orderKey = '';
+    this.order = null;
     this.availableCards = null;
     this.selectedCard = null;
     this.selectedShippingCountry = '';
     this.cart = null;
+    this.isVettingRequired = false;
     this.currentItemToReviewContract = 0;
     this.contracts = [];
   }
 
-  mounted(): void {
-    this.consumerPayInApi.getCards().then((cardsResponse) => {
-      this.availableCards = cardsResponse.result.filter((x) => x.active);
-    });
+  created(): void {
+    store.commit('setLoading', true);
+
+    this.mode = this.$route.params.orderKey ? EnumMode.ACCEPTED_ORDER_CHECKOUT : EnumMode.CART_CHECKOUT;
+    this.orderKey = this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT ? this.$route.params.orderKey : '';
+
+    if (this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT) {
+      Promise.all([
+        this.consumerPayInApi.getCards(),
+        this.consumerOrderApi.getOrder(this.orderKey),
+      ]).then((responses) => {
+        const [cardsResponse] = responses;
+        const { 1: orderResponse } = responses;
+
+        if (!orderResponse.success) {
+          this.$router.push('/errors/404');
+          return;
+        }
+
+        this.availableCards = cardsResponse.result.filter((x) => x.active);
+        this.order = orderResponse.result;
+      }).catch((err) => {
+        console.log('err', err);
+      }).finally(() => {
+        store.commit('setLoading', false);
+      });
+    }
+
+    if (this.mode === EnumMode.CART_CHECKOUT) {
+      Promise.all([
+        this.consumerPayInApi.getCards(),
+        this.cartApi.getCart(),
+      ]).then((responses) => {
+        const [cardsResponse] = responses;
+        const { 1: cartResponse } = responses;
+
+        this.availableCards = cardsResponse.result.filter((x) => x.active);
+        this.cart = cartResponse.result;
+
+        // todo: in the future, should follow a different approach for multiple items in cart (currently, checkout works for one item only)
+        if (this.cart.items.some((x) => x.asset.vettingRequired)) this.isVettingRequired = true;
+      }).catch((err) => {
+        console.log('err', err);
+      }).finally(() => {
+        store.commit('setLoading', false);
+      });
+    }
   }
 
   onCountrySelection(country: {code: string, name: string}): void {
@@ -397,7 +510,8 @@ export default class Checkout extends Vue {
   }
 
   isAllContractsAccepted(): boolean {
-    if (this.cart && this.currentItemToReviewContract < this.cart.items.length) return false;
+    if (this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT && this.order && this.currentItemToReviewContract < this.order.items.length) return false;
+    if (this.mode === EnumMode.CART_CHECKOUT && this.cart && this.currentItemToReviewContract < this.cart.items.length) return false;
     return true;
   }
 
@@ -418,21 +532,15 @@ export default class Checkout extends Vue {
       this.currentStep += 1;
 
       if (this.currentStep === 2) {
+        if (this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT) return;
+
         store.commit('setLoading', true);
-        // this.cartApi.getCart().then((cartResponse) => {
-        //   this.cart = cartResponse.result;
-        //   store.commit('setLoading', false);
-        // });
-        Promise.all([
-          this.cartApi.getCart(),
-          this.consumerPayInApi.checkout(),
-        ]).then((responses) => {
-          const [cartResponse] = responses;
-          const { 1: checkoutResponse } = responses;
 
-          this.cart = cartResponse.result;
-          this.orderKey = checkoutResponse.result.key;
-
+        this.consumerPayInApi.checkout().then((response) => {
+          this.orderKey = response.result.key;
+        }).catch((err) => {
+          console.log('err', err);
+        }).finally(() => {
           store.commit('setLoading', false);
         });
       }
@@ -489,11 +597,16 @@ export default class Checkout extends Vue {
       // eslint-disable-next-line
       cardId: this.selectedCard!,
     };
-    if (this.cart && this.cart.totalPrice === 0) { // FREE PAYIN
+    if ((this.cart && this.cart.totalPrice === 0) || (this.order && this.order.totalPrice === 0)) { // FREE PAYIN
       this.consumerPayInApi.createFreePayIn(this.orderKey).then((payInResponse) => {
         console.log('payin response', payInResponse);
         if (payInResponse.success) {
           console.log('successful free payin!');
+
+          if (this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT) {
+            this.$router.push(`/order-thankyou/${this.orderKey}`);
+            return;
+          }
 
           this.cartApi.clear().then((clearCartResponse) => {
             if (clearCartResponse.success) {
@@ -515,22 +628,37 @@ export default class Checkout extends Vue {
         if (payInResponse.success) {
           console.log('successful payin!');
 
-          this.cartApi.clear().then((clearCartResponse) => {
-            if (clearCartResponse.success) {
-              store.commit('setCartItems', []);
-              console.log('cleared items from cart');
+          if (this.mode === EnumMode.ACCEPTED_ORDER_CHECKOUT) {
+            store.commit('setCartItems', []);
+            console.log('cleared items from cart');
 
-              const redirectUrl = payInResponse.result.secureModeRedirectURL;
-              if (redirectUrl) {
-                console.log('redirecting to secure mode url', redirectUrl);
-                window.location.href = redirectUrl;
-              } else {
-                this.$router.push(`/order-thankyou/${this.orderKey}`);
-              }
+            const redirectUrl = payInResponse.result.secureModeRedirectURL;
+            if (redirectUrl) {
+              console.log('redirecting to secure mode url', redirectUrl);
+              window.location.href = redirectUrl;
             } else {
-              console.log('error clearing cart', clearCartResponse);
+              this.$router.push(`/order-thankyou/${this.orderKey}`);
             }
-          });
+          }
+
+          if (this.mode === EnumMode.CART_CHECKOUT) {
+            this.cartApi.clear().then((clearCartResponse) => {
+              if (clearCartResponse.success) {
+                store.commit('setCartItems', []);
+                console.log('cleared items from cart');
+
+                const redirectUrl = payInResponse.result.secureModeRedirectURL;
+                if (redirectUrl) {
+                  console.log('redirecting to secure mode url', redirectUrl);
+                  window.location.href = redirectUrl;
+                } else {
+                  this.$router.push(`/order-thankyou/${this.orderKey}`);
+                }
+              } else {
+                console.log('error clearing cart', clearCartResponse);
+              }
+            });
+          }
         } else {
           console.log('payin error');
         }
