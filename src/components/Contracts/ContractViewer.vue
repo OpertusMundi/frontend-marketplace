@@ -3,17 +3,16 @@
     <div class="contract-builder" v-if="masterContract">
       <div class="contract-builder__index">
         <h4>Document Outline</h4>
-        <ul>
-          <li v-for="section in masterContract.sections" v-bind:key="section.id" :style="{ paddingLeft: 0.1 * section.indent + 'em' }" class="contract-builder__index__item" :class="{ active: selectedSection.id == section.id }">
-            <a href="#" @click.prevent>Section {{ section.index }} {{ section.title }}</a>
-          </li>
-        </ul>
+
+        <scrollactive ref="scrollactive" v-if="masterContract && loaded" v-on:itemchanged="onItemChanged" class="my-nav" active-class="active" :offset="80" :duration="800" bezier-easing-value=".5,0,.35,1" scroll-container-selector="#inhalt">
+          <a v-for="(section, index) in masterContract.sections" :style="{ paddingLeft: 0.1 * section.indent + 'em' }" v-bind:key="section.id" :href="`#id-${index}`" class="scrollactive-item">Section {{ section.index }} {{ section.title }}</a>
+        </scrollactive>
       </div>
-      <div class="contract-builder__main" v-if="selectedSection">
+      <div class="contract-builder__main" v-if="masterContract">
         <div class="contract-builder__main__inner">
-          <div class="contract-builder__main__content">
-            <div v-for="section in masterContract.sections" :key="section.id">
-              <h2>{{ section.index }} - {{ section.title }}</h2>
+          <div id="inhalt" class="contract-builder__main__content">
+            <div v-for="(section, index) in masterContract.sections" :key="section.id">
+              <h2 :id="`id-${index}`">{{ section.index }} - {{ section.title }}</h2>
               <div v-if="section.dynamic && section.variable">
                 <div v-for="(options, index) in section.options" :key="options.id">
                   <div v-if="section.option === index">
@@ -46,30 +45,18 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component, Vue, Watch, Prop,
-} from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { MasterContract, ProviderTemplateContract } from '@/model/provider-contract';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
-import ProviderContractApi from '@/service/provider-contract';
-
-extend('required', required);
 
 @Component({
-  components: {
-    ValidationObserver,
-    ValidationProvider,
-  },
+  components: {},
 })
-export default class ContractBuilder extends Vue {
+export default class ContractViewer extends Vue {
   @Prop({ required: true }) readonly selectedMasterContract!: MasterContract;
 
   @Prop({ default: null }) readonly draftTemplateContract!: ProviderTemplateContract;
 
   @Prop({ required: true }) readonly templateContract!: any;
-
-  providerContractApi: ProviderContractApi;
 
   masterContract: MasterContract | null;
 
@@ -83,22 +70,54 @@ export default class ContractBuilder extends Vue {
 
   contractSelectedSections: any | null;
 
+  loaded: boolean;
+
+  timer: any | null;
+
   constructor() {
     super();
 
-    this.providerContractApi = new ProviderContractApi();
     this.masterContract = null;
     this.masterContract1 = null;
     this.selectedSection = null;
     this.keepCurrentSection = true;
     this.selectedSectionValue = null;
     this.contractSelectedSections = null;
+    this.loaded = false;
+    this.timer = null;
   }
 
   created(): void {
     if (this.selectedMasterContract) {
       this.getMasterContract();
     }
+  }
+
+  mounted(): void {
+    this.$nextTick(() => {
+      this.loaded = true;
+    });
+  }
+
+  onItemChanged(event, currentItem, lastActiveItem) {
+    console.log(event, currentItem, lastActiveItem);
+
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      this.scrollToActive(currentItem);
+    }, 500);
+  }
+
+  scrollToActive(activeIndex: any): void {
+    console.log('trigger');
+    console.log(activeIndex);
+    setTimeout(() => {
+      activeIndex.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'start',
+      });
+    }, 1000);
   }
 
   getMasterContract(): void {
@@ -124,5 +143,16 @@ export default class ContractBuilder extends Vue {
   font-weight: bold;
   text-decoration: underline;
   color: blue;
+}
+.my-nav {
+  .scrollactive-item {
+    display: block;
+    font-size: 0.8em;
+    margin-bottom: 5px;
+    color: #6c6c6c;
+    &.active {
+      color: #190aff;
+    }
+  }
 }
 </style>

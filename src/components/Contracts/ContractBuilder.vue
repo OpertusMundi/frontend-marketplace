@@ -158,6 +158,7 @@ export default class ContractBuilder extends Vue {
 
   scrollToActive(): void {
     const activeIndex = document.getElementsByClassName('contract-builder__index__item active')[0];
+    console.log(activeIndex);
     activeIndex.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
