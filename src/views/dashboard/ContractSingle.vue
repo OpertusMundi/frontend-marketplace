@@ -8,6 +8,7 @@
         <h1>{{ contract.title }}</h1>
         <div class="dashboard__head__settings">
           <!-- <a href="#">ok</a> -->
+          <button href="#" class="btn btn--outlinedark" @click="deactivateContract()">DEACTIVATE</button>
         </div>
       </div>
     </div>
@@ -32,15 +33,24 @@
       </ul>
     </div>
     <div class="dashboard__form">
-      <ul class="dashboard__form__nav">
-        <li>
-          <a href="#" class="active">{{ contract.masterContract.title }}</a>
-        </li>
-      </ul>
+      <div class="dashboard__form__header">
+        <h3>
+          {{ contract.masterContract.title }}
+        </h3>
+        <a class="contract-link" href="" @click.prevent="exportPdf()">
+          <span
+            ><svg xmlns="http://www.w3.org/2000/svg" width="13.714" height="12" viewBox="0 0 13.714 12">
+              <g id="Group_4257" data-name="Group 4257" transform="translate(-0.002 -32)">
+                <path id="Path_10069" data-name="Path 10069" d="M9.431,73.432H1.716V65.717H4.288V64H.859A.857.857,0,0,0,0,64.86v9.429a.857.857,0,0,0,.857.857h9.428a.856.856,0,0,0,.857-.857V70.03H9.431Z" transform="translate(0 -31.145)" fill="#333" />
+                <path id="Path_10070" data-name="Path 10070" d="M138.115,34.658l-3.429-2.571a.429.429,0,0,0-.686.343v1.286h-1.286A4.719,4.719,0,0,0,128,38.429a.429.429,0,0,0,.812.192l.1-.2a3.836,3.836,0,0,1,3.45-2.133H134v1.286a.429.429,0,0,0,.686.343l3.429-2.571a.429.429,0,0,0,0-.686Z" transform="translate(-124.57)" fill="#333" />
+              </g></svg></span
+          >Export to PDF</a
+        >
+      </div>
       <div class="dashboard__form__steps">
         <transition name="fade" mode="out-in">
           <div class="dashboard__form__steps__inner">
-            <contract-viewer :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContract.sync="templateContract" v-if="currentStep == 2"></contract-viewer>
+            <contract-viewer :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContract.sync="templateContract" v-if="contract"></contract-viewer>
           </div>
         </transition>
       </div>
@@ -64,8 +74,6 @@ import moment from 'moment';
 export default class ContractSingle extends Vue {
   contractKey: string | null;
 
-  currentStep: number;
-
   providerContractApi: ProviderContractApi;
 
   contract: ProviderTemplateContract | null;
@@ -86,7 +94,6 @@ export default class ContractSingle extends Vue {
     this.contract = null;
     this.selectedMasterContract = null;
     this.draftTemplateContract = null;
-    this.currentStep = 1;
     this.templateContractFilled = false;
     this.templateContract = {
       templateKey: '',
@@ -105,12 +112,9 @@ export default class ContractSingle extends Vue {
       if (response.success) {
         this.contract = response.result;
         this.draftTemplateContract = response.result;
-        console.log(this.draftTemplateContract, 'DRAFT TEMPLATATE');
-
         if (this.draftTemplateContract.masterContract) {
           this.selectedMasterContract = this.draftTemplateContract.masterContract;
         }
-        this.currentStep = 2;
         console.log(response);
       } else {
         // TODO: handle error
@@ -121,6 +125,20 @@ export default class ContractSingle extends Vue {
 
   formatDate(date: string): string {
     return moment(date).format('MMM Do YYYY');
+  }
+
+  exportPdf(): void {
+    console.log('EXPORT PDF');
+  }
+
+  deactivateContract(): void {
+    store.commit('setLoading', true);
+    this.providerContractApi.deactivate(this.$route.params.key).then((response) => {
+      if (response.success) {
+        store.commit('setLoading', false);
+        this.$router.push('/dashboard/contracts');
+      }
+    });
   }
 }
 </script>

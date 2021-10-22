@@ -191,9 +191,7 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   saveDraft(): void {
-    // store.commit('setLoading', true);
-    console.log(this.selectedMasterContract, 'selected master contract on SAVE DRAFT');
-    console.log(this.templateContract, 'TEMPLATE CONTRACT SAVED DRAFT   before');
+    store.commit('setLoading', true);
     const masterSections: any = this.selectedMasterContract?.sections.slice(this.templateContract.sections.length);
     const map = masterSections.map((obj: { id: number; optional: boolean }) => ({
       masterSectionId: obj.id,
@@ -232,7 +230,6 @@ export default class ContractCreateTemplate extends Vue {
   }
 
   deleteDraft(): void {
-    console.log(this.templateContract);
     store.commit('setLoading', true);
     this.providerContractApi.deleteDraft(this.draftTemplateContract?.key as string).then((response) => {
       if (response.success) {

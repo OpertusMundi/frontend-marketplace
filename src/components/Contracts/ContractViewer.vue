@@ -4,27 +4,24 @@
       <div class="contract-builder__index">
         <h4>Document Outline</h4>
 
-        <scrollactive ref="scrollactive" v-if="masterContract && loaded" v-on:itemchanged="onItemChanged" class="my-nav" active-class="active" :offset="80" :duration="800" bezier-easing-value=".5,0,.35,1" scroll-container-selector="#inhalt">
+        <scrollactive ref="scrollactive" v-if="masterContract" v-on:itemchanged="onItemChanged" class="my-nav" active-class="active" :offset="80" :duration="800" bezier-easing-value=".5,0,.35,1" scroll-container-selector="#inhalt">
           <a v-for="(section, index) in masterContract.sections" :style="{ paddingLeft: 0.1 * section.indent + 'em' }" v-bind:key="section.id" :href="`#id-${index}`" class="scrollactive-item">Section {{ section.index }} {{ section.title }}</a>
         </scrollactive>
       </div>
       <div class="contract-builder__main" v-if="masterContract">
-        <div class="contract-builder__main__inner">
+        <div class="contract-builder__main__inner contract-builder__main__inner--no-border">
           <div id="inhalt" class="contract-builder__main__content">
             <div v-for="(section, index) in masterContract.sections" :key="section.id">
-              <h2 :id="`id-${index}`">{{ section.index }} - {{ section.title }}</h2>
+              <h2 :id="`id-${index}`">{{ section.index }} {{ section.title }}</h2>
               <div v-if="section.dynamic && section.variable">
                 <div v-for="(options, index) in section.options" :key="options.id">
                   <div v-if="section.option === index">
-                    <span>{{ index }}</span>
-                    <div :class="section.option === index ? 'active' : ''" v-html="options.bodyHtml"></div>
-                    <div>{{ section.option }}</div>
+                    <div v-html="options.bodyHtml"></div>
                   </div>
                 </div>
               </div>
               <div v-else-if="!section.dynamic && section.variable">
-                <div v-for="(options, index) in section.options" :key="options.id">
-                  <span>{{ index }}</span>
+                <div v-for="options in section.options" :key="options.id">
                   <div v-html="options.bodyHtml"></div>
                   <div class="active">
                     <p v-if="section.optional">DISCARD</p>
@@ -62,15 +59,11 @@ export default class ContractViewer extends Vue {
 
   masterContract1: MasterContract | null;
 
-  selectedSection: any | null;
-
   keepCurrentSection: boolean;
 
   selectedSectionValue: any | null;
 
   contractSelectedSections: any | null;
-
-  loaded: boolean;
 
   timer: any | null;
 
@@ -79,11 +72,10 @@ export default class ContractViewer extends Vue {
 
     this.masterContract = null;
     this.masterContract1 = null;
-    this.selectedSection = null;
+
     this.keepCurrentSection = true;
     this.selectedSectionValue = null;
     this.contractSelectedSections = null;
-    this.loaded = false;
     this.timer = null;
   }
 
@@ -93,15 +85,7 @@ export default class ContractViewer extends Vue {
     }
   }
 
-  mounted(): void {
-    this.$nextTick(() => {
-      this.loaded = true;
-    });
-  }
-
   onItemChanged(event, currentItem, lastActiveItem) {
-    console.log(event, currentItem, lastActiveItem);
-
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this.scrollToActive(currentItem);
@@ -109,8 +93,6 @@ export default class ContractViewer extends Vue {
   }
 
   scrollToActive(activeIndex: any): void {
-    console.log('trigger');
-    console.log(activeIndex);
     setTimeout(() => {
       activeIndex.scrollIntoView({
         behavior: 'smooth',
@@ -127,11 +109,8 @@ export default class ContractViewer extends Vue {
         this.masterContract = this.draftTemplateContract.masterContract;
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
-        [this.selectedSection] = this.masterContract.sections;
-
         this.contractSelectedSections = this.masterContract.sections.map((item, i) => ({ ...item, ...this.draftTemplateContract.sections![i] }));
         this.masterContract.sections = this.contractSelectedSections;
-        console.log(this.draftTemplateContract, this.masterContract, 'MASTER CONTRACT DRAFT');
       }
     }
   }
