@@ -31,21 +31,34 @@
         </li>
       </ul>
     </div>
-    <contract-builder ref="step2" :disabled="true" :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-if="currentStep == 2"></contract-builder>
+    <div class="dashboard__form">
+      <ul class="dashboard__form__nav">
+        <li>
+          <a href="#" class="active">{{ contract.masterContract.title }}</a>
+        </li>
+      </ul>
+      <div class="dashboard__form__steps">
+        <transition name="fade" mode="out-in">
+          <div class="dashboard__form__steps__inner">
+            <contract-viewer :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContract.sync="templateContract" v-if="currentStep == 2"></contract-viewer>
+          </div>
+        </transition>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ProviderContractApi from '@/service/provider-contract';
-import { ProviderTemplateContract, MasterContract } from '@/model/provider-contract';
-import ContractBuilder from '@/components/Contracts/ContractBuilder.vue';
+import { ProviderTemplateContract, MasterContract, ProviderTemplateContractCommand } from '@/model/provider-contract';
+import ContractViewer from '@/components/Contracts/ContractViewer.vue';
 import store from '@/store';
 import moment from 'moment';
 
 @Component({
   components: {
-    ContractBuilder,
+    ContractViewer,
   },
 })
 export default class ContractSingle extends Vue {
@@ -61,6 +74,10 @@ export default class ContractSingle extends Vue {
 
   selectedMasterContract: MasterContract | null;
 
+  templateContractFilled: boolean;
+
+  templateContract: ProviderTemplateContractCommand;
+
   constructor() {
     super();
 
@@ -70,6 +87,13 @@ export default class ContractSingle extends Vue {
     this.selectedMasterContract = null;
     this.draftTemplateContract = null;
     this.currentStep = 1;
+    this.templateContractFilled = false;
+    this.templateContract = {
+      templateKey: '',
+      title: '',
+      subtitle: '',
+      sections: [],
+    };
   }
 
   mounted(): void {
