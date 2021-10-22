@@ -31,23 +31,35 @@
         </li>
       </ul>
     </div>
+    <contract-builder ref="step2" :disabled="true" :selectedMasterContract.sync="selectedMasterContract" :draftTemplateContract="draftTemplateContract" :templateContractFilled.sync="templateContractFilled" :templateContract.sync="templateContract" v-if="currentStep == 2"></contract-builder>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ProviderContractApi from '@/service/provider-contract';
-import { ProviderTemplateContract } from '@/model/provider-contract';
+import { ProviderTemplateContract, MasterContract } from '@/model/provider-contract';
+import ContractBuilder from '@/components/Contracts/ContractBuilder.vue';
 import store from '@/store';
 import moment from 'moment';
 
-@Component
+@Component({
+  components: {
+    ContractBuilder,
+  },
+})
 export default class ContractSingle extends Vue {
   contractKey: string | null;
+
+  currentStep: number;
 
   providerContractApi: ProviderContractApi;
 
   contract: ProviderTemplateContract | null;
+
+  draftTemplateContract: ProviderTemplateContract | null;
+
+  selectedMasterContract: MasterContract | null;
 
   constructor() {
     super();
@@ -55,6 +67,9 @@ export default class ContractSingle extends Vue {
     this.contractKey = null;
     this.providerContractApi = new ProviderContractApi();
     this.contract = null;
+    this.selectedMasterContract = null;
+    this.draftTemplateContract = null;
+    this.currentStep = 1;
   }
 
   mounted(): void {
@@ -65,6 +80,13 @@ export default class ContractSingle extends Vue {
       store.commit('setLoading', false);
       if (response.success) {
         this.contract = response.result;
+        this.draftTemplateContract = response.result;
+        console.log(this.draftTemplateContract, 'DRAFT TEMPLATATE');
+
+        if (this.draftTemplateContract.masterContract) {
+          this.selectedMasterContract = this.draftTemplateContract.masterContract;
+        }
+        this.currentStep = 2;
         console.log(response);
       } else {
         // TODO: handle error
@@ -82,4 +104,5 @@ export default class ContractSingle extends Vue {
 @import '@/assets/styles/abstracts/_spacings.scss';
 @import '@/assets/styles/_dashboard.scss';
 @import '@/assets/styles/_contracts.scss';
+@import '@/assets/styles/_forms.scss';
 </style>

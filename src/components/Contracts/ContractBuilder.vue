@@ -22,7 +22,7 @@
               <div class="contract-builder__options" v-if="this.selectedSection.dynamic && this.selectedSection.variable">
                 <label class="control control-radio" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`">
                   <strong v-html="option.bodyHtml"></strong>
-                  <input type="radio" v-model="selectedSectionValue" :value="index" />
+                  <input :disabled="disabled" type="radio" v-model="selectedSectionValue" :value="index" />
                   <div class="control_indicator"></div>
                 </label>
               </div>
@@ -30,12 +30,12 @@
                 <div class="contract-builder__option" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`" v-html="option.bodyHtml"></div>
                 <label class="control control-radio">
                   DISCARD
-                  <input type="radio" v-model="selectedSectionValue" :value="false" />
+                  <input :disabled="disabled" type="radio" v-model="selectedSectionValue" :value="false" />
                   <div class="control_indicator"></div>
                 </label>
                 <label class="control control-radio">
                   KEEP
-                  <input type="radio" v-model="selectedSectionValue" :value="true" />
+                  <input :disabled="disabled" type="radio" v-model="selectedSectionValue" :value="true" />
                   <div class="control_indicator"></div>
                 </label>
               </div>
@@ -79,6 +79,8 @@ export default class ContractBuilder extends Vue {
   @Prop({ default: false }) readonly isDraft!: boolean;
 
   @Prop({ required: true }) readonly templateContract!: any;
+
+  @Prop({ default: false }) readonly disabled!: boolean;
 
   providerContractApi: ProviderContractApi;
 
