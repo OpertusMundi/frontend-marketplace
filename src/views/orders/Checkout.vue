@@ -227,13 +227,19 @@
                         <h4>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</h4>
                       </div>
                       <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Vendor:</strong> {{ cartItem.asset.publisherName }}</span></p>
-                      <p>
-                        <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
-                        <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
-                        <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="cartItem.asset.type === 'SERVICE'">
+                      <p class="d-flex align-items-center">
+                        <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
+                        <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
+                        <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="cartItem.asset.type === 'TABULAR'">
+                        <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">
+                        <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">
+                        <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">
                         <span v-if="cartItem.asset.type === 'VECTOR'">Vector dataset</span>
                         <span v-if="cartItem.asset.type === 'RASTER'">Raster dataset</span>
-                        <span v-if="cartItem.asset.type === 'SERVICE'">Service dataset</span>
+                        <span v-if="cartItem.asset.type === 'TABULAR'">Tabular dataset</span>
+                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WMS'">WMS</span>
+                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'WFS'">WFS</span>
+                        <span v-if="cartItem.asset.type === 'SERVICE' && cartItem.asset.spatialDataServiceType === 'DATA_API'">Data API</span>
                       </p>
                     </div>
                     <div class="checkout__payment__bottom_fields">

@@ -1,5 +1,6 @@
 <template>
   <div class="asset__head__type">
+    <!-- TODO  -->
     <img src="@/assets/images/icons/vector_icon.svg" alt="">
     {{category}}
   </div>
