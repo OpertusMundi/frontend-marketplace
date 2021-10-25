@@ -92,13 +92,9 @@ import ProviderAssetsApi from '@/service/provider-assets';
 import AssetApiDetailsCard from '@/components/Assets/AssetApiDetailsCard.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
-<<<<<<< HEAD
-import { CatalogueItem, CatalogueItemCommand } from '@/model/catalogue';
 import store from '@/store';
-=======
 import { CatalogueItem, CatalogueItemCommand, DraftApiFromFileCommand } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
->>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
 
 extend('required', required);
 
@@ -174,6 +170,9 @@ export default class ApiDetails extends Vue {
   onCreationTypeChange(creationType: CreationType): void {
     console.log('creation type changed', creationType);
     this.$emit('update:apiCreationType', creationType);
+    if (creationType === 'TOPIO_DRIVE') {
+      this.selectedPublishedAssetForApiCreationLocal = null;
+    }
   }
 
   @Watch('assetLocal', { deep: true })
@@ -197,7 +196,6 @@ export default class ApiDetails extends Vue {
 
   created(): void {
     console.log('selectedPublishedAsset', this.selectedPublishedAssetForApiCreationLocal);
-
     store.commit('setLoading', true);
     const query: ProviderDraftQuery = {
       q: '',
@@ -205,20 +203,6 @@ export default class ApiDetails extends Vue {
       pageRequest: { page: 0, size: 1000 },
       sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
     };
-<<<<<<< HEAD
-    this.providerAssetsApi.find(query).then((response) => {
-      if (response.success) {
-        console.log('successfully fetched provider assets', response);
-        this.publishedAssets = response.result.items;
-      } else {
-        console.log('error fetching provider assets', response);
-      }
-    }).catch((err) => {
-      console.log('err', (err));
-    }).finally(() => {
-      store.commit('setLoading', false);
-    });
-=======
     this.providerAssetsApi
       .find(query)
       .then((response) => {
@@ -231,12 +215,15 @@ export default class ApiDetails extends Vue {
       })
       .catch((err) => {
         console.log('err', err);
+      })
+      .finally(() => {
+        store.commit('setLoading', false);
       });
->>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
   }
 
   onSelectPublishedAsset(asset: CatalogueItem): void {
     this.selectedPublishedAssetForApiCreationLocal = asset;
+    console.log(asset);
   }
 }
 </script>
