@@ -56,6 +56,7 @@
         </ul>
         <div class="dashboard__form__steps">
           <transition name="fade" mode="out-in">
+<<<<<<< HEAD
           <div class="dashboard__form__steps__inner">
 
             <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
@@ -76,14 +77,55 @@
 
             <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
             <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+=======
+            <div class="dashboard__form__steps__inner">
+              <!-- ASSET TYPE -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
+              <!-- </transition> -->
 
-            <div class="dashboard__form__errors" v-if="uploading.errors.length">
-              <ul>
-                <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">{{ error.description }}</li>
-              </ul>
+              <!-- METADATA -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="assetMainType !== 'API' && currentStep == 2"></metadata>
+              <!-- <api-details ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details> -->
+              <api-details ref="step2" :asset.sync="asset" :selectedPublishedFileForApiCreation.sync="selectedPublishedFileForApiCreation" :apiCreationType.sync="apiCreationType" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :serviceType="serviceType" v-if="assetMainType === 'API' && currentStep == 2"></api-details>
+              <!-- </transition> -->
+
+              <!-- CONTRACT -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType !== 'API' && currentStep === 3"></contract>
+              <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep === 3"></api-metadata>
+              <!-- </transition> -->
+
+              <!-- PRICING -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="assetMainType !== 'API' && currentStep == 4"></pricing>
+              <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="assetMainType === 'API' && currentStep == 4"></api-pricing>
+              <!-- </transition> -->
+
+              <!-- DELIVERY -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="assetMainType !== 'API' && currentStep == 5"></delivery>
+              <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="assetMainType === 'API' && currentStep === 5"></contract>
+              <!-- </transition> -->
+
+              <!-- PAYOUT -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <payout ref="step6" v-if="currentStep == 6"></payout>
+              <!-- </transition> -->
+
+              <!-- REVIEW -->
+              <!-- <transition name="fade" mode="out-in"> -->
+              <review ref="step7" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+              <!-- </transition> -->
+>>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
+
+              <div class="dashboard__form__errors" v-if="uploading.errors.length">
+                <ul>
+                  <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">{{ error.description }}</li>
+                </ul>
+              </div>
             </div>
-
-          </div>
           </transition>
         </div>
         <div class="dashboard__form__navbuttons">
@@ -96,7 +138,7 @@
     <div class="dashboard__form__uploading" v-if="uploading.status">
       <div class="dashboard__form__uploading__inner">
         <div class="dashboard__form__uploading__pbar">
-          <span :style="{width: uploading.percentage + '%'}"></span>
+          <span :style="{ width: uploading.percentage + '%' }"></span>
           <p v-if="!uploading.completed">{{ uploading.percentage }}%</p>
           <p v-if="uploading.completed">Well done!</p>
         </div>
@@ -109,12 +151,11 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CatalogueItemCommand, ServerResponse } from '@/model';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
@@ -128,11 +169,7 @@ import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import { AssetDraft } from '@/model/draft';
 import {
-  CatalogueItem,
-  EnumConformity,
-  EnumDeliveryMethod,
-  DraftApiFromAssetCommand,
-  EnumDraftCommandType,
+  CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand, FileResourceCommand } from '@/model/asset';
@@ -189,14 +226,14 @@ interface FileToUpload {
 })
 export default class CreateAsset extends Vue {
   $refs!: {
-    step1: InstanceType<typeof ValidationObserver>,
-    step2: InstanceType<typeof ValidationObserver>,
-    step3: InstanceType<typeof ValidationObserver>,
-    step4: InstanceType<typeof ValidationObserver>,
-    step5: InstanceType<typeof ValidationObserver>,
-    step6: InstanceType<typeof ValidationObserver>,
-    step7: InstanceType<typeof ValidationObserver>,
-  }
+    step1: InstanceType<typeof ValidationObserver>;
+    step2: InstanceType<typeof ValidationObserver>;
+    step3: InstanceType<typeof ValidationObserver>;
+    step4: InstanceType<typeof ValidationObserver>;
+    step5: InstanceType<typeof ValidationObserver>;
+    step6: InstanceType<typeof ValidationObserver>;
+    step7: InstanceType<typeof ValidationObserver>;
+  };
 
   catalogueApi: CatalogueApi;
 
@@ -218,7 +255,11 @@ export default class CreateAsset extends Vue {
 
   selectedPublishedAssetForApiCreation: CatalogueItem | null;
 
+<<<<<<< HEAD
   selectedPayoutMethod: 'through_platform' | 'external_means' | 'credit_debit' | null;
+=======
+  selectedPublishedFileForApiCreation: DraftApiFromFileCommand | null;
+>>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
 
   // contract: string;
 
@@ -226,11 +267,17 @@ export default class CreateAsset extends Vue {
 
   currentStep = 1;
 
-  additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
+  additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand; file: File }[];
 
+  fileToUpload: { isFileSelected: boolean; file: File; fileName: string; fileExtension: string };
+
+<<<<<<< HEAD
   fileToUpload: FileToUpload;
+=======
+  uploading: any;
+>>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
 
-  uploading:any;
+  apiCreationType: string | null;
 
   constructor() {
     super();
@@ -239,6 +286,8 @@ export default class CreateAsset extends Vue {
     console.log('config', store.getters.getConfig);
 
     this.modalToShow = '';
+
+    this.apiCreationType = '';
 
     this.additionalResourcesToUpload = [];
 
@@ -259,6 +308,8 @@ export default class CreateAsset extends Vue {
 
     this.selectedPublishedAssetForApiCreation = null;
 
+    this.selectedPublishedFileForApiCreation = null;
+
     this.assetId = '';
 
     this.asset = {} as CatalogueItemCommand;
@@ -278,6 +329,12 @@ export default class CreateAsset extends Vue {
 
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
+  }
+
+  @Watch('selectedPublishedFileForApiCreation', { deep: true })
+  onFileApiChange(selectedPublishedFileForApiCreation: any | null): void {
+    console.log('file api changed on father component', selectedPublishedFileForApiCreation);
+    console.log('creation TYPE', this.apiCreationType);
   }
 
   created(): void {
@@ -371,9 +428,15 @@ export default class CreateAsset extends Vue {
 
       // todo (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
+<<<<<<< HEAD
         this.assetMainType = EnumAssetTypeCategory.DATA_FILE;
       } else if (this.asset.type as string === EnumAssetType.SERVICE) {
         this.assetMainType = EnumAssetTypeCategory.API;
+=======
+        this.assetMainType = 'datafile';
+      } else if ((this.asset.type as string) === 'SERVICE') {
+        this.assetMainType = 'API';
+>>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
       } else {
         // todo
         console.log('other main type');
@@ -381,23 +444,28 @@ export default class CreateAsset extends Vue {
     });
   }
 
-  goToStep(step:number):void {
+  goToStep(step: number): void {
     this.currentStep = step;
   }
 
-  previousStep():void {
+  previousStep(): void {
     if (this.currentStep <= 1) return;
     this.currentStep -= 1;
   }
 
-  nextStep():void {
+  nextStep(): void {
     console.log('a', this.asset);
     console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
+<<<<<<< HEAD
           if (this.assetMainType === EnumAssetTypeCategory.API) {
+=======
+          if (this.assetMainType === 'API') {
+            console.log('NEXT STEP PUBLISHED');
+>>>>>>> b46ec63c37c0f86e41e9b6222ca8576400c0c5e1
             this.submitFormForService();
           } else {
             this.submitForm();
@@ -490,14 +558,29 @@ export default class CreateAsset extends Vue {
       } else {
         console.log('new draft');
         const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-        const draftApi: DraftApiFromAssetCommand = {
-          type: EnumDraftCommandType.ASSET,
-          pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-          title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
-          version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
-          serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-        };
-        draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+        if (this.apiCreationType === 'TOPIO_DRIVE') {
+          console.log('IS TOPIO DRIVE');
+          const draftApi: DraftApiFromFileCommand = {
+            type: EnumDraftCommandType.FILE,
+            title: this.selectedPublishedFileForApiCreation ? `${this.selectedPublishedFileForApiCreation.title} (${serviceType})` : '',
+            version: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.version : '',
+            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+            path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
+            format: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.format : '',
+          };
+          console.log(draftApi, 'ON SUBMIT');
+          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+        } else {
+          const draftApi: DraftApiFromAssetCommand = {
+            type: EnumDraftCommandType.ASSET,
+            pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+            title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
+            version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+          };
+          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+        }
+
         // this.asset.parentId = draftAssetResponse.result.command.parentId;
         this.asset = { ...draftAssetResponse.result.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
         console.log('qwe', this.asset);
@@ -689,29 +772,29 @@ export default class CreateAsset extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_forms.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
-  @import "~flexboxgrid/css/flexboxgrid.min.css";
+@import '@/assets/styles/_forms.scss';
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '~flexboxgrid/css/flexboxgrid.min.css';
 
-  .card {
-    padding: 30px;
-    background: #fff;
-    letter-spacing: 0.06em;
-    font-size: .8em;
-    border: solid 2px $darkColor;
-    border-radius: 7px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+.card {
+  padding: 30px;
+  background: #fff;
+  letter-spacing: 0.06em;
+  font-size: 0.8em;
+  border: solid 2px $darkColor;
+  border-radius: 7px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
-    &--selected {
-      border: solid 2px $secondColor;
-    }
+  &--selected {
+    border: solid 2px $secondColor;
+  }
 
-    &--clickable {
-      cursor: pointer;
-    }
+  &--clickable {
+    cursor: pointer;
+  }
 
   .form-group .multiselect__option--highlight {
     background: $secondColor !important;
@@ -720,5 +803,5 @@ export default class CreateAsset extends Vue {
   .form-group .multiselect__tag {
     background: $secondColor !important;
   }
-  }
+}
 </style>
