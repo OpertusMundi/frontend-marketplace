@@ -57,12 +57,6 @@ export default class ContractViewer extends Vue {
 
   masterContract: MasterContract | null;
 
-  masterContract1: MasterContract | null;
-
-  keepCurrentSection: boolean;
-
-  selectedSectionValue: any | null;
-
   contractSelectedSections: any | null;
 
   timer: any | null;
@@ -71,10 +65,6 @@ export default class ContractViewer extends Vue {
     super();
 
     this.masterContract = null;
-    this.masterContract1 = null;
-
-    this.keepCurrentSection = true;
-    this.selectedSectionValue = null;
     this.contractSelectedSections = null;
     this.timer = null;
   }
@@ -85,11 +75,11 @@ export default class ContractViewer extends Vue {
     }
   }
 
-  onItemChanged(event, currentItem, lastActiveItem) {
+  onItemChanged(event: any | null, currentItem: any, lastActiveItem: any): void {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this.scrollToActive(currentItem);
-    }, 500);
+    }, 200);
   }
 
   scrollToActive(activeIndex: any): void {

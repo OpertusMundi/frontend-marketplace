@@ -162,9 +162,7 @@ export default class ContractCreateTemplate extends Vue {
   getDraft(draftKey: string): void {
     this.providerContractApi.findOneDraft(draftKey).then((response) => {
       if (response.success) {
-        console.log('FIND ONE DRAFT', response.result);
         this.draftTemplateContract = response.result;
-
         if (this.draftTemplateContract.masterContract) {
           this.selectedMasterContract = this.draftTemplateContract.masterContract;
         }
@@ -176,7 +174,6 @@ export default class ContractCreateTemplate extends Vue {
   publishDraft(): void {
     store.commit('setLoading', true);
     this.providerContractApi.createDraft(this.templateContract).then((response) => {
-      console.log(this.templateContract, 'ON PUBLISH');
       store.commit('setLoading', false);
       if (response.success) {
         store.commit('setLoading', true);
@@ -200,15 +197,9 @@ export default class ContractCreateTemplate extends Vue {
       subOption: null,
     }));
     this.templateContract.sections = [...this.templateContract.sections, ...map];
-    console.log(this.templateContract, 'TEMPLATE CONTRACT SAVED DRAFT');
     if (this.isNewDraft) {
-      console.log('SAVE FUNCTION');
-      // const index: number = Math.floor(Math.random() * 100);
-      // this.templateContract.title = `Title No: ${index}`;
-      // this.templateContract.subtitle = `Subtitle No: ${index}`;
       this.providerContractApi.createDraft(this.templateContract).then((response) => {
         store.commit('setLoading', false);
-        console.log(this.templateContract, response, 'RESPONSE');
         if (response.success) {
           store.commit('setLoading', false);
           console.log('SUCCESS');
@@ -216,9 +207,8 @@ export default class ContractCreateTemplate extends Vue {
         }
       });
     } else if (!this.isNewDraft) {
-      console.log('UPDATE FUNCTION');
+      store.commit('setLoading', true);
       this.providerContractApi.updateDraft(this.$route.query.key as string, this.templateContract).then((response) => {
-        store.commit('setLoading', false);
         console.log(this.templateContract, response, 'RESPONSE');
         if (response.success) {
           store.commit('setLoading', false);
@@ -236,7 +226,6 @@ export default class ContractCreateTemplate extends Vue {
         store.commit('setLoading', false);
         this.$router.push('/dashboard/contracts');
       }
-      console.log(response);
     });
   }
 

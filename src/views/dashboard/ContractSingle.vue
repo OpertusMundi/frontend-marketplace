@@ -104,7 +104,6 @@ export default class ContractSingle extends Vue {
   }
 
   mounted(): void {
-    console.log(this.$route);
     this.contractKey = this.$route.params.key;
     store.commit('setLoading', true);
     this.providerContractApi.findOneTemplate(this.contractKey).then((response) => {
