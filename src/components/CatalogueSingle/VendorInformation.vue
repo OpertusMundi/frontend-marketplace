@@ -5,7 +5,7 @@
         <div class="asset__related__content__right" v-if="catalogueItem && catalogueItem.publisher">
           <h6>About the vendor</h6>
           <div class="asset__vendor_info__card">
-            <img :src="'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage" alt="" height="80" width="80">
+            <img :src="catalogueItem.publisher.logoImage ? 'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage : defaultLogo()" alt="" height="80" width="80">
             <div class="asset__vendor_info__card__info">
               <div>
                 <span class="asset__vendor_info__card__info__title">{{ catalogueItem.publisher.name }}</span>
@@ -37,6 +37,7 @@ import { CatalogueItem } from '@/model';
 import FavoriteApi from '@/service/favorite';
 import store from '@/store';
 import { EnumFavoriteType, FavoriteProviderCommand } from '@/model/favorite';
+import getDefaultLogo from '@/helper/logo';
 import moment from 'moment';
 
 @Component
@@ -49,6 +50,10 @@ export default class VendorInformation extends Vue {
     super();
 
     this.favoriteApi = new FavoriteApi();
+  }
+
+  defaultLogo(): string {
+    return getDefaultLogo();
   }
 
   formatDate(date: string): string {

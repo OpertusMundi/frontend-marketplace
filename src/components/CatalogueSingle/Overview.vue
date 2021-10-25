@@ -15,14 +15,16 @@
           </ul>
           <h5 v-if="catalogueItem.additionalResources">Additional resources:</h5>
           <!-- <a v-for="(additionalResources, index) in catalogueItem.additionalResources" v-bind:key="`${index}_aditional_r`" :href="additionalResources.uri" target="_blank" style="display:block">{{ additionalResources.text }}</a> -->
-          <div v-for="(additionalResource, index) in catalogueItem.additionalResources" :key="`${index}_aditional_r`">
-            <template v-if="additionalResource.type === 'URI'">
-              <a :href="additionalResource.uri" target="_blank" style="display: block">{{ additionalResource.text }}</a>
-            </template>
-            <template v-if="additionalResource.type === 'FILE'">
-              <a href="#" @click.prevent="onDownloadAdditionalResource(additionalResource.id, additionalResource.fileName)" style="display: block">{{ additionalResource.fileName }}</a>
-              <small>{{ additionalResource.description }}</small>
-            </template>
+          <div class="asset__section__overview__resources">
+            <div v-for="(additionalResource, index) in catalogueItem.additionalResources" :key="`${index}_aditional_r`" :class="{'asset__section__overview__resources__uri': additionalResource.type === 'URI', 'asset__section__overview__resources__file': additionalResource.type === 'FILE'}">
+              <template v-if="additionalResource.type === 'URI'">
+                <a :href="'//' + additionalResource.uri" target="_blank" style="display: block">{{ additionalResource.text || additionalResource.uri }}</a>
+              </template>
+              <template v-if="additionalResource.type === 'FILE'">
+                <a href="#" @click.prevent="onDownloadAdditionalResource(additionalResource.id, additionalResource.fileName)">{{ additionalResource.fileName }}</a>
+                <small>{{ additionalResource.description }}</small>
+              </template>
+            </div>
           </div>
         </div>
         <div class="asset__section__overview__right">

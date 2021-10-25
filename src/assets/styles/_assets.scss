@@ -420,16 +420,16 @@
             color: $secondColor;
             border-color: transparent;
           }
-          &__option {
-            &--selected {
-              background-color: transparent;
-              color: $darkColor;
-            }
-            &--highlight {
-              background-color: $lightBgColor;
-              color: $secondColor;
-            }
-          }
+          // &__option {
+          //   &--selected {
+          //     background-color: transparent;
+          //     color: $darkColor;
+          //   }
+          //   &--highlight {
+          //     background-color: $lightBgColor;
+          //     color: $secondColor;
+          //   }
+          // }
         }
       }
 
@@ -692,6 +692,26 @@
           margin-top: 30px;
         }
       }
+      &__resources {
+        display: flex;
+        flex-direction: column;
+        row-gap: 5px;
+        &__uri {
+          display: inline-block;
+          overflow-wrap: break-word;
+          word-break: break-word;          
+        }
+        &__file {
+          display: inline-block;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          display: flex;
+          column-gap: 10px;
+          small {
+            color: $labelColor;
+          }
+        }
+      }
     }
   }
 
@@ -723,7 +743,7 @@
       }
 
       > img {
-        border: solid 2px $darkColor;
+        border: solid 2px #fff;
         border-radius: 50%;
       }
 
@@ -981,11 +1001,11 @@
         }
       }
     }
-    .multiselect__option--selected & {
-      #{$ac}__inner {
-        border-color: var(--color);
-      }
-    }
+    // .multiselect__option--selected & {
+    //   #{$ac}__inner {
+    //     border-color: var(--color);
+    //   }
+    // }
   }
   &--nohover {
     &:hover {

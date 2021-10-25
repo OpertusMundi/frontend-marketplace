@@ -349,7 +349,7 @@
             <div class="tabs__tab tabs__tab__tab-general">
               <div class="tabs__tab__list">
                 <div class="tabs__tab__list__item"><strong>Image</strong></div>
-                <div class="tabs__tab__list__item right avatar"><img :src="'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image" :height="80" :width="80" alt="user image"></div>
+                <div class="tabs__tab__list__item right avatar"><img :src="userData.profile.image ? 'data:' + userData.profile.imageMimeType + ';base64, ' + userData.profile.image : defaultLogo()" :height="80" :width="80" alt="user image"></div>
                 <div class="tabs__tab__list__item"><button @click="modalToShow = 'image'" class="btn--std btn--outlinedark">CHANGE</button></div>
                 <div class="tabs__tab__list__line"></div>
 
@@ -402,7 +402,7 @@
                 <div class="tabs__tab__list__line"></div>
 
                 <div class="tabs__tab__list__item"><strong>Company Logo</strong></div>
-                <div class="tabs__tab__list__item right avatar"><img :src="'data:' + userData.profile.provider.current.logoImageMimeType + ';base64, ' + userData.profile.provider.current.logoImage" :height="80" :width="80" alt="user image"></div>
+                <div class="tabs__tab__list__item right avatar"><img :src="userData.profile.provider.current.logoImage ? 'data:' + userData.profile.provider.current.logoImageMimeType + ';base64, ' + userData.profile.provider.current.logoImage : defaultLogo()" :height="80" :width="80" alt="user image"></div>
                 <div class="tabs__tab__list__item"><button @click="modalToShow = 'companyImage'" class="btn btn--std btn--outlinedark">CHANGE</button></div>
                 <div class="tabs__tab__list__line"></div>
 
@@ -880,12 +880,13 @@ import {
 } from '@/model/ubo-declaration';
 import Modal from '@/components/Modal.vue';
 import Pagination from '@/components/Pagination.vue';
-import AccountApi from '../../service/account';
-import ProfileApi from '../../service/profile';
-import ProviderApi from '../../service/provider';
-import PaymentApi from '../../service/consumer-payin';
-import KycDocumentApi from '../../service/kyc-document';
-import UboDeclarationApi from '../../service/ubo-declaration';
+import AccountApi from '@/service/account';
+import ProfileApi from '@/service/profile';
+import ProviderApi from '@/service/provider';
+import PaymentApi from '@/service/consumer-payin';
+import KycDocumentApi from '@/service/kyc-document';
+import UboDeclarationApi from '@/service/ubo-declaration';
+import getDefaultLogo from '@/helper/logo';
 
 extend('required', required);
 extend('email', email);
@@ -1179,6 +1180,10 @@ export default class DashboardHome extends Vue {
       return true;
     }
     return false;
+  }
+
+  defaultLogo(): string {
+    return getDefaultLogo();
   }
 
   /*

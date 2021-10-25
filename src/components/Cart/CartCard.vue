@@ -6,9 +6,12 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/vector_icon.svg" alt="" v-if="item.asset.type === 'VECTOR'">
-          <img src="@/assets/images/icons/raster_icon.svg" alt="" v-if="item.asset.type === 'RASTER'">
-          <img src="@/assets/images/icons/api_icon.svg" alt="" v-if="item.asset.type === 'SERVICE'">
+          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="item.asset.type === 'VECTOR'">
+          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="item.asset.type === 'RASTER'">
+          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="item.asset.type === 'TABULAR'">
+          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WMS'">
+          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WFS'">
+          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'DATA_API'">
           <span class="asset_card__type">{{ item.asset.type }}</span>
         </div>
         <!-- <div class="asset_card__top__right"><span>asset status</span></div> -->

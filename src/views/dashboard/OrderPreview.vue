@@ -17,7 +17,7 @@
       <div v-if="order.status === 'PENDING_PROVIDER_APPROVAL'">
         <h4 class="mb-xs-20">You received a new pucrhase request</h4>
         <button @click="onAcceptOrRejectOrder(true)" class="btn btn--std btn--blue">accept</button>
-        <button @click="modalToShow = 'rejectOrder'" class="btn btn--std btn--blue">reject</button>
+        <button @click="modalToShow = 'rejectOrder'" class="btn btn--std btn--blue ml-xs-20">reject</button>
       </div>
       <div v-else-if="order.status === 'PENDING_PROVIDER_SEND_CONFIRMATION'" class="mt-xs-50">
         <h4 class="mb-xs-20">Update order status?</h4>
@@ -153,7 +153,7 @@ export default class DashboardPurchases extends Vue {
     }).catch((err) => {
       console.log('error', err);
     }).finally(() => {
-      store.commit('setLoading', true);
+      store.commit('setLoading', false);
     });
   }
 

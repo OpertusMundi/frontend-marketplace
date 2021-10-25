@@ -904,6 +904,10 @@ export interface CatalogueItemDetails extends CatalogueItem {
    */
   ingestionInfo?: ResourceIngestionData[];
   /**
+   * Provides the identifier of a parent data source resource
+   */
+  parentDataSourceId?: string;
+  /**
    * A list of resources of the dataset
    */
   resources: Resource[];
@@ -936,6 +940,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * This value will be overwritten by the publish asset workflow
    */
   ingestionInfo?: ResourceIngestionData[];
+  /**
+   * Provides the identifier of a parent data source resource
+   */
+  parentDataSourceId?: string;
   /*
    * Pricing model available for the asset
    */

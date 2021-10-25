@@ -291,7 +291,7 @@ export default class CreateAsset extends Vue {
       creationDate: '',
       dateEnd: '',
       dateStart: '',
-      deliveryMethod: '' as EnumDeliveryMethod,
+      deliveryMethod: EnumDeliveryMethod.NONE,
       format: '',
       ingested: false,
       keywords: [],
@@ -360,8 +360,11 @@ export default class CreateAsset extends Vue {
 
       if (this.asset.type === EnumAssetType.SERVICE) {
         console.log('type: service');
-        this.catalogueApi.findOne(this.asset.parentId).then((parentAssetResponse) => {
-          console.log('parent id', this.asset.parentId, parentAssetResponse);
+        console.log('aa', this.asset);
+        console.log('id', this.asset.parentDataSourceId);
+        if (!this.asset.parentDataSourceId) throw new Error('unknown parent data source id');
+        this.catalogueApi.findOne(this.asset.parentDataSourceId).then((parentAssetResponse) => {
+          console.log('parent id', this.asset.parentDataSourceId, parentAssetResponse);
           this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
         });
       }
@@ -466,13 +469,14 @@ export default class CreateAsset extends Vue {
             version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
             serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
           };
+          console.log(draftApi);
           draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
           // todo
         }
         if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
         return;
       } catch (err) {
-        console.error(err.message);
+        console.error((err as any).message);
         // eslint-disable-next-line
         alert('Error (check console)');
       }
@@ -501,10 +505,10 @@ export default class CreateAsset extends Vue {
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);
     } catch (err) {
-      console.error(err.message);
+      console.error((err as any).message);
       // eslint-disable-next-line
-      alert(`Error: ${err.message}`);
-      throw new Error(err.message);
+      alert(`Error: ${(err as any).message}`);
+      throw new Error((err as any).message);
     }
     if (!draftAssetResponse.success) {
       console.log('error', draftAssetResponse);
@@ -577,10 +581,10 @@ export default class CreateAsset extends Vue {
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);
     } catch (err) {
-      console.error(err.message);
+      console.error((err as any).message);
       // eslint-disable-next-line
-      alert(`Error: ${err.message}`);
-      throw new Error(err.message);
+      alert(`Error: ${(err as any).message}`);
+      throw new Error((err as any).message);
     }
     if (!draftAssetResponse.success) {
       console.log('error', draftAssetResponse);
@@ -602,10 +606,10 @@ export default class CreateAsset extends Vue {
           this.asset = uploadAdditionalResourceResponse.result.command;
           console.log('upload additional resource success', uploadAdditionalResourceResponse);
         } catch (err) {
-          console.error(err.message);
+          console.error((err as any).message);
           // eslint-disable-next-line
-          alert(`Error: ${err.message}`);
-          throw new Error(err.message);
+          alert(`Error: ${(err as any).message}`);
+          throw new Error((err as any).message);
         }
         if (!uploadAdditionalResourceResponse.success) {
           console.log('error', uploadAdditionalResourceResponse);
@@ -636,10 +640,10 @@ export default class CreateAsset extends Vue {
         this.asset = uploadResource.result.command;
         console.log('upload resource success', uploadResource);
       } catch (err) {
-        console.error(err.message);
+        console.error((err as any).message);
         // eslint-disable-next-line
-        alert(`Error: ${err.message}`);
-        throw new Error(err.message);
+        alert(`Error: ${(err as any).message}`);
+        throw new Error((err as any).message);
       }
       if (!uploadResource.success) {
         console.log('error', uploadResource);
@@ -659,10 +663,10 @@ export default class CreateAsset extends Vue {
         this.showUploadingMessage(true, 'Asset created!');
         console.log('submit success', submitResponse);
       } catch (err) {
-        console.error(err.message);
+        console.error((err as any).message);
         // eslint-disable-next-line
-        alert(`Error: ${err.message}`);
-        throw new Error(err.message);
+        alert(`Error: ${(err as any).message}`);
+        throw new Error((err as any).message);
       }
       if (!submitResponse.success) {
         console.log('error', submitResponse);

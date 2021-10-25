@@ -29,7 +29,10 @@ const getOrderSteps = (order: ConsumerOrder | ProviderOrder): { status: EnumOrde
   }
 
   if (order.vettingRequired) {
-    steps.splice(1, 0, { status: EnumOrderStatus.PENDING_PROVIDER_APPROVAL, label: 'Pending provider approval' });
+    steps.splice(1, 0, ...[
+      { status: EnumOrderStatus.PENDING_PROVIDER_APPROVAL, label: 'Pending provider approval' },
+      { status: EnumOrderStatus.PROVIDER_ACCEPTED, label: 'Accepted by provider<br> Awaiting PayIn' },
+    ]);
   }
 
   const currentStep = steps.findIndex((x) => x.status === order.status);

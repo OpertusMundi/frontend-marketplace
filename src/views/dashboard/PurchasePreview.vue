@@ -15,6 +15,9 @@
         <h4 class="mb-xs-20">Update order status?</h4>
         <button @click="onOrderDeliveredConfirmation" class="btn btn--std btn--blue">Order is Delivered</button>
       </div>
+      <div v-else-if="order.status === 'PROVIDER_ACCEPTED'" class="mt-xs-50">
+        <router-link :to="`/checkout/${order.key}`" class="btn btn--std btn--blue">Proceed to Checkout</router-link>
+      </div>
       <h3 v-else>{{ getStatusDescription(order.status) }}</h3>
 
       <hr>
