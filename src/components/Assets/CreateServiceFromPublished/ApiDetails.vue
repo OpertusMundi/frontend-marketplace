@@ -33,7 +33,7 @@
         </div>
         <!-- MIDDLE  -->
         <div class="col-md-4" v-if="creationType === 'PUBLISHED_ASSET'">
-          <div class="dashboard__form__step__title">
+          <div class="dashboard__form__step__title overflow-y">
             <p>Select one of your published data files</p>
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
@@ -138,6 +138,8 @@ export default class ApiDetails extends Vue {
 
   selectedPublishedAssetForApiCreationLocal: CatalogueItem | null;
 
+  selectedPublishedFileForApiCreationLocal: DraftApiFromFileCommand | null;
+
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>;
   };
@@ -157,13 +159,8 @@ export default class ApiDetails extends Vue {
     this.publishedAssets = [];
 
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
+    this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
     console.log('local', this.selectedPublishedAssetForApiCreationLocal);
-  }
-
-  @Watch('fileApi', { deep: true })
-  onFileApiChange(fileApi: any | null): void {
-    console.log('file api changed', fileApi);
-    this.$emit('update:selectedPublishedFileForApiCreation', fileApi);
   }
 
   @Watch('creationType', { deep: true })
@@ -190,12 +187,19 @@ export default class ApiDetails extends Vue {
 
   @Watch('selectedPublishedAssetForApiCreationLocal')
   onSelectedPublishedAssetChange(asset: CatalogueItem): void {
-    console.log('hey', asset);
+    console.log('change published asset', asset);
     this.$emit('update:selectedPublishedAssetForApiCreation', asset);
   }
 
+  @Watch('fileApi', { deep: true })
+  onFileApiChange(fileApi: DraftApiFromFileCommand | null): void {
+    console.log('file api changed', fileApi);
+    this.selectedPublishedFileForApiCreationLocal = fileApi;
+    this.$emit('update:selectedPublishedFileForApiCreation', this.selectedPublishedFileForApiCreationLocal);
+  }
+
   created(): void {
-    console.log('selectedPublishedAsset', this.selectedPublishedAssetForApiCreationLocal);
+    this.$emit('update:apiCreationType', this.creationType);
     store.commit('setLoading', true);
     const query: ProviderDraftQuery = {
       q: '',
@@ -230,4 +234,9 @@ export default class ApiDetails extends Vue {
 <style lang="scss">
 @import '@/assets/styles/_assets.scss';
 @import '~flexboxgrid/css/flexboxgrid.min.css';
+.overflow-y {
+  max-height: 470px;
+  overflow-y: auto;
+  margin-bottom: 0 !important;
+}
 </style>

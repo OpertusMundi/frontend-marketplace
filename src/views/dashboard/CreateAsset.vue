@@ -285,18 +285,20 @@ export default class CreateAsset extends Vue {
   @Watch('selectedPublishedAssetForApiCreation', { deep: true })
   onAssetChange(value: any): void {
     console.log(value, 'on asset change');
+    // this.asset = value;
+    console.log(this.asset, 'asset print');
   }
 
   @Watch('selectedPublishedFileForApiCreation', { deep: true })
   onFileApiChange(value: any): void {
     console.log('file api changed on father component', value);
     console.log('creation TYPE->>>', this.apiCreationType);
-    console.log(this.asset);
+    console.log(this.asset, this.selectedPublishedFileForApiCreation, this.assetMainType);
   }
 
   @Watch('apiCreationType')
   creationtype(value: string): void {
-    console.log(value, 'wATCHER OUTSIDE');
+    console.log(value, 'Create or publish an API');
   }
 
   @Watch('assetMainType', { deep: true })
@@ -379,6 +381,7 @@ export default class CreateAsset extends Vue {
       console.log('asset', this.asset);
       console.log('asset resp', assetResponse);
       this.asset = { ...this.asset, ...assetResponse.result.command };
+      console.log(this.assetMainType, 'ASSET MAIN TYPE');
 
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
 
@@ -386,11 +389,13 @@ export default class CreateAsset extends Vue {
         console.log('type: service');
         console.log('aa', this.asset);
         console.log('id', this.asset.parentDataSourceId);
-        if (!this.asset.parentDataSourceId) throw new Error('unknown parent data source id');
-        this.catalogueApi.findOne(this.asset.parentDataSourceId).then((parentAssetResponse) => {
-          console.log('parent id', this.asset.parentDataSourceId, parentAssetResponse);
-          this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
-        });
+        // if (!this.asset.parentDataSourceId) throw new Error('unknown parent data source id');
+        if (this.asset.parentDataSourceId) {
+          this.catalogueApi.findOne(this.asset.parentDataSourceId).then((parentAssetResponse) => {
+            console.log('parent id', this.asset.parentDataSourceId, parentAssetResponse);
+            this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
+          });
+        }
       }
 
       // todo (Enums may have to be fixed to include NetCDF)
@@ -398,6 +403,7 @@ export default class CreateAsset extends Vue {
         this.assetMainType = EnumAssetTypeCategory.DATA_FILE;
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
         this.assetMainType = EnumAssetTypeCategory.API;
+        console.log('ΕΔΩ');
       } else {
         // todo
         console.log('other main type');
@@ -446,7 +452,8 @@ export default class CreateAsset extends Vue {
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.API) {
-      if (!this.selectedPublishedAssetForApiCreation) return false;
+      console.log('IS API');
+      // if (!this.selectedPublishedAssetForApiCreation) return false;
       // if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
     }
 
@@ -480,26 +487,59 @@ export default class CreateAsset extends Vue {
     if (isDraft) {
       try {
         if (this.isEditingExistingDraft) {
-          console.log('save draft - edit existing draft');
+          console.log('save draft - edit existing draft', this.asset);
+          // const updateDraft: any = {
+          //   title: this.selectedPublishedAssetForApiCreation!.title ? this.selectedPublishedAssetForApiCreation!.title : '',
+          //   type: this.selectedPublishedAssetForApiCreation!.type ? this.selectedPublishedAssetForApiCreation!.type : '',
+          //   version: this.selectedPublishedAssetForApiCreation!.version ? this.selectedPublishedAssetForApiCreation!.version : '',
+          // };
+          console.log(this.selectedPublishedAssetForApiCreation);
           draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+          console.log(draftAssetResponse);
+          if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
           // todo
         } else {
-          console.log('create draft');
-          console.log(this.selectedPublishedFileForApiCreation);
-          const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-          const draftApi: DraftApiFromAssetCommand = {
-            type: EnumDraftCommandType.ASSET,
+          /**
+           * Create API draft
+           * DraftApiFromAssetCommandDto
+           * SUCCESS
+           */
+          console.log('NOT EXISTING DRAFT -- CREATE NEW');
+          if (this.apiCreationType === 'TOPIO_DRIVE') {
+            console.log('apiCreationType: TOPIO_DRIVE');
+            const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+            const draftApi: DraftApiFromFileCommand = {
+              type: EnumDraftCommandType.FILE,
+              title: this.asset.title as string,
+              version: this.asset.version,
+              serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+              path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
+              format: this.asset.format,
+            };
+            console.log(draftApi, 'draft API for file');
+            draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+            console.log(draftAssetResponse);
+            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved from file!');
+          }
+          if (this.apiCreationType === 'PUBLISHED_ASSET') {
+            console.log('apiCreationType: PUBLISHED_ASSET');
+            const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+            const draftApi: DraftApiFromAssetCommand = {
+              type: EnumDraftCommandType.ASSET,
+              pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+              title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
+              version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+              serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+            };
+            console.log(draftApi, 'draft API');
+            draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+            console.log(draftAssetResponse);
+            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
+          }
 
-            pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-            title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
-            version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
-            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-          };
-          console.log(draftApi);
-          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
           // todo
         }
-        if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
+
         return;
       } catch (err) {
         console.error((err as any).message);

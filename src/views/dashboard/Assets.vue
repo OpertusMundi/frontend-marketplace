@@ -11,6 +11,16 @@
       </template>
     </modal>
 
+    <modal :withSlots="true" :show="modalToShow === 'modalDeleteDraft'" @dismiss="modalToShow = ''" :modalId="'modalDeleteDraft'">
+      <template v-slot:body>
+        <h2>Are you sure you want to delete draft?</h2>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="onConfirmDeleteDraft">Delete</button>
+      </template>
+    </modal>
+
     <modal :withSlots="true" :show="modalToShow === 'modalCreatedServiceFromPublished'" @dismiss="modalToShow = ''" :modalId="'modalCreatedServiceFromPublished'" :showCancelButton="false" :showCloseButton="false" :closeOnClickOutside="false">
       <template v-slot:body>
         <div class="p-xs-30">
@@ -33,9 +43,7 @@
     <div class="filters">
       <div class="filters__block">
         <p class="filters__title">
-          <template v-if="!$store.getters.isLoading">
-            {{ unpublishedItemsTotal }} {{ selectedStatus === 'ALL' ? 'UNPUBLISHED ASSETS' : `UNPUBLISHED ASSETS OF STATUS "${selectedStatus}"` }}
-          </template>
+          <template v-if="!$store.getters.isLoading"> {{ unpublishedItemsTotal }} {{ selectedStatus === 'ALL' ? 'UNPUBLISHED ASSETS' : `UNPUBLISHED ASSETS OF STATUS "${selectedStatus}"` }} </template>
         </p>
       </div>
       <div class="filters__block">
@@ -54,26 +62,24 @@
       </div>
     </div>
 
-    <asset-draft-card v-for="asset, i in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'mt-xs-20': i==0}"></asset-draft-card>
+    <asset-draft-card @delete="onDeleteDraft" v-for="(asset, i) in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{ 'mt-xs-20': i == 0 }"></asset-draft-card>
     <pagination :currentPage="unpublishedCurrentPage" :itemsPerPage="unpublishedItemsPerPage" :itemsTotal="unpublishedItemsTotal" @pageSelection="onPageSelect(false, $event)"></pagination>
 
-    <hr class="mt-xs-50 mb-xs-50 seperator-published-unpublished">
+    <hr class="mt-xs-50 mb-xs-50 seperator-published-unpublished" />
 
     <div class="collection__menu">
       <ul>
-        <li @click="selectedTab = 'ALL_ASSETS'" :class="{ 'active': selectedTab==='ALL_ASSETS' }"><a href="#" @click.prevent="">All assets</a></li>
-        <li @click="selectedTab = 'DATA_FILES'" :class="{ 'active': selectedTab==='DATA_FILES' }"><a href="#" @click.prevent="">Data files</a></li>
-        <li @click="selectedTab = 'YOUR_APIS'" :class="{ 'active': selectedTab==='YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li>
-        <li @click="selectedTab = 'TOPIO_APIS'" :class="{ 'active': selectedTab==='TOPIO_APIS' }"><a href="#" @click.prevent="">Topio APIs</a></li>
+        <li @click="selectedTab = 'ALL_ASSETS'" :class="{ active: selectedTab === 'ALL_ASSETS' }"><a href="#" @click.prevent="">All assets</a></li>
+        <li @click="selectedTab = 'DATA_FILES'" :class="{ active: selectedTab === 'DATA_FILES' }"><a href="#" @click.prevent="">Data files</a></li>
+        <li @click="selectedTab = 'YOUR_APIS'" :class="{ active: selectedTab === 'YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li>
+        <li @click="selectedTab = 'TOPIO_APIS'" :class="{ active: selectedTab === 'TOPIO_APIS' }"><a href="#" @click.prevent="">Topio APIs</a></li>
       </ul>
     </div>
 
     <div class="filters mt-xs-30">
       <div class="filters__block">
         <p class="filters__title">
-          <template v-if="!$store.getters.isLoading">
-            {{ publishedItemsTotal }} PUBLISHED ASSETS
-          </template>
+          <template v-if="!$store.getters.isLoading"> {{ publishedItemsTotal }} PUBLISHED ASSETS </template>
         </p>
       </div>
       <div class="filters__block">
@@ -86,9 +92,8 @@
       </div>
     </div>
 
-    <asset-published-card @serviceDraftCreated="onServiceDraftCreated" @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="asset, i in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{'asset_card__published--first': i==0}"></asset-published-card>
+    <asset-published-card @serviceDraftCreated="onServiceDraftCreated" @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="(asset, i) in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{ 'asset_card__published--first': i == 0 }"></asset-published-card>
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
-
   </div>
 </template>
 
@@ -101,10 +106,7 @@ import AssetDraftCard from '@/components/Assets/AssetDraftCard.vue';
 import AssetPublishedCard from '@/components/Assets/AssetPublishedCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import {
-  AssetDraft,
-  AssetDraftQuery,
-  EnumDraftStatus,
-  EnumSortField,
+  AssetDraft, AssetDraftQuery, EnumDraftStatus, EnumSortField,
 } from '@/model/draft';
 import { Order } from '@/model/request';
 import { EnumAssetType } from '@/model/enum';
@@ -161,7 +163,9 @@ export default class DashboardHome extends Vue {
 
   idOfAssetToDelete: string;
 
-  serviceDraftCreatedData: { key: string, serviceType: string };
+  idOfDraftToDelete: string;
+
+  serviceDraftCreatedData: { key: string; serviceType: string };
 
   constructor() {
     super();
@@ -183,16 +187,7 @@ export default class DashboardHome extends Vue {
     this.isLoadingUnpublished = false;
     this.isLoadingPublished = false;
 
-    this.statusFilterOptions = [
-      'ALL',
-      EnumDraftStatus.DRAFT,
-      EnumDraftStatus.SUBMITTED,
-      EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-      EnumDraftStatus.HELPDESK_REJECTED,
-      EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-      EnumDraftStatus.PROVIDER_REJECTED,
-      EnumDraftStatus.POST_PROCESSING,
-    ];
+    this.statusFilterOptions = ['ALL', EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING];
     const [selectedStatus] = this.statusFilterOptions;
     this.selectedStatus = selectedStatus;
 
@@ -203,6 +198,7 @@ export default class DashboardHome extends Vue {
 
     this.modalToShow = '';
     this.idOfAssetToDelete = '';
+    this.idOfDraftToDelete = '';
     this.serviceDraftCreatedData = { key: '', serviceType: '' };
   }
 
@@ -242,17 +238,7 @@ export default class DashboardHome extends Vue {
 
     const query: Partial<AssetDraftQuery> = {};
 
-    query.status = this.selectedStatus === 'ALL' ? [
-      EnumDraftStatus.DRAFT,
-      EnumDraftStatus.SUBMITTED,
-      EnumDraftStatus.PENDING_HELPDESK_REVIEW,
-      EnumDraftStatus.HELPDESK_REJECTED,
-      EnumDraftStatus.PENDING_PROVIDER_REVIEW,
-      EnumDraftStatus.PROVIDER_REJECTED,
-      EnumDraftStatus.POST_PROCESSING,
-    ] : [
-      this.selectedStatus as EnumDraftStatus,
-    ];
+    query.status = this.selectedStatus === 'ALL' ? [EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING] : [this.selectedStatus as EnumDraftStatus];
 
     const pageRequest = {
       page,
@@ -429,7 +415,7 @@ export default class DashboardHome extends Vue {
     return false;
   }
 
-  onServiceDraftCreated(data: { key: string, serviceType: string }): void {
+  onServiceDraftCreated(data: { key: string; serviceType: string }): void {
     this.serviceDraftCreatedData = data;
     this.modalToShow = 'modalCreatedServiceFromPublished';
   }
@@ -442,6 +428,12 @@ export default class DashboardHome extends Vue {
     console.log('delete asset: ', id);
     this.idOfAssetToDelete = id;
     this.modalToShow = 'modalDeleteAsset';
+  }
+
+  onDeleteDraft(id: string): void {
+    console.log('delete draft: ', id);
+    this.idOfDraftToDelete = id;
+    this.modalToShow = 'modalDeleteDraft';
   }
 
   onCreateNewDraft(id: string): void {
@@ -474,6 +466,22 @@ export default class DashboardHome extends Vue {
     });
   }
 
+  onConfirmDeleteDraft(): void {
+    store.commit('setLoading', true);
+    this.draftAssetApi.deleteDraft(this.idOfDraftToDelete).then((deleteResponse) => {
+      if (deleteResponse.data.success) {
+        console.log('draft deleted successfully', deleteResponse);
+        this.modalToShow = '';
+        store.commit('setLoading', false);
+        //  this.searchAssets(true, this.publishedCurrentPage);
+        // this.searchPublishedAssets(this.publishedCurrentPage);
+        this.searchUnpublishedAssets(0);
+      } else {
+        console.log('error deleting asset', deleteResponse);
+      }
+    });
+  }
+
   @Watch('isLoading')
   onLoadingStatusChange(): void {
     store.commit('setLoading', this.isLoading);
@@ -481,7 +489,7 @@ export default class DashboardHome extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/abstracts/_spacings.scss";
-  @import "@/assets/styles/_filters.scss";
-  @import "@/assets/styles/_collection.scss";
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/_filters.scss';
+@import '@/assets/styles/_collection.scss';
 </style>
