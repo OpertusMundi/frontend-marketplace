@@ -9,17 +9,17 @@
         <div class="form-group">
           <label class="control control-radio">
             Data File
-            <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="DATA_FILE" />
+            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="DATA_FILE" />
             <div class="control_indicator"></div>
           </label>
           <label class="control control-radio">
             API
-            <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="API" />
+            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="API" />
             <div class="control_indicator"></div>
           </label>
           <label class="control control-radio">
             Collection
-            <input type="radio" name="asset_type" v-model="assetMainTypeLocal" value="COLLECTION" />
+            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="COLLECTION" />
             <div class="control_indicator"></div>
           </label>
           <div class="errors" v-if="errors">
@@ -47,6 +47,8 @@ extend('required', required);
 })
 export default class Type extends Vue {
   @Prop({ required: true }) private assetMainType!: string;
+
+  @Prop({ default: false }) private disabled!: boolean;
 
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>;

@@ -4,25 +4,25 @@
       <div class="row">
         <!-- LEFT -->
         <div class="col-md-4">
-          <div class="dashboard__form__step__title">
+          <div class="dashboard__form__step__title" v-if="!disabled">
             <h3>Create or publish an API</h3>
             <p>Create an API from a file or just publish an API you provide</p>
           </div>
-          <validation-provider v-slot="{ errors }" name="API creation method" rules="required">
+          <validation-provider v-slot="{ errors }" name="API creation method" rules="required" v-if="!disabled">
             <div class="form-group">
               <label class="control control-radio">
                 Create API from file already published in Topio
-                <input type="radio" name="creation_type" v-model="creationType" value="PUBLISHED_ASSET" />
+                <input :disabled="disabled" type="radio" name="creation_type" v-model="creationType" value="PUBLISHED_ASSET" />
                 <div class="control_indicator"></div>
               </label>
               <label class="control control-radio">
                 Create API from file in your topio Drive
-                <input type="radio" name="creation_type" v-model="creationType" value="TOPIO_DRIVE" />
+                <input :disabled="disabled" type="radio" name="creation_type" v-model="creationType" value="TOPIO_DRIVE" />
                 <div class="control_indicator"></div>
               </label>
               <label class="control control-radio">
                 Publish existing API
-                <input type="radio" name="creation_type" v-model="creationType" value="EXISTING_API" />
+                <input :disabled="disabled" type="radio" name="creation_type" v-model="creationType" value="EXISTING_API" />
                 <div class="control_indicator"></div>
               </label>
               <div class="errors" v-if="errors">
@@ -33,11 +33,15 @@
         </div>
         <!-- MIDDLE  -->
         <div class="col-md-4" v-if="creationType === 'PUBLISHED_ASSET'">
-          <div class="dashboard__form__step__title overflow-y">
+          <div class="dashboard__form__step__title overflow-y" v-if="!disabled">
             <p>Select one of your published data files</p>
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
             </div>
+          </div>
+          <div v-else class="dashboard__form__step__title">
+            <p>Selected data file</p>
+            <asset-api-details-card :selected="true" :asset="asset"></asset-api-details-card>
           </div>
         </div>
         <!-- INHALT WORKING HERE -->
@@ -124,6 +128,8 @@ export default class ApiDetails extends Vue {
 
   @Prop({ required: true }) private selectedPublishedFileForApiCreation!: DraftApiFromFileCommand | null;
 
+  @Prop({ default: false }) private disabled!: boolean;
+
   providerAssetsApi: ProviderAssetsApi;
 
   assetLocal: CatalogueItemCommand;
@@ -157,17 +163,22 @@ export default class ApiDetails extends Vue {
     this.creationType = CreationType.PUBLISHED_ASSET;
 
     this.publishedAssets = [];
-
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
     this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
   }
 
   @Watch('creationType', { deep: true })
   onCreationTypeChange(creationType: CreationType): void {
+    console.log('creation type watch');
     this.$emit('update:apiCreationType', creationType);
     if (creationType === 'TOPIO_DRIVE') {
       this.selectedPublishedAssetForApiCreationLocal = null;
     }
+  }
+
+  @Watch('apiCreationType')
+  onApiCreationChange(value: CreationType): void {
+    console.log(value, 'API DETAILS');
   }
 
   /**
