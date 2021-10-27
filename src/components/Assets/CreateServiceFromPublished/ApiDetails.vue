@@ -160,42 +160,46 @@ export default class ApiDetails extends Vue {
 
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
     this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
-    console.log('local', this.selectedPublishedAssetForApiCreationLocal);
   }
 
   @Watch('creationType', { deep: true })
   onCreationTypeChange(creationType: CreationType): void {
-    console.log('creation type changed', creationType);
     this.$emit('update:apiCreationType', creationType);
     if (creationType === 'TOPIO_DRIVE') {
       this.selectedPublishedAssetForApiCreationLocal = null;
     }
   }
 
+  /**
+   * STEP 2 -> B1 Control the published asset selection
+   */
+  @Watch('selectedPublishedAssetForApiCreationLocal')
+  onSelectedPublishedAssetChange(asset: CatalogueItem): void {
+    this.$emit('update:selectedPublishedAssetForApiCreation', asset);
+  }
+
+  /**
+   * STEP 2 -> B2 Control the file selection
+   */
+
+  @Watch('fileApi', { deep: true })
+  onFileApiChange(fileApi: DraftApiFromFileCommand | null): void {
+    this.$emit('update:selectedPublishedFileForApiCreation', fileApi);
+  }
+
+  /**
+   * STEP 2 -> C Control the file selection
+   */
+
   @Watch('assetLocal', { deep: true })
   onAssetChange(asset: CatalogueItemCommand): void {
-    console.log('updated metadata');
     this.$emit('update:asset', asset);
   }
 
   @Watch('serviceTypeLocal')
   onServiceTypeChange(serviceType: EnumSpatialDataServiceType | null): void {
-    console.log('s', serviceType);
     // this.assetLocal.spatialDataServiceType = serviceType;
     Vue.set(this.assetLocal, 'spatialDataServiceType', serviceType);
-  }
-
-  @Watch('selectedPublishedAssetForApiCreationLocal')
-  onSelectedPublishedAssetChange(asset: CatalogueItem): void {
-    console.log('change published asset', asset);
-    this.$emit('update:selectedPublishedAssetForApiCreation', asset);
-  }
-
-  @Watch('fileApi', { deep: true })
-  onFileApiChange(fileApi: DraftApiFromFileCommand | null): void {
-    console.log('file api changed', fileApi);
-    this.selectedPublishedFileForApiCreationLocal = fileApi;
-    this.$emit('update:selectedPublishedFileForApiCreation', this.selectedPublishedFileForApiCreationLocal);
   }
 
   created(): void {
@@ -227,7 +231,6 @@ export default class ApiDetails extends Vue {
 
   onSelectPublishedAsset(asset: CatalogueItem): void {
     this.selectedPublishedAssetForApiCreationLocal = asset;
-    console.log(asset);
   }
 }
 </script>

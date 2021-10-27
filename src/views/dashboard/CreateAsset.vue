@@ -282,28 +282,50 @@ export default class CreateAsset extends Vue {
     this.draftAssetApi = new DraftAssetApi();
   }
 
-  @Watch('selectedPublishedAssetForApiCreation', { deep: true })
-  onAssetChange(value: any): void {
-    console.log(value, 'on asset change');
-    // this.asset = value;
-    console.log(this.asset, 'asset print');
+  /**
+   * STEP 1 => Controll the asset main type
+   */
+  @Watch('assetMainType', { deep: true })
+  onMaitTypeChange(assetMainType: string): void {
+    // console.log('View: Type -> CreateAsset =', assetMainType);
+    // console.log('this.asset : ', this.asset);
+    console.info('STEP 1 => this.assetMainType: ', this.assetMainType, assetMainType);
   }
 
-  @Watch('selectedPublishedFileForApiCreation', { deep: true })
-  onFileApiChange(value: any): void {
-    console.log('file api changed on father component', value);
-    console.log('creation TYPE->>>', this.apiCreationType);
-    console.log(this.asset, this.selectedPublishedFileForApiCreation, this.assetMainType);
-  }
+  /**
+   * STEP 2 -> A Control the API Creation type
+   */
 
   @Watch('apiCreationType')
   creationtype(value: string): void {
-    console.log(value, 'Create or publish an API');
+    console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
+  }
+  /**
+   * STEP 2 -> B1 Control the published asset selection
+   */
+
+  @Watch('selectedPublishedAssetForApiCreation', { deep: true })
+  onPublishedAssetChange(value: any): void {
+    // this.asset = value;
+    console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation);
   }
 
-  @Watch('assetMainType', { deep: true })
-  onMaitTypeChange(assetMainType: string): void {
-    console.log('asset main type father component', assetMainType);
+  /**
+   * STEP 2 -> B2 Control the file selection
+   */
+
+  @Watch('selectedPublishedFileForApiCreation', { deep: true })
+  onFileApiChange(value: any): void {
+    console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
+  }
+
+  /**
+   * STEP 2 -> C Control the file selection
+   */
+  @Watch('asset', { deep: true })
+  onAssetChange(value: any): void {
+    this.serviceType = value.spatialDataServiceType;
+    console.log('STEP 2 C => this.asset: ', this.asset);
   }
 
   created(): void {
@@ -421,14 +443,19 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep(): void {
-    console.log('asset: ', this.asset);
-    console.log('uploadFile?', this.fileToUpload.isFileSelected);
+    // console.log(JSON.stringify(this.asset, null, 4));
+    // console.group('asset: ', this.asset);
+    // console.log(Object.keys(this.asset));
+    // console.dir(this.selectedPublishedAssetForApiCreation, { depth: null, colors: true });
+
+    // console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
           if (this.assetMainType === EnumAssetTypeCategory.API) {
             this.submitFormForService();
+            console.log('submit form for service');
           } else {
             this.submitForm();
           }
@@ -441,6 +468,12 @@ export default class CreateAsset extends Vue {
         }
       }
     });
+    console.group('STEP: ', this.currentStep);
+    console.log('STEP 1 => this.assetMainType: ', this.assetMainType);
+    console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
+    console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation!.title : 'null');
+    console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
+    console.log('STEP 2 C => this.asset: ', this.asset.spatialDataServiceType);
   }
 
   isButtonSaveDraftShown(): boolean {
@@ -452,7 +485,7 @@ export default class CreateAsset extends Vue {
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.API) {
-      console.log('IS API');
+      // console.log('isButtonSaveDraftShown: is API');
       // if (!this.selectedPublishedAssetForApiCreation) return false;
       // if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
     }
@@ -472,6 +505,7 @@ export default class CreateAsset extends Vue {
     }
     if (this.assetMainType === EnumAssetTypeCategory.API) {
       this.submitFormForService(true);
+      console.log('IS API BRO!!!! -> SUBMIT FORM SERVICE');
     }
   }
 
@@ -487,17 +521,19 @@ export default class CreateAsset extends Vue {
     if (isDraft) {
       try {
         if (this.isEditingExistingDraft) {
-          console.log('save draft - edit existing draft', this.asset);
-          // const updateDraft: any = {
-          //   title: this.selectedPublishedAssetForApiCreation!.title ? this.selectedPublishedAssetForApiCreation!.title : '',
-          //   type: this.selectedPublishedAssetForApiCreation!.type ? this.selectedPublishedAssetForApiCreation!.type : '',
-          //   version: this.selectedPublishedAssetForApiCreation!.version ? this.selectedPublishedAssetForApiCreation!.version : '',
-          // };
-          console.log(this.selectedPublishedAssetForApiCreation);
-          draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-          console.log(draftAssetResponse);
-          if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
-          // todo
+          if (this.apiCreationType === 'PUBLISHED_ASSET') {
+            console.log('save draft - edit existing draft', this.asset);
+            // const updateDraft: any = {
+            //   title: this.selectedPublishedAssetForApiCreation!.title ? this.selectedPublishedAssetForApiCreation!.title : '',
+            //   type: this.selectedPublishedAssetForApiCreation!.type ? this.selectedPublishedAssetForApiCreation!.type : '',
+            //   version: this.selectedPublishedAssetForApiCreation!.version ? this.selectedPublishedAssetForApiCreation!.version : '',
+            // };
+            console.log(this.selectedPublishedAssetForApiCreation);
+            draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+            console.log(draftAssetResponse);
+            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
+            // todo
+          }
         } else {
           /**
            * Create API draft

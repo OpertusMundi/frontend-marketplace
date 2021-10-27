@@ -63,7 +63,6 @@ export default class Type extends Vue {
   @Watch('assetMainType', { immediate: true })
   onAssetMainTypeChange(assetMainType: string): void {
     this.assetMainTypeLocal = assetMainType;
-    console.log('ASSET MAIN TYPE COMPONENT', assetMainType);
   }
 
   @Watch('assetMainTypeLocal')
