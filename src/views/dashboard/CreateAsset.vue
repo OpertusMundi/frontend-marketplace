@@ -29,7 +29,7 @@
       <div class="dashboard__head">
         <h1>Add an asset</h1>
         <div class="dashboard__head__helpers">
-          <button href="#" class="btn btn--outlineblue" @click="onSaveDraft" v-if="isButtonSaveDraftShown()">SAVE DRAFT</button>
+          <button href="#" class="btn btn--outlineblue" @click="onSaveDraft" v-if="isButtonSaveDraftShown()" v-html="isEditingExistingDraft ? 'UPDATE DRAFT' : 'SAVE DRAFT'"></button>
           <a href="#" class="btn btn--outlineblue" @click="modalToShow = 'exitCreateAssetAlert'">EXIT</a>
         </div>
       </div>
@@ -153,6 +153,13 @@ extend('credit_card', (value) => Vue.prototype.$cardFormat.validateCardNumber(va
 extend('credit_card_exp', (value) => Vue.prototype.$cardFormat.validateCardExpiry(value));
 extend('credit_card_cvc', (value) => Vue.prototype.$cardFormat.validateCardCVC(value));
 
+enum CreationType {
+  UNDEFINED = 'UNDEFINED',
+  PUBLISHED_ASSET = 'PUBLISHED_ASSET',
+  TOPIO_DRIVE = 'TOPIO_DRIVE',
+  EXISTING_API = 'EXISTING_API',
+}
+
 interface FileToUpload {
   isFileSelected: boolean;
   file: File;
@@ -228,7 +235,9 @@ export default class CreateAsset extends Vue {
 
   uploading: any;
 
-  apiCreationType: string | null;
+  apiCreationType: CreationType;
+
+  isTopioDrive: boolean;
 
   constructor() {
     super();
@@ -236,9 +245,11 @@ export default class CreateAsset extends Vue {
     // TODO: do validation of filetype<->format before uploading file
     console.log('config', store.getters.getConfig);
 
+    this.isTopioDrive = false;
+
     this.modalToShow = '';
 
-    this.apiCreationType = '';
+    this.apiCreationType = CreationType.UNDEFINED;
 
     this.additionalResourcesToUpload = [];
 
@@ -287,14 +298,7 @@ export default class CreateAsset extends Vue {
    */
   @Watch('assetMainType', { deep: true })
   onMaitTypeChange(assetMainType: string): void {
-    // console.log('View: Type -> CreateAsset =', assetMainType);
-    // console.log('this.asset : ', this.asset);
-    console.info('STEP 1 => this.assetMainType: ', this.assetMainType, assetMainType);
-  }
-
-  @Watch('apiCreationType')
-  onApiCreationChange(value: string): void {
-    console.log(value);
+    console.info('STEP 1 => this.assetMainType: ', assetMainType);
   }
 
   /**
@@ -302,17 +306,22 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('apiCreationType')
-  creationtype(value: string): void {
-    console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
+  onApiCreationChange(value: CreationType): void {
+    if (value === 'TOPIO_DRIVE') {
+      this.isTopioDrive = true;
+    } else {
+      this.isTopioDrive = false;
+    }
+    this.apiCreationType = value;
   }
   /**
    * STEP 2 -> B1 Control the published asset selection
    */
 
   @Watch('selectedPublishedAssetForApiCreation', { deep: true })
-  onPublishedAssetChange(value: any): void {
+  onPublishedAssetChange(value: CatalogueItem): void {
     // this.asset = value;
-    console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation);
+    console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', value);
   }
 
   /**
@@ -320,8 +329,8 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('selectedPublishedFileForApiCreation', { deep: true })
-  onFileApiChange(value: any): void {
-    console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
+  onFileApiChange(value: DraftApiFromFileCommand): void {
+    console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', value);
   }
 
   /**
@@ -329,9 +338,8 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('asset', { deep: true })
-  onAssetChange(value: any): void {
+  onAssetChange(value: CatalogueItemCommand): void {
     this.serviceType = value.spatialDataServiceType;
-    console.log('STEP 2 C => this.asset: ', this.asset);
   }
 
   /**
@@ -418,7 +426,6 @@ export default class CreateAsset extends Vue {
       console.log('asset', this.asset);
       console.log('asset resp', assetResponse);
       this.asset = { ...this.asset, ...assetResponse.result.command };
-      console.log(this.assetMainType, 'ASSET MAIN TYPE');
 
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
 
@@ -431,7 +438,12 @@ export default class CreateAsset extends Vue {
           this.catalogueApi.findOne(this.asset.parentDataSourceId).then((parentAssetResponse) => {
             console.log('parent id', this.asset.parentDataSourceId, parentAssetResponse);
             this.selectedPublishedAssetForApiCreation = parentAssetResponse.result;
+            this.isTopioDrive = false;
+            this.apiCreationType = CreationType.PUBLISHED_ASSET;
           });
+        } else {
+          this.isTopioDrive = true;
+          this.apiCreationType = CreationType.TOPIO_DRIVE;
         }
       }
 
@@ -440,7 +452,6 @@ export default class CreateAsset extends Vue {
         this.assetMainType = EnumAssetTypeCategory.DATA_FILE;
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
         this.assetMainType = EnumAssetTypeCategory.API;
-        console.log('ΕΔΩ');
       } else {
         // todo
         console.log('other main type');
@@ -458,19 +469,12 @@ export default class CreateAsset extends Vue {
   }
 
   nextStep(): void {
-    // console.log(JSON.stringify(this.asset, null, 4));
-    // console.group('asset: ', this.asset);
-    // console.log(Object.keys(this.asset));
-    // console.dir(this.selectedPublishedAssetForApiCreation, { depth: null, colors: true });
-
-    // console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
           if (this.assetMainType === EnumAssetTypeCategory.API) {
             this.submitFormForService();
-            console.log('submit form for service');
           } else {
             this.submitForm();
           }
@@ -483,13 +487,6 @@ export default class CreateAsset extends Vue {
         }
       }
     });
-    console.log('ASSET=> ', this.asset);
-    console.group('STEP: ', this.currentStep);
-    console.log('STEP 1 => this.assetMainType: ', this.assetMainType);
-    console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
-    console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation!.title : 'null');
-    console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
-    console.log('STEP 2 C => this.asset: ', this.asset.spatialDataServiceType);
   }
 
   isButtonSaveDraftShown(): boolean {
@@ -500,16 +497,21 @@ export default class CreateAsset extends Vue {
       if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
     }
 
-    if (this.assetMainType === EnumAssetTypeCategory.API && this.apiCreationType !== 'TOPIO_DRIVE') {
-      console.log('isButtonSaveDraftShown: is API', this.apiCreationType);
-      if (!this.selectedPublishedAssetForApiCreation) return false;
-      if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
-    }
-
-    if (this.apiCreationType === 'TOPIO_DRIVE') {
-      console.log('is here');
-      if (!this.selectedPublishedFileForApiCreation) return false;
+    if (this.isEditingExistingDraft) {
       if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+      return true;
+    }
+    if (!this.isEditingExistingDraft) {
+      if (this.assetMainType === EnumAssetTypeCategory.API && !this.isTopioDrive) {
+        if (!this.selectedPublishedAssetForApiCreation) return false;
+        if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
+      }
+
+      if (this.isTopioDrive) {
+        if (!this.selectedPublishedFileForApiCreation) return false;
+        if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
+        if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+      }
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) return false;
@@ -527,7 +529,6 @@ export default class CreateAsset extends Vue {
     }
     if (this.assetMainType === EnumAssetTypeCategory.API) {
       this.submitFormForService(true);
-      console.log('IS API BRO!!!! -> SUBMIT FORM SERVICE');
     }
   }
 
@@ -544,7 +545,6 @@ export default class CreateAsset extends Vue {
       try {
         if (this.isEditingExistingDraft) {
           draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-          console.log(draftAssetResponse);
           if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
           // todo
         } else {
@@ -553,9 +553,7 @@ export default class CreateAsset extends Vue {
            * DraftApiFromAssetCommandDto
            * SUCCESS
            */
-          console.log('NOT EXISTING DRAFT -- CREATE NEW');
           if (this.apiCreationType === 'TOPIO_DRIVE') {
-            console.log('apiCreationType: TOPIO_DRIVE');
             const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
             const draftApi: DraftApiFromFileCommand = {
               type: EnumDraftCommandType.FILE,
@@ -565,13 +563,11 @@ export default class CreateAsset extends Vue {
               path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
               format: this.asset.format,
             };
-            console.log(draftApi, 'draft API for file');
             draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
             console.log(draftAssetResponse);
             if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved from file!');
           }
           if (this.apiCreationType === 'PUBLISHED_ASSET') {
-            console.log('apiCreationType: PUBLISHED_ASSET');
             const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
             const draftApi: DraftApiFromAssetCommand = {
               type: EnumDraftCommandType.ASSET,
@@ -580,7 +576,6 @@ export default class CreateAsset extends Vue {
               version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
               serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
             };
-            console.log(draftApi, 'draft API');
             draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
             console.log(draftAssetResponse);
             if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
@@ -607,7 +602,6 @@ export default class CreateAsset extends Vue {
         console.log('new draft');
         const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
         if (this.apiCreationType === 'TOPIO_DRIVE') {
-          console.log('IS TOPIO DRIVE', EnumDraftCommandType.FILE, this.selectedPublishedFileForApiCreation);
           const draftApi: DraftApiFromFileCommand = {
             type: EnumDraftCommandType.FILE,
             title: this.asset.title as string,
@@ -619,7 +613,6 @@ export default class CreateAsset extends Vue {
           console.log(draftApi, 'ON SUBMIT');
           draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
         } else {
-          console.log('FROM ASSET');
           const draftApi: DraftApiFromAssetCommand = {
             type: EnumDraftCommandType.ASSET,
             pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
@@ -631,8 +624,8 @@ export default class CreateAsset extends Vue {
         }
 
         // this.asset.parentId = draftAssetResponse.result.command.parentId;
-        this.asset = { ...draftAssetResponse.result.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
         console.log('qwe', this.asset);
+        console.log('SUMBIT WITHOUT MAKING DRAFT');
       }
       draftAssetKey = draftAssetResponse.result.key;
       console.log('create draft success', draftAssetResponse);

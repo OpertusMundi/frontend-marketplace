@@ -14,7 +14,7 @@
           <div v-else>
             <purchase-card v-for="(purchase, i) in latestPurchases" :key="purchase.key" :purchase="purchase" :index="i + 1"></purchase-card>
             <div v-if="latestPurchases && latestPurchases.length === 0">
-              <p>No purchases yet <button class="btn btn--std btn--outlineblue" @click="$router.push('/catalogue')">explore assets</button></p>
+              <p>No purchases yet <button class="btn btn--std btn--outlineblue" @click="$router.push('/catalogue')">BECOME A VENDOR</button></p>
             </div>
           </div>
         </div>

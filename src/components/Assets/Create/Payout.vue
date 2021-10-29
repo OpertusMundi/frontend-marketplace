@@ -9,19 +9,21 @@
           <div class="dashboard__form__step__title">
             <p class="mt-xs-5">Select where your profits will be transfered</p>
             <validation-provider v-slot="{ errors }" name="Payout method" rules="required">
-            <div class="form-group mt-xs-20">
-              <label class="control control-radio">
-                Through the platform
-                <input type="radio" name="payout_method" v-model="selectedPayoutMethodLocal" value="through_platform" />
-                <div class="control_indicator"></div>
-              </label>
-              <label class="control control-radio">
-                External means
-                <input type="radio" name="payout_method" v-model="selectedPayoutMethodLocal" value="external_means" />
-                <div class="control_indicator"></div>
-              </label>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-            </div>
+              <div class="form-group mt-xs-20">
+                <label class="control control-radio">
+                  Through the platform
+                  <input type="radio" name="payout_method" v-model="selectedPayoutMethodLocal" value="through_platform" />
+                  <div class="control_indicator"></div>
+                </label>
+                <label class="control control-radio">
+                  External means
+                  <input type="radio" name="payout_method" v-model="selectedPayoutMethodLocal" value="external_means" />
+                  <div class="control_indicator"></div>
+                </label>
+                <div class="errors" v-if="errors">
+                  <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                </div>
+              </div>
             </validation-provider>
           </div>
         </div>
@@ -68,33 +70,41 @@
             </div>
             <div class="col-md-6">
               <div v-if="selectedExternalPayoutMethod === 'credit_debit'">
-                <validation-provider>
+                <validation-provider v-slot="{ errors }">
                   <div class="form-group">
                     <label for="metadata_holder_name">Holder name</label>
-                    <input type="text" class="form-group__text" name="metadata_holder_name" id="metadata_holder_name">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    <input type="text" class="form-group__text" name="metadata_holder_name" id="metadata_holder_name" />
+                    <div class="errors" v-if="errors.length">
+                      <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                    </div>
                   </div>
                 </validation-provider>
-                <validation-provider>
+                <validation-provider v-slot="{ errors }">
                   <div class="form-group">
                     <label for="metadata_card_number">Card number</label>
-                    <input type="text" class="form-group__text" name="metadata_card_number" id="metadata_card_number">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    <input type="text" class="form-group__text" name="metadata_card_number" id="metadata_card_number" />
+                    <div class="errors" v-if="errors.length">
+                      <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                    </div>
                   </div>
                 </validation-provider>
                 <div class="d-flex space-between">
-                  <validation-provider class="flex-grow-1 mr-xs-20">
+                  <validation-provider class="flex-grow-1 mr-xs-20" v-slot="{ errors }">
                     <div class="form-group">
                       <label for="metadata_expiration_date">Expiration date</label>
-                      <input type="text" class="form-group__text" name="metadata_expiration_date" id="metadata_expiration_date">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      <input type="text" class="form-group__text" name="metadata_expiration_date" id="metadata_expiration_date" />
+                      <div class="errors" v-if="errors.length">
+                        <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                      </div>
                     </div>
                   </validation-provider>
-                  <validation-provider>
+                  <validation-provider v-slot="{ errors }">
                     <div class="form-group" style="max-width: 100px;">
                       <label for="metadata_cvv">CVV</label>
-                      <input type="text" class="form-group__text" name="metadata_expiration_cvv" id="metadata_cvv">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      <input type="text" class="form-group__text" name="metadata_expiration_cvv" id="metadata_cvv" />
+                      <div class="errors" v-if="errors.length">
+                        <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                      </div>
                     </div>
                   </validation-provider>
                 </div>
@@ -108,10 +118,7 @@
 </template>
 <script lang="ts">
 import {
-  Component,
-  Vue,
-  Watch,
-  Prop,
+  Component, Vue, Watch, Prop,
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
@@ -159,10 +166,15 @@ export default class Payout extends Vue {
 
     this.$emit('update:selectedPayoutMethod', payoutMethod);
   }
+
+  @Watch('selectedExternalPayoutMethod')
+  onSelectedExternalPayoutMethodChange(externalMethod: string): void {
+    console.log('External Payout Method: ', externalMethod);
+  }
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_assets.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
-  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
+@import '@/assets/styles/_assets.scss';
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/abstracts/_flexbox-utilities.scss';
 </style>

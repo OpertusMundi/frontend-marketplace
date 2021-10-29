@@ -45,10 +45,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
 import { ServerResponse } from '@/model';
 import { DirectoryInfo } from '@/model/file';
+import { DraftApiFromFileCommand } from '@/model/catalogue';
 import { AxiosError } from 'axios';
 import moment from 'moment';
 
@@ -63,6 +64,8 @@ import moment from 'moment';
   },
 })
 export default class DashboardStorage extends Vue {
+  @Prop({ required: false }) private fileApi!: DraftApiFromFileCommand;
+
   get filteredFolders(): any {
     return this.activeFolder.folders.filter((folder) => folder.name.toLowerCase().includes(this.searchString.toLowerCase()));
   }
