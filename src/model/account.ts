@@ -1,8 +1,15 @@
-import { EnumRole } from './role';
+import { EnumRole, EnumVendorRole } from './role';
 import { EnumAuthProvider } from './configuration';
 
+export enum EnumAccountType {
+  OPERTUSMUNDI = 'OPERTUSMUNDI',
+  VENDOR = 'VENDOR',
+}
+
 export enum EnumActivationStatus {
+  UNDEFINED = 'UNDEFINED',
   PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
 }
 
@@ -38,6 +45,12 @@ export enum EnumKycLevel {
    * Customer KYC documents have been submitted and validated
    */
   REGULAR = 'REGULAR',
+}
+
+export enum EnumAccountSortField {
+  EMAIL = 'EMAIL',
+  FIRST_NAME = 'FIRST_NAME',
+  LAST_NAME = 'LAST_NAME',
 }
 
 /**
@@ -445,7 +458,7 @@ export interface Profile extends ProfileBase {
 /**
  * Account command
  */
-export interface AccountCommandDto {
+export interface PlatformAccountCommand {
   /**
    * User email. Must be unique
    */
@@ -465,9 +478,31 @@ export interface AccountCommandDto {
 }
 
 /**
+ * Account command
+ */
+export interface VendorAccountCommand {
+  /**
+   * User email. Must be unique
+   */
+  email: string;
+  /**
+   * Account profile
+   */
+  profile: AccountProfileCommand;
+  /**
+   * Vendor account roles
+   */
+  roles: EnumVendorRole[];
+}
+
+/**
  * Account
  */
 export interface Account {
+  /**
+   * True if the account is active
+   */
+  active: boolean;
   /**
    * Date of account activation. Activation occurs when the user verifies his email address.
    * The date is in ISO format.
@@ -536,6 +571,21 @@ export interface PasswordChangeCommand {
    * New password verification. Must match property `newPassword`
    */
   verifyNewPassword: string;
+}
+
+export interface JoinVendorCommand {
+  /**
+   * User email. Must match the registered mail
+   */
+  email: string;
+  /**
+   * New vendor account password
+   */
+  password: string;
+  /**
+   * New vendor account password verification. Must match property password.
+   */
+  verifyPassword: string;
 }
 
 /**

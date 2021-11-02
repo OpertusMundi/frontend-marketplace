@@ -75,7 +75,7 @@ import store from '@/store';
 import AccountApi from '@/service/account';
 import ProfileApi from '@/service/profile';
 import { ServerResponse } from '@/model';
-import { Account, AccountCommandDto, AccountProfileCommand } from '@/model/account';
+import { Account, PlatformAccountCommand, AccountProfileCommand } from '@/model/account';
 
 extend('required', required);
 extend('email', email);
@@ -94,7 +94,7 @@ export default class Login extends Vue {
 
   profileApi: ProfileApi;
 
-  account: AccountCommandDto;
+  account: PlatformAccountCommand;
 
   termsAccepted: boolean;
 

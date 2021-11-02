@@ -57,7 +57,7 @@
         <div class="dashboard__form__steps">
           <transition name="fade" mode="out-in">
             <div class="dashboard__form__steps__inner">
-              <type ref="step1" :assetMainType.sync="assetMainType" v-if="currentStep == 1"></type>
+              <type ref="step1" :assetMainType.sync="assetMainType" :disabled="isEditingExistingDraft" v-if="currentStep == 1"></type>
 
               <template v-if="assetMainType !== 'API'">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
@@ -67,7 +67,7 @@
               </template>
 
               <template v-if="assetMainType === 'API'">
-                <api-details ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :selectedPublishedFileForApiCreation.sync="selectedPublishedFileForApiCreation" :serviceType="serviceType" :apiCreationType.sync="apiCreationType" v-if="currentStep === 2"></api-details>
+                <api-details :disabled="isEditingExistingDraft" ref="step2" :asset.sync="asset" :selectedPublishedAssetForApiCreation.sync="selectedPublishedAssetForApiCreation" :selectedPublishedFileForApiCreation.sync="selectedPublishedFileForApiCreation" :serviceType="serviceType" :apiCreationType.sync="apiCreationType" v-if="currentStep === 2"></api-details>
                 <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 3 && selectedPublishedAssetForApiCreation != null"></api-metadata>
                 <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-else-if="currentStep === 3 && selectedPublishedAssetForApiCreation == null"></metadata>
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
@@ -292,6 +292,11 @@ export default class CreateAsset extends Vue {
     console.info('STEP 1 => this.assetMainType: ', this.assetMainType, assetMainType);
   }
 
+  @Watch('apiCreationType')
+  onApiCreationChange(value: string): void {
+    console.log(value);
+  }
+
   /**
    * STEP 2 -> A Control the API Creation type
    */
@@ -322,10 +327,20 @@ export default class CreateAsset extends Vue {
   /**
    * STEP 2 -> C Control the file selection
    */
+
   @Watch('asset', { deep: true })
   onAssetChange(value: any): void {
     this.serviceType = value.spatialDataServiceType;
     console.log('STEP 2 C => this.asset: ', this.asset);
+  }
+
+  /**
+   * Step 6 Payout method
+   */
+
+  @Watch('selectedPayoutMethod')
+  onChangePayoutMethod(value: 'through_platform' | 'external_means' | 'credit_debit' | null): void {
+    console.log('STEP 6 => Payout method', value);
   }
 
   created(): void {
@@ -468,6 +483,7 @@ export default class CreateAsset extends Vue {
         }
       }
     });
+    console.log('ASSET=> ', this.asset);
     console.group('STEP: ', this.currentStep);
     console.log('STEP 1 => this.assetMainType: ', this.assetMainType);
     console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
@@ -484,10 +500,16 @@ export default class CreateAsset extends Vue {
       if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
     }
 
-    if (this.assetMainType === EnumAssetTypeCategory.API) {
-      // console.log('isButtonSaveDraftShown: is API');
-      // if (!this.selectedPublishedAssetForApiCreation) return false;
-      // if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
+    if (this.assetMainType === EnumAssetTypeCategory.API && this.apiCreationType !== 'TOPIO_DRIVE') {
+      console.log('isButtonSaveDraftShown: is API', this.apiCreationType);
+      if (!this.selectedPublishedAssetForApiCreation) return false;
+      if (!this.asset.spatialDataServiceType || ![EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType)) return false;
+    }
+
+    if (this.apiCreationType === 'TOPIO_DRIVE') {
+      console.log('is here');
+      if (!this.selectedPublishedFileForApiCreation) return false;
+      if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) return false;
@@ -521,19 +543,10 @@ export default class CreateAsset extends Vue {
     if (isDraft) {
       try {
         if (this.isEditingExistingDraft) {
-          if (this.apiCreationType === 'PUBLISHED_ASSET') {
-            console.log('save draft - edit existing draft', this.asset);
-            // const updateDraft: any = {
-            //   title: this.selectedPublishedAssetForApiCreation!.title ? this.selectedPublishedAssetForApiCreation!.title : '',
-            //   type: this.selectedPublishedAssetForApiCreation!.type ? this.selectedPublishedAssetForApiCreation!.type : '',
-            //   version: this.selectedPublishedAssetForApiCreation!.version ? this.selectedPublishedAssetForApiCreation!.version : '',
-            // };
-            console.log(this.selectedPublishedAssetForApiCreation);
-            draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-            console.log(draftAssetResponse);
-            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
-            // todo
-          }
+          draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+          console.log(draftAssetResponse);
+          if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
+          // todo
         } else {
           /**
            * Create API draft
@@ -698,7 +711,7 @@ export default class CreateAsset extends Vue {
       }
       this.asset = draftAssetResponse.result.command;
       draftAssetKey = draftAssetResponse.result.key;
-      console.log('create draft success', draftAssetResponse);
+      console.log('UPDATE DRAFT FILE', draftAssetResponse);
     } catch (err) {
       console.error((err as any).message);
       // eslint-disable-next-line

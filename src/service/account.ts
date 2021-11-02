@@ -3,7 +3,7 @@ import Api from '@/service/api';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { LoginResult, LogoutResult } from '@/model/auth';
 import {
-  Account, AccountCommandDto, ActivationTokenCommand, PasswordChangeCommand,
+  Account, PlatformAccountCommand, ActivationTokenCommand, PasswordChangeCommand,
 } from '@/model/account';
 
 export default class AccountApi extends Api {
@@ -44,10 +44,10 @@ export default class AccountApi extends Api {
    *
    * @param command - Account creation command
    */
-  public async register(command: AccountCommandDto): Promise<ServerResponse<Account>> {
+  public async register(command: PlatformAccountCommand): Promise<ServerResponse<Account>> {
     const url = '/action/account/register';
 
-    return this.post<AccountCommandDto, ServerResponse<Account>>(url, command)
+    return this.post<PlatformAccountCommand, ServerResponse<Account>>(url, command)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
 
@@ -65,22 +65,6 @@ export default class AccountApi extends Api {
     const url = '/action/account/token/request';
 
     return this.post<ActivationTokenCommand, ServerResponse<void>>(url, command)
-      .then((response: AxiosServerResponse<void>) => {
-        const { data } = response;
-
-        return data;
-      });
-  }
-
-  /**
-   * Validates an activation token
-   *
-   * @param token - Token to validate
-   */
-  public async tokenValidate(token: string): Promise<ServerResponse<void>> {
-    const url = `/action/account/token/verify/${token}`;
-
-    return this.post<ActivationTokenCommand, ServerResponse<void>>(url, null)
       .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
 
