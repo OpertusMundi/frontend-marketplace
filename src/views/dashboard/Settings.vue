@@ -859,7 +859,7 @@ import en from 'vee-validate/dist/locale/en.json';
 import store from '@/store';
 import Datepicker from 'vuejs-datepicker';
 // eslint-disable-next-line
-import EnumRole from '@/model/role';
+import { EnumRole } from '@/model/role';
 import {
   CustomerDraftIndividual,
   CustomerDraftProfessional,
