@@ -707,7 +707,7 @@ export default class CreateAsset extends Vue {
       if (this.isEditingExistingDraft) {
         draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
       } else {
-        draftAssetResponse = await this.draftAssetApi.create(this.asset, config);
+        draftAssetResponse = await this.draftAssetApi.create(this.asset, true, config);
       }
       this.asset = draftAssetResponse.result.command;
       draftAssetKey = draftAssetResponse.result.key;
