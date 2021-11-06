@@ -10,7 +10,7 @@
       </template>
 
       <template v-slot:footer>
-        <button class="btn btn--std btn--blue ml-xs-20" @click="submitForm(true)">Save Draft</button>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="submitDataFileForm(true)">Save Draft</button>
       </template>
     </modal>
 
@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { CatalogueItemCommand, ServerResponse } from '@/model';
+import { CatalogueItemCommand } from '@/model';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 import { required, email, regex } from 'vee-validate/dist/rules';
@@ -302,7 +302,7 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('apiCreationType')
-  creationtype(value: string): void {
+  creationtype(): void {
     console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
   }
   /**
@@ -310,7 +310,7 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('selectedPublishedAssetForApiCreation', { deep: true })
-  onPublishedAssetChange(value: any): void {
+  onPublishedAssetChange(): void {
     // this.asset = value;
     console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation);
   }
@@ -320,7 +320,7 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('selectedPublishedFileForApiCreation', { deep: true })
-  onFileApiChange(value: any): void {
+  onFileApiChange(): void {
     console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
   }
 
@@ -329,7 +329,7 @@ export default class CreateAsset extends Vue {
    */
 
   @Watch('asset', { deep: true })
-  onAssetChange(value: any): void {
+  onAssetChange(value: CatalogueItemCommand): void {
     this.serviceType = value.spatialDataServiceType;
     console.log('STEP 2 C => this.asset: ', this.asset);
   }
@@ -469,10 +469,10 @@ export default class CreateAsset extends Vue {
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
           if (this.assetMainType === EnumAssetTypeCategory.API) {
-            this.submitFormForService();
+            this.submitApiForm();
             console.log('submit form for service');
           } else {
-            this.submitForm();
+            this.submitDataFileForm();
           }
         } else {
           this.currentStep += 1;
@@ -487,6 +487,7 @@ export default class CreateAsset extends Vue {
     console.group('STEP: ', this.currentStep);
     console.log('STEP 1 => this.assetMainType: ', this.assetMainType);
     console.log('STEP 2 A => this.apiCreationType', this.apiCreationType);
+    // eslint-disable-next-line
     console.log('STEP 2 B1 => this.selectedPublishedAssetForApiCreation: ', this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation!.title : 'null');
     console.log('STEP 2 B2 => this.selectedPublishedFileForApiCreation: ', this.selectedPublishedFileForApiCreation);
     console.log('STEP 2 C => this.asset: ', this.asset.spatialDataServiceType);
@@ -523,10 +524,10 @@ export default class CreateAsset extends Vue {
         this.modalToShow = 'saveDraftFileAlert';
         return;
       }
-      this.submitForm(true);
+      this.submitDataFileForm(true);
     }
     if (this.assetMainType === EnumAssetTypeCategory.API) {
-      this.submitFormForService(true);
+      this.submitApiForm(true);
       console.log('IS API BRO!!!! -> SUBMIT FORM SERVICE');
     }
   }
@@ -535,276 +536,198 @@ export default class CreateAsset extends Vue {
     this.$router.push('/dashboard/assets');
   }
 
-  // todo: needs refactoring
-  async submitFormForService(isDraft = false): Promise<void> {
-    let draftAssetResponse: ServerResponse<AssetDraft>;
-    let draftAssetKey = '';
+  isSelectedFormatCompatibleWithFileExtension(): boolean {
+    const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
+    const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
+    if (acceptedExtensions.includes(this.fileToUpload.fileExtension)) return true;
+    return false;
+  }
 
-    if (isDraft) {
-      try {
-        if (this.isEditingExistingDraft) {
-          draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-          console.log(draftAssetResponse);
-          if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
-          // todo
-        } else {
-          /**
-           * Create API draft
-           * DraftApiFromAssetCommandDto
-           * SUCCESS
-           */
-          console.log('NOT EXISTING DRAFT -- CREATE NEW');
-          if (this.apiCreationType === 'TOPIO_DRIVE') {
-            console.log('apiCreationType: TOPIO_DRIVE');
-            const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-            const draftApi: DraftApiFromFileCommand = {
-              type: EnumDraftCommandType.FILE,
-              title: this.asset.title as string,
-              version: this.asset.version,
-              serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-              path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
-              format: this.asset.format,
-            };
-            console.log(draftApi, 'draft API for file');
-            draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
-            console.log(draftAssetResponse);
-            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved from file!');
-          }
-          if (this.apiCreationType === 'PUBLISHED_ASSET') {
-            console.log('apiCreationType: PUBLISHED_ASSET');
-            const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-            const draftApi: DraftApiFromAssetCommand = {
-              type: EnumDraftCommandType.ASSET,
-              pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-              title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
-              version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
-              serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-            };
-            console.log(draftApi, 'draft API');
-            draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
-            console.log(draftAssetResponse);
-            if (draftAssetResponse.success) this.showUploadingMessage(true, 'Draft saved!');
-          }
+  async createDraft(): Promise<AssetDraft> {
+    const draftAssetResponse = await this.draftAssetApi.create(this.asset);
+    if (draftAssetResponse.success) return draftAssetResponse.result;
 
-          // todo
-        }
+    console.log('err', draftAssetResponse);
+    this.showUploadingMessage(true, 'An error occurred.');
+    throw new Error('error');
+  }
 
-        return;
-      } catch (err) {
-        console.error((err as any).message);
-        // eslint-disable-next-line
-        alert('Error (check console)');
-      }
-      console.log('is draft');
-    }
+  async saveDraftAfterEditingExistingDraft(): Promise<AssetDraft> {
+    const draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+    if (draftAssetResponse.success) return draftAssetResponse.result;
 
-    // let asset: CatalogueItemCommand;
-    try {
-      if (this.isEditingExistingDraft) {
-        console.log('editing existing draft');
-        draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
-      } else {
-        console.log('new draft');
-        const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
-        if (this.apiCreationType === 'TOPIO_DRIVE') {
-          console.log('IS TOPIO DRIVE', EnumDraftCommandType.FILE, this.selectedPublishedFileForApiCreation);
-          const draftApi: DraftApiFromFileCommand = {
-            type: EnumDraftCommandType.FILE,
-            title: this.asset.title as string,
-            version: this.asset.version,
-            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-            path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
-            format: this.asset.format,
-          };
-          console.log(draftApi, 'ON SUBMIT');
-          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
-        } else {
-          console.log('FROM ASSET');
-          const draftApi: DraftApiFromAssetCommand = {
-            type: EnumDraftCommandType.ASSET,
-            pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
-            title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
-            version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
-            serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
-          };
-          draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
-        }
+    console.log('err', draftAssetResponse);
+    this.showUploadingMessage(true, 'An error occurred.');
+    throw new Error('error');
+  }
 
-        // this.asset.parentId = draftAssetResponse.result.command.parentId;
-        this.asset = { ...draftAssetResponse.result.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
-        console.log('qwe', this.asset);
-      }
-      draftAssetKey = draftAssetResponse.result.key;
-      console.log('create draft success', draftAssetResponse);
-    } catch (err) {
-      console.error((err as any).message);
-      // eslint-disable-next-line
-      alert(`Error: ${(err as any).message}`);
-      throw new Error((err as any).message);
-    }
-    if (!draftAssetResponse.success) {
-      console.log('error', draftAssetResponse);
-      // eslint-disable-next-line
-      alert(`Error: ${draftAssetResponse.messages}`);
-      return;
-    }
+  async saveDraftApiFromTopioDrive(): Promise<AssetDraft> {
+    const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+    const draftApi: DraftApiFromFileCommand = {
+      type: EnumDraftCommandType.FILE,
+      title: this.asset.title as string,
+      version: this.asset.version,
+      serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+      path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
+      format: this.asset.format,
+    };
+    console.log(draftApi, 'draft API for file');
+    const draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+    console.log(draftAssetResponse);
 
-    // const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    if (draftAssetResponse.success) return draftAssetResponse.result;
+
+    console.log('err', draftAssetResponse);
+    this.showUploadingMessage(true, 'An error occurred.');
+    throw new Error('error');
+  }
+
+  async saveDraftApiFromPublishedAsset(): Promise<AssetDraft> {
+    const serviceType = this.asset.spatialDataServiceType && [EnumSpatialDataServiceType.WMS, EnumSpatialDataServiceType.WFS, EnumSpatialDataServiceType.DATA_API].includes(this.asset.spatialDataServiceType) ? this.asset.spatialDataServiceType : '';
+    const draftApi: DraftApiFromAssetCommand = {
+      type: EnumDraftCommandType.ASSET,
+      pid: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.id : '',
+      title: this.selectedPublishedAssetForApiCreation ? `${this.selectedPublishedAssetForApiCreation.title} (${serviceType})` : '',
+      version: this.selectedPublishedAssetForApiCreation ? this.selectedPublishedAssetForApiCreation.version : '',
+      serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
+    };
+    console.log(draftApi, 'draft API');
+    const draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
+    console.log(draftAssetResponse);
+
+    if (draftAssetResponse.success) return draftAssetResponse.result;
+
+    console.log('err', draftAssetResponse);
+    this.showUploadingMessage(true, 'An error occurred.');
+    throw new Error('error');
+  }
+
+  async submitAsset(draftAssetKey: string): Promise<void> {
     const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-    console.log(submitResponse);
+
     if (submitResponse.success) {
-      this.uploading.status = true;
-      this.uploading.completed = true;
-      this.uploading.title = 'Service created!';
-      this.uploading.subtitle = '';
+      this.showUploadingMessage(true, 'Asset created!');
     } else {
-      console.log('error submitting service');
+      console.log('error submitting service', submitResponse);
+      this.showUploadingMessage(true, 'An error occurred.');
     }
   }
 
-  // needs refactoring
-  async submitForm(isDraft = false): Promise<void> {
-    this.modalToShow = '';
+  async uploadAdditionalResources(draftAssetKey: string, config: AxiosRequestConfig): Promise<CatalogueItemCommand> {
+    this.showUploadingMessage(false, 'Your additional metadata resources are being uploaded');
 
-    console.log('rtu', this.additionalResourcesToUpload);
+    let asset: CatalogueItemCommand = {} as CatalogueItemCommand;
 
-    // if user has selected file to upload, check if format is compatible with file extension
-    if (!isDraft) {
-      if (this.fileToUpload.isFileSelected) {
-        console.log('file is selected');
-        const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
-        const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
-        console.log('accepted extensions:', acceptedExtensions);
+    for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
+      // eslint-disable-next-line
+      const uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand, config);
 
-        if (!acceptedExtensions.includes(this.fileToUpload.fileExtension)) {
+      if (!uploadAdditionalResourceResponse.success) {
+        console.log('err', uploadAdditionalResourceResponse);
+        this.showUploadingMessage(true, 'An error occurred.');
+        throw new Error('error');
+      }
+
+      asset = uploadAdditionalResourceResponse.result.command;
+    }
+
+    return asset;
+  }
+
+  async uploadResource(draftAssetKey: string, config: AxiosRequestConfig): Promise<CatalogueItemCommand> {
+    this.showUploadingMessage(false, 'Your resource is being uploaded');
+
+    // todo: currently, file CRS is ignored (when support for multiple resources is implemented, we should consider adding a CRS for each resource)
+    const fileInfo: FileResourceCommand = {
+      fileName: this.fileToUpload.fileName,
+      format: this.asset.format,
+      ...(this.fileToUpload.encoding && { encoding: this.fileToUpload.encoding }),
+    };
+
+    const uploadResourceResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, fileInfo, config);
+
+    if (!uploadResourceResponse.success) {
+      console.log('err', uploadResourceResponse);
+      this.showUploadingMessage(true, 'An error occurred.');
+      throw new Error('error');
+    }
+
+    const asset = uploadResourceResponse.result.command;
+    return asset;
+  }
+
+  async submitApiForm(isDraft = false): Promise<void> {
+    try {
+      let draftAsset: AssetDraft = {} as AssetDraft;
+
+      if (this.isEditingExistingDraft) {
+        draftAsset = await this.saveDraftAfterEditingExistingDraft();
+      } else {
+        if (this.apiCreationType === 'TOPIO_DRIVE') {
+          draftAsset = await this.saveDraftApiFromTopioDrive();
+        }
+        if (this.apiCreationType === 'PUBLISHED_ASSET') {
+          draftAsset = await this.saveDraftApiFromPublishedAsset();
+        }
+      }
+
+      if (isDraft) {
+        this.showUploadingMessage(true, 'Draft saved!');
+        return;
+      }
+
+      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
+      await this.submitAsset(draftAsset.key);
+    } catch (err) {
+      console.error((err as any).message);
+      this.showUploadingMessage(true, 'An error occurred.');
+    }
+  }
+
+  async submitDataFileForm(isDraft = false): Promise<void> {
+    try {
+      this.modalToShow = '';
+
+      let draftAsset: AssetDraft;
+
+      if (!isDraft && this.fileToUpload.isFileSelected) {
+        if (!this.isSelectedFormatCompatibleWithFileExtension()) {
           // TODO: make it a modal
           // eslint-disable-next-line
           alert('format-extension mismatch (not compatible)');
           return;
         }
-      } else {
-        console.log('no file selected');
       }
-    }
 
-    // this.uploading.status = true;
-    // this.uploading.errors = [];
-
-    const config: AxiosRequestConfig = {
-      onUploadProgress: (progressEvent: any): void => {
-        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-        if (totalLength !== null) {
-          this.showUploadingProgress(Math.round((progressEvent.loaded * 100) / totalLength));
-        }
-      },
-    };
-    console.log('ASSET', this.asset);
-
-    // CREATE DRAFT
-    let draftAssetResponse: ServerResponse<AssetDraft>;
-    let draftAssetKey = '';
-    try {
       if (this.isEditingExistingDraft) {
-        draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+        draftAsset = await this.saveDraftAfterEditingExistingDraft();
       } else {
-        draftAssetResponse = await this.draftAssetApi.create(this.asset, true, config);
+        draftAsset = await this.createDraft();
       }
-      this.asset = draftAssetResponse.result.command;
-      draftAssetKey = draftAssetResponse.result.key;
-      console.log('UPDATE DRAFT FILE', draftAssetResponse);
-    } catch (err) {
-      console.error((err as any).message);
-      // eslint-disable-next-line
-      alert(`Error: ${(err as any).message}`);
-      throw new Error((err as any).message);
-    }
-    if (!draftAssetResponse.success) {
-      console.log('error', draftAssetResponse);
-      // eslint-disable-next-line
-      alert(`Error: ${draftAssetResponse.messages}`);
-      return;
-    }
+      this.asset = draftAsset.command;
 
-    // UPLOAD ADDITIONAL RESOURCES FILES
-    if (!isDraft && this.additionalResourcesToUpload.length) {
-      console.log('upload additional resources');
-      this.showUploadingMessage(false, 'Your additional metadata resources are being uploaded');
-
-      for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
-        let uploadAdditionalResourceResponse: ServerResponse<AssetDraft>;
-        try {
-          // eslint-disable-next-line
-          uploadAdditionalResourceResponse = await this.draftAssetApi.uploadAdditionalResource(draftAssetKey, this.additionalResourcesToUpload[i].file, this.additionalResourcesToUpload[i].resourceCommand);
-          this.asset = uploadAdditionalResourceResponse.result.command;
-          console.log('upload additional resource success', uploadAdditionalResourceResponse);
-        } catch (err) {
-          console.error((err as any).message);
-          // eslint-disable-next-line
-          alert(`Error: ${(err as any).message}`);
-          throw new Error((err as any).message);
-        }
-        if (!uploadAdditionalResourceResponse.success) {
-          console.log('error', uploadAdditionalResourceResponse);
-          // eslint-disable-next-line
-          alert(`Error: ${uploadAdditionalResourceResponse.messages}`);
-          return;
-        }
-      }
-    }
-
-    // UPLOAD RESOURCE
-    if (!isDraft && this.fileToUpload.isFileSelected) {
-      console.log('upload resource');
-      this.showUploadingMessage(false, 'Your resource is being uploaded');
-
-      let uploadResource: ServerResponse<AssetDraft>;
-      try {
-        const fileInfo: FileResourceCommand = {
-          fileName: this.fileToUpload.fileName,
-          format: this.asset.format,
-        };
-        if (this.fileToUpload.encoding) fileInfo.encoding = this.fileToUpload.encoding;
-        // todo: currently, file CRS is ignored (when support for multiple resources is implemented, we should consider adding a CRS for each resource)
-
-        console.log('file info', fileInfo);
-
-        uploadResource = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, fileInfo, config);
-        this.asset = uploadResource.result.command;
-        console.log('upload resource success', uploadResource);
-      } catch (err) {
-        console.error((err as any).message);
-        // eslint-disable-next-line
-        alert(`Error: ${(err as any).message}`);
-        throw new Error((err as any).message);
-      }
-      if (!uploadResource.success) {
-        console.log('error', uploadResource);
-        // eslint-disable-next-line
-        alert(`Error: ${uploadResource.messages}`);
+      if (isDraft) {
+        this.showUploadingMessage(true, 'Draft saved!');
         return;
       }
-    }
 
-    // SUBMIT
-    if (isDraft) {
-      this.showUploadingMessage(true, 'Draft saved!');
-    } else {
-      let submitResponse: ServerResponse<AssetDraft>;
-      try {
-        submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
-        this.showUploadingMessage(true, 'Asset created!');
-        console.log('submit success', submitResponse);
-      } catch (err) {
-        console.error((err as any).message);
-        // eslint-disable-next-line
-        alert(`Error: ${(err as any).message}`);
-        throw new Error((err as any).message);
-      }
-      if (!submitResponse.success) {
-        console.log('error', submitResponse);
-        // eslint-disable-next-line
-        alert(`Error: ${submitResponse.messages}`);
-      }
+      const uploadConfig: AxiosRequestConfig = {
+        onUploadProgress: (progressEvent: any): void => {
+          const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+          if (totalLength !== null) {
+            this.showUploadingProgress(Math.round((progressEvent.loaded * 100) / totalLength));
+          }
+        },
+      };
+
+      if (this.additionalResourcesToUpload.length) this.asset = await this.uploadAdditionalResources(draftAsset.key, uploadConfig);
+
+      if (this.fileToUpload.isFileSelected) this.asset = await this.uploadResource(draftAsset.key, uploadConfig);
+
+      await this.submitAsset(draftAsset.key);
+    } catch (err) {
+      console.error((err as any).message);
+      this.showUploadingMessage(true, 'An error occurred.');
     }
   }
 

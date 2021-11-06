@@ -155,7 +155,10 @@
             <validation-observer ref="step2">
               <div class="dashboard__form__step dashboard__form__step--full-width" v-if="currentStep == 2">
                 <div v-if="isVettingRequired" class="row flex align-items-center justify-content-center">
-                  <h3>A purchase request has been sent to vendor. Approval is pending.</h3>
+                  <div class="flex justify-content-center" style="text-align: center;">
+                    <h4>In order for the transaction to proceed, the supplier must first approve your purchase.</h4>
+                    <h4 class="mt-xs-20">If the supplier approves your request, your order will be processed automatically.</h4>
+                  </div>
                 </div>
                 <div v-else class="row">
                   <div class="col-md-5">
