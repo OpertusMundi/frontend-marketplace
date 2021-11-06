@@ -125,6 +125,19 @@ interface Dimension {
   values: string[];
 }
 
+interface LayerStyle {
+  abstract: string;
+  legendUrls: [{
+    /**
+     * A Base64 encoded image sample of the style
+     */
+    image: string;
+    url: string;
+  }],
+  name: string;
+  title: string;
+}
+
 export interface ServiceResource extends Resource {
   /**
    * Discriminator field used for deserializing the model to the appropriate data type
@@ -147,9 +160,9 @@ export interface ServiceResource extends Resource {
    */
   crs: string[];
   /**
-   * A list of URLs pointing to the available styles of the resource
+   * A list of layer styles of the resource
    */
-  styles: string[];
+  styles: LayerStyle[];
   /**
    * The bounding box of the resource
    */
