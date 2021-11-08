@@ -80,7 +80,7 @@
                     <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for vendors</span></router-link>
                   </li>
                   <li>
-                    <router-link to="/become-vendor"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link>
+                    <router-link :to="navigationForBecomeVendor()"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link>
                   </li>
                 </ul>
               </div>
@@ -107,7 +107,8 @@
                             </g>
                           </g>
                         </svg>
-                        <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/become-vendor" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
+                        <!-- <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/become-vendor" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p> -->
+                        <p @click="showSubmenuSell = !showSubmenuSell"><router-link :to="navigationForBecomeVendor()" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
                       </div>
                     </div>
                     <div class="header__submenu__block">
@@ -365,6 +366,8 @@ import Search from '@/components/Search.vue';
 import { ServerResponse, LogoutResult } from '@/model';
 import { Notification } from '@/model/notification';
 import moment from 'moment';
+import { RawLocation } from 'vue-router';
+// import { EnumRole } from '@/model/role';
 
 @Component({
   components: { Search },
@@ -416,6 +419,12 @@ export default class Header extends Vue {
   beforeDestroy(): void {
     console.log('unmounted navbar');
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+  }
+
+  navigationForBecomeVendor(): RawLocation {
+    if (!store.getters.isAuthenticated) return { name: 'Login', params: { pathToNavigateAfterLogin: '/become-vendor' } };
+    // if (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft) return { name: 'BecomeVendorAlreadyVendor' };
+    return { name: 'BecomeVendor' };
   }
 
   pollNotifications(): void {
