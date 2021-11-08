@@ -63,19 +63,22 @@ export default class Login extends Vue {
 
   formErrors: string;
 
+  redirectPath: string;
+
   constructor() {
     super();
     this.email = '';
     this.password = '';
     this.loading = false;
     this.formErrors = '';
+    this.redirectPath = '';
 
     this.accountApi = new AccountApi();
     this.profileApi = new ProfileApi();
   }
 
-  mounted(): void {
-    console.log('ok');
+  created(): void {
+    this.redirectPath = this.$route.params.pathToNavigateAfterLogin || '/';
   }
 
   async submitLogin():Promise<void> {
@@ -98,7 +101,7 @@ export default class Login extends Vue {
                 if (accountResponse.success) {
                   store.commit('setUserData', accountResponse.result);
                   this.loading = false;
-                  this.$router.push('/');
+                  this.$router.push(this.redirectPath);
                 } else {
                   // TODO: Handle error
                   this.loading = false;
