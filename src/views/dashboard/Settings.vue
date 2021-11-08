@@ -1006,7 +1006,7 @@ export default class DashboardHome extends Vue {
 
     this.userData = {} as Account;
 
-    this.selectedTab = 'general';
+    this.selectedTab = '';
     this.modalToShow = '';
 
     this.passwordCurrent = '';
@@ -1035,7 +1035,9 @@ export default class DashboardHome extends Vue {
 
   // TODO: add pagination to documents that support it (e.g. KYC)
 
-  mounted(): void {
+  created(): void {
+    this.selectedTab = this.$route.params.initialTab || 'general';
+
     this.setKycRole();
     this.setKycCategoriesForSelectedRole();
 
