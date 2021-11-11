@@ -53,7 +53,8 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { CatalogueItemDetails, ContractTerm, EnumContractIconCategory } from '@/model/catalogue';
+import { EnumContractIconCategory } from '@/model/contract';
+import { CatalogueItemDetails, ContractTerm } from '@/model/catalogue';
 import { chunk as lodashChunk } from 'lodash';
 
 @Component

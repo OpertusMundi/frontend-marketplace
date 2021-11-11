@@ -4,6 +4,7 @@ import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { Provider } from '@/model/account';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
+import { EnumContractIcon, EnumContractIconCategory } from '@/model/contract';
 
 export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
@@ -811,31 +812,6 @@ export interface CatalogueItem extends BaseCatalogueItem {
    * Asset statistics
    */
   statistics: CatalogueItemStatistics;
-}
-
-export enum EnumContractIcon {
-  AlterationNotPermitted = 'AlterationNotPermitted',
-  AlterationPermitted = 'AlterationPermitted',
-  CommercialUseNotPermitted = 'CommercialUseNotPermitted',
-  CommercialUsePermitted = 'CommercialUsePermitted',
-  DeliveredByTopio = 'DeliveredByTopio',
-  DeliveredByVendor = 'DeliveredByVendor',
-  DigitalDelivery = 'DigitalDelivery',
-  PhysicalDelivery = 'PhysicalDelivery',
-  ThirdPartyNotPermitted = 'ThirdPartyNotPermitted',
-  ThirdPartyPermitted = 'ThirdPartyPermitted',
-  UpdatesNotIncluded = 'UpdatesNotIncluded',
-  UpdatesIncluded = 'UpdatesIncluded',
-  WarrantyNotProvided = 'WarrantyNotProvided',
-  WarrantyProvided = 'WarrantyProvided',
-  NoRestrictionsWorldwide = 'NoRestrictionsWorldwide',
-  Geomarketing = 'Geomarketing',
-}
-
-export enum EnumContractIconCategory {
-  Terms = 'Terms',
-  Countries = 'Countries',
-  Restrictions = 'Restrictions',
 }
 
 export interface ContractTerm {
