@@ -260,7 +260,7 @@
             <transition name="fade" mode="out-in">
               <div class="user_menu__dropdown user_menu__dropdown--large" v-show="showNotifications">
                 <ul>
-                  <li v-if="!notifications.length"><span>No notifications</span></li>
+                  <li v-if="!notifications.length"><span class="dropdown-text">No notifications</span></li>
                   <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                     <router-link to="">
                       <span :class="{'notification--unread': !notification.read}">{{ notification.text }}</span><br>
@@ -275,17 +275,30 @@
           </div>
         </div>
         <div class="header__cart">
-          <router-link to="/cart">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24.08" height="24.001" viewBox="0 0 24.08 24.001">
-              <g id="Group_1973" data-name="Group 1973" transform="translate(-1684 -36)">
-                <g id="Group_1972" data-name="Group 1972" transform="translate(1005.503 -324.638)">
-                  <path id="Path_8968" data-name="Path 8968" d="M693.77,368.612h-6.464a1,1,0,0,0,0,2h6.464a1,1,0,0,0,0-2Z" fill="#ffffff" />
-                  <path id="Path_8969" data-name="Path 8969" d="M701.841,368.651a1,1,0,0,0-1.229.7l-3.628,13.28H684.092l-3.629-13.28a1,1,0,1,0-1.93.527l3.83,14.017a1,1,0,0,0,.965.736h14.42a1,1,0,0,0,.965-.736l3.829-14.017A1,1,0,0,0,701.841,368.651Z" fill="#ffffff" />
-                  <path id="Path_8970" data-name="Path 8970" d="M683.553,370.615h0a1,1,0,0,0,1-1c0-.285.1-6.98,6-6.98,5.873,0,5.969,6.7,5.969,6.978a1,1,0,0,0,2,0c0-3.105-1.666-8.978-7.97-8.978-6.325,0-8,5.873-8,8.978A1,1,0,0,0,683.553,370.615Z" fill="#ffffff" />
-                </g>
-              </g></svg
-            ><span>{{ cartCount() }}</span>
-          </router-link>
+          <div class="user_menu">
+            <router-link to="/cart">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24.08" height="24.001" viewBox="0 0 24.08 24.001">
+                <g id="Group_1973" data-name="Group 1973" transform="translate(-1684 -36)">
+                  <g id="Group_1972" data-name="Group 1972" transform="translate(1005.503 -324.638)">
+                    <path id="Path_8968" data-name="Path 8968" d="M693.77,368.612h-6.464a1,1,0,0,0,0,2h6.464a1,1,0,0,0,0-2Z" fill="#ffffff" />
+                    <path id="Path_8969" data-name="Path 8969" d="M701.841,368.651a1,1,0,0,0-1.229.7l-3.628,13.28H684.092l-3.629-13.28a1,1,0,1,0-1.93.527l3.83,14.017a1,1,0,0,0,.965.736h14.42a1,1,0,0,0,.965-.736l3.829-14.017A1,1,0,0,0,701.841,368.651Z" fill="#ffffff" />
+                    <path id="Path_8970" data-name="Path 8970" d="M683.553,370.615h0a1,1,0,0,0,1-1c0-.285.1-6.98,6-6.98,5.873,0,5.969,6.7,5.969,6.978a1,1,0,0,0,2,0c0-3.105-1.666-8.978-7.97-8.978-6.325,0-8,5.873-8,8.978A1,1,0,0,0,683.553,370.615Z" fill="#ffffff" />
+                  </g>
+                </g></svg
+              ><span>{{ cartCount() }}</span>
+            </router-link>
+            <transition name="fade" mode="out-in">
+              <div class="user_menu__dropdown user_menu__dropdown--x-large" v-show="showCart">
+                <ul>
+                  <li><span class="dropdown-text">{{ cartItemsNum }} {{ cartItemsNum === 1 ? 'ASSET' : 'ASSETS' }} IN YOUR CART</span></li>
+                  <li v-for="item in cartItems" :key="item.id">
+                    <cart-mini-card :item="item"></cart-mini-card>
+                  </li>
+                  <li class="user_menu__dropdown__btn_view_all"><router-link to="/cart">VIEW CART</router-link></li>
+                </ul>
+              </div>
+            </transition>
+          </div>
         </div>
         <div class="header__login" v-if="$store.getters.isAuthenticated" @mouseover="showUserMenu = true" @mouseleave="showUserMenu = false">
           <div class="user_menu">
@@ -358,19 +371,31 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import {
+  Component,
+  Prop,
+  Vue,
+  Watch,
+} from 'vue-property-decorator';
 import store from '@/store';
 import AccountApi from '@/service/account';
 import NotificationApi from '@/service/notification';
 import Search from '@/components/Search.vue';
-import { ServerResponse, LogoutResult } from '@/model';
+import {
+  ServerResponse,
+  LogoutResult,
+  Cart,
+  CartItem,
+} from '@/model';
 import { Notification } from '@/model/notification';
+import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
+import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import moment from 'moment';
 import { RawLocation } from 'vue-router';
 // import { EnumRole } from '@/model/role';
 
 @Component({
-  components: { Search },
+  components: { Search, CartMiniCard, AssetMiniCard },
 })
 export default class Header extends Vue {
   @Prop({ default: 'header--nobg' }) private headerClass!: string;
@@ -386,6 +411,12 @@ export default class Header extends Vue {
   notifications: Notification[];
 
   pollTimeoutRef: ReturnType<typeof setTimeout> | null;
+
+  cartItems: CartItem[] = [];
+
+  cartItemsNum = 0;
+
+  showCart = false;
 
   accountApi: AccountApi;
 
@@ -419,6 +450,18 @@ export default class Header extends Vue {
   beforeDestroy(): void {
     console.log('unmounted navbar');
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+  }
+
+  @Watch('$store.getters.getCart', { deep: true })
+  onCartChange(cartCurrent: Cart, cartPrevious: Cart): void {
+    if (cartCurrent.totalItems > cartPrevious.totalItems) {
+      this.cartItems = cartCurrent.items;
+      this.cartItemsNum = cartCurrent.totalItems;
+      this.showCart = true;
+      setTimeout(() => {
+        this.showCart = false;
+      }, 2000);
+    }
   }
 
   navigationForBecomeVendor(): RawLocation {

@@ -1015,6 +1015,12 @@
 		}
 	}
 
+	&--border-always-shown {
+		.asset_card__inner {
+			border-color: var(--color) !important;
+		}
+	}
+
 	&--red_marked {
 		.asset_card__inner {
 			&::before {

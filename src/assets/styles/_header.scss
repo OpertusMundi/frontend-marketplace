@@ -545,6 +545,9 @@
         &--large {
             width: 340px !important;
         }
+        &--x-large {
+            width: 450px !important;
+        }
         &__btn_view_all {
             cursor: default;
             text-align: center;
@@ -593,6 +596,11 @@
                     }
                 }
             }
+        }
+        .dropdown-text {
+            font-size: em(14);
+            font-weight: 500;
+            color: $darkColor;
         }
     }
 }
