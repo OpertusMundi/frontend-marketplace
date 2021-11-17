@@ -26,12 +26,13 @@ import store from '@/store';
 import AccountApi from '@/service/account';
 import ConfigurationApi from '@/service/config';
 import CartApi from '@/service/cart';
-import ProfileApi from '@/service/profile';
+
+import { fetchUserProfileAndCart } from '@/helper/user';
 
 import {
-  Configuration, Account, ServerResponse, LogoutResult, Cart,
+  Configuration, ServerResponse, LogoutResult,
 } from '@/model';
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
@@ -46,8 +47,6 @@ export default class App extends Vue {
   accountApi: AccountApi;
 
   configApi: ConfigurationApi;
-
-  profileApi: ProfileApi;
 
   cartApi: CartApi;
 
@@ -75,7 +74,6 @@ export default class App extends Vue {
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
-    this.profileApi = new ProfileApi();
 
     this.noHeader = ['Login', 'Register'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
@@ -152,49 +150,40 @@ export default class App extends Vue {
         store.commit('setConfiguration', {
           configuration: configResponse.result,
         });
-        // Check if user is authenticated
-        this.profileApi
-          .getProfile()
-          .then((profileResponse: ServerResponse<Account>) => {
-            if (profileResponse.success) {
-              store.commit('setUserData', profileResponse.result);
-            } else {
-              console.log('unsuccessful profile fetching');
-              // this.logout();
-            }
-          })
-          .catch((error: AxiosError) => {
-            console.log('getProfile error', error);
-            // this.logout();
-          });
+
+        fetchUserProfileAndCart().then((res) => {
+          if (res.success) {
+            console.log('fetched user profile and cart');
+            return;
+          }
+          console.log('could not fetch user profile and cart');
+        });
       })
       .catch((err) => {
         console.log('getConfiguration error', err);
         // store.commit('setLoading', false);
       });
-
-    this.getCartItems();
   }
 
   toggleMobileMenu(status: boolean): void {
     this.showMenuMobile = status;
   }
 
-  getCartItems(): void {
-    this.cartApi
-      .getCart()
-      .then((cartResponse: ServerResponse<Cart>) => {
-        if (cartResponse.success) {
-          store.commit('setCartItems', cartResponse.result);
-        } else {
-          // TODO: Handle error
-          console.error('cannot add item to cart!');
-        }
-      })
-      .catch((err) => {
-        console.log('getCartItems error: ', err);
-      });
-  }
+  // getCartItems(): void {
+  //   this.cartApi
+  //     .getCart()
+  //     .then((cartResponse: ServerResponse<Cart>) => {
+  //       if (cartResponse.success) {
+  //         store.commit('setCartItems', cartResponse.result);
+  //       } else {
+  //         // TODO: Handle error
+  //         console.error('cannot add item to cart!');
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log('getCartItems error: ', err);
+  //     });
+  // }
 
   logout(): void {
     const router = this.$router;

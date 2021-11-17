@@ -34,9 +34,8 @@ import { required, email } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import store from '@/store';
 import AccountApi from '@/service/account';
-import ProfileApi from '@/service/profile';
+import { fetchUserProfileAndCart } from '@/helper/user';
 import { ServerResponse, LoginResult } from '@/model';
-import { Account } from '@/model/account';
 import { AxiosError } from 'axios';
 
 extend('required', required);
@@ -59,8 +58,6 @@ export default class Login extends Vue {
 
   accountApi: AccountApi;
 
-  profileApi: ProfileApi;
-
   formErrors: string;
 
   redirectPath: string;
@@ -74,7 +71,6 @@ export default class Login extends Vue {
     this.redirectPath = '';
 
     this.accountApi = new AccountApi();
-    this.profileApi = new ProfileApi();
   }
 
   created(): void {
@@ -94,19 +90,16 @@ export default class Login extends Vue {
             // Set CSRF Token
             const { csrfToken: token, csrfHeader: header } = loginResponse.result;
             store.commit('setCsrfToken', { token, header });
-            // Load user data
-            this.profileApi
-              .getProfile()
-              .then((accountResponse: ServerResponse<Account>) => {
-                if (accountResponse.success) {
-                  store.commit('setUserData', accountResponse.result);
-                  this.loading = false;
-                  this.$router.push(this.redirectPath);
-                } else {
-                  // TODO: Handle error
-                  this.loading = false;
-                }
-              });
+
+            fetchUserProfileAndCart().then((res) => {
+              if (res.success) {
+                this.loading = false;
+                this.$router.push(this.redirectPath);
+              } else {
+                // this.loading = false;
+                console.log('error fetching user profile and cart');
+              }
+            });
           } else {
             console.log('error loggin in', loginResponse);
             // TODO: Hanlde error
