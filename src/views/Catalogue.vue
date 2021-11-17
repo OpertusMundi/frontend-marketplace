@@ -6,7 +6,7 @@
       </div>
       <div class="d-flex space-between">
         <div class="form-group catalogue_search">
-          <input v-model="catalogQuery.query" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
+          <input v-model="catalogQuery.query" v-on:keyup.enter="searchTextOnly" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
           <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
         </div>
         <div class="d-inline-flex align-items-center">

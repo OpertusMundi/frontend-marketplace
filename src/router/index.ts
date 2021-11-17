@@ -302,6 +302,11 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "becomevendorsuccess" */ '../views/BecomeVendorSuccess.vue'),
   },
   {
+    path: '/vendor-already',
+    name: 'BecomeVendorAlreadyVendor',
+    component: (): Promise<any> => import(/* webpackChunkName: "becomevendoralreadyvendor" */ '../views/BecomeVendorAlreadyVendor.vue'),
+  },
+  {
     path: '/become-consumer',
     name: 'BecomeConsumer',
     component: (): Promise<any> => import(/* webpackChunkName: "becomeconsumer" */ '../views/BecomeConsumer.vue'),
@@ -374,6 +379,9 @@ router.beforeEach((to, from, next) => {
 
   if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
     next('/error/401');
+  // If already a vendor, do not navigate to /become-vendor
+  } else if (to.name === 'BecomeVendor' && (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft)) {
+    next('/vendor-already');
   } else if (role && !store.getters.hasRole(role)) {
     next('/error/401');
   } else {
