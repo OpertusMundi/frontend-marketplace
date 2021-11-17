@@ -263,7 +263,7 @@
                   <li v-if="!notifications.length"><span class="dropdown-text">No notifications</span></li>
                   <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                     <router-link to="">
-                      <span :class="{'notification--unread': !notification.read}">{{ notification.text }}</span><br>
+                      <div :class="{'notification--unread': !notification.read}" v-html="notification.text"></div><br>
                       <small>{{ getTimeFromNow(notification.createdAt) }}</small>
                       <hr>
                     </router-link>
@@ -580,3 +580,6 @@ export default class Header extends Vue {
   }
 }
 </script>
+<style lang="scss">
+  @import "@/assets/styles/_notifications.scss";
+</style>
