@@ -9,12 +9,10 @@
     <transition name="fade" mode="out-in">
       <app-footer v-if="!$store.getters.isLoading && showFooter"></app-footer>
     </transition>
-    <!-- <transition name="fade" mode="out-in">
-      <div class="loader" v-if="$store.getters.isLoading"></div>
-    </transition> -->
     <transition name="fade" mode="out-in">
       <loader v-if="$store.getters.isLoading && !noLoaderRoutes.includes($route.name)"></loader>
     </transition>
+    <global-modals></global-modals>
   </div>
 </template>
 
@@ -37,9 +35,15 @@ import {
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
+import GlobalModals from '@/components/GlobalModals.vue';
 
 @Component({
-  components: { AppHeader, AppFooter, Loader },
+  components: {
+    AppHeader,
+    AppFooter,
+    Loader,
+    GlobalModals,
+  },
 })
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;

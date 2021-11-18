@@ -1,6 +1,29 @@
 import ProfileApi from '@/service/profile';
 import CartApi from '@/service/cart';
 import store from '@/store';
+import { EnumActivationStatus } from '@/model/account';
+
+const recursionInterval = 7000;
+
+const fetchProfileRecursivelyUntilActivationCompleted = async (): Promise<void> => {
+  const profileApi = new ProfileApi();
+
+  try {
+    const response = await profileApi.getProfile();
+
+    if (response.success) store.commit('setUserData', response.result);
+
+    if (!response.success || response.result.activationStatus !== EnumActivationStatus.COMPLETED) {
+      setTimeout(() => {
+        fetchProfileRecursivelyUntilActivationCompleted();
+      }, recursionInterval);
+    }
+  } catch (err) {
+    setTimeout(() => {
+      fetchProfileRecursivelyUntilActivationCompleted();
+    }, recursionInterval);
+  }
+};
 
 const fetchUserProfileAndCart = async (): Promise<{ success: boolean }> => {
   const profileApi = new ProfileApi();
@@ -20,6 +43,12 @@ const fetchUserProfileAndCart = async (): Promise<{ success: boolean }> => {
     store.commit('setUserData', profileResponse.result);
     store.commit('setCartItems', cartResponse.result);
     console.log('cart', cartResponse);
+
+    if (profileResponse.result.activationStatus !== EnumActivationStatus.COMPLETED) {
+      setTimeout(() => {
+        fetchProfileRecursivelyUntilActivationCompleted();
+      }, recursionInterval);
+    }
 
     return { success: true };
   } catch (err) {
