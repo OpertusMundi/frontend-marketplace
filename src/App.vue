@@ -124,6 +124,8 @@ export default class App extends Vue {
 
       console.log('handle auth change', this.$route.name);
 
+      store.commit('setCartItems', null);
+
       if (excludeRedirectionToHome.includes(this.$route.name as string)) return;
 
       if (this.$route.name !== name) this.$router.push({ name });
