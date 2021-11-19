@@ -81,7 +81,7 @@ export default class App extends Vue {
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
 
-    this.noHeader = ['Login', 'Register'];
+    this.noHeader = ['Login', 'Register', 'OrganisationalAccountJoin'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
     // this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
     this.noLoaderRoutes = ['Home'];

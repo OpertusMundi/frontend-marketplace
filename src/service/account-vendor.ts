@@ -1,7 +1,7 @@
 import Api from '@/service/api';
 
 import { Sorting } from '@/model/request';
-import { AxiosServerResponse, AxiosPageResponse, ServerResponse, PageResult } from '@/model/response';
+import { AxiosServerResponse, ServerResponse, PageResult } from '@/model/response';
 import {
   EnumAccountSortField, Account, VendorAccountCommand, JoinVendorCommand,
 } from '@/model/account';
@@ -24,7 +24,7 @@ export default class AccountVendorApi extends Api {
   public async findAccounts(
     active: boolean | null = null, email: string | null = null,
     page = 0, size = 10, sorting: Sorting<EnumAccountSortField>,
-  ): Promise<AxiosPageResponse<Account>> {
+  ): Promise<ServerResponse<PageResult<Account>>> {
     const { id: field, order } = sorting;
 
     const endpoint = '/action/vendor-accounts';
@@ -32,7 +32,11 @@ export default class AccountVendorApi extends Api {
     const filters = `active=${active === null ? '' : active}&email=${email || ''}`;
     const url = `${endpoint}?${filters}&${pagination}`;
 
-    return this.get<ServerResponse<PageResult<Account>>>(url);
+    return this.get<ServerResponse<PageResult<Account>>>(url).then((response) => {
+      const { data } = response;
+
+      return data;
+    });
   }
 
   /**

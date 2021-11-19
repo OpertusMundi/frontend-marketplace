@@ -21,12 +21,14 @@
   }
 }
 
-.users-form .form-group {
-  &__text {
-    max-width: 600px;
-  }
-  &__select {
-    max-width: 300px;
+.users-form {
+  max-width: 600px;
+
+  .avatar {
+    > img {
+      border: solid 1px #fff;
+      border-radius: 50%; 
+    }
   }
 }
 

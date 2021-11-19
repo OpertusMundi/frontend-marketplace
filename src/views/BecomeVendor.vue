@@ -719,4 +719,3 @@ export default class BecomeVendor extends Vue {
   @import "@/assets/styles/_forms.scss";
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-

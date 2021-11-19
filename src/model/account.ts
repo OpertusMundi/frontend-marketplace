@@ -396,11 +396,11 @@ interface ProfileBase {
   /**
    * Locale ISO 3166-1 alpha-2 code e.g. el. Default is en.
    */
-  locale: string;
+  locale?: string;
   /**
    * User phone
    */
-  phone: string;
+  phone?: string;
 }
 
 /**
