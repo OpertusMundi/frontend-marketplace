@@ -12,7 +12,9 @@
     <transition name="fade" mode="out-in">
       <loader v-if="$store.getters.isLoading && !noLoaderRoutes.includes($route.name)"></loader>
     </transition>
-    <global-modals></global-modals>
+    <transition name="fade" mode="out-in">
+      <global-modals v-if="$store.getters.getShownGlobalModal"></global-modals>
+    </transition>
   </div>
 </template>
 

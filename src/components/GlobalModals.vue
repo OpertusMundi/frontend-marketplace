@@ -1,6 +1,16 @@
+<!-- note: we use :withTransition="false" cause we already apply transition on the global-modals component -->
+
 <template>
   <!-- USER ACCOUNT NOT READY -->
-  <modal :withSlots="true" :show="getShownGlobalModal() === 'modalPendingAccountActivation'" @dismiss="dismissGlobalModal" :modalId="'modalShowCrsList'" :showCancelButton="false" :showCloseButton="false">
+  <modal
+    :withSlots="true"
+    :show="getShownGlobalModal() === 'modalPendingAccountActivation'"
+    @dismiss="dismissGlobalModal"
+    :modalId="'modalShowCrsList'"
+    :showCancelButton="false"
+    :showCloseButton="false"
+    :withTransition="false"
+  >
     <template v-slot:body>
       <h3>We are setting things up with your account. Please join us in a few minutes!</h3>
     </template>
