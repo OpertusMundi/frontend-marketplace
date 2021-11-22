@@ -1,34 +1,68 @@
 .users {
+  font-size: em(16);
   display: grid;
-  grid-template-columns: 20% 20% 20% 20% 20%;
+  column-gap: 20px;
+  grid-template-columns: min-content fit-content(16%) fit-content(16%) fit-content(16%) fit-content(16%) auto;
 
   &__header {
     &__item {
       font-weight: 700;
-      padding: 10px 20px 10px 20px;
+      padding: 20px 0;
     }
   }
 
   &__item {
-    padding: 20px;    
+    max-width: 100%;
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &--avatar {
+      padding: 10px 0;
+    }
+
+    span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 
   &__line {
-    grid-column: 1/6;
+    grid-column: 1/7;
     height: 1px !important;
     width: 100%;
     background: $labelColor;
+  }
+
+  &__avatar {
+    height: 80px;
+    width: 80px;
+    img {
+      border: solid 1px #fff;
+      border-radius: 50%;
+    }
   }
 }
 
 .users-form {
   max-width: 600px;
+}
 
-  .avatar {
-    > img {
-      border: solid 1px #fff;
-      border-radius: 50%; 
-    }
+.status-indicator {
+  margin-right: 10px;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+
+  &--active {
+    background-color: $secondColor;
+  }
+  &--inactive {
+    background-color: red;
   }
 }
 
@@ -36,9 +70,9 @@
   display: contents;
 }
 
-.btn-add-user {
-  background: transparent;
-}
+// .btn-add-user {
+//   background: transparent;
+// }
 
 .text-second-color {
   color: $secondColor;
