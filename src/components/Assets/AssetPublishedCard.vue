@@ -1,7 +1,7 @@
 <template>
   <div class="asset_card__wrapper">
     <router-link :to="`/catalogue/${asset.id}`" class="asset_card asset_card--wrapped" :class="{'asset_card--red_marked': asset.status === 'DRAFT'}">
-      <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
+      <div @click.prevent="createNewDraftFromPublished" class="asset_card__view" :style="{'--color': getColor()}"><span>EDIT</span></div>
         <div class="asset_card__inner" :style="{'--color': getColor()}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">

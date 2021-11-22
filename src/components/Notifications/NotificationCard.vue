@@ -6,9 +6,9 @@
       <!-- TODO: add more cases, wait for enum -->
     </div>
     <div class="notification__card__main">
-      <div class="notification__card__title">{{ formatTitle(notification.eventType) }}</div>
-      <div class="notification__card__text">{{ notification.text }}</div>
-      <div class="notification__card__moment">{{ getTimeFromNow(notification.createdAt) }}</div>
+      <div class="notification__title">{{ formatTitle(notification.eventType) }}</div>
+      <div class="notification__text" v-html="notification.text"></div>
+      <div class="notification__moment">{{ getTimeFromNow(notification.createdAt) }}</div>
     </div>
   </div>
 </template>

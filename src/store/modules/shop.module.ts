@@ -17,7 +17,7 @@ const actions = {
 };
 
 const mutations = {
-  setCartItems(state: State, cart: Cart): void {
+  setCartItems(state: State, cart: Cart | null): void {
     state.cart = cart;
   },
 };

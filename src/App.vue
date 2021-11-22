@@ -9,11 +9,11 @@
     <transition name="fade" mode="out-in">
       <app-footer v-if="!$store.getters.isLoading && showFooter"></app-footer>
     </transition>
-    <!-- <transition name="fade" mode="out-in">
-      <div class="loader" v-if="$store.getters.isLoading"></div>
-    </transition> -->
     <transition name="fade" mode="out-in">
       <loader v-if="$store.getters.isLoading && !noLoaderRoutes.includes($route.name)"></loader>
+    </transition>
+    <transition name="fade" mode="out-in">
+      <global-modals v-if="$store.getters.getShownGlobalModal"></global-modals>
     </transition>
   </div>
 </template>
@@ -37,9 +37,15 @@ import {
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
+import GlobalModals from '@/components/GlobalModals.vue';
 
 @Component({
-  components: { AppHeader, AppFooter, Loader },
+  components: {
+    AppHeader,
+    AppFooter,
+    Loader,
+    GlobalModals,
+  },
 })
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
@@ -75,7 +81,7 @@ export default class App extends Vue {
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
 
-    this.noHeader = ['Login', 'Register'];
+    this.noHeader = ['Login', 'Register', 'OrganisationalAccountJoin'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
     // this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
     this.noLoaderRoutes = ['Home'];
@@ -123,6 +129,8 @@ export default class App extends Vue {
       ];
 
       console.log('handle auth change', this.$route.name);
+
+      store.commit('setCartItems', null);
 
       if (excludeRedirectionToHome.includes(this.$route.name as string)) return;
 

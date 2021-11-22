@@ -336,7 +336,13 @@
 
           <li
             v-if="!includeTabDueToRole('ROLE_CONSUMER')">
-            <router-link v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'" to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
+            <router-link
+              v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'"
+              :to="$store.getters.isAccountActivated ? '/become-consumer' : ''"
+              @click.native="$store.getters.isAccountActivated ? () => {} : $store.commit('setShownGlobalModal', 'modalPendingAccountActivation')"
+              class="btn btn--std btn--blue">
+              become a consumer
+            </router-link>
             <button disabled v-if="$store.getters.getProfile.consumer.draft && $store.getters.getProfile.consumer.draft.status === 'SUBMITTED'" class="btn btn--std btn--outlinedark">pending consumer role...</button>
           </li>
         </ul>

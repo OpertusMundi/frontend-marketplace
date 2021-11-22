@@ -17,7 +17,7 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required|length:9">
+                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required">
                   <div class="form-group">
                     <label for="vat_number">VAT number *</label>
                     <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
@@ -267,7 +267,7 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="IBAN" rules="required">
+                <validation-provider v-slot="{ errors }" name="IBAN" rules="required|iban">
                   <div class="form-group">
                     <label for="iban">IBAN *</label>
                     <input type="text" class="form-group__text" name="iban" id="iban" v-model="vendorData.bankAccount.iban">
@@ -275,7 +275,7 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="BIC" rules="required">
+                <validation-provider v-slot="{ errors }" name="BIC" rules="required|bic">
                   <div class="form-group">
                     <label for="bic">BIC *</label>
                     <input type="text" class="form-group__text" name="bic" id="bic" v-model="vendorData.bankAccount.bic">
@@ -450,7 +450,7 @@ import {
   email,
   confirmed,
   min,
-  length,
+  // length,
 } from 'vee-validate/dist/rules';
 import {
   ValidationProvider,
@@ -458,6 +458,7 @@ import {
   extend,
   localize,
 } from 'vee-validate';
+import { isValidIBAN, isValidBIC } from 'ibantools';
 import Multiselect from 'vue-multiselect';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
@@ -468,11 +469,12 @@ extend('required', required);
 extend('email', email);
 extend('confirmed', confirmed);
 extend('min', min);
-extend('length', length);
+// extend('length', length);
 localize({
   en,
 });
-const phoneNumber = {
+
+const phoneNumberValidator = {
   validate(value) {
     /* eslint-disable */
     const phone = new PhoneNumber(value);
@@ -482,7 +484,23 @@ const phoneNumber = {
     return `Phone field ${phone.toJSON().possibility.replace(/-/g, ' ')}`;
   },
 };
-extend('phoneNumber', phoneNumber);
+extend('phoneNumber', phoneNumberValidator);
+
+const ibanValidator = {
+  validate(value) {
+    if (isValidIBAN(value)) return true;
+    return false;
+  }
+}
+extend('iban', ibanValidator);
+
+const bicValidator = {
+  validate(value) {
+    if (isValidBIC(value)) return true;
+    return false;
+  }
+}
+extend('bic', bicValidator);
 
 @Component({
   components: {
@@ -701,4 +719,3 @@ export default class BecomeVendor extends Vue {
   @import "@/assets/styles/_forms.scss";
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-

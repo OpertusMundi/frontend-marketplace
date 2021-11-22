@@ -15,7 +15,7 @@
       </template>
 
       <template v-slot:footer>
-        <button class="btn btn--std btn--blue ml-xs-20" @click="modalToShow = ''">OK</button>
+        <button class="btn btn--std btn--blue" @click="modalToShow = ''">OK</button>
       </template>
     </modal>
 
@@ -32,7 +32,7 @@
       </template>
 
       <template v-slot:footer>
-        <button class="btn btn--std btn--blue ml-xs-20" @click="modalToShow = ''">OK</button>
+        <button class="btn btn--std btn--blue" @click="modalToShow = ''">OK</button>
       </template>
     </modal>
     <!-- END OF MODALS -->

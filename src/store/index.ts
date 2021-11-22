@@ -8,6 +8,7 @@ import Shop from './modules/shop.module';
 import Router from './modules/router.module';
 import CatalogueFilters from './modules/catalogue-filters.module';
 import Notifications from './modules/notifications.module';
+import GlobalModals from './modules/global-modals.module';
 
 Vue.use(Vuex);
 
@@ -21,6 +22,7 @@ const store = new Vuex.Store({
     router: Router,
     catalogueFilters: CatalogueFilters,
     notifications: Notifications,
+    globalModals: GlobalModals,
   },
   plugins: [createPersistedState({
     // paths: ['user'],

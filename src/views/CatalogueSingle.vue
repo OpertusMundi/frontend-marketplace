@@ -26,7 +26,7 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card>
+          <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal" @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"></shop-card>
           <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
 
           <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
@@ -40,6 +40,17 @@
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModelKey"></select-areas>
+
+    <modal :withSlots="true" :show="modalToShow === 'modalLoginToAddAssetToCart'" @dismiss="modalToShow = ''">
+      <template v-slot:body>
+        <h3>Your have to be logged in to proceed with the purchase</h3>
+      </template>
+
+      <template v-slot:footer>
+        <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
   </div>
 </template>
 
@@ -51,6 +62,8 @@ import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 
 import store from '@/store';
+
+import Modal from '@/components/Modal.vue';
 
 import AssetHead from '../components/CatalogueSingle/AssetHead.vue';
 import AssetHeadMap from '../components/CatalogueSingle/AssetHeadMap.vue';
@@ -83,6 +96,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     ApiLayerProfiler,
     Metadata,
     SelectAreas,
+    Modal,
   },
 })
 export default class CatalogueSingle extends Vue {
@@ -102,6 +116,8 @@ export default class CatalogueSingle extends Vue {
 
   isSelectAreasModalOn: boolean;
 
+  modalToShow: string;
+
   constructor() {
     super();
 
@@ -120,6 +136,8 @@ export default class CatalogueSingle extends Vue {
     this.selectedPricingModelKey = '';
 
     this.isSelectAreasModalOn = false;
+
+    this.modalToShow = '';
   }
 
   mounted():void {
