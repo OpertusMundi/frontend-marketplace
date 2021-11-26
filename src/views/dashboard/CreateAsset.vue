@@ -38,9 +38,9 @@
         <ul v-if="assetMainType !== 'API'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
-          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Contract</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Delivery</a></li>
           <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
-          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Delivery</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
           <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
@@ -61,9 +61,9 @@
 
               <template v-if="assetMainType !== 'API'">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <contract ref="step3" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 3"></contract>
+                <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
-                <delivery ref="step5" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep === 5"></delivery>
+                <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
               </template>
 
               <template v-if="assetMainType === 'API'">
