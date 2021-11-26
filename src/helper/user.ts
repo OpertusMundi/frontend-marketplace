@@ -2,6 +2,7 @@ import ProfileApi from '@/service/profile';
 import CartApi from '@/service/cart';
 import store from '@/store';
 import { EnumActivationStatus } from '@/model/account';
+import { EnumRole } from '@/model/role';
 
 const recursionInterval = 7000;
 
@@ -30,19 +31,15 @@ const fetchUserProfileAndCart = async (): Promise<{ success: boolean }> => {
   const cartApi = new CartApi();
 
   try {
-    const responses = await Promise.all([
-      profileApi.getProfile(),
-      cartApi.getCart(),
-    ]);
-
-    const { 0: profileResponse } = responses;
-    const { 1: cartResponse } = responses;
-
-    if (!profileResponse.success || !cartResponse.success) return { success: false };
-
+    const profileResponse = await profileApi.getProfile();
+    if (!profileResponse.success) return { success: false };
     store.commit('setUserData', profileResponse.result);
-    store.commit('setCartItems', cartResponse.result);
-    console.log('cart', cartResponse);
+
+    if (profileResponse.result.roles.some((x) => [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER].includes(x))) {
+      const cartResponse = await cartApi.getCart();
+      if (!cartResponse.success) return { success: false };
+      store.commit('setCartItems', cartResponse.result);
+    }
 
     if (profileResponse.result.activationStatus !== EnumActivationStatus.COMPLETED) {
       setTimeout(() => {
