@@ -131,6 +131,26 @@
               <p><strong>fixedHeight</strong><span>{{ 'fixedHeight' in resources[1].attributes && resources[1].attributes.fixedHeight !== null ? resources[1].attributes.fixedHeight : '' }}</span></p>
             </div>
           </li>
+
+          <!-- STYLES -->
+          <li v-if="activeTab === 3 && resources[1] && resources[1].styles">
+            <p>Different styles available</p>
+            <div v-for="(style, i) in resources[1].styles" :key="i">
+              <hr>
+              <h3>Style #{{ i + 1 }}</h3>
+              <div class="asset__section__tabs__info_table">
+                <template v-if="style.name"><p><strong>name</strong></p><p>{{ style.name }}</p></template>
+                <template v-if="style.title"><p><strong>title</strong></p><p>{{ style.title }}</p></template>
+                <template v-if="style.abstract"><p><strong>abstract</strong></p><p>{{ style.abstract }}</p></template>
+                <template v-if="style.legendUrls"><p><strong>legends</strong></p>
+                  <div class="asset__section__tabs__info_table" v-for="(legend, j) in style.legendUrls" :key="j">
+                    <p v-if="legend.url"><strong>URL</strong><span style="white-space: nowrap; overflow-x: scroll;">{{ legend.url }}</span></p>
+                    <p v-if="legend.image"><strong class="mt-xs-10">image</strong><img class="mt-xs-10" :src="`data:image/png;base64,${legend.image}`" alt=""></p>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
