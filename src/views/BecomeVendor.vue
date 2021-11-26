@@ -17,7 +17,7 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT Number" rules="required">
+                <validation-provider v-slot="{ errors }" name="VAT Number" :rules="`required|vat:${vendorData.headquartersAddress.country}`">
                   <div class="form-group">
                     <label for="vat_number">VAT number *</label>
                     <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
@@ -79,7 +79,8 @@
                   <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                     <div class="form-group">
                       <label for="multiselect_headquarters_country">Country *</label>
-                      <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <!-- IMPORTANT NOTE: dropdown is populated by europe countries so that country codes are compatible with vat-validate library  -->
+                      <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="europeCountries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false" open-direction="top"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
@@ -459,6 +460,7 @@ import {
   localize,
 } from 'vee-validate';
 import { isValidIBAN, isValidBIC } from 'ibantools';
+import validateVat, { CountryCodes as validateVatCountryCodes } from 'validate-vat-ts';
 import Multiselect from 'vue-multiselect';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
@@ -485,6 +487,25 @@ const phoneNumberValidator = {
   },
 };
 extend('phoneNumber', phoneNumberValidator);
+
+const vatValidator = {
+  async validate(value, args): Promise<boolean> {
+    const [country] = args;
+    if (!country) return true;
+
+    store.commit('setLoading', true);
+    try {
+      const validationResponse = await validateVat(country, value);
+      if (validationResponse.valid) return true;
+      return false;
+    } catch (err) {
+      return true;
+    } finally {
+      store.commit('setLoading', false);
+    }
+  }
+}
+extend('vat', vatValidator);
 
 const ibanValidator = {
   validate(value) {
@@ -527,6 +548,8 @@ export default class BecomeVendor extends Vue {
 
   countries: { name: string, code: string }[];
 
+  europeCountries: { name: string, code: string }[];
+
   legalPersonTypeOptions: { name: string, code: string }[];
 
   $refs!: {
@@ -560,6 +583,7 @@ export default class BecomeVendor extends Vue {
     this.providerAPI = new ProviderAPI();
 
     this.countries = store.getters.getConfig.configuration.countries;
+    this.europeCountries = store.getters.getConfig.configuration.europeCountries.map((x) => ({name: x.name, code: x.code}));
 
     this.legalPersonTypeOptions = [
       { name: 'Business', code: 'BUSINESS' },
@@ -626,7 +650,20 @@ export default class BecomeVendor extends Vue {
     // this.selectedLegalPersonType = { name: 'Business', code: 'BUSINESS' };
   }
 
+  created(): void {
+    if (!this.isHeadquartersCountryListCompatibleWithVatValidationLibrary()) throw new Error('Country list is incompatible with vat-validate library');
+  }
+
+  isHeadquartersCountryListCompatibleWithVatValidationLibrary(): boolean {
+    const validationLibraryCountries = Object.values(validateVatCountryCodes);
+    const headquartersCountries = store.getters.getConfig.configuration.europeCountries.map((x) => x.code);
+
+    if (headquartersCountries.some((x) => !validationLibraryCountries.includes(x))) return false;
+    return true;
+  }
+
   onSelectHeadquartersCountry(): void {
+    if (!(Object.values(validateVatCountryCodes) as string[]).includes(this.selectedHeadquartersCountry.code)) throw new Error('Country incompatible with vat-validate library');
     this.vendorData.headquartersAddress.country = this.selectedHeadquartersCountry.code;
   }
 
@@ -670,11 +707,11 @@ export default class BecomeVendor extends Vue {
     this.$refs[`step${this.currentStep}`].validate().then((success) => {
       if (success) {
         this.currentStep += 1;
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
       }
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
     });
   }
 
