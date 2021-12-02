@@ -1016,24 +1016,28 @@ export interface CatalogueHarvestImportCommand {
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
 
-export interface CatalogueItemVisibilityCommand {
+export interface CatalogueItemMetadataCommand {
   /**
    * Resource key
    */
   resourceKey: string;
   /**
-   * Controls automated metadata property visibility. Selected properties are hidden.
+   * Samples as a JSON object. If property is set to `null`, sample data is not updated.
    */
-  visibility: string[];
-}
-
-export interface CatalogueItemSamplesCommand {
+  samples?: Sample[] | null;
   /**
-   * Resource key
+   * Areas of interest (bounding boxes) for creating samples for WMS or WFS layers.
+   * If the property is set to `null`, no sampling operation is executed. This property
+   * is applicable only to assets of type `SERVICE` with property `spatialDataServiceType`
+   * in [`WMS`, `WFS`]. The sampling is performed after the provider accepts a draft
+   * and replaces any data that is either already computed by the profiler service or
+   * set by the `samples` property.
    */
-  resourceKey: string;
+  sampleAreas?: GeoJSON.Polygon[] | null;
   /**
-   * Sample data
+   * Controls automated metadata property visibility. The specified properties are hidden.
+   * If the property is set to `null`, the metadata is not updated. An empty array will
+   * make all metadata properties visible.
    */
-  data: Sample[];
+  visibility?: string[] | null;
 }

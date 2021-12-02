@@ -291,8 +291,7 @@ import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 import {
-  CatalogueItemVisibilityCommand,
-  CatalogueItemSamplesCommand,
+  CatalogueItemMetadataCommand,
   CatalogueItemDetails,
   Sample,
 } from '@/model/catalogue';
@@ -605,12 +604,12 @@ export default class DataProfilingAndSamples extends Vue {
     } else {
       fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.filter((x) => x !== field) : [];
     }
-    const visibility: CatalogueItemVisibilityCommand = {
+    const visibility: CatalogueItemMetadataCommand = {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
       visibility: fieldsToHide,
     };
-    this.draftAssetApi.updateDraftMetadataVisibility(key, visibility).then((hideFieldResponse) => {
+    this.draftAssetApi.updateDraftMetadata(key, visibility).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
       this.hiddenMetadata = hideFieldResponse.data.result.command.visibility;
       store.commit('setLoading', false);
@@ -666,11 +665,11 @@ export default class DataProfilingAndSamples extends Vue {
     samplesData[i] = this.tempSamples[i];
     console.log('k', key);
     console.log(samplesData);
-    const samples: CatalogueItemSamplesCommand = {
+    const samples: CatalogueItemMetadataCommand = {
       resourceKey: this.metadata.key,
-      data: samplesData,
+      samples: samplesData,
     };
-    this.draftAssetApi.updateDraftSamples(key, samples).then((updateSamplesResponse) => {
+    this.draftAssetApi.updateDraftMetadata(key, samples).then((updateSamplesResponse) => {
       if (updateSamplesResponse.data.success) {
         console.log('successfully updated samples!', updateSamplesResponse);
         this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);

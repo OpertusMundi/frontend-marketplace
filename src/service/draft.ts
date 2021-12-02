@@ -6,7 +6,7 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
-  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand,
+  CatalogueItemMetadataCommand,
   //  Sample,
 } from '@/model/catalogue';
 import {
@@ -173,30 +173,18 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
-   * Update draft metadata property visibility. The draft status
-   * must be `PENDING_PROVIDER_REVIEW`
+   * Update draft metadata
+   *
+   * The draft status must be either `PENDING_PROVIDER_REVIEW`
    *
    * If the record is locked by another user, the operation will fail.
    *
    * @param key
    */
-  public async updateDraftMetadataVisibility(key: string, command: CatalogueItemVisibilityCommand): Promise<AxiosServerResponse<AssetDraft>> {
-    const url = `/action/drafts/${key}/metadata/visibility`;
+  public async updateDraftMetadata(key: string, command: CatalogueItemMetadataCommand): Promise<AxiosServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/metadata`;
 
-    return this.post<CatalogueItemVisibilityCommand, ServerResponse<AssetDraft>>(url, command);
-  }
-
-  /**
-   * Update draft samples. The draft status must be `PENDING_PROVIDER_REVIEW`
-   *
-   * If the record is locked by another user, the operation will fail.
-   *
-   * @param key
-   */
-  public async updateDraftSamples(key: string, command: CatalogueItemSamplesCommand): Promise<AxiosServerResponse<void>> {
-    const url = `/action/drafts/${key}/metadata/samples`;
-
-    return this.post<CatalogueItemSamplesCommand, ServerResponse<void>>(url, command);
+    return this.post<CatalogueItemMetadataCommand, ServerResponse<AssetDraft>>(url, command);
   }
 
   /**
