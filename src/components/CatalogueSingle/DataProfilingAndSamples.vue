@@ -294,6 +294,7 @@ import {
   CatalogueItemMetadataCommand,
   CatalogueItemDetails,
   Sample,
+  TabularSample,
 } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -449,7 +450,7 @@ export default class DataProfilingAndSamples extends Vue {
     // const index = parseInt(this.metadataDownloadFileSelection.split('_')!.pop()!.split('.')[0]) - 1;
 
     const csvArr: Record<string, string>[] = [];
-    Object.values<Array<any>>(this.samples[index])[0].forEach((v, i) => {
+    Object.values<Array<any>>(this.samples[index] as TabularSample)[0].forEach((v, i) => {
       const obj: Record<string, string> = {};
       Object.keys(this.samples[index]).forEach((x) => {
         obj[x] = `${this.samples[index][x][i]}`;

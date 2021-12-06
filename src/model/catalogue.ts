@@ -441,7 +441,92 @@ export interface Metadata {
   assetType: 'NetCDF' | 'vector' | 'raster' | 'tabular';
 }
 
-export type Sample = { [prop: string]: (string | number)[] };
+/**
+ * Tabular data sample
+ */
+export interface TabularSample {
+  [prop: string]: (string | number)[];
+}
+
+/**
+ * WMS layer sample
+ */
+export interface WmsLayerSample {
+  /**
+   * Sample bounding box
+   */
+  bbox: GeoJSON.Polygon;
+  /**
+   * Base64 encoded PNG image. Rendered as a data URL e.g.
+   * data:image/png;base64,<image>
+   */
+  image: string;
+}
+
+interface WfsLayerSampleFeature {
+  /**
+   * Object type. Always equal to `Feature`
+   */
+  type: 'Feature';
+  /**
+   * Feature unique identifier
+   */
+  id: string;
+  /**
+   * Feature geometry
+   */
+  geometry: GeoJSON.Geometry;
+  /**
+   * Feature properties
+   */
+  properties: {
+    [prop: string]: any;
+  }
+}
+
+interface WfsLayerSampleFeatureCollection {
+  /**
+   * Object type. Always equal to `FeatureCollection`
+   */
+  type: 'FeatureCollection';
+  /**
+   * Sample features
+   */
+  features: WfsLayerSampleFeature[],
+  /**
+   * Total number of features
+   */
+  totalFeatures: number;
+  /**
+   * Number of selected features
+   */
+  numberMatched: number;
+  /**
+   * Number of returned features
+   */
+  numberReturned: number;
+  /**
+   * Size (bytes) of the WFS service
+   */
+  size: number;
+}
+
+/**
+ * WFS layer sample
+ */
+export interface WfsLayerSample {
+  /**
+   * Sample bounding box
+   */
+  bbox: GeoJSON.Polygon;
+  /**
+   * Base64 encoded PNG image. Rendered as a data URL e.g.
+   * data:image/png;base64,<image>
+   */
+  data: WfsLayerSampleFeatureCollection;
+}
+
+export type Sample = TabularSample | WmsLayerSample | WfsLayerSample;
 
 export interface VectorMetadata extends Metadata {
   /**
