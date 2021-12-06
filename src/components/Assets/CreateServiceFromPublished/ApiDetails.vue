@@ -4,11 +4,11 @@
       <div class="row">
         <!-- LEFT -->
         <div class="col-md-4">
-          <div class="dashboard__form__step__title" v-if="!disabled">
+          <div class="dashboard__form__step__title">
             <h3>Create or publish an API</h3>
             <p>Create an API from a file or just publish an API you provide</p>
           </div>
-          <validation-provider v-slot="{ errors }" name="API creation method" rules="required" v-if="!disabled">
+          <validation-provider v-slot="{ errors }" name="API creation method" rules="required">
             <div class="form-group">
               <label class="control control-radio">
                 Create API from file already published in Topio
@@ -46,10 +46,14 @@
         </div>
         <!-- INHALT WORKING HERE -->
         <div class="col-md-4" v-if="creationType === 'TOPIO_DRIVE'">
-          <div class="dashboard__form__step__title">
+          <div class="dashboard__form__step__title" v-if="!disabled">
             <p>Select one data file from your topio Drive</p>
             <p v-html="`${fileApi.name}`"></p>
             <file-topio-drive :fileApi.sync="fileApi"></file-topio-drive>
+          </div>
+          <div v-else class="dashboard__form__step__title">
+            <p>Selected data file</p>
+            <asset-api-details-card :selected="true" :asset="asset"></asset-api-details-card>
           </div>
         </div>
 
@@ -124,7 +128,7 @@ export default class ApiDetails extends Vue {
 
   @Prop({ required: true }) private selectedPublishedAssetForApiCreation!: CatalogueItem | null;
 
-  @Prop({ required: true }) private apiCreationType!: CreationType | null;
+  @Prop({ required: true }) private apiCreationType!: CreationType;
 
   @Prop({ required: true }) private selectedPublishedFileForApiCreation!: DraftApiFromFileCommand | null;
 
@@ -160,7 +164,7 @@ export default class ApiDetails extends Vue {
     this.assetLocal = this.asset;
     this.serviceTypeLocal = this.serviceType;
 
-    this.creationType = CreationType.PUBLISHED_ASSET;
+    this.creationType = this.apiCreationType;
 
     this.publishedAssets = [];
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
@@ -169,16 +173,10 @@ export default class ApiDetails extends Vue {
 
   @Watch('creationType', { deep: true })
   onCreationTypeChange(creationType: CreationType): void {
-    console.log('creation type watch');
     this.$emit('update:apiCreationType', creationType);
     if (creationType === 'TOPIO_DRIVE') {
       this.selectedPublishedAssetForApiCreationLocal = null;
     }
-  }
-
-  @Watch('apiCreationType')
-  onApiCreationChange(value: CreationType): void {
-    console.log(value, 'API DETAILS');
   }
 
   /**
@@ -214,6 +212,9 @@ export default class ApiDetails extends Vue {
   }
 
   created(): void {
+    if (this.apiCreationType === 'UNDEFINED') {
+      this.creationType = CreationType.PUBLISHED_ASSET;
+    }
     this.$emit('update:apiCreationType', this.creationType);
     store.commit('setLoading', true);
     const query: ProviderDraftQuery = {
