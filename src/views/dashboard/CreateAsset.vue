@@ -5,16 +5,12 @@
       <template v-slot:body>
         <h1>Save draft?</h1>
 
-        <p class="mb-xs-10">
-          Selected file will not be saved. You will need to specify it again when completing draft creation.
-        </p>
+        <p class="mb-xs-10">Selected file will not be saved. You will need to specify it again when completing draft creation.</p>
         <p><strong>Everything else will be saved as draft.</strong></p>
       </template>
 
       <template v-slot:footer>
-        <button class="btn btn--std btn--blue ml-xs-20" @click="submitDataFileForm(true)">
-          Save Draft
-        </button>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="submitDataFileForm(true)">Save Draft</button>
       </template>
     </modal>
 
@@ -33,60 +29,30 @@
       <div class="dashboard__head">
         <h1>Add an asset</h1>
         <div class="dashboard__head__helpers">
-          <button href="#" class="btn btn--outlineblue" @click="onSaveDraft" v-if="isButtonSaveDraftShown()">
-            SAVE DRAFT
-          </button>
+          <button href="#" class="btn btn--outlineblue" @click="onSaveDraft" v-if="isButtonSaveDraftShown()">SAVE DRAFT</button>
           <a href="#" class="btn btn--outlineblue" @click="modalToShow = 'exitCreateAssetAlert'">EXIT</a>
         </div>
       </div>
 
       <div class="dashboard__form">
         <ul v-if="assetMainType !== 'API'" class="dashboard__form__nav">
-          <li>
-            <a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Contract</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Delivery</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a>
-          </li>
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Contract</a></li>
+          <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Delivery</a></li>
+          <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
+          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
 
         <ul v-else class="dashboard__form__nav">
-          <li>
-            <a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Metadata</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a>
-          </li>
-          <li>
-            <a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a>
-          </li>
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Metadata</a></li>
+          <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
+          <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
+          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
         <div class="dashboard__form__steps">
           <transition name="fade" mode="out-in">
@@ -109,42 +75,19 @@
               </template>
 
               <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
-              <review
-                ref="step7"
-                :vettingRequired.sync="asset.vettingRequired"
-                :asset="
-                  assetMainType === 'API'
-                    ? {
-                        ...selectedPublishedAssetForApiCreation,
-                        ...{
-                          contractTemplateKey: asset.contractTemplateKey,
-                          pricingModels: asset.pricingModels,
-                          spatialDataServiceType: asset.spatialDataServiceType,
-                        },
-                      }
-                    : asset
-                "
-                v-if="currentStep == 7"
-                @goToStep="goToStep"
-              ></review>
+              <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
 
               <div class="dashboard__form__errors" v-if="uploading.errors.length">
                 <ul>
-                  <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">
-                    {{ error.description }}
-                  </li>
+                  <li v-for="error in uploading.errors" v-bind:key="`error${error.code}`">{{ error.description }}</li>
                 </ul>
               </div>
             </div>
           </transition>
         </div>
         <div class="dashboard__form__navbuttons">
-          <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">
-            PREVIOUS
-          </button>
-          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">
-            {{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}
-          </button>
+          <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
+          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
     </div>
@@ -279,10 +222,7 @@ export default class CreateAsset extends Vue {
 
   currentStep = 1;
 
-  additionalResourcesToUpload: {
-    resourceCommand: AssetFileAdditionalResourceCommand;
-    file: File;
-  }[];
+  additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand; file: File }[];
 
   fileToUpload: FileToUpload;
 
@@ -736,13 +676,7 @@ export default class CreateAsset extends Vue {
         return;
       }
 
-      this.asset = {
-        ...draftAsset.command,
-        ...{
-          contractTemplateKey: this.asset.contractTemplateKey,
-          pricingModels: this.asset.pricingModels,
-        },
-      };
+      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);
