@@ -9,11 +9,23 @@
           </div>
 
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <validation-provider v-slot="{ errors }" name="Delivery method" rules="required">
               <div class="form-group">
-                <!-- todo: fix values -->
                 <label class="control control-radio">
+                  By the platform
+                  <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
+                  <input type="radio" name="delivery_method_category" v-model="deliveryMethodCategory" value="BY_THE_PLATFORM" />
+                  <div class="control_indicator"></div>
+                </label>
+                <label class="control control-radio">
+                  By own means
+                  <span>If your data is too large, updated daily, or you do not want to use our repository services, you can handle the delivery of the data asset to consumer through your own channel.</span>
+                  <input type="radio" name="delivery_method_category" v-model="deliveryMethodCategory" value="BY_OWN_MEANS" />
+                  <div class="control_indicator"></div>
+                </label>
+                <!-- todo: fix values -->
+                <!-- <label class="control control-radio">
                   By the platform
                   <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
                   <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PLATFORM" />
@@ -30,14 +42,48 @@
                   <span>Physical Provider.</span>
                   <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
                   <div class="control_indicator"></div>
-                </label>
+                </label> -->
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
               </div>
               </validation-provider>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="dashboard__form__step__title" v-if="deliveryMethodCategory">
+                <p>Select one of the following options and provide the requested information. Delivery must take place within three (3) working days following a proof of payment provided to us by the consumer.</p>
+              </div>
+              <div class="form-group" v-if="deliveryMethodCategory === 'BY_THE_PLATFORM'">
+                <label class="control control-radio">
+                  Direct upload
+                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="DIGITAL_PLATFORM" />
+                  <div class="control_indicator"></div>
+                </label>
+                <label class="control control-radio">
+                  Link to asset
+                  <input type="radio" name="delivery_method"/>
+                  <div class="control_indicator"></div>
+                </label>
+                <label class="control control-radio">
+                  Select from topio Drive
+                  <input type="radio" name="delivery_method"/>
+                  <div class="control_indicator"></div>
+                </label>
+              </div>
+              <div class="form-group" v-if="deliveryMethodCategory === 'BY_OWN_MEANS'">
+                <label class="control control-radio">
+                  Digital delivery
+                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="DIGITAL_PROVIDER" />
+                  <div class="control_indicator"></div>
+                </label>
+                <label class="control control-radio">
+                  Physical media
+                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
+                  <div class="control_indicator"></div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-4">
               <!-- <div v-if="deliveryMethod === 'DIGITAL_PLATFORM'"> -->
-              <div>
+              <div v-if="deliveryMethodLocal !== 'NONE'">
                 <h1>Upload Asset</h1>
                 <input type="file" @change="readFile($event)">
 
@@ -153,6 +199,8 @@ export default class Delivery extends Vue {
     refObserver: InstanceType<typeof ValidationObserver>,
   }
 
+  deliveryMethodCategory: string;
+
   deliveryMethodLocal: EnumDeliveryMethod;
 
   fileToUploadLocal: FileToUpload;
@@ -162,7 +210,20 @@ export default class Delivery extends Vue {
 
     this.deliveryMethodLocal = this.deliveryMethod;
 
+    const methodCategories = {
+      NONE: '',
+      DIGITAL_PLATFORM: 'BY_THE_PLATFORM',
+      DIGITAL_PROVIDER: 'BY_OWN_MEANS',
+      PHYSICAL_PROVIDER: 'BY_OWN_MEANS',
+    };
+    this.deliveryMethodCategory = methodCategories[this.deliveryMethodLocal];
+
     this.fileToUploadLocal = this.fileToUpload;
+  }
+
+  @Watch('deliveryMethodCategory')
+  onDeliveryMethodCategoryChange(): void {
+    this.deliveryMethodLocal = EnumDeliveryMethod.NONE;
   }
 
   @Watch('deliveryMethodLocal')

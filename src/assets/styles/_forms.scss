@@ -142,10 +142,7 @@
     margin: 0 auto;
     padding: 40px 0;
 
-    &--delivery {
-      max-width: 900px;
-    }
-    &--pricing {
+    &--pricing, &--delivery {
       max-width: 1100px;
     }
 
