@@ -1,4 +1,4 @@
-import { Account, Profile } from '@/model/account';
+import { Account, EnumActivationStatus, Profile } from '@/model/account';
 import { EnumRole } from '@/model/role';
 
 interface State {
@@ -7,6 +7,7 @@ interface State {
       roles: EnumRole[];
       username: string | null;
       email: string | null;
+      activationStatus: EnumActivationStatus | null;
     };
     auth: {
       token: string | null;
@@ -23,6 +24,7 @@ const initialState: State = {
     roles: [],
     username: null,
     email: null,
+    activationStatus: null,
   },
   auth: {
     token: null,
@@ -40,6 +42,7 @@ const getters = {
   hasRole: (state: State) => (role: EnumRole[]): boolean => role.some((x) => state.account.roles.includes(x)),
   isAuthenticated: (state: State): boolean => !!state.auth.token || !!state.account.profile,
   getProfile: (state: State): Profile | null => state.account.profile,
+  isAccountActivated: (state: State): boolean => state.account.activationStatus === EnumActivationStatus.COMPLETED,
   getEmail: (state: State): string | null => state.account.email,
 };
 
@@ -81,6 +84,7 @@ const mutations = {
     state.account.roles = data.roles;
     state.account.profile = data.profile;
     state.account.email = data.email;
+    state.account.activationStatus = data.activationStatus;
   },
   logout(state: State): void {
     state.auth.token = null;
@@ -88,6 +92,7 @@ const mutations = {
     state.account.roles = [];
     state.account.profile = null;
     state.account.email = null;
+    state.account.activationStatus = null;
     // Uncomment for using global axios default instance
     /*
     axios.defaults.headers = null;

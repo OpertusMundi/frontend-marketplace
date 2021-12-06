@@ -71,6 +71,10 @@ export default class Cart extends Vue {
   }
 
   goToCheckout(): void {
+    if (!store.getters.isAuthenticated) {
+      this.$router.push({ name: 'Login', params: { pathToNavigateAfterLogin: '/checkout' } });
+      return;
+    }
     this.$router.push('/checkout');
   }
 }

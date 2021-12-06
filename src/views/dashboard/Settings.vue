@@ -336,7 +336,13 @@
 
           <li
             v-if="!includeTabDueToRole('ROLE_CONSUMER')">
-            <router-link v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'" to="/become-consumer" class="btn btn--std btn--blue">become a consumer</router-link>
+            <router-link
+              v-if="!$store.getters.getProfile.consumer.draft || $store.getters.getProfile.consumer.draft.status !== 'SUBMITTED'"
+              :to="$store.getters.isAccountActivated ? '/become-consumer' : ''"
+              @click.native="$store.getters.isAccountActivated ? () => {} : $store.commit('setShownGlobalModal', 'modalPendingAccountActivation')"
+              class="btn btn--std btn--blue">
+              become a consumer
+            </router-link>
             <button disabled v-if="$store.getters.getProfile.consumer.draft && $store.getters.getProfile.consumer.draft.status === 'SUBMITTED'" class="btn btn--std btn--outlinedark">pending consumer role...</button>
           </li>
         </ul>
@@ -859,7 +865,7 @@ import en from 'vee-validate/dist/locale/en.json';
 import store from '@/store';
 import Datepicker from 'vuejs-datepicker';
 // eslint-disable-next-line
-import EnumRole from '@/model/role';
+import { EnumRole } from '@/model/role';
 import {
   CustomerDraftIndividual,
   CustomerDraftProfessional,
@@ -1006,7 +1012,7 @@ export default class DashboardHome extends Vue {
 
     this.userData = {} as Account;
 
-    this.selectedTab = 'general';
+    this.selectedTab = '';
     this.modalToShow = '';
 
     this.passwordCurrent = '';
@@ -1035,7 +1041,9 @@ export default class DashboardHome extends Vue {
 
   // TODO: add pagination to documents that support it (e.g. KYC)
 
-  mounted(): void {
+  created(): void {
+    this.selectedTab = this.$route.params.initialTab || 'general';
+
     this.setKycRole();
     this.setKycCategoriesForSelectedRole();
 

@@ -56,7 +56,6 @@ export interface AssetDraftQuery {
   type: EnumAssetType[];
 }
 
-
 export interface AssetDraft {
   /**
    * Catalogue draft id. Always equal to key property
@@ -92,6 +91,14 @@ export interface AssetDraft {
    * Date of lat update in ISO format
    */
   modifiedOn: string;
+  /**
+   * Owner account key
+   */
+  owner: string;
+  /**
+   * Draft parent asset PID
+   */
+  parentId: string | null;
   /**
    * Rejection reason if the draft has been rejected by the provider
    */

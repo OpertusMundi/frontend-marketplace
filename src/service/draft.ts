@@ -6,7 +6,7 @@ import {
 } from '@/model/response';
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
-  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand,
+  CatalogueItemMetadataCommand,
   //  Sample,
 } from '@/model/catalogue';
 import {
@@ -57,9 +57,11 @@ export default class DraftAssetApi extends Api {
    * Get a single draft by its key
    *
    * @param key
+   * @param lock True if the selected record must be also locked. If a lock already exists and
+   *             belongs to another user, an error is returned.
    */
-  public async findOne(key: string): Promise<ServerResponse<AssetDraft>> {
-    const url = `/action/drafts/${key}`;
+  public async findOne(key: string, lock = false): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}?lock=${lock}`;
 
     return this.get<ServerResponse<AssetDraft>>(url)
       .then((response: AxiosServerResponse<AssetDraft>) => {
@@ -73,9 +75,10 @@ export default class DraftAssetApi extends Api {
    * Create a new draft
    *
    * @param command
+   * @param lock True if the new record must be also locked
    */
-  public async create(command: CatalogueItemCommand, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
-    const url = '/action/drafts';
+  public async create(command: CatalogueItemCommand, lock = true, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts?lock=${lock}`;
 
     return this.post<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
@@ -87,9 +90,12 @@ export default class DraftAssetApi extends Api {
 
   /**
    * Create a new draft from existing asset
+   *
+   * @param pid
+   * @param lock True if the new record must be also locked
    */
-  public async createFromAsset(pid: string): Promise<ServerResponse<AssetDraft>> {
-    const url = '/action/drafts/asset';
+  public async createFromAsset(pid: string, lock = true): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/asset?lock=${lock}`;
 
     const command = {
       pid,
@@ -106,11 +112,12 @@ export default class DraftAssetApi extends Api {
    * Create a new API draft
    *
    * @param command
+   * @param lock True if the new record must be also locked
    */
   public async createApi(
-    command: DraftApiFromAssetCommand | DraftApiFromFileCommand, config?: AxiosRequestConfig,
+    command: DraftApiFromAssetCommand | DraftApiFromFileCommand, lock = true, config?: AxiosRequestConfig,
   ): Promise<ServerResponse<AssetDraft>> {
-    const url = '/action/drafts/api';
+    const url = `/action/drafts/api?lock=${lock}`;
 
     return this.post<DraftApiFromAssetCommand | DraftApiFromFileCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
@@ -128,9 +135,11 @@ export default class DraftAssetApi extends Api {
    *
    * @param key
    * @param command
+   * @param lock True if the record must remain locked after a successful save operation.
+   *             If a lock already exists and belongs to another user, an error is returned.
    */
-  public async update(key: string, command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
-    const url = `/action/drafts/${key}`;
+  public async update(key: string, command: CatalogueItemCommand, lock = false): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}?lock=${lock}`;
 
 
     return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
@@ -147,6 +156,8 @@ export default class DraftAssetApi extends Api {
    * If a resource file or an additional file resource entry is deleted from {@link CatalogueItemCommand#resources}
    * or {@link CatalogueItemCommand#additionalResources} arrays, it will be also be deleted at the server.
    *
+   * The lock on the record is also automatically released.
+   *
    * @param key
    * @param command
    */
@@ -162,30 +173,24 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
-   * Update draft metadata property visibility. The draft status
-   * must be `PENDING_PROVIDER_REVIEW`
+   * Update draft metadata
+   *
+   * The draft status must be either `PENDING_PROVIDER_REVIEW`
+   *
+   * If the record is locked by another user, the operation will fail.
    *
    * @param key
    */
-  public async updateDraftMetadataVisibility(key: string, command: CatalogueItemVisibilityCommand): Promise<AxiosServerResponse<AssetDraft>> {
-    const url = `/action/drafts/${key}/metadata/visibility`;
+  public async updateDraftMetadata(key: string, command: CatalogueItemMetadataCommand): Promise<AxiosServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/metadata`;
 
-    return this.post<CatalogueItemVisibilityCommand, ServerResponse<AssetDraft>>(url, command);
-  }
-
-  /**
-   * Update draft samples. The draft status must be `PENDING_PROVIDER_REVIEW`
-   *
-   * @param key
-   */
-  public async updateDraftSamples(key: string, command: CatalogueItemSamplesCommand): Promise<AxiosServerResponse<void>> {
-    const url = `/action/drafts/${key}/metadata/samples`;
-
-    return this.post<CatalogueItemSamplesCommand, ServerResponse<void>>(url, command);
+    return this.post<CatalogueItemMetadataCommand, ServerResponse<AssetDraft>>(url, command);
   }
 
   /**
    * Accept draft
+   *
+   * If the record is locked by another user, the operation will fail.
    *
    * @param key
    */
@@ -202,6 +207,8 @@ export default class DraftAssetApi extends Api {
 
   /**
    * Reject draft
+   *
+   * If the record is locked by another user, the operation will fail.
    *
    * @param key
    * @param reason
@@ -220,6 +227,8 @@ export default class DraftAssetApi extends Api {
   /**
    * Delete draft. Draft status must be {@link EnumDraftStatus.DRAFT}
    *
+   * If the record is locked by another user, the operation will fail.
+   *
    * @param key
    */
   public async deleteDraft(key: string): Promise<AxiosServerResponse<void>> {
@@ -231,6 +240,8 @@ export default class DraftAssetApi extends Api {
 
   /**
    * Upload resource file
+   *
+   * If the record is locked by another user, the operation will fail.
    *
    * @param key Draft unique key
    * @param resource File to upload
@@ -259,12 +270,14 @@ export default class DraftAssetApi extends Api {
   /**
    * Upload additional file resource
    *
+   * If the record is locked by another user, the operation will fail.
+   *
    * @param key Draft unique key
    * @param resource File to upload
    * @param command Command object with resource metadata
    */
   public async uploadAdditionalResource(
-    key: string, resource: File, command: AssetFileAdditionalResourceCommand,
+    key: string, resource: File, command: AssetFileAdditionalResourceCommand, config?: AxiosRequestConfig,
   ): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}/additional-resources`;
 
@@ -276,6 +289,7 @@ export default class DraftAssetApi extends Api {
     }));
 
     return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
+      ...config,
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
@@ -294,5 +308,20 @@ export default class DraftAssetApi extends Api {
     const url = `/action/drafts/${draftKey}/additional-resources/${resourceKey}`;
 
     return this.get(url, { responseType: 'blob' });
+  }
+
+  /**
+   * Release the record lock
+   *
+   * If the record is not locked, the request is ignored.
+   * If a lock exists and belongs to another user, an error is returned.
+   *
+   * @param key
+   */
+  public async releaseLock(key: string): Promise<AxiosServerResponse<void>> {
+    const url = `/action/drafts/${key}/lock`;
+
+
+    return this.delete<ServerResponse<void>>(url);
   }
 }

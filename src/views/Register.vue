@@ -73,9 +73,9 @@ import { required, email, confirmed } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import store from '@/store';
 import AccountApi from '@/service/account';
-import ProfileApi from '@/service/profile';
-import { ServerResponse } from '@/model';
-import { Account, AccountCommandDto, AccountProfileCommand } from '@/model/account';
+import { fetchUserProfileAndCart } from '@/helper/user';
+// import { ServerResponse } from '@/model';
+import { PlatformAccountCommand, AccountProfileCommand } from '@/model/account';
 
 extend('required', required);
 extend('email', email);
@@ -92,9 +92,7 @@ export default class Login extends Vue {
 
   accountApi: AccountApi;
 
-  profileApi: ProfileApi;
-
-  account: AccountCommandDto;
+  account: PlatformAccountCommand;
 
   termsAccepted: boolean;
 
@@ -110,7 +108,6 @@ export default class Login extends Vue {
     super();
 
     this.accountApi = new AccountApi();
-    this.profileApi = new ProfileApi();
 
     this.termsAccepted = false;
     this.loading = false;
@@ -161,16 +158,13 @@ export default class Login extends Vue {
             // Set CSRF Token
             const { csrfToken: token, csrfHeader: header } = loginResponse.result;
             store.commit('setCsrfToken', { token, header });
-            // Load user data
-            this.profileApi.getProfile().then((accountResponse: ServerResponse<Account>) => {
-              if (accountResponse.success) {
-                store.commit('setUserData', accountResponse.result);
+
+            fetchUserProfileAndCart().then((res) => {
+              if (res.success) {
                 this.loading = false;
                 this.$router.push('/confirmemail');
               } else {
-                // TODO: Handle error
-                console.log('error getting profile', accountResponse);
-                this.loading = false;
+                console.log('error fetching user profile and cart');
               }
             });
           } else {

@@ -1,3 +1,5 @@
+import { EnumContractIcon } from '@/model/contract';
+
 export enum EnumContractStatus {
   DRAFT = 'DRAFT',
   HISTORY = 'HISTORY',
@@ -22,9 +24,19 @@ export enum EnumProviderContractSortField {
   VERSION = 'VERSION',
 }
 
-export interface SubOption {
-  id: number;
+export interface ContractSectionSubOption {
   body: string;
+  bodyHtml: string;
+}
+
+export interface ContractSectionOption {
+  body: string;
+  bodyHtml: string;
+  icon: EnumContractIcon;
+  mutexSuboptions: boolean | null;
+  shortDescription: string;
+  subOptions: ContractSectionSubOption[];
+  summary: string;
 }
 
 export interface MasterSection {
@@ -35,11 +47,7 @@ export interface MasterSection {
   variable: boolean;
   optional: boolean;
   dynamic: boolean;
-  options: string[];
-  styledOptions: string[];
-  subOptions: { [key: number]: SubOption[] };
-  summary?: string[];
-  icons?: string[];
+  options: ContractSectionOption[];
   descriptionOfChange: string;
 }
 
@@ -72,9 +80,9 @@ export interface ProviderTemplateSection {
    */
   option: number | null;
   /**
-   * Sub-option identifier
+   * Sub-option identifiers
    */
-  subOption: number | null;
+  subOption: number[] | null;
 }
 
 export interface ProviderTemplateContract {
@@ -83,7 +91,7 @@ export interface ProviderTemplateContract {
    */
   key: string;
   /**
-   * Master template ke
+   * Master template key
    */
   templateKey: string;
   /**

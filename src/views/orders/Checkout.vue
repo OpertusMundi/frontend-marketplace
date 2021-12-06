@@ -135,13 +135,18 @@
                     <hr>
                     <validation-provider v-slot="{ errors }" name="Card" rules="required">
                       <div class="form-group">
-                        <div v-for="card in availableCards" :key="card.id">
-                          <label class="control control-radio">
-                            {{ card.alias }}
-                            <input type="radio" name="asset_type" :value="card.id" v-model="selectedCard" />
-                            <div class="control_indicator"></div>
-                          </label>
-                        </div>
+                        <template v-if="availableCards && !availableCards.length">
+                          <router-link :to="{ name: 'Settings', params: { initialTab: 'paymentMethods' } }" class="btn btn--std btn--blue">Add Payment Method</router-link>
+                        </template>
+                        <template v-else>
+                          <div v-for="card in availableCards" :key="card.id">
+                            <label class="control control-radio">
+                              {{ card.alias }}
+                              <input type="radio" name="asset_type" :value="card.id" v-model="selectedCard" />
+                              <div class="control_indicator"></div>
+                            </label>
+                          </div>
+                        </template>
                         <!-- <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div> -->
                         <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">Card is required</span></div>
                       </div>
@@ -155,7 +160,10 @@
             <validation-observer ref="step2">
               <div class="dashboard__form__step dashboard__form__step--full-width" v-if="currentStep == 2">
                 <div v-if="isVettingRequired" class="row flex align-items-center justify-content-center">
-                  <h3>A purchase request has been sent to vendor. Approval is pending.</h3>
+                  <div class="flex justify-content-center" style="text-align: center;">
+                    <h4>In order for the transaction to proceed, the supplier must first approve your purchase.</h4>
+                    <h4 class="mt-xs-20">If the supplier approves your request, your order will be processed automatically.</h4>
+                  </div>
                 </div>
                 <div v-else class="row">
                   <div class="col-md-5">
@@ -312,7 +320,7 @@
           <button class="btn--std btn--blue" @click.prevent="previousStep()" v-if="currentStep > 1">previous</button>
 
           <router-link v-if="mode === 'CART_CHECKOUT' && currentStep === 2 && isVettingRequired" to="/dashboard/purchases" class="btn btn--std btn--blue">VIEW PURCHASES</router-link>
-          <button v-else class="btn btn--std btn--blue" :disabled="currentStep === 2 && !isAllContractsAccepted()" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'place order' : 'next' }}</button>
+          <button v-else class="btn btn--std btn--blue" :disabled="isBtnNextDisabled()" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'place order' : 'next' }}</button>
         </div>
       </div>
     </div>
@@ -489,6 +497,12 @@ export default class Checkout extends Vue {
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');
+  }
+
+  isBtnNextDisabled(): boolean {
+    if (this.availableCards && !this.availableCards.length) return true;
+    if (this.currentStep === 2 && !this.isAllContractsAccepted()) return true;
+    return false;
   }
 
   onContractAccept(): void {

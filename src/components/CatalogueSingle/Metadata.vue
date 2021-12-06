@@ -21,7 +21,7 @@
               <p><strong>Abstract:</strong><span>{{ catalogueItem.abstract }}</span></p>
               <p><strong>Type:</strong><span>{{ catalogueItem.type }}</span></p>
               <p><strong>Format:</strong><span>{{ catalogueItem.spatialDataServiceType }}</span></p>
-              <p><strong>Language:</strong><span>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language).name }}</span></p>
+              <p><strong>Language:</strong><span>{{ catalogueItem.language ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language).name : '' }}</span></p>
               <p><strong>Resource locator:</strong><span>{{ catalogueItem.resourceLocator }}</span></p>
               <p><strong>Version:</strong><span>{{ catalogueItem.version }}</span></p>
               <!-- <p><strong>Data coupled resource</strong><span>{{  }}</span></p> -->
@@ -63,9 +63,9 @@
               <p><strong>Publisher E-mail:</strong><span>{{ catalogueItem.publisherEmail }}</span></p>
               <!-- <p><strong>Additional resources:</strong><span>{{ catalogueItem.additionalResources }}</span></p> -->
               <p><strong>Public access limitations:</strong><span>{{ catalogueItem.publicAccessLimitations }}</span></p>
-              <p><strong>Metadata language:</strong><span>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.metadataLanguage).name }}</span></p>
+              <p><strong>Metadata language:</strong><span>{{ catalogueItem.metadataLanguage ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.metadataLanguage).name : '' }}</span></p>
               <p><strong>Metadata version:</strong><span>{{ catalogueItem.version }}</span></p>
-              <p><strong>Metadata date:</strong><span>{{ formatDate(catalogueItem.metadataDate) }}</span></p>
+              <p><strong>Metadata date:</strong><span>{{ catalogueItem.metadataDate ? formatDate(catalogueItem.metadataDate) : '' }}</span></p>
             </div>
           </li>
         </ul>

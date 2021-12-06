@@ -4,6 +4,7 @@ import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { Provider } from '@/model/account';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
+import { EnumContractIcon, EnumContractIconCategory } from '@/model/contract';
 
 export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
@@ -440,7 +441,92 @@ export interface Metadata {
   assetType: 'NetCDF' | 'vector' | 'raster' | 'tabular';
 }
 
-export type Sample = { [prop: string]: (string | number)[] };
+/**
+ * Tabular data sample
+ */
+export interface TabularSample {
+  [prop: string]: (string | number)[];
+}
+
+/**
+ * WMS layer sample
+ */
+export interface WmsLayerSample {
+  /**
+   * Sample bounding box
+   */
+  bbox: GeoJSON.Polygon;
+  /**
+   * Base64 encoded PNG image. Rendered as a data URL e.g.
+   * data:image/png;base64,<image>
+   */
+  image: string;
+}
+
+interface WfsLayerSampleFeature {
+  /**
+   * Object type. Always equal to `Feature`
+   */
+  type: 'Feature';
+  /**
+   * Feature unique identifier
+   */
+  id: string;
+  /**
+   * Feature geometry
+   */
+  geometry: GeoJSON.Geometry;
+  /**
+   * Feature properties
+   */
+  properties: {
+    [prop: string]: any;
+  }
+}
+
+interface WfsLayerSampleFeatureCollection {
+  /**
+   * Object type. Always equal to `FeatureCollection`
+   */
+  type: 'FeatureCollection';
+  /**
+   * Sample features
+   */
+  features: WfsLayerSampleFeature[],
+  /**
+   * Total number of features
+   */
+  totalFeatures: number;
+  /**
+   * Number of selected features
+   */
+  numberMatched: number;
+  /**
+   * Number of returned features
+   */
+  numberReturned: number;
+  /**
+   * Size (bytes) of the WFS service
+   */
+  size: number;
+}
+
+/**
+ * WFS layer sample
+ */
+export interface WfsLayerSample {
+  /**
+   * Sample bounding box
+   */
+  bbox: GeoJSON.Polygon;
+  /**
+   * Base64 encoded PNG image. Rendered as a data URL e.g.
+   * data:image/png;base64,<image>
+   */
+  data: WfsLayerSampleFeatureCollection;
+}
+
+export type Sample = TabularSample | WmsLayerSample | WfsLayerSample;
 
 export interface VectorMetadata extends Metadata {
   /**
@@ -813,31 +899,6 @@ export interface CatalogueItem extends BaseCatalogueItem {
   statistics: CatalogueItemStatistics;
 }
 
-export enum EnumContractIcon {
-  AlterationNotPermitted = 'AlterationNotPermitted',
-  AlterationPermitted = 'AlterationPermitted',
-  CommercialUseNotPermitted = 'CommercialUseNotPermitted',
-  CommercialUsePermitted = 'CommercialUsePermitted',
-  DeliveredByTopio = 'DeliveredByTopio',
-  DeliveredByVendor = 'DeliveredByVendor',
-  DigitalDelivery = 'DigitalDelivery',
-  PhysicalDelivery = 'PhysicalDelivery',
-  ThirdPartyNotPermitted = 'ThirdPartyNotPermitted',
-  ThirdPartyPermitted = 'ThirdPartyPermitted',
-  UpdatesNotIncluded = 'UpdatesNotIncluded',
-  UpdatesIncluded = 'UpdatesIncluded',
-  WarrantyNotProvided = 'WarrantyNotProvided',
-  WarrantyProvided = 'WarrantyProvided',
-  NoRestrictionsWorldwide = 'NoRestrictionsWorldwide',
-  Geomarketing = 'Geomarketing',
-}
-
-export enum EnumContractIconCategory {
-  Terms = 'Terms',
-  Countries = 'Countries',
-  Restrictions = 'Restrictions',
-}
-
 export interface ContractTerm {
   /**
    * Icon
@@ -1040,24 +1101,28 @@ export interface CatalogueHarvestImportCommand {
 
 export type CatalogueQueryResponse = ServerResponse<QueryResultPage<CatalogueItem>>;
 
-export interface CatalogueItemVisibilityCommand {
+export interface CatalogueItemMetadataCommand {
   /**
    * Resource key
    */
   resourceKey: string;
   /**
-   * Controls automated metadata property visibility. Selected properties are hidden.
+   * Samples as a JSON object. If property is set to `null`, sample data is not updated.
    */
-  visibility: string[];
-}
-
-export interface CatalogueItemSamplesCommand {
+  samples?: Sample[] | null;
   /**
-   * Resource key
+   * Areas of interest (bounding boxes) for creating samples for WMS or WFS layers.
+   * If the property is set to `null`, no sampling operation is executed. This property
+   * is applicable only to assets of type `SERVICE` with property `spatialDataServiceType`
+   * in [`WMS`, `WFS`]. The sampling is performed after the provider accepts a draft
+   * and replaces any data that is either already computed by the profiler service or
+   * set by the `samples` property.
    */
-  resourceKey: string;
+  sampleAreas?: GeoJSON.Polygon[] | null;
   /**
-   * Sample data
+   * Controls automated metadata property visibility. The specified properties are hidden.
+   * If the property is set to `null`, the metadata is not updated. An empty array will
+   * make all metadata properties visible.
    */
-  data: Sample[];
+  visibility?: string[] | null;
 }

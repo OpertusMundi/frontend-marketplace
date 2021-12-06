@@ -9,11 +9,11 @@
     <transition name="fade" mode="out-in">
       <app-footer v-if="!$store.getters.isLoading && showFooter"></app-footer>
     </transition>
-    <!-- <transition name="fade" mode="out-in">
-      <div class="loader" v-if="$store.getters.isLoading"></div>
-    </transition> -->
     <transition name="fade" mode="out-in">
       <loader v-if="$store.getters.isLoading && !noLoaderRoutes.includes($route.name)"></loader>
+    </transition>
+    <transition name="fade" mode="out-in">
+      <global-modals v-if="$store.getters.getShownGlobalModal"></global-modals>
     </transition>
   </div>
 </template>
@@ -26,19 +26,26 @@ import store from '@/store';
 import AccountApi from '@/service/account';
 import ConfigurationApi from '@/service/config';
 import CartApi from '@/service/cart';
-import ProfileApi from '@/service/profile';
+
+import { fetchUserProfileAndCart } from '@/helper/user';
 
 import {
-  Configuration, Account, ServerResponse, LogoutResult, Cart,
+  Configuration, ServerResponse, LogoutResult,
 } from '@/model';
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
+import GlobalModals from '@/components/GlobalModals.vue';
 
 @Component({
-  components: { AppHeader, AppFooter, Loader },
+  components: {
+    AppHeader,
+    AppFooter,
+    Loader,
+    GlobalModals,
+  },
 })
 export default class App extends Vue {
   apiUrl = `${process.env.VUE_APP_API_GATEWAY_URL}/swagger-ui/index.html?configUrl=/api-docs/swagger-config`;
@@ -46,8 +53,6 @@ export default class App extends Vue {
   accountApi: AccountApi;
 
   configApi: ConfigurationApi;
-
-  profileApi: ProfileApi;
 
   cartApi: CartApi;
 
@@ -75,9 +80,8 @@ export default class App extends Vue {
     this.accountApi = new AccountApi();
     this.configApi = new ConfigurationApi();
     this.cartApi = new CartApi();
-    this.profileApi = new ProfileApi();
 
-    this.noHeader = ['Login', 'Register'];
+    this.noHeader = ['Login', 'Register', 'OrganisationalAccountJoin'];
     this.noHeaderBgArray = ['Home', 'CatalogueSingle', 'OrderThankYou'];
     // this.noLoaderRoutes = ['Home', 'CatalogueSingle'];
     this.noLoaderRoutes = ['Home'];
@@ -126,6 +130,8 @@ export default class App extends Vue {
 
       console.log('handle auth change', this.$route.name);
 
+      store.commit('setCartItems', null);
+
       if (excludeRedirectionToHome.includes(this.$route.name as string)) return;
 
       if (this.$route.name !== name) this.$router.push({ name });
@@ -152,49 +158,40 @@ export default class App extends Vue {
         store.commit('setConfiguration', {
           configuration: configResponse.result,
         });
-        // Check if user is authenticated
-        this.profileApi
-          .getProfile()
-          .then((profileResponse: ServerResponse<Account>) => {
-            if (profileResponse.success) {
-              store.commit('setUserData', profileResponse.result);
-            } else {
-              console.log('unsuccessful profile fetching');
-              // this.logout();
-            }
-          })
-          .catch((error: AxiosError) => {
-            console.log('getProfile error', error);
-            // this.logout();
-          });
+
+        fetchUserProfileAndCart().then((res) => {
+          if (res.success) {
+            console.log('fetched user profile and cart');
+            return;
+          }
+          console.log('could not fetch user profile and cart');
+        });
       })
       .catch((err) => {
         console.log('getConfiguration error', err);
         // store.commit('setLoading', false);
       });
-
-    this.getCartItems();
   }
 
   toggleMobileMenu(status: boolean): void {
     this.showMenuMobile = status;
   }
 
-  getCartItems(): void {
-    this.cartApi
-      .getCart()
-      .then((cartResponse: ServerResponse<Cart>) => {
-        if (cartResponse.success) {
-          store.commit('setCartItems', cartResponse.result);
-        } else {
-          // TODO: Handle error
-          console.error('cannot add item to cart!');
-        }
-      })
-      .catch((err) => {
-        console.log('getCartItems error: ', err);
-      });
-  }
+  // getCartItems(): void {
+  //   this.cartApi
+  //     .getCart()
+  //     .then((cartResponse: ServerResponse<Cart>) => {
+  //       if (cartResponse.success) {
+  //         store.commit('setCartItems', cartResponse.result);
+  //       } else {
+  //         // TODO: Handle error
+  //         console.error('cannot add item to cart!');
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log('getCartItems error: ', err);
+  //     });
+  // }
 
   logout(): void {
     const router = this.$router;

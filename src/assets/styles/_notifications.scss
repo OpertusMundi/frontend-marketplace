@@ -23,21 +23,25 @@
             flex-direction: column;
             padding: 10px 10px;
         }
+    }
 
-        &__title {
+    &__title {
+        font-weight: bold;
+        font-size: em(16);
+    }
+
+    &__text {
+        margin-top: 2px;
+        font-size: em(16);
+
+        &--bold {
             font-weight: bold;
-            font-size: em(16);
         }
+    }
 
-        &__text {
-            margin-top: 2px;
-            font-size: em(16);
-        }
-
-        &__moment {
-            font-size: em(12);
-            margin-top: 5px;
-        }
+    &__moment {
+        font-size: em(12);
+        margin-top: 5px;
     }
 
     &__btn_mark_all_as_read {

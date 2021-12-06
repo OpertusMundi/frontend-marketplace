@@ -43,6 +43,7 @@
     showCancelButton?: boolean
     showCloseButton?: boolean
     closeOnClickOutside?: boolean
+    withTransition?: boolean
     title: string
     modalId: string
     inputs: {
@@ -68,7 +69,7 @@
 -->
 
 <template>
-  <transition name="fade">
+  <transition :name="withTransition ? 'fade' : ''">
     <div class="modal__wrapper" v-if="show" @click="onClickOutside">
       <div class="modal" @click.stop>
         <div v-if="showCloseButton" class="mb-xs-40">
@@ -137,6 +138,8 @@ export default class Modal extends Vue {
   @Prop({ default: true }) private showCloseButton!: boolean;
 
   @Prop({ default: true }) private closeOnClickOutside!: boolean;
+
+  @Prop({ default: true }) private withTransition!: boolean;
 
   // eslint-disable-next-line
   readFile(i: number, e): void {

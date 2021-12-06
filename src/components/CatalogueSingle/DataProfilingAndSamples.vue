@@ -370,7 +370,10 @@ import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 import {
-  CatalogueItemVisibilityCommand, CatalogueItemSamplesCommand, CatalogueItemDetails, Sample,
+  CatalogueItemMetadataCommand,
+  CatalogueItemDetails,
+  Sample,
+  TabularSample,
 } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -538,7 +541,7 @@ export default class DataProfilingAndSamples extends Vue {
     // const index = parseInt(this.metadataDownloadFileSelection.split('_')!.pop()!.split('.')[0]) - 1;
 
     const csvArr: Record<string, string>[] = [];
-    Object.values<Array<any>>(this.samples[index])[0].forEach((v, i) => {
+    Object.values<Array<any>>(this.samples[index] as TabularSample)[0].forEach((v, i) => {
       const obj: Record<string, string> = {};
       Object.keys(this.samples[index]).forEach((x) => {
         obj[x] = `${this.samples[index][x][i]}`;
@@ -699,12 +702,12 @@ export default class DataProfilingAndSamples extends Vue {
     } else {
       fieldsToHide = this.hiddenMetadata && this.hiddenMetadata.length ? this.hiddenMetadata.filter((x) => x !== field) : [];
     }
-    const visibility: CatalogueItemVisibilityCommand = {
+    const visibility: CatalogueItemMetadataCommand = {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
       visibility: fieldsToHide,
     };
-    this.draftAssetApi.updateDraftMetadataVisibility(key, visibility).then((hideFieldResponse) => {
+    this.draftAssetApi.updateDraftMetadata(key, visibility).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
       this.hiddenMetadata = hideFieldResponse.data.result.command.visibility;
       store.commit('setLoading', false);
@@ -762,11 +765,11 @@ export default class DataProfilingAndSamples extends Vue {
     samplesData[i] = this.tempSamples[i];
     console.log('k', key);
     console.log(samplesData);
-    const samples: CatalogueItemSamplesCommand = {
+    const samples: CatalogueItemMetadataCommand = {
       resourceKey: this.metadata.key,
-      data: samplesData,
+      samples: samplesData,
     };
-    this.draftAssetApi.updateDraftSamples(key, samples).then((updateSamplesResponse) => {
+    this.draftAssetApi.updateDraftMetadata(key, samples).then((updateSamplesResponse) => {
       if (updateSamplesResponse.data.success) {
         console.log('successfully updated samples!', updateSamplesResponse);
         this.indexesOfReplacedSamples = this.indexesOfReplacedSamples.filter((x) => x !== i);

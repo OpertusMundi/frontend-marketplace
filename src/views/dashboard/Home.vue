@@ -10,7 +10,13 @@
       <div class="row mb-md-100">
         <div class="col-md-6">
           <h3 class="mb-xs-20">Latest purchases</h3>
-          <router-link v-if="!isConsumer" to="/become-consumer" class="btn btn--std btn--outlineblue">become a consumer</router-link>
+          <router-link
+            v-if="!isConsumer"
+            :to="$store.getters.isAccountActivated ? '/become-consumer' : ''"
+            @click.native="$store.getters.isAccountActivated ? () => {} : $store.commit('setShownGlobalModal', 'modalPendingAccountActivation')"
+            class="btn btn--std btn--outlineblue">
+            become a consumer
+          </router-link>
           <div v-else>
             <purchase-card v-for="(purchase, i) in latestPurchases" :key="purchase.key" :purchase="purchase" :index="i + 1"></purchase-card>
             <div v-if="latestPurchases && latestPurchases.length === 0">
