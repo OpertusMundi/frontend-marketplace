@@ -25,18 +25,6 @@
                     <input type="radio" name="asset_delivery" v-model="byOwnMeans" value="MEANS" />
                     <div class="control_indicator"></div>
                   </label>
-                  <!-- <label class="control control-radio">
-                    Digital Provider
-                    <span>Digital Provider</span>
-                    <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PROVIDER" />
-                    <div class="control_indicator"></div>
-                  </label> -->
-                  <!-- <label class="control control-radio">
-                    Physical Provider
-                    <span>Physical Provider.</span>
-                    <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
-                    <div class="control_indicator"></div>
-                  </label> -->
                   <div class="errors" v-if="errors">
                     <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
                   </div>
@@ -48,7 +36,7 @@
               <div class="dashboard__form__step__title">
                 <p>Select specifically how the platform will have access to your asset</p>
               </div>
-              <validation-provider v-slot="{ errors }" name="Platform access to your asset" rules="required">
+              <validation-provider v-slot="{ errors }" mode="passive" name="Platform access to your asset" rules="required">
                 <div class="form-group">
                   <label class="control control-radio">
                     Direct upload
@@ -75,7 +63,7 @@
               <div class="dashboard__form__step__title">
                 <p>Select one of the following options and provide the requested information. Delivery must take place within three (3) working days following a proof of payment provided to us by the consumer.</p>
               </div>
-              <validation-provider v-slot="{ errors }" name="Delivery type" rules="required">
+              <validation-provider v-slot="{ errors }" mode="passive" name="Delivery type" rules="required">
                 <div class="form-group">
                   <label class="control control-radio">
                     Digital delivery
@@ -131,7 +119,7 @@
                 <p>Select an asset from your topio Drive. ssss</p>
               </div>
               <div>
-                <file-topio-drive :fileApi.sync="fileApi"></file-topio-drive>
+                <file-topio-drive :fileTopioDrive.sync="fileTopioDrive"></file-topio-drive>
               </div>
             </div>
             <div v-if="deliveryMethodLocal === 'DIGITAL_PROVIDER' && byOwnMeans === 'MEANS'" class="col-md-4">
@@ -149,9 +137,9 @@
               </div>
               <div class="form-group">
                 <label for="">Type of physical media</label>
-                <input type="text" name="typeMedia" class="form-group__text" id="" v-model="typeMedia" />
+                <input type="text" name="typeMedia" class="form-group__text" id="" />
                 <label for="">Number of objects</label>
-                <input type="text" name="numberObjects" class="form-group__text" id="" v-model="numberObjects" />
+                <input type="text" name="numberObjects" class="form-group__text" id="" />
                 <label for="">Notes for buyer</label>
                 <textarea class="form-group__text" cols="20" rows="5" value="notes for buyer"></textarea>
               </div>
@@ -261,7 +249,7 @@ export default class Delivery extends Vue {
 
   linkToAsset: string | null;
 
-  fileApi: any | null;
+  fileTopioDrive: any | null;
 
   constructor() {
     super();
@@ -276,36 +264,27 @@ export default class Delivery extends Vue {
 
     this.linkToAsset = '';
 
-    this.fileApi = {};
+    this.fileTopioDrive = {};
   }
 
   @Watch('deliveryMethodLocal')
-  onDeliveryMethodChange(deliveryMethod: string): void {
+  onDeliveryMethodChange(deliveryMethod: EnumDeliveryMethod): void {
     this.$emit('update:deliveryMethod', deliveryMethod);
-    console.log(deliveryMethod, '==> deliveryMethodLocal');
-  }
-
-  @Watch('byPlatform')
-  onbyPlatform(value): void {
-    console.log(value);
   }
 
   @Watch('byOwnMeans')
-  onByOwnMeans(value): void {
+  onByOwnMeans(value: string): void {
     if (value === 'MEANS') {
-      console.log(value, 'MEANS PRINT CONSOLE');
       this.deliveryMethodLocal = null;
+      this.byPlatform = null;
     } else {
-      console.log(value, 'EMIT VALUE*****');
-      this.$emit('update:deliveryMethod', value);
+      this.$emit('update:deliveryMethod', EnumDeliveryMethod.DIGITAL_PLATFORM);
     }
-    console.log(value, 'RADIO VALUES');
   }
 
-  @Watch('fileApi', { deep: true })
-  onFileApiChange(fileApi: DraftApiFromFileCommand | null): void {
-    console.log(fileApi, 'topio drive');
-    // this.$emit('update:selectedFile', fileApi);
+  @Watch('fileTopioDrive', { deep: true })
+  onfileTopioDriveChange(fileTopioDrive: DraftApiFromFileCommand | null): void {
+    console.log(fileTopioDrive, 'topio drive');
   }
 
   // eslint-disable-next-line

@@ -544,10 +544,12 @@ export default class CreateAsset extends Vue {
   }
 
   async createDraft(): Promise<AssetDraft> {
+    console.log(this.asset, 'ASSET ON CREATE');
     const draftAssetResponse = await this.draftAssetApi.create(this.asset);
+
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
-    console.log('err', draftAssetResponse);
+    console.log('err => create draft', draftAssetResponse);
     this.showUploadingMessage(true, 'An error occurred.');
     throw new Error('error');
   }
@@ -685,6 +687,8 @@ export default class CreateAsset extends Vue {
   }
 
   async submitDataFileForm(isDraft = false): Promise<void> {
+    console.log('DATA FILE');
+    console.log(this.fileToUpload.isFileSelected, 'IS FILE SELECTED');
     try {
       this.modalToShow = '';
 
@@ -700,9 +704,12 @@ export default class CreateAsset extends Vue {
       }
 
       if (this.isEditingExistingDraft) {
+        console.log('EDITING DRAFT');
         draftAsset = await this.saveDraftAfterEditingExistingDraft();
       } else {
+        console.log('GO TO CREATE');
         draftAsset = await this.createDraft();
+        console.log(draftAsset, 'draft asset => go to create');
       }
       this.asset = draftAsset.command;
 
@@ -727,6 +734,7 @@ export default class CreateAsset extends Vue {
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);
+
       this.showUploadingMessage(true, 'An error occurred.');
     }
   }
