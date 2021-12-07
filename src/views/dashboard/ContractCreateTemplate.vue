@@ -190,11 +190,10 @@ export default class ContractCreateTemplate extends Vue {
   saveDraft(): void {
     store.commit('setLoading', true);
     const masterSections: any = this.selectedMasterContract?.sections.slice(this.templateContract.sections.length);
-    const map = masterSections.map((obj: { id: number; optional: boolean }) => ({
+    const map = masterSections.map((obj: { id: number }) => ({
       masterSectionId: obj.id,
-      optional: null,
-      option: undefined,
-      subOption: null,
+      option: 0,
+      subOption: [],
     }));
     this.templateContract.sections = [...this.templateContract.sections, ...map];
     if (this.isNewDraft) {

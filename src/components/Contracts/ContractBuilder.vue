@@ -20,11 +20,22 @@
             </div>
             <div class="contract-builder__main__content">
               <div class="contract-builder__options" v-if="this.selectedSection.dynamic && this.selectedSection.variable">
-                <label class="control control-radio" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`">
-                  <strong v-html="option.bodyHtml"></strong>
-                  <input :disabled="disabled" type="radio" v-model="selectedSectionValue" :value="index" />
-                  <div class="control_indicator"></div>
-                </label>
+                <template v-for="(option, index) in selectedSection.options">
+                  <label class="control control-radio" v-bind:key="`option_${index}`">
+                    <strong v-html="option.bodyHtml"></strong>
+                    <input :disabled="disabled" type="radio" v-model="selectedSectionValue" :value="index" />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <div style="padding-left:40px;" v-if="!option.mutexSuboptions && selectedSectionValue === 1" v-bind:key="`subOption_${index}`">
+                    <template v-for="(subOption, index) in option.subOptions">
+                      <label class="control control-radio" :key="`suboption-${index}`">
+                        <strong v-html="option.bodyHtml"></strong>
+                        <input :disabled="disabled" type="checkbox" v-model="selectedSectionValueSubOption" :value="index" />
+                        <div class="control_indicator"></div>
+                      </label>
+                    </template>
+                  </div>
+                </template>
               </div>
               <div class="contract-builder__options" v-else-if="this.selectedSection.optional && this.selectedSection.variable">
                 <div class="contract-builder__option" v-for="(option, index) in selectedSection.options" v-bind:key="`option_${index}`" v-html="option.bodyHtml"></div>
@@ -100,6 +111,8 @@ export default class ContractBuilder extends Vue {
 
   templateFilled: boolean | null;
 
+  selectedSectionValueSubOption: any;
+
   constructor() {
     super();
 
@@ -112,6 +125,7 @@ export default class ContractBuilder extends Vue {
     this.currentSelectionValid = false;
     this.templateFilled = null;
     this.templateContractC = {};
+    this.selectedSectionValueSubOption = [];
   }
 
   created(): void {
@@ -137,6 +151,7 @@ export default class ContractBuilder extends Vue {
 
   nextSection(): void {
     const currentSectionIndex = this.masterContract?.sections.map((e) => e.id).indexOf(this.selectedSection.id);
+    console.log(this.masterContract, 'ON NEXT SELECTED SECTION');
     if (!this.lastSection() && this.masterContract && currentSectionIndex !== undefined) {
       this.saveSection();
       this.selectedSection = this.masterContract?.sections[currentSectionIndex + 1];
@@ -177,18 +192,22 @@ export default class ContractBuilder extends Vue {
     const selectedOptions: any = {
       masterSectionId: this.selectedSection.id,
       optional: null,
-      option: null,
-      subOption: null,
+      option: 0,
+      subOption: [],
     };
     console.log(this.selectedSectionValue, this.selectedSection, 'SELECTED DECTION VALUE');
     if (this.selectedSection.dynamic && this.selectedSection.variable) {
       selectedOptions.optional = false;
       selectedOptions.option = this.selectedSectionValue;
+      selectedOptions.subOption = this.selectedSectionValueSubOption;
+      console.log(this.selectedSectionValue, 'SELECTED');
     } else if (this.selectedSection.optional && this.selectedSection.variable) {
       selectedOptions.optional = this.selectedSectionValue;
       selectedOptions.option = null;
+      console.log('TRUE FALSE');
     }
     this.selectedSectionValue = null;
+    this.selectedSectionValueSubOption = [];
     const selectionExists = this.templateContractC.sections.find((o) => o.masterSectionId === this.selectedSection.id);
     if (selectionExists) {
       this.templateContractC.sections = this.templateContractC.sections.filter((item) => item.masterSectionId !== this.selectedSection.id);
@@ -202,6 +221,7 @@ export default class ContractBuilder extends Vue {
     if (selectionExists) {
       if (this.selectedSection.dynamic && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.option;
+        this.selectedSectionValueSubOption = selectionExists.subOption;
         console.log(this.selectedSectionValue, 'EXIST OPTION IF IF IF IF');
       } else if (this.selectedSection.optional && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.optional;
@@ -246,11 +266,11 @@ export default class ContractBuilder extends Vue {
       this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
         if (response.success) {
           this.masterContract = response.result;
-          console.log(this.masterContract, 'MASTER CONTRACT NEW');
-
+          console.log(this.masterContract, 'MASTER CONTRACT');
           this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
           this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
           this.$emit('update:selectedMasterContract', this.masterContract);
+          console.log(this.masterContract, 'MASTER CONTRACT NEW');
           this.initTemplateContract();
           [this.selectedSection] = this.masterContract.sections;
         } else {
