@@ -198,6 +198,11 @@ export default class ContractBuilder extends Vue {
       selectedOptions.optional = false;
       selectedOptions.option = this.selectedSectionValue;
       selectedOptions.subOption = this.selectedSectionValueSubOption;
+      if (this.selectedSectionValue === 1) {
+        selectedOptions.subOption = this.selectedSectionValueSubOption;
+      } else {
+        selectedOptions.subOption = [];
+      }
     } else if (this.selectedSection.optional && this.selectedSection.variable) {
       selectedOptions.optional = this.selectedSectionValue;
       selectedOptions.option = null;
