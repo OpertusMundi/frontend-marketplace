@@ -190,11 +190,10 @@ export default class ContractCreateTemplate extends Vue {
   saveDraft(): void {
     store.commit('setLoading', true);
     const masterSections: any = this.selectedMasterContract?.sections.slice(this.templateContract.sections.length);
-    const map = masterSections.map((obj: { id: number; optional: boolean }) => ({
+    const map = masterSections.map((obj: { id: number }) => ({
       masterSectionId: obj.id,
-      optional: null,
-      option: undefined,
-      subOption: null,
+      option: 0,
+      subOption: [],
     }));
     this.templateContract.sections = [...this.templateContract.sections, ...map];
     if (this.isNewDraft) {
@@ -209,7 +208,7 @@ export default class ContractCreateTemplate extends Vue {
     } else if (!this.isNewDraft) {
       store.commit('setLoading', true);
       this.providerContractApi.updateDraft(this.$route.query.key as string, this.templateContract).then((response) => {
-        console.log(this.templateContract, response, 'RESPONSE');
+        console.log(response, 'RESPONSE');
         if (response.success) {
           store.commit('setLoading', false);
           console.log('SUCCESS');

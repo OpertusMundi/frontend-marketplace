@@ -1,6 +1,6 @@
 <template>
   <validation-observer ref="refObserver">
-    <div class="dashboard__form__step dashboard__form__step--delivery">
+    <div class="dashboard__form__step dashboard__form__step--full-width">
       <div class="dashboard__form__step__delivery">
         <div class="dashboard__form__step__delivery__inner">
           <div class="dashboard__form__step__title">
@@ -11,96 +11,230 @@
           <div class="row">
             <div class="col-md-4">
               <validation-provider v-slot="{ errors }" name="Delivery method" rules="required">
-              <div class="form-group">
-                <label class="control control-radio">
-                  By the platform
-                  <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                  <input type="radio" name="delivery_method_category" v-model="deliveryMethodCategory" value="BY_THE_PLATFORM" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  By own means
-                  <span>If your data is too large, updated daily, or you do not want to use our repository services, you can handle the delivery of the data asset to consumer through your own channel.</span>
-                  <input type="radio" name="delivery_method_category" v-model="deliveryMethodCategory" value="BY_OWN_MEANS" />
-                  <div class="control_indicator"></div>
-                </label>
-                <!-- todo: fix values -->
-                <!-- <label class="control control-radio">
-                  By the platform
-                  <span>You can upload your data asset securely in the platform. Customers will be able to download the data asset only after a transaction is made.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PLATFORM" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  Digital Provider
-                  <span>Digital Provider</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="DIGITAL_PROVIDER" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  Physical Provider
-                  <span>Physical Provider.</span>
-                  <input type="radio" name="asset_delivery" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
-                  <div class="control_indicator"></div>
-                </label> -->
-                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-              </div>
+                <div class="form-group">
+                  <!-- todo: fix values -->
+                  <label class="control control-radio">
+                    By the platform
+                    <span
+                      >You can upload your data asset securely in the platform. Customers will be
+                      able to download the data asset only after a transaction is made.</span
+                    >
+                    <input
+                      type="radio"
+                      name="asset_delivery"
+                      v-model="byOwnMeans"
+                      value="DIGITAL_PLATFORM"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    By own means
+                    <span
+                      >If your data is too large, updated daily, or you do not want to use our
+                      repository services, you can handle the delivery of the data asset to consumer
+                      through your own channel.
+                    </span>
+                    <input type="radio" name="asset_delivery" v-model="byOwnMeans" value="MEANS" />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <div class="errors" v-if="errors">
+                    <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                  </div>
+                </div>
               </validation-provider>
             </div>
-            <div class="col-md-4">
-              <div class="dashboard__form__step__title" v-if="deliveryMethodCategory">
-                <p>Select one of the following options and provide the requested information. Delivery must take place within three (3) working days following a proof of payment provided to us by the consumer.</p>
+
+            <div class="col-md-4" v-if="byOwnMeans === 'DIGITAL_PLATFORM' && byOwnMeans !== 0">
+              <div class="dashboard__form__step__title">
+                <p>Select specifically how the platform will have access to your asset</p>
               </div>
-              <div class="form-group" v-if="deliveryMethodCategory === 'BY_THE_PLATFORM'">
-                <label class="control control-radio">
-                  Direct upload
-                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="DIGITAL_PLATFORM" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  Link to asset
-                  <input type="radio" name="delivery_method"/>
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  Select from topio Drive
-                  <input type="radio" name="delivery_method"/>
-                  <div class="control_indicator"></div>
-                </label>
-              </div>
-              <div class="form-group" v-if="deliveryMethodCategory === 'BY_OWN_MEANS'">
-                <label class="control control-radio">
-                  Digital delivery
-                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="DIGITAL_PROVIDER" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  Physical media
-                  <input type="radio" name="delivery_method" v-model="deliveryMethodLocal" value="PHYSICAL_PROVIDER" />
-                  <div class="control_indicator"></div>
-                </label>
-              </div>
+              <validation-provider
+                v-slot="{ errors }"
+                mode="passive"
+                name="Platform access to your asset"
+                rules="required"
+              >
+                <div class="form-group">
+                  <label class="control control-radio">
+                    Direct upload
+                    <input
+                      type="radio"
+                      name="by_platform"
+                      v-model="byPlatform"
+                      value="DIRECT_UPLOAD"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    Link to asset
+                    <input
+                      type="radio"
+                      name="by_platform"
+                      v-model="byPlatform"
+                      value="LINK_TO_ASSET"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    Select from Storage
+                    <input
+                      type="radio"
+                      name="by_platform"
+                      v-model="byPlatform"
+                      value="TOPIO_DRIVE"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <div class="errors" v-if="errors">
+                    <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                  </div>
+                </div>
+              </validation-provider>
             </div>
-            <div class="col-md-4">
-              <!-- <div v-if="deliveryMethod === 'DIGITAL_PLATFORM'"> -->
-              <div v-if="deliveryMethodLocal !== 'NONE'">
+            <div class="col-md-4" v-else-if="byOwnMeans === 'MEANS' && byOwnMeans !== 0">
+              <div class="dashboard__form__step__title">
+                <p>
+                  Select one of the following options and provide the requested information.
+                  Delivery must take place within three (3) working days following a proof of
+                  payment provided to us by the consumer.
+                </p>
+              </div>
+              <validation-provider
+                v-slot="{ errors }"
+                mode="passive"
+                name="Delivery type"
+                rules="required"
+              >
+                <div class="form-group">
+                  <label class="control control-radio">
+                    Digital delivery
+                    <input
+                      type="radio"
+                      name="asset_provider"
+                      v-model="deliveryMethodLocal"
+                      value="DIGITAL_PROVIDER"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    Physical media
+                    <input
+                      type="radio"
+                      name="asset_provider"
+                      v-model="deliveryMethodLocal"
+                      value="PHYSICAL_PROVIDER"
+                    />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <div class="errors" v-if="errors">
+                    <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
+                  </div>
+                </div>
+              </validation-provider>
+            </div>
+
+            <div
+              v-if="byPlatform === 'DIRECT_UPLOAD' && byOwnMeans === 'DIGITAL_PLATFORM'"
+              class="col-md-4"
+            >
+              <div class="dashboard__form__step__title">
+                <p>Please note that hosting your data asset is free for up to 20GB.</p>
+              </div>
+              <div>
                 <h1>Upload Asset</h1>
-                <input type="file" @change="readFile($event)">
+                <input type="file" @change="readFile($event)" />
 
                 <!-- a dummy hidden input to be cathced by validation observer if no file selected -->
                 <div v-if="!fileToUploadLocal.isFileSelected">
                   <validation-provider v-slot="{ errors }" name="Upload" rules="required">
                     <div class="form-group mt-xs-20">
-                      <input type="text" hidden>
-                      <div class="errors" v-if="errors.length"><span class="mt-xs-20">Upload is required</span></div>
+                      <input type="text" hidden />
+                      <div class="errors" v-if="errors.length">
+                        <span class="mt-xs-20">Upload is required</span>
+                      </div>
                     </div>
                   </validation-provider>
                 </div>
 
                 <div v-if="fileToUploadLocal.isFileSelected" class="form-group mt-xs-20">
                   <label for="fileEncoding">Encoding</label>
-                  <input class="form-group__text" id="fileEncoding" type="text" placeholder="(optional)" v-model="fileToUploadLocal.encoding">
+                  <input
+                    class="form-group__text"
+                    id="fileEncoding"
+                    type="text"
+                    placeholder="(optional)"
+                    v-model="fileToUploadLocal.encoding"
+                  />
                 </div>
+              </div>
+            </div>
+            <div
+              v-else-if="byPlatform === 'LINK_TO_ASSET' && byOwnMeans === 'DIGITAL_PLATFORM'"
+              class="col-md-4"
+            >
+              <div class="dashboard__form__step__title">
+                <p>
+                  Please provide a direct web accessible link for the system to download the file
+                  from.
+                </p>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name="linkToAsset"
+                  class="form-group__text"
+                  id=""
+                  placeholder="Paste link here"
+                  v-model="linkToAsset"
+                />
+              </div>
+            </div>
+            <div
+              v-else-if="byPlatform === 'TOPIO_DRIVE' && byOwnMeans === 'DIGITAL_PLATFORM'"
+              class="col-md-4"
+            >
+              <div class="dashboard__form__step__title">
+                <p>Select an asset from your topio Drive. ssss</p>
+              </div>
+              <div>
+                <file-topio-drive :fileTopioDrive.sync="fileTopioDrive"></file-topio-drive>
+              </div>
+            </div>
+            <div
+              v-if="deliveryMethodLocal === 'DIGITAL_PROVIDER' && byOwnMeans === 'MEANS'"
+              class="col-md-4"
+            >
+              <div class="dashboard__form__step__title">
+                <p>
+                  Fill in any information you believe is important for the delivery of your asset.
+                </p>
+              </div>
+              <div class="form-group">
+                <label for="">Notes for buyer</label>
+                <textarea class="form-group__text" cols="20" rows="5" value="test"></textarea>
+              </div>
+            </div>
+            <div
+              v-if="deliveryMethodLocal === 'PHYSICAL_PROVIDER' && byOwnMeans === 'MEANS'"
+              class="col-md-4"
+            >
+              <div class="dashboard__form__step__title">
+                <p>
+                  Fill in any information you believe is important for the delivery of your asset.
+                </p>
+              </div>
+              <div class="form-group">
+                <label for="">Type of physical media</label>
+                <input type="text" name="typeMedia" class="form-group__text" id="" />
+                <label for="">Number of objects</label>
+                <input type="text" name="numberObjects" class="form-group__text" id="" />
+                <label for="">Notes for buyer</label>
+                <textarea
+                  class="form-group__text"
+                  cols="20"
+                  rows="5"
+                  value="notes for buyer"
+                ></textarea>
               </div>
             </div>
           </div>
@@ -163,32 +297,29 @@
   </validation-observer>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-  Watch,
-  Prop,
-} from 'vue-property-decorator';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
-import { EnumDeliveryMethod } from '@/model/catalogue';
+import { Component, Vue, Watch, Prop } from "vue-property-decorator";
+import { ValidationProvider, ValidationObserver, extend } from "vee-validate";
+import { required } from "vee-validate/dist/rules";
+import { EnumDeliveryMethod, DraftApiFromFileCommand } from "@/model/catalogue";
+import FileTopioDrive from "@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue";
 
-extend('required', required);
+extend("required", required);
 
 interface FileToUpload {
-  isFileSelected: boolean,
-  file: File,
-  fileName: string,
-  fileExtension: string,
-  crs: string,
-  encoding: string,
+  isFileSelected: boolean;
+  file: File;
+  fileName: string;
+  fileExtension: string;
+  crs: string;
+  encoding: string;
 }
 
 @Component({
   components: {
     ValidationProvider,
     ValidationObserver,
-  },
+    FileTopioDrive
+  }
 })
 export default class Delivery extends Vue {
   @Prop({ required: true }) private deliveryMethod!: EnumDeliveryMethod;
@@ -196,54 +327,71 @@ export default class Delivery extends Vue {
   @Prop({ required: true }) private fileToUpload!: FileToUpload;
 
   $refs!: {
-    refObserver: InstanceType<typeof ValidationObserver>,
-  }
+    refObserver: InstanceType<typeof ValidationObserver>;
+  };
 
-  deliveryMethodCategory: string;
-
-  deliveryMethodLocal: EnumDeliveryMethod;
+  deliveryMethodLocal: EnumDeliveryMethod | null;
 
   fileToUploadLocal: FileToUpload;
+
+  byOwnMeans: any | null;
+
+  byPlatform: any | null;
+
+  linkToAsset: string | null;
+
+  fileTopioDrive: any | null;
 
   constructor() {
     super();
 
     this.deliveryMethodLocal = this.deliveryMethod;
 
-    const methodCategories = {
-      NONE: '',
-      DIGITAL_PLATFORM: 'BY_THE_PLATFORM',
-      DIGITAL_PROVIDER: 'BY_OWN_MEANS',
-      PHYSICAL_PROVIDER: 'BY_OWN_MEANS',
-    };
-    this.deliveryMethodCategory = methodCategories[this.deliveryMethodLocal];
-
     this.fileToUploadLocal = this.fileToUpload;
+
+    this.byOwnMeans = 0;
+
+    this.byPlatform = null;
+
+    this.linkToAsset = "";
+
+    this.fileTopioDrive = {};
   }
 
-  @Watch('deliveryMethodCategory')
-  onDeliveryMethodCategoryChange(): void {
-    this.deliveryMethodLocal = EnumDeliveryMethod.NONE;
+  @Watch("deliveryMethodLocal")
+  onDeliveryMethodChange(deliveryMethod: EnumDeliveryMethod): void {
+    this.$emit("update:deliveryMethod", deliveryMethod);
   }
 
-  @Watch('deliveryMethodLocal')
-  onDeliveryMethodChange(deliveryMethod: string): void {
-    this.$emit('update:deliveryMethod', deliveryMethod);
+  @Watch("byOwnMeans")
+  onByOwnMeans(value: string): void {
+    if (value === "MEANS") {
+      this.deliveryMethodLocal = null;
+      this.byPlatform = null;
+    } else {
+      this.$emit("update:deliveryMethod", EnumDeliveryMethod.DIGITAL_PLATFORM);
+    }
+  }
+
+  @Watch("fileTopioDrive", { deep: true })
+  onfileTopioDriveChange(fileTopioDrive: DraftApiFromFileCommand | null): void {
+    console.log(fileTopioDrive, "topio drive");
   }
 
   // eslint-disable-next-line
   readFile(e): void {
+    console.log(e);
     const [file] = e.srcElement.files;
     this.fileToUploadLocal.isFileSelected = true;
     this.fileToUploadLocal.file = file;
     this.fileToUploadLocal.fileName = file.name;
-    this.fileToUploadLocal.fileExtension = file.name.split('.').pop();
+    this.fileToUploadLocal.fileExtension = file.name.split(".").pop();
 
-    this.$emit('update:fileToUpload', this.fileToUploadLocal);
+    this.$emit("update:fileToUpload", this.fileToUploadLocal);
   }
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_assets.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
+@import "@/assets/styles/_assets.scss";
+@import "@/assets/styles/abstracts/_spacings.scss";
 </style>
