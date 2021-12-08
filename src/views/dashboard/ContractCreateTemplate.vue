@@ -208,7 +208,7 @@ export default class ContractCreateTemplate extends Vue {
     } else if (!this.isNewDraft) {
       store.commit('setLoading', true);
       this.providerContractApi.updateDraft(this.$route.query.key as string, this.templateContract).then((response) => {
-        console.log(this.templateContract, response, 'RESPONSE');
+        console.log(response, 'RESPONSE');
         if (response.success) {
           store.commit('setLoading', false);
           console.log('SUCCESS');

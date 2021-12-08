@@ -87,7 +87,7 @@ export default class Contracts extends Vue {
       if (data.success) {
         this.draftContractTemplates = data.result.items;
         this.totalDraftContracts = data.result.count;
-        console.log(data, this.draftContractTemplates, 'draft data');
+        console.log(data, 'draft data');
       }
     });
   }

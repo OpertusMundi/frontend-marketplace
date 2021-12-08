@@ -151,7 +151,6 @@ export default class ContractBuilder extends Vue {
 
   nextSection(): void {
     const currentSectionIndex = this.masterContract?.sections.map((e) => e.id).indexOf(this.selectedSection.id);
-    console.log(this.masterContract, 'ON NEXT SELECTED SECTION');
     if (!this.lastSection() && this.masterContract && currentSectionIndex !== undefined) {
       this.saveSection();
       this.selectedSection = this.masterContract?.sections[currentSectionIndex + 1];
@@ -173,7 +172,6 @@ export default class ContractBuilder extends Vue {
 
   scrollToActive(): void {
     const activeIndex = document.getElementsByClassName('contract-builder__index__item active')[0];
-    console.log(activeIndex);
     activeIndex.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -195,16 +193,14 @@ export default class ContractBuilder extends Vue {
       option: 0,
       subOption: [],
     };
-    console.log(this.selectedSectionValue, this.selectedSection, 'SELECTED DECTION VALUE');
+
     if (this.selectedSection.dynamic && this.selectedSection.variable) {
       selectedOptions.optional = false;
       selectedOptions.option = this.selectedSectionValue;
       selectedOptions.subOption = this.selectedSectionValueSubOption;
-      console.log(this.selectedSectionValue, 'SELECTED');
     } else if (this.selectedSection.optional && this.selectedSection.variable) {
       selectedOptions.optional = this.selectedSectionValue;
       selectedOptions.option = null;
-      console.log('TRUE FALSE');
     }
     this.selectedSectionValue = null;
     this.selectedSectionValueSubOption = [];
@@ -213,7 +209,6 @@ export default class ContractBuilder extends Vue {
       this.templateContractC.sections = this.templateContractC.sections.filter((item) => item.masterSectionId !== this.selectedSection.id);
     }
     this.templateContractC.sections.push(selectedOptions);
-    console.log(this.templateContract, 'PUSHED');
   }
 
   loadSelectedSectionValue(): void {
@@ -222,7 +217,6 @@ export default class ContractBuilder extends Vue {
       if (this.selectedSection.dynamic && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.option;
         this.selectedSectionValueSubOption = selectionExists.subOption;
-        console.log(this.selectedSectionValue, 'EXIST OPTION IF IF IF IF');
       } else if (this.selectedSection.optional && this.selectedSection.variable) {
         this.selectedSectionValue = selectionExists.optional;
       }
@@ -252,25 +246,20 @@ export default class ContractBuilder extends Vue {
       // Draft contract
       if (this.draftTemplateContract.masterContract) {
         this.masterContract = this.draftTemplateContract.masterContract;
-        console.log(this.masterContract, 'is draft bri');
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
         this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
-        console.log(this.masterContract, 'is draft bri AFTER SORTING');
         this.initTemplateContract();
         [this.selectedSection] = this.masterContract.sections;
         this.templateContractC.sections = this.draftTemplateContract.sections;
-        console.log(this.masterContract, this.templateContractC, 'MASTER CONTRACT DRAFT');
       }
     } else {
       // New contract
       this.providerContractApi.findOneMasterContract(this.selectedMasterContract.key).then((response) => {
         if (response.success) {
           this.masterContract = response.result;
-          console.log(this.masterContract, 'MASTER CONTRACT');
           this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index));
           this.masterContract.sections.sort((a, b) => a.index.localeCompare(b.index, undefined, { numeric: true }));
           this.$emit('update:selectedMasterContract', this.masterContract);
-          console.log(this.masterContract, 'MASTER CONTRACT NEW');
           this.initTemplateContract();
           [this.selectedSection] = this.masterContract.sections;
         } else {
