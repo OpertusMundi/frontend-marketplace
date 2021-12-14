@@ -17,12 +17,17 @@ const routes: RouteConfig[] = [
   {
     path: '/catalogue/',
     name: 'Catalogue',
-    component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/Catalogue.vue'),
+    component: (): Promise<any> => import(/* webpackChunkName: "catalogue" */ '../views/Catalogue.vue'),
   },
   {
     path: '/catalogue/:id',
     name: 'CatalogueSingle',
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
+  },
+  {
+    path: '/eo-explorer',
+    name: 'EOExplorer',
+    component: (): Promise<any> => import(/* webpackChunkName: "eoexplorer" */ '../views/EOExplorer.vue'),
   },
   {
     path: '/helpdesk-review/:key',
