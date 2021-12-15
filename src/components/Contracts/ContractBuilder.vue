@@ -29,7 +29,7 @@
                   <div style="padding-left:40px;" v-if="!option.mutexSuboptions && selectedSectionValue === 1" v-bind:key="`subOption_${index}`">
                     <template v-for="(subOption, index) in option.subOptions">
                       <label class="control control-radio" :key="`suboption-${index}`">
-                        <strong v-html="option.bodyHtml"></strong>
+                        <strong v-html="subOption.bodyHtml"></strong>
                         <input :disabled="disabled" type="checkbox" v-model="selectedSectionValueSubOption" :value="index" />
                         <div class="control_indicator"></div>
                       </label>
