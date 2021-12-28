@@ -13,6 +13,7 @@ import {
   EnumPayInSortField,
   EnumTransactionStatus,
   ConsumerPayIn,
+  BrowserInfo,
 } from '@/model/payin';
 import { AxiosRequestConfig } from 'axios';
 
@@ -204,7 +205,12 @@ export default class ConsumerPayInApi extends Api {
   ): Promise<ServerResponse<ConsumerCardDirectPayIn>> {
     const url = `/action/consumer/payins/card-direct/${orderKey}`;
 
-    return this.post<CardDirectPayInCommand, ServerResponse<ConsumerCardDirectPayIn>>(url, command)
+    const postData: CardDirectPayInCommand = {
+      ...command,
+      browserInfo: this.getBrowserInfo(),
+    };
+
+    return this.post<CardDirectPayInCommand, ServerResponse<ConsumerCardDirectPayIn>>(url, postData)
       .then((response: AxiosServerResponse<ConsumerCardDirectPayIn>) => {
         const { data } = response;
 
@@ -268,5 +274,29 @@ export default class ConsumerPayInApi extends Api {
     const url = `/action/consumer/payins?page=${page}&size=${size}&status=${status || ''}&orderBy=${field}&order=${order}`;
 
     return this.get<ServerResponse<PageResult<ConsumerPayIn | ConsumerBankwirePayIn | ConsumerCardDirectPayIn>>>(url);
+  }
+
+  /**
+   * Collect browser information
+   *
+   * Since navigator.javaEnabled() is deprecated, we always the set property to false
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/javaEnabled
+   *
+   * @returns
+   */
+  private getBrowserInfo(): BrowserInfo {
+    const result: BrowserInfo = {
+      colorDepth: window.screen.colorDepth,
+      javaEnabled: false,
+      javaScriptEnabled: true,
+      language: navigator.language,
+      screenHeight: window.screen.height,
+      screenWidth: window.screen.width,
+      timeZoneOffset: (new Date()).getTimezoneOffset(),
+      userAgent: navigator.userAgent,
+    };
+
+    return result;
   }
 }

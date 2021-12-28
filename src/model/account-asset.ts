@@ -59,7 +59,7 @@ export interface AccountSubscription {
   /**
    * Service PID
    */
-  service: string;
+  assetId: string;
   /**
    * When the subscription was registered to the user account
    */

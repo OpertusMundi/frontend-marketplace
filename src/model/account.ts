@@ -287,6 +287,14 @@ export interface CustomerDraftProfessional extends CustomerDraft {
  */
 interface Customer {
   /**
+   * Indicates if a user has her inflows (payins, incoming transfers) blocked
+   */
+  blockedInflows: boolean;
+  /**
+   * Indicates if a user has her outflows (payouts, outgoing transfers) blocked
+   */
+  blockedOutflows: boolean;
+  /**
    * Contract reference
    */
   contract: string;

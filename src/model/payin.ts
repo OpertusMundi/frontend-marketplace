@@ -1,7 +1,24 @@
 import { EnumPaymentMethod } from '@/model/enum';
-import { BankAccount, Consumer } from '@/model/account';
+import { BankAccount, Consumer, Address } from '@/model/account';
 import { ConsumerOrder, ProviderOrder } from '@/model/order';
 import { ConsumerAccountSubscription, ProviderAccountSubscription } from '@/model/account-asset';
+
+export interface BrowserInfo {
+  colorDepth: number;
+  javaEnabled: boolean;
+  javaScriptEnabled: boolean;
+  language: string;
+  screenHeight: number;
+  screenWidth: number;
+  timeZoneOffset: number;
+  userAgent: string;
+}
+
+export interface PayInAddress {
+  address: Address;
+  firstName: string;
+  lastName: string;
+}
 
 export enum EnumCardType {
   CB_VISA_MASTERCARD = 'CB_VISA_MASTERCARD',
@@ -288,6 +305,20 @@ export interface ProviderBankwirePayIn extends ProviderPayIn {
   bankAccount?: BankAccount;
 }
 
+/**
+ * Card Direct PayIn (payment with registered card)
+ *
+ * If both the Billing and Shipping objects are empty, MANGOPAY service will automatically
+ * complete them with the information from the User object before the call is sent to the issuer.
+ *
+ * If the `Billing` is supplied but the `Shipping` is empty, MANGOPAY service will automatically
+ * complete the Shipping object with the fields supplied for Billing.
+ *
+ * If the Shipping is supplied but the Billing is empty, MANGOPAY service will automatically
+ * complete the Billing object with the fields supplied for Shipping.
+ *
+ * @see https://docs.mangopay.com/guide/3ds2-integration
+ */
 export interface ConsumerCardDirectPayIn extends ConsumerPayIn {
   /**
    * A partially obfuscated version of the credit card number
@@ -317,9 +348,21 @@ export interface ProviderCardDirectPayIn extends ProviderPayIn {
 
 export interface CardDirectPayInCommand {
   /**
+   * Contains every useful information related to the user billing
+   */
+  billingAddress?: PayInAddress | null;
+  /**
+   * This object describes the Browser being user by an end user
+   */
+  browserInfo?: BrowserInfo | null;
+  /**
    * A registered card unique identifier
    */
   cardId: string;
+  /**
+   * Contains every useful information related to the user shipping
+   */
+  shippingAddress?: PayInAddress | null;
 }
 
 export interface Card {

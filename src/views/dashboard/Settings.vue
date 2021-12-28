@@ -1706,8 +1706,9 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  initUboToAdd(): UboCommand {
+  initUboToAdd(customerType: EnumCustomerType = EnumCustomerType.PROVIDER): UboCommand {
     return {
+      customerType,
       firstName: '',
       lastName: '',
       address: {
