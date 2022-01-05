@@ -115,6 +115,15 @@ export interface AssetQuery extends BaseQuery {
   metric: EnumAssetQueryMetric
 }
 
+export interface AssetTotalValueQuery {
+  time?: TemporalDimension | null;
+}
+
+export interface CoverageQuery {
+  time?: TemporalDimension | null;
+  segments?: EnumTopicCategory[] | null;
+}
+
 /**
  * An object that represents a time instant. Depending on the time unit specified by a
  * query, properties are set up to the specified time granularity e.g. if time unit is `MONTH`,

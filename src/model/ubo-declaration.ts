@@ -1,4 +1,4 @@
-import { AddressCommand } from '@/model/account';
+import { AddressCommand, EnumCustomerType } from '@/model/account';
 import { QueryResultPage } from '@/model/request';
 import { ServerResponse } from '@/model/response';
 
@@ -24,6 +24,10 @@ export interface Birthplace {
 }
 
 export interface UboCommand {
+  /**
+   * The customer type
+   */
+  customerType: EnumCustomerType;
   /**
    * The name of the UBO (required)
    */

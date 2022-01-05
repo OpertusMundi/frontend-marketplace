@@ -27,7 +27,7 @@
         <div class="col-md-6">
           <h3 class="mb-xs-20">Latest active subscriptions</h3>
           <p v-if="latestActiveSubscriptions && latestActiveSubscriptions.length === 0">No active subscriptions</p>
-          <horizontal-card v-for="subscription in latestActiveSubscriptions" v-bind:key="subscription.serviceId" :title="subscription.item.title" price="" subtitle="" link="#" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
+          <horizontal-card v-for="subscription in latestActiveSubscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" price="" subtitle="" link="#" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
         </div>
       </div>
       <div class="row">

@@ -1,7 +1,9 @@
 import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
-import { SalesQuery, DataSeries, AssetQuery } from '@/model/analytics';
+import {
+  SalesQuery, DataSeries, AssetQuery, CoverageQuery, AssetTotalValueQuery,
+} from '@/model/analytics';
 
 export default class AnalyticsApi extends Api {
   constructor() {
@@ -68,6 +70,28 @@ export default class AnalyticsApi extends Api {
     const url = '/action/analytics/assets';
 
     return this.post<AssetQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response: AxiosServerResponse<DataSeries>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async executeCoverageQuery(query: CoverageQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/coverage';
+
+    return this.post<CoverageQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response: AxiosServerResponse<DataSeries>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async executeTotalAssetValueQuery(query: AssetTotalValueQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/asset-total-value';
+
+    return this.post<AssetTotalValueQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
 
