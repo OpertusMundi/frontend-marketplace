@@ -208,7 +208,9 @@ export default class DashboardUsers extends Vue {
 
   @Watch('selectedRoles', { deep: true })
   onSelectedRolesChange(): void {
-    this.userToAddOrEdit.roles = this.selectedRoles.map((x) => x.id);
+    this.userToAddOrEdit.roles = this.selectedRoles
+      .map((x) => x.id);
+    // .filter((x) => x !== EnumVendorRole.ROLE_VENDOR_USER); // ROLE_VENDOR_USER is automatically assigned server-side
   }
 
   async loadUsers(page = 0): Promise<void> {
