@@ -2,6 +2,7 @@ import { EnumSpatialDataServiceType, EnumAssetType } from '@/model/enum';
 import { ServerResponse } from '@/model/response';
 import { Provider } from '@/model/account';
 import { CatalogueItemCommand } from '@/model/catalogue';
+import { EnumRecordLock, RecordLock } from '@/model/lock';
 
 export enum EnumDraftStatus {
   /**
@@ -56,6 +57,13 @@ export interface AssetDraftQuery {
   type: EnumAssetType[];
 }
 
+export interface DraftRecordLock extends RecordLock {
+  /**
+     * Record type
+     */
+  recordType: EnumRecordLock.DRAFT;
+}
+
 export interface AssetDraft {
   /**
    * Catalogue draft id. Always equal to key property
@@ -87,6 +95,10 @@ export interface AssetDraft {
    * is used as the business key
    */
   key: string;
+  /**
+   * Lock details
+   */
+  lock?: DraftRecordLock;
   /**
    * Date of lat update in ISO format
    */
