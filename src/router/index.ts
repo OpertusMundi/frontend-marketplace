@@ -17,7 +17,7 @@ const routes: RouteConfig[] = [
   {
     path: '/catalogue/',
     name: 'Catalogue',
-    component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/Catalogue.vue'),
+    component: (): Promise<any> => import(/* webpackChunkName: "catalogue" */ '../views/Catalogue.vue'),
   },
   {
     path: '/catalogue/:id',
@@ -83,13 +83,13 @@ const routes: RouteConfig[] = [
   {
     path: '/dashboard',
     component: (): Promise<any> => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
-    meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+    meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
     children: [
       {
         path: '',
         name: 'DashboardHome',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardhome" */ '../views/dashboard/Home.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'assets',
@@ -132,14 +132,14 @@ const routes: RouteConfig[] = [
         path: 'storage',
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'notebooks',
         name: 'Notebooks',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardnotebooks" */ '../views/dashboard/Notebooks.vue'),
         // TODO: correct role?
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'assets/create/:id?',
@@ -151,19 +151,19 @@ const routes: RouteConfig[] = [
         path: 'favorites',
         name: 'Favorites',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardfavorites" */ '../views/dashboard/Favorites.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'messages',
         name: 'Messages',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardmesssages" */ '../views/dashboard/Messages.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'topiomaps',
         name: 'TopioMaps',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardtopiomaps" */ '../views/dashboard/TopioMaps.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'orders',
@@ -187,13 +187,13 @@ const routes: RouteConfig[] = [
         path: 'subscriptions',
         name: 'Subscriptions',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsubscriptions" */ '../views/dashboard/Subscriptions.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'subscriptions/:key',
         name: 'SubscriptionPreview',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsubscriptionpreview" */ '../views/dashboard/SubscriptionPreview.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'purchase/:key',
@@ -206,7 +206,7 @@ const routes: RouteConfig[] = [
         name: 'Settings',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardsettings" */ '../views/dashboard/Settings.vue'),
         // meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_PROVIDER], layout: 'dashboard' },
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'users',
@@ -218,13 +218,13 @@ const routes: RouteConfig[] = [
         path: 'messages/create',
         name: 'MessageNew',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardmesssagenew" */ '../views/dashboard/MessageNew.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'messages/:id',
         name: 'MessagesThread',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardmesssagesthread" */ '../views/dashboard/MessagesThread.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
       {
         path: 'analytics',
@@ -236,7 +236,7 @@ const routes: RouteConfig[] = [
         path: 'notifications',
         name: 'Notifications',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardnotifications" */ '../views/dashboard/Notifications.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },
       },
     ],
   },

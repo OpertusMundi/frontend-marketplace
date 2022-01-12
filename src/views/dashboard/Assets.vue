@@ -298,6 +298,7 @@ export default class DashboardHome extends Vue {
 
     this.providerAssetsApi.find(query).then((resp) => {
       let assets = resp.result.items;
+      console.log('hey there, assets', assets);
 
       if (this.selectedTab === 'DATA_FILES') {
         assets = assets.filter((x) => x.type === EnumAssetType.VECTOR || x.type === EnumAssetType.RASTER);
