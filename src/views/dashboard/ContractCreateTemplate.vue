@@ -133,6 +133,13 @@ export default class ContractCreateTemplate extends Vue {
     }
   }
 
+  @Watch('templateContractFilled')
+  onContractTemplateFilled(v: boolean): void {
+    if (v) {
+      this.goToStep(3);
+    }
+  }
+
   goToStep(step: number): void {
     this.currentStep = step;
   }

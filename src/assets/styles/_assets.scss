@@ -481,6 +481,41 @@
 					color: $mainFontColor;
 					letter-spacing: 0.03em;
 					margin-right: 25px;
+					&.dropdown-item {
+						position: relative;
+						svg {
+							transition: all 0.2s ease;
+							transform: rotate(0deg);
+						}
+						.dropdown-container {
+							position: absolute;
+							top: 100%;
+							padding-top: 15px;
+							width: 100%;
+							&__inner {
+								background: #f2f2f2;
+								padding: 15px;
+								border-radius: 8px;
+								border: 1px solid $greyColor;
+								max-height: 230px;
+								overflow-y: auto;
+							}
+							&__list {
+								&__item {
+									display: flex;
+									margin-bottom: 5px;
+									&:last-child{
+										margin-bottom: 0;
+									}
+								}
+							}
+						}
+					}
+					&.active {
+						svg {
+							transform: rotate(180deg);
+						}
+					}
 					a {
 						color: inherit;
 						font-weight: 500;
@@ -660,6 +695,7 @@
 				background: #f2f2f2;
 				padding: 25px;
 				border-radius: 8px;
+				min-height: 240px;
 
 				&--centered {
 					text-align: center;
