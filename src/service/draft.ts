@@ -13,7 +13,7 @@ import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
 } from '@/model/draft';
 import {
-  AssetFileAdditionalResourceCommand, FileResourceCommand,
+  AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand,
 } from '@/model/asset';
 import { AxiosRequestConfig } from 'axios';
 
@@ -261,6 +261,23 @@ export default class DraftAssetApi extends Api {
       ...config,
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
+
+  /**
+   * Adds a resource from an existing file in the user's file system. On success, an updated draft is returned
+   * with the new resource registration. If the record is locked by another user, the operation will fail.
+   *
+   * @param key Draft unique key
+   * @param command Command object with resource metadata
+   */
+  public async addResourceFromFileSystem(key: string, command: UserFileResourceCommand): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/resources`;
+
+    return this.post<UserFileResourceCommand, ServerResponse<AssetDraft>>(url, command).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
 
       return data;
