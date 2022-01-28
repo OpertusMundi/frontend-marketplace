@@ -82,12 +82,17 @@ export enum EnumPricingModel {
    * Pay per row, optional define reverse block rate pricing
    */
   PER_ROW_WITH_BLOCK_RATE = 'PER_ROW_WITH_BLOCK_RATE',
+  /**
+   * Sentinel Hub open data collections
+   */
+  SENTINEL_HUB_SUBSCRIPTION = 'SENTINEL_HUB_SUBSCRIPTION',
+  /**
+   * Sentinel Hub commercial data
+   */
+  SENTINEL_HUB_IMAGES = 'SENTINEL_HUB_IMAGES',
 }
 
 export interface BasePricingModelCommand {
-  /*
-   *
-   */
   key?: string,
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
@@ -248,7 +253,42 @@ export interface RowBlockRatePricingModelCommand extends BasePricingModelCommand
   discountRates: DiscountRate[];
 }
 
-export interface SystemParameters {
+/**
+ * Pricing model for Sentinel hub commercial data
+ */
+export interface SHImagePricingModelCommand extends BasePricingModelCommand {
+  /*
+   * Discriminator field used for deserializing the model to the appropriate data type
+   */
+  type: EnumPricingModel.SENTINEL_HUB_IMAGES;
+}
+
+/**
+ * Pricing model for Sentinel hub open data collections
+ */
+export interface SHSubscriptionPricingModelCommand extends BasePricingModelCommand {
+  /*
+   * Discriminator field used for deserializing the model to the appropriate data type
+   */
+  type: EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION;
+  /**
+   * Monthly price excluding tax
+   */
+  monthlyPriceExcludingTax: number | null;
+  /**
+   * Annual price excluding tax
+   */
+  annualPriceExcludingTax: number | null;
+}
+
+/**
+ * Dynamic parameters set by the system
+ */
+export interface SystemQuotationParameters {
+  /**
+   * Tax applied based on the billing region
+   */
+  taxPercent: number;
   /**
    * System-defined parameter of the size of selected population. If the pricing model does not
    * support population size parameter, this property is not set
@@ -267,35 +307,75 @@ export interface SystemParameters {
 }
 
 /**
- * User-defined quotation parameters
+ * Default user-defined quotation parameters
  */
-export interface QuotationParametersCommand {
-  /**
-   * User-defined array of NUTS codes. The codes are used for computing asset coverage and population
-   */
-  nuts?: string[];
-  /**
-   * Selected prepaid tier index if the feature is supported. If a tier is selected and the pricing
-   * model does not support prepaid tiers, the quotation service will return a validation error
-   */
-  prePaidTier?: number | null;
-  /**
-   * Dynamic system-defined parameters set during the creation of a quotation such as the
-   * selected number of rows or population
-   */
-  systemParams?: SystemParameters;
+export interface EmptyQuotationParameters {
+  type: EnumPricingModel.UNDEFINED;
 }
 
-/**
- * Quotation parameters bag with all user and system defined parameters
- */
-export interface QuotationParameters extends QuotationParametersCommand {
+export interface FixedRowQuotationParameters {
+  type: EnumPricingModel.FIXED_PER_ROWS;
   /**
-   * Dynamic system-defined parameters set during the creation of a quotation such as the
-   * selected number of rows or population
+   * User-defined parameter of array of NUTS codes. The codes are used for computing asset coverage and population
+   *
+   * @see https://ec.europa.eu/eurostat/web/regions-and-cities/overview
    */
-  systemParams?: SystemParameters;
+  nuts: string[];
 }
+
+export interface FixedPopulationQuotationParameters {
+  type: EnumPricingModel.FIXED_FOR_POPULATION;
+  /**
+   * User-defined parameter of array of NUTS codes. The codes are used for computing asset coverage and population
+   *
+   * @see https://ec.europa.eu/eurostat/web/regions-and-cities/overview
+   */
+  nuts: string[];
+}
+
+export interface CallPrePaidQuotationParameters {
+  type: EnumPricingModel.PER_CALL_WITH_PREPAID;
+  /**
+   * Selected prepaid tier index if feature is supported. If a tier is selected and the pricing
+   * model does not support prepaid tiers, quotation service will return a validation error
+   */
+  prePaidTier: number;
+}
+
+export interface RowPrePaidQuotationParameters {
+  type: EnumPricingModel.PER_ROW_WITH_PREPAID;
+  /**
+   * Selected prepaid tier index if feature is supported. If a tier is selected and the pricing
+   * model does not support prepaid tiers, quotation service will return a validation error
+   */
+  prePaidTier: number;
+}
+
+export interface SHSubscriptionQuotationParameters {
+  type: EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION;
+  /**
+   * Payment frequency for subscriptions
+   */
+  frequency: 'MONTHLY' | 'ANNUAL';
+}
+
+export interface SHImageQuotationParameters {
+  type: EnumPricingModel.SENTINEL_HUB_IMAGES;
+  /**
+   * Query used for selecting images
+   */
+  query: unknown;
+}
+
+export type QuotationParameters =
+  EmptyQuotationParameters |
+  CallPrePaidQuotationParameters |
+  FixedRowQuotationParameters |
+  FixedPopulationQuotationParameters |
+  RowPrePaidQuotationParameters |
+  SHImageQuotationParameters |
+  SHSubscriptionQuotationParameters;
+
 
 export interface QuotationCommand {
   /**
@@ -310,7 +390,7 @@ export interface QuotationCommand {
   /**
    * Quotation parameters
    */
-  parameters: QuotationParametersCommand;
+  parameters: QuotationParameters;
 }
 
 export interface Quotation {
@@ -340,6 +420,18 @@ export interface Quotation {
   currency: string;
 }
 
+export type PricingModelCommand =
+  FreePricingModelCommand |
+  FixedPricingModelCommand |
+  FixedRowPricingModelCommand |
+  FixedPopulationPricingModelCommand |
+  CallPrePaidPricingModelCommand |
+  CallBlockRatePricingModelCommand |
+  RowPrePaidPricingModelCommand |
+  RowBlockRatePricingModelCommand |
+  SHImagePricingModelCommand |
+  SHSubscriptionPricingModelCommand;
+
 /**
  * Represents an effective pricing model that consists of
  * a pricing model, the quotation parameters and a quotation
@@ -353,11 +445,15 @@ export interface EffectivePricingModel {
   /**
    * The pricing model
    */
-  model: FreePricingModelCommand | FixedPricingModelCommand | FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | CallPrePaidPricingModelCommand | CallBlockRatePricingModelCommand | RowPrePaidPricingModelCommand | RowBlockRatePricingModelCommand;
+  model: PricingModelCommand;
   /**
-   * Parameters applied to the pricing model for computing the effective pricing model
+   * User-defined parameters applied to the pricing model for computing the effective pricing model
    */
-  parameters: QuotationParameters;
+  userParameters: QuotationParameters;
+  /**
+   * System-defined parameters applied to the pricing model for computing the effective pricing model
+   */
+  systemParameters: SystemQuotationParameters;
   /**
    * Quotation data. May be null if the pricing model is dynamic i.e. `FIXED_FOR_POPULATION`
    * and parameters are missing

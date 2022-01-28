@@ -215,3 +215,28 @@ export interface FileResourceCommand {
    */
   format: string;
 }
+
+export interface UserFileResourceCommand {
+  /**
+   * Geometry data CRS e.g. EPSG:4326
+   */
+  crs?: string;
+  /**
+   * File encoding e.g. UTF-8
+   */
+  encoding?: string;
+  /**
+   * Optional file name. If it is not set, the name of the selected file is used.
+   * The user may rename a file to avoid name collisions e.g. if two files with the
+   * same name but different paths are selected.
+   */
+  fileName?: string;
+  /**
+   * File format
+   */
+  format: string;
+  /**
+   * Path to user's file system
+   */
+  path: string;
+}

@@ -5,9 +5,7 @@ import { Consumer, Provider } from './account';
 
 export enum EnumOrderItemType {
   ASSET = 'ASSET',
-  SERVICE = 'SERVICE',
-  BUNDLE = 'BUNDLE',
-  VAS = 'VAS',
+  SUBSCRIPTION = 'SUBSCRIPTION',
 }
 
 export enum EnumOrderSortField {
