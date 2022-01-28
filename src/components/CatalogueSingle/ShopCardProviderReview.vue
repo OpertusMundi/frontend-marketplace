@@ -10,6 +10,8 @@
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'"><span>{{ `monthly: ${selectedPricingModel.monthlyPriceExcludingTax}€, annually: ${selectedPricingModel.annualPriceExcludingTax}€` }}</span></span>
       </div>
 
       <!-- <div v-if="catalogueItem.pricingModels.length === 1" class="asset__shopcard__variations__row mt-xs-20">
@@ -168,6 +170,7 @@ import store from '@/store';
 
 @Component({
   components: {
+    // todo: check if needed
     SelectAreas,
   },
 })
@@ -210,6 +213,8 @@ export default class ShopCardProviderReview extends Vue {
       PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
       PER_ROW_WITH_PREPAID: 'PER ROW',
       PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+      SENTINEL_HUB_IMAGES: 'SENTINEL HUB IMAGES',
+      SENTINEL_HUB_SUBSCRIPTION: 'SENTINEL HUB SUBSCRIPTION',
     };
     return labels[t];
   }

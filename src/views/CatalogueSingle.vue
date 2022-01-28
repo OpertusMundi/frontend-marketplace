@@ -39,7 +39,7 @@
     <related-assets :catalogueItem="catalogueItem"></related-assets>
 
     <!-- MODALS -->
-    <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModelKey="selectedPricingModelKey"></select-areas>
+    <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>
 
     <modal :withSlots="true" :show="modalToShow === 'modalLoginToAddAssetToCart'" @dismiss="modalToShow = ''">
       <template v-slot:body>
@@ -58,6 +58,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { CatalogueItem, ServerResponse } from '@/model';
 import { CatalogueItemCommand, CatalogueItemDetails } from '@/model/catalogue';
+import { FixedPopulationPricingModelCommand, FixedRowPricingModelCommand } from '@/model/pricing-model';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 
@@ -112,7 +113,7 @@ export default class CatalogueSingle extends Vue {
 
   isItemLoaded: boolean;
 
-  selectedPricingModelKey: string;
+  selectedPricingModelForAreaSelection: FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | null;
 
   isSelectAreasModalOn: boolean;
 
@@ -133,7 +134,7 @@ export default class CatalogueSingle extends Vue {
 
     this.catalogueItem = {} as CatalogueItem;
 
-    this.selectedPricingModelKey = '';
+    this.selectedPricingModelForAreaSelection = null;
 
     this.isSelectAreasModalOn = false;
 
@@ -183,8 +184,8 @@ export default class CatalogueSingle extends Vue {
     }
   }
 
-  openSelectAreaModal(key: string): void {
-    this.selectedPricingModelKey = key;
+  openSelectAreaModal(pricingModel: FixedRowPricingModelCommand | FixedPopulationPricingModelCommand): void {
+    this.selectedPricingModelForAreaSelection = pricingModel;
     this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
   }
 

@@ -14,6 +14,8 @@
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'"><span>{{ `monthly: ${selectedPricingModel.monthlyPriceExcludingTax}€, annually: ${selectedPricingModel.annualPriceExcludingTax}€` }}</span></span>
       </div>
 
       <div class="mt-xs-20" v-if="catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE'">
@@ -164,12 +166,18 @@ import {
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import CartApi from '@/service/cart';
 import { CatalogueItem } from '@/model';
-import { BasePricingModelCommand, EnumPricingModel } from '@/model/pricing-model';
+import {
+  BasePricingModelCommand,
+  CallPrePaidQuotationParameters,
+  EnumPricingModel,
+  RowPrePaidQuotationParameters,
+} from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
 import store from '@/store';
 
 @Component({
   components: {
+    // todo: check if needed
     SelectAreas,
   },
 })
@@ -213,21 +221,19 @@ export default class ShopCard extends Vue {
       return;
     }
     this.cartErrors = '';
-    console.log('TODO: add to cart');
-    // TODO: add to cart functions
 
     const cartItem:CartAddItemCommand = {
       assetId: this.catalogueItem.id,
       // eslint-disable-next-line
       pricingModelKey: this.selectedPricingModel.key!,
-      parameters: {},
+      parameters: {
+        type: this.selectedPricingModel.type as EnumPricingModel.UNDEFINED, // TODO: CHECK
+      },
     };
 
     if ([EnumPricingModel.PER_CALL_WITH_PREPAID, EnumPricingModel.PER_ROW_WITH_PREPAID].includes(this.selectedPricingModel.type)) {
-      cartItem.parameters.prePaidTier = this.selectedPrepaidTierIndex;
+      (cartItem.parameters as CallPrePaidQuotationParameters | RowPrePaidQuotationParameters).prePaidTier = this.selectedPrepaidTierIndex;
     }
-
-    if (this.selectedPrepaidTierIndex !== null) cartItem.parameters.prePaidTier = this.selectedPrepaidTierIndex;
 
     this.cartApi.addItem(cartItem)
       // .then((cartResponse: ServerResponse<Cart>) => {
@@ -267,13 +273,16 @@ export default class ShopCard extends Vue {
       PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
       PER_ROW_WITH_PREPAID: 'PER ROW',
       PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+      SENTINEL_HUB_IMAGES: 'SENTINEL HUB IMAGES',
+      SENTINEL_HUB_SUBSCRIPTION: 'SENTINEL HUB SUBSCRIPTION',
     };
     return labels[t];
   }
 
   openSelectAreaModal(): void {
     // eslint-disable-next-line
-    this.$emit('openSelectAreaModal', this.selectedPricingModel!.key);
+    this.$emit('openSelectAreaModal', this.selectedPricingModel);
+    // this.$emit('openSelectAreaModal', this.selectedPricingModel!.key);
   }
 
   getDomainRestrictions(): string[] {
