@@ -276,6 +276,10 @@ interface BaseCatalogueItem {
    * Channel of asset distribution
    */
   deliveryMethod: EnumDeliveryMethod;
+  /**
+   * Collection of custom properties required for external data provider integration
+   */
+  extensions?: Extensions;
   /*
    * The file format, physical medium, or dimensions of the resource
    */
@@ -980,6 +984,31 @@ export interface CatalogueItemDetails extends CatalogueItem {
    * The list of hidden automated metadata properties
    */
   visibility: string[];
+}
+
+export interface SHCommercialDataSentinelHubProperties {
+  type: 'COMMERCIAL';
+}
+
+export interface SHOpenDataSentinelHubProperties {
+  type: 'OPEN_DATA';
+  /**
+   * `true` if this is an open data collection
+   */
+  open: true;
+  /**
+   * Open data collection name e.g. `sentinel-1-grd`
+   *
+   * @see https://docs.sentinel-hub.com/api/latest/data/
+   */
+  collection: string;
+}
+
+export interface Extensions {
+  /**
+   * Sentinel Hub custom properties
+   */
+  sentinelHub?: SHCommercialDataSentinelHubProperties | SHOpenDataSentinelHubProperties;
 }
 
 export interface CatalogueItemCommand extends BaseCatalogueItem {

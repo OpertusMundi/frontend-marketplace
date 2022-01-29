@@ -1,6 +1,6 @@
 <template>
-  <div class="asset_card__wrapper">
-    <router-link :to="getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{ 'asset_card--red_marked': asset.status === 'DRAFT' }">
+  <div class="asset_card__wrapper" @click="'lock' in asset ? onLockedAssetClick() : ''">
+    <router-link :to="'lock' in asset ? '' : getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{ 'asset_card--red_marked': asset.status === 'DRAFT' }">
       <div class="asset_card__view" :style="{ '--color': getColor() }"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{ '--color': getColor() }">
         <div class="asset_card__top">
@@ -40,7 +40,7 @@
     </router-link>
 
     <div class="asset_card__right_dropdown_container" v-if="asset.status === 'DRAFT'">
-      <div @click="isRightDropdownOpen = !isRightDropdownOpen" class="asset_card__three_dots_btn">
+      <div @click="isRightDropdownOpen = 'lock' in asset ? false : !isRightDropdownOpen" class="asset_card__three_dots_btn">
         <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17">
           <g data-name="Group 2622" fill="#333">
             <circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5" />
@@ -57,7 +57,7 @@
             <!-- <li @click="createService('WMS')">Create WMS</li>
             <li @click="createService('WFS')">Create WFS</li> -->
 
-            <li @click="deleteAsset">Delete</li>
+            <li @click="'lock' in asset ? onLockedAssetClick() : deleteAsset()">Delete</li>
           </ul>
         </div>
       </transition>
@@ -162,6 +162,11 @@ export default class AssetDraftCard extends Vue {
   deleteAsset(): void {
     console.log(this.asset.key);
     this.$emit('delete', this.asset.key);
+  }
+
+  onLockedAssetClick(): void {
+    console.log('locked asset click!!');
+    this.$emit('assetLocked');
   }
 }
 </script>

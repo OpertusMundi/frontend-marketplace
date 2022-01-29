@@ -163,7 +163,12 @@ import QuotationApi from '../../service/quotation';
 import CartApi from '../../service/cart';
 import SpatialApi from '../../service/spatial';
 import europeGeoJSON from '../../service/lists/europe-geojson';
-import { EffectivePricingModel, QuotationCommand } from '../../model/pricing-model';
+import {
+  EffectivePricingModel,
+  FixedPopulationPricingModelCommand,
+  FixedRowPricingModelCommand,
+  QuotationCommand,
+} from '../../model/pricing-model';
 
 @Component({
   components: {
@@ -175,7 +180,7 @@ import { EffectivePricingModel, QuotationCommand } from '../../model/pricing-mod
 export default class SelectAreas extends Vue {
   @Prop() private assetId!: string;
 
-  @Prop() private pricingModelKey!: string;
+  @Prop() private pricingModel!: FixedRowPricingModelCommand | FixedPopulationPricingModelCommand;
 
   show: boolean;
 
@@ -415,10 +420,13 @@ export default class SelectAreas extends Vue {
 
   getQuotation(): void {
     this.isQuotationLoading = true;
+
     const quotation: QuotationCommand = {
       assetId: this.assetId,
-      pricingModelKey: this.pricingModelKey,
+      // eslint-disable-next-line
+      pricingModelKey: this.pricingModel.key!,
       parameters: {
+        type: this.pricingModel.type,
         nuts: this.areasSelectedForPurchase,
       },
     };
@@ -440,15 +448,17 @@ export default class SelectAreas extends Vue {
     const item: CartAddItemCommand = {
       assetId: this.assetId,
       parameters: {
+        type: this.pricingModel.type,
         nuts: this.areasSelectedForPurchase,
         prePaidTier: 0,
-        systemParams: {
-          population: 0,
-          populationPercent: 0,
-          rows: 0,
-        },
+        // systemParams: {
+        //   population: 0,
+        //   populationPercent: 0,
+        //   rows: 0,
+        // },
       },
-      pricingModelKey: this.pricingModelKey,
+      // eslint-disable-next-line
+      pricingModelKey: this.pricingModel.key!,
     };
 
     this.cartApi.addItem(item).then((addItemResp) => {
