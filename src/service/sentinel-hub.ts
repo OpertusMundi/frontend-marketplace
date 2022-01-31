@@ -46,4 +46,22 @@ export default class QuotationApi extends Api {
         return data;
       });
   }
+
+  /**
+   * Check if the authenticated user has already an active subscription to Sentinel Hub service
+   *
+   * Required role: `ROLE_USER`
+   *
+   * @returns
+   */
+  public async isSubscribed(): Promise<ServerResponse<boolean>> {
+    const url = `${baseUri}/subscriptions`;
+
+    return this.get<ServerResponse<boolean>>(url)
+      .then((response: AxiosServerResponse<boolean>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
 }

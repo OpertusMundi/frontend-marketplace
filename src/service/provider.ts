@@ -75,4 +75,21 @@ export default class ProviderApi extends Api {
         return data;
       });
   }
+
+  /**
+   * Check if company name is available
+   *
+   * @param name
+   * @returns
+   */
+  public async isNameAvailable(name: string): Promise<boolean> {
+    const url = `/action/provider/name?name=${name}`;
+
+    return this.get<ServerResponse<boolean>>(url)
+      .then((response: AxiosServerResponse<boolean>) => {
+        const { data } = response;
+
+        return data.result;
+      });
+  }
 }
