@@ -87,6 +87,7 @@ export default class App extends Vue {
     this.noLoaderRoutes = ['Home'];
   }
 
+  // todo: refactoring
   @Watch('$route', { immediate: true, deep: true })
   showHideHeader(): void {
     if (this.$route.meta.layout === 'dashboard') {
@@ -98,7 +99,7 @@ export default class App extends Vue {
     if (this.noHeader.includes(this.routeName)) {
       this.showHeader = false;
       this.showFooter = false;
-    } else if (this.routeName === 'DashboardHome') {
+    } else if (this.routeName === 'DashboardHome' || this.routeName === 'EOExplorer') {
       this.showFooter = false;
       this.headerClass = 'header--dark';
     // } else if (this.routeName === 'Cart') {

@@ -1,0 +1,24 @@
+.eo_explorer_page {
+  padding-top: $header_height;
+  min-height: 100vh;
+  height: 0;
+  
+  >.container-fluid {
+    height: 100%;
+    padding: 0;
+
+    >.row {
+      height: 100%;
+      margin: 0;
+
+      div:nth-child(2) {
+        padding-right: 0;
+      }
+    }
+  }
+
+  #eo-map {
+    height: 100%;
+    width: 100%;
+  }
+}
