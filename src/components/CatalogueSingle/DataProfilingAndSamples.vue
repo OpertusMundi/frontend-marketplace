@@ -51,7 +51,7 @@
             <a href="#" @click.prevent="activeTab = i + 3" :class="{ active: activeTab == i + 3 }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
-        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
+        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1">
           <li>
             <a href="#" @click.prevent="changeLayout('VERTICAL')"
               ><svg :class="isVertical ? 'active' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">

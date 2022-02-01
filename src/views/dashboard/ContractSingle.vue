@@ -65,6 +65,7 @@ import { ProviderTemplateContract, MasterContract, ProviderTemplateContractComma
 import ContractViewer from '@/components/Contracts/ContractViewer.vue';
 import store from '@/store';
 import moment from 'moment';
+import { saveAs } from 'file-saver';
 
 @Component({
   components: {
@@ -114,7 +115,6 @@ export default class ContractSingle extends Vue {
         if (this.draftTemplateContract.masterContract) {
           this.selectedMasterContract = this.draftTemplateContract.masterContract;
         }
-        console.log(response);
       } else {
         // TODO: handle error
         console.log('error fetching contract info');
@@ -127,7 +127,12 @@ export default class ContractSingle extends Vue {
   }
 
   exportPdf(): void {
-    console.log('EXPORT PDF');
+    store.commit('setLoading', true);
+    this.providerContractApi.printTemplate(this.$route.params.key).then((response) => {
+      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
+      saveAs(blob, this.$route.params.key);
+      store.commit('setLoading', false);
+    });
   }
 
   deactivateContract(): void {
