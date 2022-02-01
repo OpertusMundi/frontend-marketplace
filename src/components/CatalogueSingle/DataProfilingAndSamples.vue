@@ -80,8 +80,24 @@
               </svg>
             </a>
           </li>
-
-          <li><a href="#">Viewing 10 of 15 attributes</a></li>
+          <!-- DROPDOWN BUTTON -->
+          <li :class="toggleDropdownContainer ? 'active' : ''" class="dropdown-item">
+            <a href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
+            <svg xmlns="http://www.w3.org/2000/svg" width="10.29" height="7.492" viewBox="0 0 10.29 7.492">
+              <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
+            </svg>
+            <!-- DROPDOWN CONTAINER -->
+            <div v-if="toggleDropdownContainer" class="dropdown-container">
+              <div class="dropdown-container__inner">
+                <ul class="dropdown-container__list">
+                  <li v-for="(attribute, i) in metadata.attributes" :key="attribute" class="dropdown-container__list__item">
+                    <input type="checkbox" class="mr-xs-10 mb-xs-10" :id="`${attribute}-${i}`" v-model="selectedAttribute" :value="attribute" />
+                    <label :for="`${attribute}-${i}`">{{ attribute }} </label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -98,57 +114,58 @@
           <!-- ATTRIBUTES -->
           <li v-if="activeTab == 1 && isVertical">
             <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
-              <h4 class="mb-xs-20">
-                [<small>{{ metadata.datatypes[attribute] }}</small
-                >] {{ attribute }}
-              </h4>
+              <template v-if="selectedAttribute.includes(attribute)">
+                <h4 class="mb-xs-20">
+                  [<small>{{ metadata.datatypes[attribute] }}</small
+                  >] {{ attribute }}
+                </h4>
+                <div class="row">
+                  <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
+                    <div class="asset__section__tabs__attribute-info">
+                      <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
 
-              <div class="row">
-                <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
-                  <div class="asset__section__tabs__attribute-info">
-                    <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
+                      <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
+                        <strong>Most frequent values</strong>
+                        <div>
+                          <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                            <span
+                              >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
+                              >]</span
+                            >
+                          </div>
+                        </div>
+                      </div>
 
-                    <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
-                      <strong>Most frequent values</strong>
-                      <div>
-                        <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
-                          <span
-                            >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
-                            >]</span
-                          >
+                      <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
+                        <strong>Distinct values</strong>
+                        <div>
+                          <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
+                        </div>
+                      </div>
+
+                      <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
+                        <strong>Statistics</strong>
+                        <div class="asset__section__tabs__attribute-info__statistics">
+                          <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                        </div>
+                      </div>
+
+                      <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
+                        <strong>Quantiles</strong>
+                        <div class="asset__section__tabs__attribute-info__quantiles">
+                          <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
                         </div>
                       </div>
                     </div>
-
-                    <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
-                      <strong>Distinct values</strong>
-                      <div>
-                        <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
-                      </div>
-                    </div>
-
-                    <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
-                      <strong>Statistics</strong>
-                      <div class="asset__section__tabs__attribute-info__statistics">
-                        <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
-                      </div>
-                    </div>
-
-                    <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
-                      <strong>Quantiles</strong>
-                      <div class="asset__section__tabs__attribute-info__quantiles">
-                        <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
-                      </div>
-                    </div>
+                  </div>
+                  <div class="col-sm-6 asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
+                    <p><strong>Distribution</strong></p>
+                    <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
                   </div>
                 </div>
-                <div class="col-sm-6 asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
-                  <p><strong>Distribution</strong></p>
-                  <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
-                </div>
-              </div>
 
-              <hr v-if="i !== metadata.attributes.length - 1" />
+                <hr v-if="i !== metadata.attributes.length - 1" />
+              </template>
             </div>
           </li>
           <!-- HORIZONTAL RENDER -->
@@ -157,70 +174,84 @@
               <thead>
                 <tr>
                   <th></th>
-                  <th v-for="(attribute, i) in metadata.attributes" :key="attribute">
-                    [<small>{{ metadata.datatypes[attribute] }}</small
-                    >] {{ attribute }}{{ i }}
-                  </th>
+                  <template v-for="attribute in metadata.attributes">
+                    <th v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      [<small>{{ metadata.datatypes[attribute] }}</small
+                      >] {{ attribute }}
+                    </th>
+                  </template>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>Values in total</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">{{ metadata.count[attribute] }}</td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.count[attribute] }}</td>
+                  </template>
                 </tr>
                 <tr>
                   <td><strong>Most frequent values</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">
-                    <template v-if="attribute in metadata.distribution">
-                      <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
-                        <span
-                          >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
-                          >]</span
-                        >
-                      </div>
-                    </template>
-                    <span v-else> - </span>
-                  </td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <template v-if="attribute in metadata.distribution">
+                        <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                          <span
+                            >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
+                            >]</span
+                          >
+                        </div>
+                      </template>
+                      <span v-else> - </span>
+                    </td>
+                  </template>
                 </tr>
                 <tr>
                   <td><strong>Distinct values</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">
-                    <template v-if="attribute in metadata.distinct">
-                      <div v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></div>
-                    </template>
-                    <span v-else> - </span>
-                  </td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <template v-if="attribute in metadata.distinct">
+                        <div v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></div>
+                      </template>
+                      <span v-else> - </span>
+                    </td>
+                  </template>
                 </tr>
                 <tr>
                   <td><strong>Statistics</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">
-                    <template v-if="attribute in metadata.statistics.min">
-                      <div class="asset__section__tabs__attribute-info__statistics">
-                        <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
-                      </div>
-                    </template>
-                    <span v-else> - </span>
-                  </td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <template v-if="attribute in metadata.statistics.min">
+                        <div class="asset__section__tabs__attribute-info__statistics">
+                          <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                        </div>
+                      </template>
+                      <span v-else> - </span>
+                    </td>
+                  </template>
                 </tr>
                 <tr>
                   <td><strong>Quantiles</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">
-                    <template v-if="attribute in metadata.quantiles['5']">
-                      <div class="asset__section__tabs__attribute-info__statistics">
-                        <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
-                      </div>
-                    </template>
-                    <span v-else> - </span>
-                  </td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <template v-if="attribute in metadata.quantiles['5']">
+                        <div class="asset__section__tabs__attribute-info__statistics">
+                          <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
+                        </div>
+                      </template>
+                      <span v-else> - </span>
+                    </td>
+                  </template>
                 </tr>
                 <tr>
                   <td><strong>Distribution</strong></td>
-                  <td v-for="attribute in metadata.attributes" :key="attribute">
-                    <template v-if="showDistributionPieChart(attribute)">
-                      <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
-                    </template>
-                    <span v-else> - </span>
-                  </td>
+                  <template v-for="attribute in metadata.attributes">
+                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <template v-if="showDistributionPieChart(attribute)">
+                        <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
+                      </template>
+                      <span v-else> - </span>
+                    </td>
+                  </template>
                 </tr>
               </tbody>
             </table>
@@ -370,10 +401,7 @@ import { ExportToCsv } from 'export-to-csv';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
 import {
-  CatalogueItemMetadataCommand,
-  CatalogueItemDetails,
-  Sample,
-  TabularSample,
+  CatalogueItemMetadataCommand, CatalogueItemDetails, Sample, TabularSample,
 } from '@/model/catalogue';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
@@ -433,12 +461,18 @@ export default class DataProfilingAndSamples extends Vue {
 
   isVertical: boolean;
 
+  toggleDropdownContainer: boolean;
+
+  selectedAttribute: any;
+
   constructor() {
     super();
 
     this.isVertical = true;
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
+    this.toggleDropdownContainer = false;
+    this.selectedAttribute = [];
 
     this.metadata = {};
     if (this.catalogueItem.automatedMetadata) [this.metadata] = this.catalogueItem.automatedMetadata;
@@ -485,6 +519,7 @@ export default class DataProfilingAndSamples extends Vue {
   }
 
   mounted(): void {
+    this.selectedAttribute = this.metadata.attributes;
     console.log('heatmap link', this.metadata.heatmap);
     this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
       this.heatmapGeoJson = heatmapResponse;
@@ -504,6 +539,11 @@ export default class DataProfilingAndSamples extends Vue {
     if (activeTab === 2 && this.isUserAuthenticated) {
       this.setMinMaxZoomLevels();
     }
+  }
+
+  @Watch('selectedAttribute')
+  onAttributeChange(v: any): void {
+    console.log(v);
   }
 
   changeLayout(value: string): void {

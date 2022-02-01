@@ -5,21 +5,27 @@ import { AxiosResponse } from 'axios';
 import {
   UboDeclaration, UboDeclarationQueryResponse, UboCommand, Ubo,
 } from '@/model/ubo-declaration';
+import {
+  EnumCustomerType,
+} from '@/model/account';
 
 export default class UboDeclarationApi extends Api {
   constructor() {
     super({ withCredentials: true });
   }
 
-  public async findAll(page = 0, size = 10): Promise<UboDeclarationQueryResponse> {
+  public async findAll(
+    page = 0, size = 10, customerType: EnumCustomerType = EnumCustomerType.PROVIDER,
+  ): Promise<UboDeclarationQueryResponse> {
     const params = {
       page,
       size,
+      type: customerType,
     };
 
     const keyValues = Object.keys(params).filter((k) => !!params[k]).map((k) => `${k}=${params[k]}`);
 
-    const url = `/action/ubo-declarations?${keyValues.join('&')}`;
+    const url = `/action/ubo-declarations?type${keyValues.join('&')}`;
 
     return this.get<UboDeclarationQueryResponse>(url)
       .then((response: AxiosResponse<UboDeclarationQueryResponse>) => {
@@ -29,8 +35,10 @@ export default class UboDeclarationApi extends Api {
       });
   }
 
-  public async findOne(uboDeclarationId: string): Promise<ServerResponse<UboDeclaration>> {
-    const url = `/action/ubo-declarations/${uboDeclarationId}`;
+  public async findOne(
+    uboDeclarationId: string, customerType: EnumCustomerType = EnumCustomerType.PROVIDER,
+  ): Promise<ServerResponse<UboDeclaration>> {
+    const url = `/action/ubo-declarations/${uboDeclarationId}?type=${customerType}`;
 
     return this.get<ServerResponse<UboDeclaration>>(url)
       .then((response: AxiosServerResponse<UboDeclaration>) => {
@@ -46,8 +54,8 @@ export default class UboDeclarationApi extends Api {
    *
    * @returns
    */
-  public async createDeclaration(): Promise<ServerResponse<UboDeclaration>> {
-    const url = '/action/ubo-declarations';
+  public async createDeclaration(customerType: EnumCustomerType = EnumCustomerType.PROVIDER): Promise<ServerResponse<UboDeclaration>> {
+    const url = `/action/ubo-declarations?type=${customerType}`;
 
     return this.post<unknown, ServerResponse<UboDeclaration>>(url, null)
       .then((response: AxiosServerResponse<UboDeclaration>) => {
@@ -77,8 +85,10 @@ export default class UboDeclarationApi extends Api {
     });
   }
 
-  public async removeUbo(uboDeclarationId: string, uboId: string): Promise<SimpleResponse> {
-    const url = `/action/ubo-declarations/${uboDeclarationId}/ubos/${uboId}`;
+  public async removeUbo(
+    uboDeclarationId: string, uboId: string, customerType: EnumCustomerType = EnumCustomerType.PROVIDER,
+  ): Promise<SimpleResponse> {
+    const url = `/action/ubo-declarations/${uboDeclarationId}/ubos/${uboId}?type=${customerType}`;
 
     return this.delete<SimpleResponse>(url).then((response: AxiosResponse<SimpleResponse>) => {
       const { data } = response;

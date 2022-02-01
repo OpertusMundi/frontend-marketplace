@@ -25,7 +25,7 @@
         </div>
         <div class="users__item"><span>{{ `${account.profile.firstName} ${account.profile.lastName}` }}</span></div>
         <div class="users__item"><span>{{ account.email }}</span></div>
-        <div class="users__item"><span>{{ account.roles.map(x => availableRoles.find(y => y.id === x).label).join(', ') }}</span></div>
+        <div class="users__item"><span>{{ account.roles.filter(x => x !== 'ROLE_VENDOR_USER').map(x => availableRoles.find(y => y.id === x).label).join(', ') }}</span></div>
         <div class="users__item">
           <button class="btn btn--std btn--outlineblue mr-xs-20" @click="onEditUser(account)">EDIT</button>
           <button v-if="account.emailVerified" :class="account.active ? 'btn--outlineblue' : 'btn--blue'" class="btn btn--std" @click="changeUserStatus(account.key, account.active ? 'disable' : 'enable')">{{ account.active ? 'DISABLE' : 'ENABLE' }}</button>
@@ -130,7 +130,7 @@ import AccountVendorApi from '@/service/account-vendor';
 import { ServerResponse } from '@/model';
 import { Sorting } from '@/model/request';
 import { EnumAccountSortField, Account, VendorAccountCommand } from '@/model/account';
-import { EnumVendorRole } from '@/model/role';
+import { EnumRole, EnumVendorRole } from '@/model/role';
 import getDefaultLogo from '@/helper/logo';
 import store from '@/store';
 
@@ -181,7 +181,7 @@ export default class DashboardUsers extends Vue {
     this.accounts = [];
 
     this.availableRoles = [
-      { id: EnumVendorRole.ROLE_VENDOR_USER, label: 'User' },
+      // { id: EnumVendorRole.ROLE_VENDOR_USER, label: 'User' },
       { id: EnumVendorRole.ROLE_VENDOR_PROVIDER, label: 'Provider' },
       { id: EnumVendorRole.ROLE_VENDOR_CONSUMER, label: 'Consumer' },
       { id: EnumVendorRole.ROLE_VENDOR_ANALYTICS, label: 'Analytics' },
@@ -208,7 +208,9 @@ export default class DashboardUsers extends Vue {
 
   @Watch('selectedRoles', { deep: true })
   onSelectedRolesChange(): void {
-    this.userToAddOrEdit.roles = this.selectedRoles.map((x) => x.id);
+    this.userToAddOrEdit.roles = this.selectedRoles
+      .map((x) => x.id);
+    // .filter((x) => x !== EnumVendorRole.ROLE_VENDOR_USER); // ROLE_VENDOR_USER is automatically assigned server-side
   }
 
   async loadUsers(page = 0): Promise<void> {
@@ -265,10 +267,12 @@ export default class DashboardUsers extends Vue {
       roles: [],
     };
 
-    this.selectedRoles = user.roles.map((x) => ({
-      id: x as unknown as EnumVendorRole,
-      label: this.availableRoles.find((y) => y.id === x as unknown as EnumVendorRole)?.label || '',
-    }));
+    this.selectedRoles = user.roles
+      .filter((x) => x !== EnumRole.ROLE_VENDOR_USER)
+      .map((x) => ({
+        id: x as unknown as EnumVendorRole,
+        label: this.availableRoles.find((y) => y.id === x as unknown as EnumVendorRole)?.label || '',
+      }));
   }
 
   defaultLogo(): string {

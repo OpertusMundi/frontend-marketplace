@@ -20,14 +20,14 @@
           <div v-else>
             <purchase-card v-for="(purchase, i) in latestPurchases" :key="purchase.key" :purchase="purchase" :index="i + 1"></purchase-card>
             <div v-if="latestPurchases && latestPurchases.length === 0">
-              <p>No purchases yet <button class="btn btn--std btn--outlineblue" @click="$router.push('/catalogue')">BECOME A VENDOR</button></p>
+              <p>No purchases yet <button class="btn btn--std btn--outlineblue" @click="$router.push('/become-vendor')">BECOME A VENDOR</button></p>
             </div>
           </div>
         </div>
         <div class="col-md-6">
           <h3 class="mb-xs-20">Latest active subscriptions</h3>
           <p v-if="latestActiveSubscriptions && latestActiveSubscriptions.length === 0">No active subscriptions</p>
-          <horizontal-card v-for="subscription in latestActiveSubscriptions" v-bind:key="subscription.serviceId" :title="subscription.item.title" price="" subtitle="" link="#" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
+          <horizontal-card v-for="subscription in latestActiveSubscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" price="" subtitle="" link="#" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
         </div>
       </div>
       <div class="row">

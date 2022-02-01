@@ -32,6 +32,18 @@
         <button class="btn btn--std btn--blue ml-xs-20" @click="onRedirectToDraftService">OK</button>
       </template>
     </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'modalAssetIsLocked'" @dismiss="modalToShow = ''" :modalId="'modalAssetIsLocked'" :showCancelButton="false" :showCloseButton="false" :closeOnClickOutside="false">
+      <template v-slot:body>
+        <div class="p-xs-30">
+          <h2>Asset is currently locked by another user.</h2>
+        </div>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="modalToShow = ''">OK</button>
+      </template>
+    </modal>
     <!-- END OF MODALS -->
 
     <div class="dashboard__head">
@@ -62,7 +74,15 @@
       </div>
     </div>
 
-    <asset-draft-card @delete="onDeleteDraft" v-for="(asset, i) in unpublishedAssets" v-bind:key="asset.id" :asset="asset" :class="{ 'mt-xs-20': i == 0 }"></asset-draft-card>
+    <asset-draft-card
+      @delete="onDeleteDraft"
+      @assetLocked="modalToShow = 'modalAssetIsLocked'"
+      v-for="(asset, i) in unpublishedAssets"
+      v-bind:key="asset.id"
+      :asset="asset"
+      :class="{ 'mt-xs-20': i == 0 }"
+    ></asset-draft-card>
+
     <pagination :currentPage="unpublishedCurrentPage" :itemsPerPage="unpublishedItemsPerPage" :itemsTotal="unpublishedItemsTotal" @pageSelection="onPageSelect(false, $event)"></pagination>
 
     <hr class="mt-xs-50 mb-xs-50 seperator-published-unpublished" />
@@ -92,7 +112,16 @@
       </div>
     </div>
 
-    <asset-published-card @serviceDraftCreated="onServiceDraftCreated" @delete="onDeleteAsset" @createNewDraft="onCreateNewDraft" v-for="(asset, i) in publishedAssets" v-bind:key="asset.id" :asset="asset" :class="{ 'asset_card__published--first': i == 0 }"></asset-published-card>
+    <asset-published-card
+      @serviceDraftCreated="onServiceDraftCreated"
+      @delete="onDeleteAsset"
+      @createNewDraft="onCreateNewDraft"
+      v-for="(asset, i) in publishedAssets"
+      v-bind:key="asset.id"
+      :asset="asset"
+      :class="{ 'asset_card__published--first': i == 0 }"
+    ></asset-published-card>
+
     <pagination :currentPage="publishedCurrentPage" :itemsPerPage="publishedItemsPerPage" :itemsTotal="publishedItemsTotal" @pageSelection="onPageSelect(true, $event)"></pagination>
   </div>
 </template>
@@ -298,6 +327,7 @@ export default class DashboardHome extends Vue {
 
     this.providerAssetsApi.find(query).then((resp) => {
       let assets = resp.result.items;
+      console.log('hey there, assets', assets);
 
       if (this.selectedTab === 'DATA_FILES') {
         assets = assets.filter((x) => x.type === EnumAssetType.VECTOR || x.type === EnumAssetType.RASTER);
