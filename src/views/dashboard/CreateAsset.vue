@@ -75,7 +75,7 @@
               </template>
 
               <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
-              <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
+              <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
 
               <div class="dashboard__form__errors" v-if="uploading.errors.length">
                 <ul>
@@ -230,6 +230,8 @@ export default class CreateAsset extends Vue {
 
   apiCreationType: string | null;
 
+  errors: any;
+
   constructor() {
     super();
 
@@ -268,6 +270,8 @@ export default class CreateAsset extends Vue {
     this.isEditingExistingDraft = false;
 
     this.selectedPayoutMethod = null;
+
+    this.errors = [];
 
     this.uploading = {
       status: false,
@@ -610,8 +614,10 @@ export default class CreateAsset extends Vue {
     if (submitResponse.success) {
       this.showUploadingMessage(true, 'Asset created!');
     } else {
-      console.log('error submitting service', submitResponse);
-      this.showUploadingMessage(true, 'An error occurred.');
+      // Passing error response to review component as prop
+      this.errors = submitResponse.messages;
+      console.log('error submitting service', submitResponse.messages);
+      // this.showUploadingMessage(true, 'An error occurred.');
     }
   }
 
