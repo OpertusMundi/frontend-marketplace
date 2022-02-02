@@ -114,7 +114,7 @@ export interface ClientCatalogueQuery {
   /**
    * Define which properties to query and the operations to apply
    */
-  query: any;
+  query?: any;
 }
 
 interface Link {

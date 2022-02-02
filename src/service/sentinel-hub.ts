@@ -5,7 +5,7 @@ import { ClientCatalogueQuery, SentinelHubCatalogueResponse, SubscriptionPlan } 
 
 const baseUri = '/action/integration/sentinel-hub';
 
-export default class QuotationApi extends Api {
+export default class SentinelHubApi extends Api {
   constructor() {
     super({ withCredentials: true });
   }
