@@ -48,7 +48,7 @@
                 <span>Analytics</span>
               </router-link>
             </li>
-            <hr>
+            <hr v-if="isShownDueToUserRole('Storage') || isShownDueToUserRole('Notebooks') || isShownDueToUserRole('TopioMaps')">
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Storage')">
               <router-link to="/dashboard/storage" data-name="Storage">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.9" viewBox="0 0 24 23.9"><g id="Group_2758" data-name="Group 2758" transform="translate(-8.26 -339.4)"><path id="Path_9490" data-name="Path 9490" d="M30.36,348.2c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8a1.012,1.012,0,1,0-1.7-1.1Z" fill="#333"/><path id="Path_9491" data-name="Path 9491" d="M31.76,353a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,1,0-1.5,1.3c1.6,1.8,5.8,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,353Z" fill="#333"/><path id="Path_9492" data-name="Path 9492" d="M31.76,358.1a.984.984,0,0,0-1.4.3c-.7,1.1-4.1,2.9-10.1,2.9s-9.3-2-10.2-3a.992.992,0,0,0-1.5,1.3c1.6,1.8,5.9,3.7,11.7,3.7,6.4,0,10.6-2,11.8-3.8A1.076,1.076,0,0,0,31.76,358.1Z" fill="#333"/><path id="Path_9493" data-name="Path 9493" d="M20.26,348c5.8,0,12-1.4,12-4.3,0-3-6.2-4.3-12-4.3s-12,1.4-12,4.3S14.46,348,20.26,348Zm0-6.7c6.5,0,10,1.7,10,2.3s-3.5,2.3-10,2.3-10-1.7-10-2.3S13.76,341.3,20.26,341.3Z" fill="#333"/></g></svg>
@@ -67,7 +67,7 @@
                 <span>t&#176;Maps</span>
               </router-link>
             </li>
-            <hr>
+            <hr v-if="isShownDueToUserRole('Purchases') || isShownDueToUserRole('Subscriptions')">
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Purchases')">
               <router-link to="/dashboard/purchases" data-name="Purchases">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23.605"><g data-name="Group 2648" fill="#333"><path data-name="Path 9494" d="M23.971 21.303 21.483 6.939a.985.985 0 1 0-1.941.337l2.488 14.363H1.97L4.488 7.274a.986.986 0 0 0-1.942-.34L.028 21.303a1.972 1.972 0 0 0 1.943 2.3H22.03a1.972 1.972 0 0 0 1.941-2.307z"/><path data-name="Path 9495" d="M7.061 10.208a.985.985 0 0 0 .985-.985v-3.3a3.954 3.954 0 1 1 7.908 0v3.3a.985.985 0 1 0 1.97 0v-3.3a5.924 5.924 0 1 0-11.848 0v3.3a.984.984 0 0 0 .985.985z"/><path data-name="Path 9496" d="M10.362 6.116a.985.985 0 1 0 0 1.97h3.285a.985.985 0 1 0 0-1.97z"/></g></svg>
@@ -80,7 +80,7 @@
                 <span>Subscriptions</span>
               </router-link>
             </li>
-            <hr>
+            <hr v-if="isShownDueToUserRole('Messages') || isShownDueToUserRole('Favorites') || isShownDueToUserRole('Settings') || isShownDueToUserRole('Users')">
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Messages')">
               <router-link to="/dashboard/messages" data-name="Messages">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16.667" viewBox="0 0 24 16.667"><g id="Group_1968" data-name="Group 1968" transform="translate(-1619.5 -489.374)"><path id="Path_8958" data-name="Path 8958" d="M1642.5,489.374h-22a1,1,0,0,0-1,1v14.667a1,1,0,0,0,1,1h22a1,1,0,0,0,1-1V490.374A1,1,0,0,0,1642.5,489.374Zm-1,14.667h-20V491.374h20Z" fill="#333"/><path id="Path_8959" data-name="Path 8959" d="M1630.831,501.357a1,1,0,0,0,1.341,0l6.944-6.292a1,1,0,1,0-1.344-1.482l-6.275,5.687-6.273-5.642a1,1,0,0,0-1.338,1.486Z" fill="#333"/></g></svg>
