@@ -25,7 +25,7 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Name" rules="required">
+                <validation-provider v-slot="{ errors }" :custom-messages="{ unique_name: 'This company is already registered as a vendor' }" name="Name" mode="lazy" rules="required|unique_name">
                   <div class="form-group">
                     <label for="name">Name *</label>
                     <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
@@ -79,7 +79,7 @@
                   <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                     <div class="form-group">
                       <label for="multiselect_headquarters_country">Country *</label>
-                      <!-- IMPORTANT NOTE: dropdown is populated by europe countries so that country codes are compatible with vat-validate library  -->
+                      <!-- IMPORTANT NOTE: dropdown is populated by europe countries -->
                       <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="europeCountries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false" open-direction="top"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
@@ -460,7 +460,8 @@ import {
   localize,
 } from 'vee-validate';
 import { isValidIBAN, isValidBIC } from 'ibantools';
-import validateVat, { CountryCodes as validateVatCountryCodes } from 'validate-vat-ts';
+import { checkVAT, countries as countriesForVatValidation } from 'jsvat';
+// import validateVat, { CountryCodes as validateVatCountryCodes } from 'validate-vat-ts';
 import Multiselect from 'vue-multiselect';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
@@ -488,15 +489,45 @@ const phoneNumberValidator = {
 };
 extend('phoneNumber', phoneNumberValidator);
 
+// const vatValidator = {
+//   async validate(value, args): Promise<boolean> {
+//     const [country] = args;
+//     if (!country) return true;
+
+//     store.commit('setLoading', true);
+//     try {
+//       const validationResponse = await validateVat(country, value);
+//       if (validationResponse.valid) return true;
+//       return false;
+//     } catch (err) {
+//       return true;
+//     } finally {
+//       store.commit('setLoading', false);
+//     }
+//   }
+// }
+// extend('vat', vatValidator);
+
 const vatValidator = {
-  async validate(value, args): Promise<boolean> {
+  validate(value, args): boolean {
     const [country] = args;
     if (!country) return true;
 
+    const fullVATValue = `${country}${value}`;
+
+    if (!checkVAT(fullVATValue, countriesForVatValidation).isSupportedCountry) throw new Error('Country incompatible with jsvat library');
+    if (checkVAT(fullVATValue, countriesForVatValidation).isValid) return true;
+    return false;
+  }
+}
+extend('vat', vatValidator);
+
+const nameValidator = {
+  async validate(value): Promise<boolean> {
     store.commit('setLoading', true);
     try {
-      const validationResponse = await validateVat(country, value);
-      if (validationResponse.valid) return true;
+      const isNameUnique = await (new ProviderAPI()).isNameAvailable(value);
+      if (isNameUnique) return true;
       return false;
     } catch (err) {
       return true;
@@ -505,7 +536,7 @@ const vatValidator = {
     }
   }
 }
-extend('vat', vatValidator);
+extend('unique_name', nameValidator);
 
 const ibanValidator = {
   validate(value) {
@@ -651,19 +682,21 @@ export default class BecomeVendor extends Vue {
   }
 
   created(): void {
-    if (!this.isHeadquartersCountryListCompatibleWithVatValidationLibrary()) throw new Error('Country list is incompatible with vat-validate library');
+    if (!this.isHeadquartersCountryListCompatibleWithVatValidationLibrary()) throw new Error('Country list is incompatible with jsvat library');
+    console.log('Country list is compatible with vat validation.');
   }
 
   isHeadquartersCountryListCompatibleWithVatValidationLibrary(): boolean {
-    const validationLibraryCountries = Object.values(validateVatCountryCodes);
+    // const validationLibraryCountries = Object.values(validateVatCountryCodes);
     const headquartersCountries = store.getters.getConfig.configuration.europeCountries.map((x) => x.code);
 
-    if (headquartersCountries.some((x) => !validationLibraryCountries.includes(x))) return false;
+    // if (headquartersCountries.some((x) => !validationLibraryCountries.includes(x))) return false;
+    if (headquartersCountries.some((x) => !checkVAT(`${x}123`, countriesForVatValidation).isSupportedCountry)) return false;
     return true;
   }
 
   onSelectHeadquartersCountry(): void {
-    if (!(Object.values(validateVatCountryCodes) as string[]).includes(this.selectedHeadquartersCountry.code)) throw new Error('Country incompatible with vat-validate library');
+    // if (!(Object.values(validateVatCountryCodes) as string[]).includes(this.selectedHeadquartersCountry.code)) throw new Error('Country incompatible with vat-validate library');
     this.vendorData.headquartersAddress.country = this.selectedHeadquartersCountry.code;
   }
 

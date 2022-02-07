@@ -2,7 +2,13 @@ import Api from '@/service/api';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import {
-  SalesQuery, DataSeries, AssetQuery, CoverageQuery, AssetTotalValueQuery,
+  SalesQuery,
+  DataSeries,
+  AssetQuery,
+  CoverageQuery,
+  AssetTotalValueQuery,
+  PopularAsset,
+  PopularTerm,
 } from '@/model/analytics';
 
 export default class AnalyticsApi extends Api {
@@ -93,6 +99,28 @@ export default class AnalyticsApi extends Api {
 
     return this.post<AssetTotalValueQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async getMostPopularAssets(query: AssetQuery): Promise<ServerResponse<PopularAsset[]>> {
+    const url = '/action/analytics/popular-assets';
+
+    return this.post<AssetQuery, ServerResponse<PopularAsset[]>>(url, query)
+      .then((response: AxiosServerResponse<PopularAsset[]>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async getMostPopularTerms(): Promise<ServerResponse<PopularTerm[]>> {
+    const url = '/action/analytics/popular-terms';
+
+    return this.get<ServerResponse<PopularTerm[]>>(url)
+      .then((response: AxiosServerResponse<PopularTerm[]>) => {
         const { data } = response;
 
         return data;

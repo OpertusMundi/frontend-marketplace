@@ -221,4 +221,18 @@ export default class ContractApi extends Api {
       return data;
     });
   }
+
+  /**
+   * Print Pdf contract
+   *
+   * @param key
+   * @returns
+   */
+  public async printTemplate(key: string): Promise<AxiosServerResponse<BinaryType>> {
+    const url = `/action/contract/provider/templates/pdf/${key}`;
+
+    return this.get<ServerResponse<BinaryType>>(url, {
+      responseType: 'blob',
+    });
+  }
 }

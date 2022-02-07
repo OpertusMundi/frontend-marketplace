@@ -12,7 +12,10 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
-                  <li><strong>{{ asset.spatialDataServiceType ? 'Published Asset type:' : 'Type:' }}</strong>{{ asset.type }}</li>
+                  <li>
+                    <strong>{{ asset.spatialDataServiceType ? 'Published Asset type:' : 'Type:' }}</strong
+                    >{{ asset.type }}
+                  </li>
                   <li v-if="asset.spatialDataServiceType"><strong>Service type:</strong>{{ asset.spatialDataServiceType }}</li>
                 </ul>
               </div>
@@ -71,33 +74,33 @@
                     </span>
                     <span v-if="pricingModel.type === 'FIXED_PER_ROWS'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€, minimum rows: {{ pricingModel.minRows }} <br>
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                      {{ pricingModel.price }}€, minimum rows: {{ pricingModel.minRows }} <br />
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
                     </span>
                     <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br>
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                      {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br />
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
                     </span>
                     <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per call<br>
-                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br></div>
+                      {{ pricingModel.price }}€ per call<br />
+                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
                     </span>
                     <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per call<br>
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br></div>
+                      {{ pricingModel.price }}€ per call<br />
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
                     </span>
                     <span v-if="pricingModel.type === 'PER_ROW_WITH_PREPAID'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per row<br>
-                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                      {{ pricingModel.price }}€ per row<br />
+                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
                     </span>
                     <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
                       <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per row<br>
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br></div>
+                      {{ pricingModel.price }}€ per row<br />
+                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
                     </span>
                   </li>
                 </ul>
@@ -126,6 +129,14 @@
               </div>
             </div>
           </div>
+          <div class="col-md-4">
+            <div v-for="error in errors" :key="error.id" style="color: red;" class="dashboard__form__review__item__head dashboard__form__review__item__head--no-border">
+              <h5>{{ error.level }}</h5>
+              <p>
+                <strong>Description</strong> : <span>{{ error.description }}</span>
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- </div> -->
@@ -138,10 +149,7 @@
 </template>
 <script lang="ts">
 import {
-  Component,
-  Vue,
-  Prop,
-  Watch,
+  Component, Vue, Prop, Watch,
 } from 'vue-property-decorator';
 import { CatalogueItemCommand } from '@/model';
 import { ValidationObserver } from 'vee-validate';
@@ -157,6 +165,8 @@ export default class Review extends Vue {
   @Prop({ required: true }) private asset!: CatalogueItemCommand;
 
   @Prop({ required: true }) private vettingRequired!: boolean;
+
+  @Prop({ required: false }) private errors: any;
 
   contractApi: ContractApi;
 
@@ -197,7 +207,7 @@ export default class Review extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_assets.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
-  @import "~flexboxgrid/css/flexboxgrid.min.css";
+@import '@/assets/styles/_assets.scss';
+@import '@/assets/styles/abstracts/_spacings.scss';
+@import '~flexboxgrid/css/flexboxgrid.min.css';
 </style>
