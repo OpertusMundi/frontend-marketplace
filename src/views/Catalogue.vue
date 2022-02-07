@@ -710,6 +710,7 @@ export default class Catalogue extends Vue {
       store.commit('setLoading', true);
       this.onToggleFilterShortcut(this.$route.params.filterShortcut);
     } else {
+      if (this.$route.params.termShortcut) Vue.set(this.catalogQuery, 'query', this.$route.params.termShortcut);
       this.searchUsingFilters(true);
     }
 

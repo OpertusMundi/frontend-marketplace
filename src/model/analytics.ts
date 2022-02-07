@@ -190,3 +190,11 @@ export interface DataSeries {
    */
   points: DataPoint[];
 }
+
+export interface PopularTerm {
+  [key: string]: number;
+}
+
+export interface PopularAsset {
+  [key: string]: number;
+}

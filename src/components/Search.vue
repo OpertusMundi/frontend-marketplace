@@ -69,7 +69,16 @@
         </li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showPopular">
-        <li>
+        <li
+          v-for="popularTerm in popularTerms"
+          :key="popularTerm.term"
+        >
+          <a href="#" @click.prevent="selectPopularTerm(popularTerm.term)">
+            <h5>{{ popularTerm.term }}</h5>
+            <!-- <span>{{ popularTerm.amount }} {{ popularTerm.amount === 1 ? 'search' : 'searches' }}</span> -->
+          </a>
+        </li>
+        <!-- <li>
           <a href="#"
             ><h5>Administrative boundaries in Greece</h5>
             <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a
@@ -86,15 +95,16 @@
             ><h5>Athens road network WFS</h5>
             <span>Roads, Street names, Athens, Greece, WFS</span></a
           >
-        </li>
+        </li> -->
       </ul>
-      <a href="" class="asset_search__resultscont__action">Delete search history</a>
+      <a href="" class="asset_search__resultscont__action" v-if="showRecent">Delete search history</a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import AnalyticsApi from '@/service/analytics';
 import CatalogueApi from '@/service/catalogue';
 import { CatalogueQueryResponse, CatalogueQuery, CatalogueItem } from '@/model';
 import { AxiosError } from 'axios';
@@ -106,7 +116,7 @@ export default class Search extends Vue {
 
   catalogQuery: CatalogueQuery;
 
-  query: '';
+  query = '';
 
   queryHasResults = false;
 
@@ -116,7 +126,11 @@ export default class Search extends Vue {
 
   showRecent = true;
 
+  analyticsApi: AnalyticsApi;
+
   catalogueApi: CatalogueApi;
+
+  popularTerms: { term: string, amount: number }[] = [];
 
   queryResults: CatalogueItem[];
 
@@ -135,7 +149,25 @@ export default class Search extends Vue {
       size: 6,
       query: this.query,
     };
+
+    this.analyticsApi = new AnalyticsApi();
     this.catalogueApi = new CatalogueApi();
+  }
+
+  created(): void {
+    this.analyticsApi.getMostPopularTerms().then((response) => {
+      if (response.success) {
+        this.popularTerms = response.result
+          // eslint-disable-next-line
+          .sort((a, b) => (Object.values(a)[0]! < Object.values(b)[0]!) ? 1 : (Object.values(a)[0]! > Object.values(b)[0]!) ? -1 : 0)
+          .map((x) => ({
+            term: Object.keys(x)[0],
+            amount: x[Object.keys(x)[0]],
+          }));
+      } else {
+        console.log('err', response);
+      }
+    });
   }
 
   clearInput(): void {
@@ -192,6 +224,10 @@ export default class Search extends Vue {
   //     });
   //   }
   // }
+
+  selectPopularTerm(popularTerm: string): void {
+    this.$router.push({ name: 'Catalogue', params: { termShortcut: popularTerm } });
+  }
 
   searchAssets(): void {
     if (this.query.length <= 2) return;
