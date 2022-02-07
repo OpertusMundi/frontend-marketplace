@@ -25,7 +25,7 @@
                   </div>
                 </validation-provider>
 
-                <validation-provider v-slot="{ errors }" name="Name" rules="required">
+                <validation-provider v-slot="{ errors }" :custom-messages="{ unique_name: 'This company is already registered as a vendor' }" name="Name" mode="lazy" rules="required|unique_name">
                   <div class="form-group">
                     <label for="name">Name *</label>
                     <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
@@ -506,6 +506,22 @@ const vatValidator = {
   }
 }
 extend('vat', vatValidator);
+
+const nameValidator = {
+  async validate(value): Promise<boolean> {
+    store.commit('setLoading', true);
+    try {
+      const isNameUnique = await (new ProviderAPI()).isNameAvailable(value);
+      if (isNameUnique) return true;
+      return false;
+    } catch (err) {
+      return true;
+    } finally {
+      store.commit('setLoading', false);
+    }
+  }
+}
+extend('unique_name', nameValidator);
 
 const ibanValidator = {
   validate(value) {
