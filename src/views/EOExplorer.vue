@@ -4,44 +4,51 @@
       <div class="container-fluid p-0">
         <div class="row">
           <div class="col-md-4">
-            <h4>Data source: Something</h4>
+            <template v-if="!searchResults">
+              <h4>Data source: Something</h4>
 
-            <h4 class="mt-xs-20">Date Selection</h4>
-            <div class="d-flex space-between">
-              <div>
-                <label>From date</label>
-                <datepicker input-class="form-group__text" :value="date.from" @input="date.from = formatDate($event)"></datepicker>
+              <h4 class="mt-xs-20">Date Selection</h4>
+              <div class="d-flex space-between">
+                <div>
+                  <label>From date</label>
+                  <datepicker input-class="form-group__text" :value="date.from" @input="date.from = formatDate($event)"></datepicker>
+                </div>
+                <div>
+                  <label>To date</label>
+                  <datepicker input-class="form-group__text" :value="date.to" @input="date.to = formatDate($event)"></datepicker>
+                </div>
               </div>
-              <div>
-                <label>To date</label>
-                <datepicker input-class="form-group__text" :value="date.to" @input="date.to = formatDate($event)"></datepicker>
-              </div>
-            </div>
 
-            <h4 class="mt-xs-20">Spatial extent</h4>
-            <div class="d-flex flex-column align-items-center">
-              <label for="bboxNorth">North</label>
-              <div><input id="bboxNorth" type="number" v-model="bbox.maxLat" class="form-group__text"></div>
-            </div>
-            <div class="d-flex space-between">
-              <div>
-                <label for="bboxWest">West</label>
-                <div><input id="bboxWest" type="number" v-model="bbox.minLon" class="form-group__text"></div>
+              <h4 class="mt-xs-20">Spatial extent</h4>
+              <div class="d-flex flex-column align-items-center">
+                <label for="bboxNorth">North</label>
+                <div><input id="bboxNorth" type="number" v-model="bbox.maxLat" class="form-group__text"></div>
               </div>
-              <div>
-                <label for="bboxEast">East</label>
-                <div><input id="bboxEast" type="number" v-model="bbox.maxLon" class="form-group__text"></div>
+              <div class="d-flex space-between">
+                <div>
+                  <label for="bboxWest">West</label>
+                  <div><input id="bboxWest" type="number" v-model="bbox.minLon" class="form-group__text"></div>
+                </div>
+                <div>
+                  <label for="bboxEast">East</label>
+                  <div><input id="bboxEast" type="number" v-model="bbox.maxLon" class="form-group__text"></div>
+                </div>
               </div>
-            </div>
-            <div class="d-flex flex-column align-items-center">
-              <label for="bboxSouth">South</label>
-              <div><input id="bboxSouth" type="number" v-model="bbox.minLat" class="form-group__text"></div>
-            </div>
+              <div class="d-flex flex-column align-items-center">
+                <label for="bboxSouth">South</label>
+                <div><input id="bboxSouth" type="number" v-model="bbox.minLat" class="form-group__text"></div>
+              </div>
 
-            <div class="d-flex justify-content-center mt-xs-50">
-              <button class="btn btn--std btn--outlineblue mr-xs-20">CANCEL</button>
-              <button class="btn btn--std btn--blue" @click="searchCollection">SEARCH</button>
-            </div>
+              <div class="d-flex justify-content-center mt-xs-50">
+                <button class="btn btn--std btn--outlineblue mr-xs-20">CANCEL</button>
+                <button class="btn btn--std btn--blue" @click="searchCollection">SEARCH</button>
+              </div>
+            </template>
+            <template v-else>
+              <a href="" @click.prevent="resetResults" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+              <hr>
+              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature"></eo-explorer-card>
+            </template>
           </div>
           <div class="col-md-8">
             <div id="eo-map"></div>
@@ -58,8 +65,9 @@ import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import 'leaflet-shades';
 import Datepicker from 'vuejs-datepicker';
+import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
-import { ClientCatalogueQuery } from '@/model/sentinel-hub';
+import { ClientCatalogueQuery, SentinelHubCatalogueResponse } from '@/model/sentinel-hub';
 import store from '@/store';
 
 interface ExtendedMapOptions extends L.MapOptions {
@@ -72,7 +80,10 @@ interface RectangleEditable extends L.Rectangle {
 }
 
 @Component({
-  components: { Datepicker },
+  components: {
+    Datepicker,
+    'eo-explorer-card': EOExplorerCard,
+  },
 })
 export default class EOExplorer extends Vue {
   sentinelHubApi = new SentinelHubApi();
@@ -94,6 +105,8 @@ export default class EOExplorer extends Vue {
     maxLat: 56,
     maxLon: -3,
   };
+
+  searchResults: SentinelHubCatalogueResponse | null = null;
 
   mapShades: any | null = null;
 
@@ -144,15 +157,18 @@ export default class EOExplorer extends Vue {
     this.mapShades.addTo(this.map);
     // this.map.invalidateSize();
 
-    this.bboxSelectionRect!.on('editable:vertex:dragstart', () => {
+    if (!this.bboxSelectionRect) return;
+
+    this.bboxSelectionRect.on('editable:vertex:dragstart', () => {
       console.log('dragstart');
       this.mapShades.onRemove(this.map);
       this.mapShades = null;
     });
 
-    this.bboxSelectionRect!.on('editable:vertex:dragend', () => {
+    this.bboxSelectionRect.on('editable:vertex:dragend', () => {
       console.log('dragend');
-      const boundsArr = this.bboxSelectionRect!.getBounds().toBBoxString().split(',');
+      if (!this.bboxSelectionRect) return;
+      const boundsArr = this.bboxSelectionRect.getBounds().toBBoxString().split(',');
       this.bbox = {
         minLat: parseFloat(boundsArr[1]),
         minLon: parseFloat(boundsArr[0]),
@@ -184,14 +200,24 @@ export default class EOExplorer extends Vue {
     this.sentinelHubApi.search(queryData).then((response) => {
       if (response.success) {
         console.log(response.result);
-        response.result.features.forEach((x) => {
+        this.searchResults = response.result;
+
+        this.searchResults.features.forEach((x) => {
           L.geoJSON(x.geometry).addTo(this.featureGroup);
         });
+
+        (this.bboxSelectionRect as RectangleEditable).disableEdit();
       } else {
         console.log('error', response);
       }
       store.commit('setLoading', false);
     });
+  }
+
+  resetResults(): void {
+    this.searchResults = null;
+    this.featureGroup.clearLayers();
+    (this.bboxSelectionRect as RectangleEditable).enableEdit();
   }
 }
 </script>

@@ -131,7 +131,7 @@ interface Asset {
   roles: string[];
 }
 
-interface Feature {
+export interface Feature {
   id: string;
   geometry: GeoJSON.Geometry;
   bbox: number[];

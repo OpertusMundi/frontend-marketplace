@@ -1,7 +1,7 @@
 .eo_explorer_page {
+  background: $lightBgColor;
   padding-top: $header_height;
-  min-height: 100vh;
-  height: 0;
+  height: 100vh;
   
   >.container-fluid {
     height: 100%;
@@ -14,11 +14,30 @@
       div:nth-child(2) {
         padding-right: 0;
       }
+
+      >div:nth-child(1) {
+        height: 100%;
+        overflow-y: scroll;
+      }
     }
   }
 
   #eo-map {
     height: 100%;
     width: 100%;
+  }
+
+  .back_btn_container {
+    display: flex;
+    align-items: center;
+    color: $darkColor;
+    margin: 20px 0;
+    font-weight: 500;
+    font-size: em(16);
+    img {
+      display: block;
+      margin-right: 10px;
+      width: 8px;
+    }
   }
 }
