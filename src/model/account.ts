@@ -1,5 +1,6 @@
 import { EnumRole, EnumVendorRole } from './role';
 import { EnumAuthProvider } from './configuration';
+import { Quota } from './file';
 
 export enum EnumAccountType {
   OPERTUSMUNDI = 'OPERTUSMUNDI',
@@ -461,6 +462,10 @@ export interface Profile extends ProfileBase {
    * Provider related data
    */
   provider: ProviderData;
+  /**
+   * User file system quota
+   */
+  quota: Quota | null;
 }
 
 /**

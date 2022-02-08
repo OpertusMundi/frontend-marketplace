@@ -60,3 +60,14 @@ export interface FileUploadCommand {
    */
   path: string;
 }
+
+export interface Quota {
+  /**
+   * Total available space
+   */
+  total: number;
+  /**
+   * Space used
+   */
+  used: number;
+}
