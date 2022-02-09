@@ -160,24 +160,39 @@ export default class EOExplorer extends Vue {
     if (!this.bboxSelectionRect) return;
 
     this.bboxSelectionRect.on('editable:vertex:dragstart', () => {
-      console.log('dragstart');
-      this.mapShades.onRemove(this.map);
-      this.mapShades = null;
+      this.onBboxRectStartEditing();
     });
 
     this.bboxSelectionRect.on('editable:vertex:dragend', () => {
-      console.log('dragend');
-      if (!this.bboxSelectionRect) return;
-      const boundsArr = this.bboxSelectionRect.getBounds().toBBoxString().split(',');
-      this.bbox = {
-        minLat: parseFloat(boundsArr[1]),
-        minLon: parseFloat(boundsArr[0]),
-        maxLat: parseFloat(boundsArr[3]),
-        maxLon: parseFloat(boundsArr[2]),
-      };
+      this.onBboxRectStopEditing();
     });
 
     // todo: catch move event
+    this.bboxSelectionRect.on('editable:dragstart', () => {
+      this.onBboxRectStartEditing();
+    });
+
+    this.bboxSelectionRect.on('editable:dragend', () => {
+      this.onBboxRectStopEditing();
+    });
+  }
+
+  onBboxRectStartEditing(): void {
+    console.log('dragstart');
+    this.mapShades.onRemove(this.map);
+    this.mapShades = null;
+  }
+
+  onBboxRectStopEditing(): void {
+    console.log('dragend');
+    if (!this.bboxSelectionRect) return;
+    const boundsArr = this.bboxSelectionRect.getBounds().toBBoxString().split(',');
+    this.bbox = {
+      minLat: parseFloat(boundsArr[1]),
+      minLon: parseFloat(boundsArr[0]),
+      maxLat: parseFloat(boundsArr[3]),
+      maxLon: parseFloat(boundsArr[2]),
+    };
   }
 
   formatDate(v: string): string {
