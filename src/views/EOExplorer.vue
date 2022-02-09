@@ -5,9 +5,9 @@
         <div class="row">
           <div class="col-md-4">
             <template v-if="!searchResults">
-              <h4>Data source: Something</h4>
+              <h4 class="mt-xs-20">Data source: <span class="collection_name">sentinel-1-grd</span></h4>
 
-              <h4 class="mt-xs-20">Date Selection</h4>
+              <h4 class="mt-xs-20 mb-xs-10">Date Selection</h4>
               <div class="d-flex space-between">
                 <div>
                   <label>From date</label>
@@ -19,7 +19,7 @@
                 </div>
               </div>
 
-              <h4 class="mt-xs-20">Spatial extent</h4>
+              <h4 class="mt-xs-20 mb-xs-10">Spatial extent</h4>
               <div class="d-flex flex-column align-items-center">
                 <label for="bboxNorth">North</label>
                 <div><input id="bboxNorth" type="number" v-model="bbox.maxLat" class="form-group__text"></div>
@@ -100,10 +100,10 @@ export default class EOExplorer extends Vue {
   };
 
   bbox = {
-    minLat: 54,
-    minLon: -5,
-    maxLat: 56,
-    maxLon: -3,
+    minLat: 49,
+    minLon: -13,
+    maxLat: 59,
+    maxLon: 5,
   };
 
   searchResults: SentinelHubCatalogueResponse | null = null;
