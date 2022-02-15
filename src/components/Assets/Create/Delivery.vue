@@ -125,7 +125,7 @@
                 <p>Select an asset from your topio Drive. ssss</p>
               </div>
               <div>
-                <file-topio-drive :fileTopioDrive.sync="fileTopioDrive"></file-topio-drive>
+                <file-topio-drive :fileApi.sync="fileTopioDrive"></file-topio-drive>
               </div>
             </div>
             <div v-if="deliveryMethodLocal === 'DIGITAL_PROVIDER' && byOwnMeans === 'MEANS'" class="col-md-4">
@@ -294,7 +294,8 @@ export default class Delivery extends Vue {
 
   @Watch('fileTopioDrive', { deep: true })
   onfileTopioDriveChange(fileTopioDrive: DraftApiFromFileCommand | null): void {
-    console.log(fileTopioDrive, 'topio drive');
+    this.$emit('update:selectedPublishedFileForDataFileCreation', fileTopioDrive);
+    console.log('Emit file from storage to CreatAsset component topio drive => ', fileTopioDrive);
   }
 
   // eslint-disable-next-line
