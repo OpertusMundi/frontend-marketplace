@@ -61,7 +61,7 @@
 
               <template v-if="assetMainType !== 'API'">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" v-if="currentStep === 3"></delivery>
+                <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
               </template>
@@ -129,7 +129,7 @@ import {
   CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
-import { AssetFileAdditionalResourceCommand, FileResourceCommand } from '@/model/asset';
+import { AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand } from '@/model/asset';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
 import Metadata from '@/components/Assets/Create/Metadata.vue';
@@ -216,6 +216,8 @@ export default class CreateAsset extends Vue {
 
   selectedPublishedFileForApiCreation: DraftApiFromFileCommand | null;
 
+  selectedPublishedFileForDataFileCreation: UserFileResourceCommand | null;
+
   // contract: string;
 
   totalSteps = 7;
@@ -262,6 +264,8 @@ export default class CreateAsset extends Vue {
     this.selectedPublishedAssetForApiCreation = null;
 
     this.selectedPublishedFileForApiCreation = null;
+
+    this.selectedPublishedFileForDataFileCreation = null;
 
     this.assetId = '';
 
@@ -345,6 +349,11 @@ export default class CreateAsset extends Vue {
   @Watch('selectedPayoutMethod')
   onChangePayoutMethod(value: 'through_platform' | 'external_means' | 'credit_debit' | null): void {
     console.log('STEP 6 => Payout method', value);
+  }
+
+  @Watch('selectedPublishedFileForDataFileCreation')
+  onChangeSelectedPublishedFileForDataFileCreation(): void {
+    console.log('FILE FROM TOPIO DRIVE DELIVERY => ', this.selectedPublishedFileForDataFileCreation);
   }
 
   created(): void {
@@ -664,6 +673,26 @@ export default class CreateAsset extends Vue {
     return asset;
   }
 
+  async addResourceFromFileSystem(draftKey: string): Promise<CatalogueItemCommand> {
+    this.showUploadingMessage(false, 'Your resource from topio drive is being uploaded');
+
+    const filetFromTopioDrive: UserFileResourceCommand = {
+      path: this.selectedPublishedFileForDataFileCreation?.path as string,
+      format: this.asset.format,
+    };
+
+    const addResourceFromFileSystemResponse = await this.draftAssetApi.addResourceFromFileSystem(draftKey, filetFromTopioDrive);
+
+    if (!addResourceFromFileSystemResponse.success) {
+      console.log('err', addResourceFromFileSystemResponse);
+      this.showUploadingMessage(true, 'An error occurred.');
+      throw new Error('error');
+    }
+
+    const asset = addResourceFromFileSystemResponse.result.command;
+    return asset;
+  }
+
   async submitApiForm(isDraft = false): Promise<void> {
     try {
       let draftAsset: AssetDraft = {} as AssetDraft;
@@ -693,7 +722,7 @@ export default class CreateAsset extends Vue {
   }
 
   async submitDataFileForm(isDraft = false): Promise<void> {
-    console.log('DATA FILE');
+    console.log('DATA FILE SUBMISSION =>');
     console.log(this.fileToUpload.isFileSelected, 'IS FILE SELECTED');
     try {
       this.modalToShow = '';
@@ -737,7 +766,10 @@ export default class CreateAsset extends Vue {
 
       if (this.fileToUpload.isFileSelected) this.asset = await this.uploadResource(draftAsset.key, uploadConfig);
 
+      if (this.selectedPublishedFileForDataFileCreation) this.asset = await this.addResourceFromFileSystem(draftAsset.key);
+
       await this.submitAsset(draftAsset.key);
+      console.log(this.asset, 'ON TYEY SUBMISSION');
     } catch (err) {
       console.error((err as any).message);
 
