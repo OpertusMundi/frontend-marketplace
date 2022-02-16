@@ -114,7 +114,7 @@ export interface ClientCatalogueQuery {
   /**
    * Define which properties to query and the operations to apply
    */
-  query: any;
+  query?: any;
 }
 
 interface Link {
@@ -131,7 +131,7 @@ interface Asset {
   roles: string[];
 }
 
-interface Feature {
+export interface Feature {
   id: string;
   geometry: GeoJSON.Geometry;
   bbox: number[];

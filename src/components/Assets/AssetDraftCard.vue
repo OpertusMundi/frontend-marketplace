@@ -57,7 +57,7 @@
             <!-- <li @click="createService('WMS')">Create WMS</li>
             <li @click="createService('WFS')">Create WFS</li> -->
 
-            <li @click="'lock' in asset ? onLockedAssetClick() : deleteAsset()">Delete</li>
+            <li @click="'lock' in asset && asset.lock.ownerKey !== $store.getters.getUserKey ? onLockedAssetClick() : deleteAsset()">Delete</li>
           </ul>
         </div>
       </transition>

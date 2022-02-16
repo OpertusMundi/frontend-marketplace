@@ -25,6 +25,11 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
+    path: '/eo-explorer',
+    name: 'EOExplorer',
+    component: (): Promise<any> => import(/* webpackChunkName: "eoexplorer" */ '../views/EOExplorer.vue'),
+  },
+  {
     path: '/helpdesk-review/:key',
     name: 'HelpdeskReview',
     component: (): Promise<any> => import(/* webpackChunkName: "helpdeskreview" */ '../views/CatalogueSingle.vue'),

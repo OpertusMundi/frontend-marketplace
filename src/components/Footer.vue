@@ -82,7 +82,7 @@
             </div>
             <div class="footer__upper__item">
               <h6>Disclaimers</h6>
-              <router-link to="/terms">Terms & Conditions</router-link>
+              <router-link to="/terms">Terms of Service</router-link>
               <router-link to="/privacy">Privacy Policy</router-link>
             </div>
             <div class="footer__upper__social">
