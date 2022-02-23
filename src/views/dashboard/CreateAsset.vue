@@ -633,6 +633,21 @@ export default class CreateAsset extends Vue {
   async uploadAdditionalResources(draftAssetKey: string, config: AxiosRequestConfig): Promise<CatalogueItemCommand> {
     this.showUploadingMessage(false, 'Your additional metadata resources are being uploaded');
 
+    // add suffix (n) to files with same name
+    this.additionalResourcesToUpload.reduceRight((_, x, i) => {
+      const numSuffix = this.additionalResourcesToUpload.filter((y, j) => y.file.name === x.file.name && j < i).length;
+
+      this.additionalResourcesToUpload[i] = numSuffix ? {
+        ...x,
+        resourceCommand: {
+          ...x.resourceCommand,
+          fileName: x.file.name.split('.').map((y, j) => (j === x.file.name.split('.').length - 2 ? `${y}(${numSuffix})` : y)).join('.'),
+        },
+      } : x;
+
+      return _;
+    }, null);
+
     let asset: CatalogueItemCommand = {} as CatalogueItemCommand;
 
     for (let i = 0; i < this.additionalResourcesToUpload.length; i += 1) {
