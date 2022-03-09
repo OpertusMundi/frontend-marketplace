@@ -158,6 +158,7 @@ export default class Search extends Vue {
     this.analyticsApi.getMostPopularTerms().then((response) => {
       if (response.success) {
         this.popularTerms = response.result
+          .filter((x) => Object.keys(x)[0])
           // eslint-disable-next-line
           .sort((a, b) => (Object.values(a)[0]! < Object.values(b)[0]!) ? 1 : (Object.values(a)[0]! > Object.values(b)[0]!) ? -1 : 0)
           .map((x) => ({

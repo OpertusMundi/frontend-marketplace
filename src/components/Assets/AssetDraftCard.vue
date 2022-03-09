@@ -1,6 +1,6 @@
 <template>
-  <div class="asset_card__wrapper" @click="'lock' in asset ? onLockedAssetClick() : ''">
-    <router-link :to="'lock' in asset ? '' : getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{ 'asset_card--red_marked': asset.status === 'DRAFT' }">
+  <div class="asset_card__wrapper" @click="'lock' in asset && asset.lock.ownerKey !== $store.getters.getUserKey ? onLockedAssetClick() : ''">
+    <router-link :to="'lock' in asset && asset.lock.ownerKey !== $store.getters.getUserKey ? '' : getRouterLink(asset.status, asset.key, asset.assetPublished)" class="asset_card asset_card--wrapped" :class="{ 'asset_card--red_marked': asset.status === 'DRAFT' }">
       <div class="asset_card__view" :style="{ '--color': getColor() }"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{ '--color': getColor() }">
         <div class="asset_card__top">
@@ -40,7 +40,7 @@
     </router-link>
 
     <div class="asset_card__right_dropdown_container" v-if="asset.status === 'DRAFT'">
-      <div @click="isRightDropdownOpen = 'lock' in asset ? false : !isRightDropdownOpen" class="asset_card__three_dots_btn">
+      <div @click="isRightDropdownOpen = !isRightDropdownOpen" class="asset_card__three_dots_btn">
         <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17">
           <g data-name="Group 2622" fill="#333">
             <circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5" />
@@ -52,11 +52,6 @@
       <transition name="fade" mode="out-in">
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
-            <!-- <li>Publish</li>
-            <li>Edit</li> -->
-            <!-- <li @click="createService('WMS')">Create WMS</li>
-            <li @click="createService('WFS')">Create WFS</li> -->
-
             <li @click="'lock' in asset && asset.lock.ownerKey !== $store.getters.getUserKey ? onLockedAssetClick() : deleteAsset()">Delete</li>
           </ul>
         </div>
@@ -69,11 +64,8 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
-// import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
 import getPriceOrMinimumPrice from '@/helper/cards';
 import moment from 'moment';
-// import { DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
-// import store from '@/store';
 
 @Component
 export default class AssetDraftCard extends Vue {

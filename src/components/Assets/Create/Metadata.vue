@@ -14,16 +14,26 @@
             <template v-slot:body>
               <h1>Upload files</h1>
 
-              <div v-for="fileInput in numberOfAdditionalResourcesFiles" :key="fileInput" class="form-group mt-sm-20">
-                <input class="form-group__text input-additional-resource-file" type="file">
-                <input class="form-group__text input-additional-resource-comments" type="text" placeholder="add comments">
+              <div v-for="(additionalResource, i) in additionalResourcesTemp" :key="i" class="form-group mt-sm-20">
+                <div class="form-group additional-resource-input">
+                  <input @input="onAdditionalResourceFileInput(i, $event.target.files[0])" class="form-group__text input-additional-resource-file" type="file">
+                  <div
+                    v-if="additionalResourcesTemp.length > 1"
+                    @click.prevent="removeInputFromAdditionalResources(i)"
+                    class="additional-resource-input__remove-btn"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13.061" height="13.061" viewBox="0 0 13.061 13.061"><g data-name="Group 762" fill="none" stroke="#333" stroke-width="1.5"><path data-name="Line 135" d="m0 0 12 12" transform="translate(.53 .53)"/><path data-name="Line 136" d="M0 12 12 0" transform="translate(.53 .53)"/></g>
+                    </svg>
+                  </div>
+                </div>
+                <input v-model="additionalResourcesTemp[i].resourceCommand.description" class="form-group__text input-additional-resource-comments" type="text" placeholder="add comments">
               </div>
 
-              <button class="btn--std btn--outlineblue" @click="numberOfAdditionalResourcesFiles++">+ add file</button>
+              <button class="btn--std btn--outlineblue" @click="addInputToAdditionalResources">+ add file</button>
             </template>
 
             <template v-slot:footer>
-              <button class="btn--std btn--blue ml-xs-20" @click="onSubmitAdditionalResourcesFiles">submit files</button>
+              <button class="btn--std btn--blue ml-xs-20" @click="onSubmitAdditionalResourceFiles">submit files</button>
             </template>
           </modal>
           <!-- END OF MODALS -->
@@ -213,9 +223,16 @@
               </ul>
             </div>
 
-            <div class="mt-xs-10 mb-xs-20 d-flex flex-column" v-if="additionalResourceSelectedTab === 'upload_file'">
-              <span v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="mb-xs-10">{{ resource.resourceCommand.fileName }}</span>
-              <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILES</button></div>
+            <div class="mt-xs-10 mb-xs-20" v-if="additionalResourceSelectedTab === 'upload_file'">
+              <div class="d-inline-flex">
+                <div v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="additional-resource-label">
+                  {{ resource.resourceCommand.fileName }}
+                  <div @click="removeAdditionalResourceFile(i)" class="additional-resource-label__remove-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="9.061" height="9.061" viewBox="0 0 9.061 9.061"><g data-name="Group 2880" fill="none" stroke="#190aff" stroke-width="1.5"><path data-name="Line 135" d="m0 0 8 8" transform="translate(.53 .53)"/><path data-name="Line 136" d="m0 8 8-8" transform="translate(.53 .53)"/></g></svg>
+                  </div>
+                </div>
+              </div>
+              <div><button class="btn btn--std btn--dark" :class="additionalResourcesToUploadLocal.length > 0 ? 'mt-xs-20' : 'mt-xs-0'" @click="openModalUploadAdditionalResources">UPLOAD FILES</button></div>
             </div>
 
             <div class="form-group" v-if="additionalResourceSelectedTab === 'external_link'">
@@ -289,11 +306,11 @@ export default class Metadata extends Vue {
 
   assetLocal: CatalogueItemCommand;
 
+  additionalResourcesTemp: { resourceCommand: AssetFileAdditionalResourceCommand, file: File | null }[];
+
   additionalResourcesToUploadLocal: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
   modalToShow: string;
-
-  numberOfAdditionalResourcesFiles: number;
 
   // additionalResourcesOption: string;
 
@@ -337,11 +354,11 @@ export default class Metadata extends Vue {
 
     this.assetLocal = this.asset;
 
+    this.additionalResourcesTemp = [];
+
     this.additionalResourcesToUploadLocal = this.additionalResourcesToUpload;
 
     this.modalToShow = '';
-
-    this.numberOfAdditionalResourcesFiles = 1;
 
     // this.additionalResourcesOption = '';
 
@@ -491,7 +508,7 @@ export default class Metadata extends Vue {
   //   }
   //   if (this.additionalResourcesOption === 'external_link') {
   //     this.additionalResourcesToUploadLocal = [];
-  //     this.numberOfAdditionalResourcesFiles = 1;
+  //     this.numberOfadditionalResourceFiles = 1;
   //   }
   // }
 
@@ -543,34 +560,56 @@ export default class Metadata extends Vue {
     return false;
   }
 
-  onSubmitAdditionalResourcesFiles(): void {
-    const files = [...this.$el.querySelectorAll('.input-additional-resource-file')].map((x) => (x as any).files[0]);
-    const comments = [...this.$el.querySelectorAll('.input-additional-resource-comments')].map((x) => (x as any).value);
+  openModalUploadAdditionalResources(): void {
+    this.initAdditionalResources();
+    this.modalToShow = 'uploadAdditionalResources';
+  }
 
-    this.additionalResourcesToUploadLocal = files.map((x, i) => ({
-      file: x,
+  initAdditionalResources(): void {
+    this.additionalResourcesTemp = [{
+      file: null,
       resourceCommand: {
-        fileName: x.name,
-        description: comments[i],
+        fileName: '',
+        description: '',
       },
-    }));
+    }];
+  }
 
-    this.additionalResourcesToUploadLocal.reduceRight((_, x, i) => {
-      const numSuffix = this.additionalResourcesToUploadLocal.filter((y, j) => y.file.name === x.file.name && j < i).length;
+  addInputToAdditionalResources(): void {
+    this.additionalResourcesTemp.push({
+      file: null,
+      resourceCommand: {
+        fileName: '',
+        description: '',
+      },
+    });
+  }
 
-      this.additionalResourcesToUploadLocal[i] = numSuffix ? {
-        ...x,
-        resourceCommand: {
-          ...x.resourceCommand,
-          fileName: x.file.name.split('.').map((y, j) => (j === x.file.name.split('.').length - 2 ? `${y}(${numSuffix})` : y)).join('.'),
-        },
-      } : x;
+  removeInputFromAdditionalResources(i: number): void {
+    this.additionalResourcesTemp = this.additionalResourcesTemp.filter((x, j) => j !== i);
+  }
 
-      return _;
-    }, null);
+  removeAdditionalResourceFile(i: number): void {
+    this.additionalResourcesToUploadLocal = this.additionalResourcesToUploadLocal.filter((x, j) => j !== i);
+  }
+
+  onAdditionalResourceFileInput(i: number, file: File): void {
+    this.additionalResourcesTemp[i] = {
+      file,
+      resourceCommand: {
+        fileName: file.name,
+        description: this.additionalResourcesTemp[i].resourceCommand.description,
+      },
+    };
+  }
+
+  onSubmitAdditionalResourceFiles(): void {
+    this.additionalResourcesToUploadLocal = this.additionalResourcesToUploadLocal.concat(
+      this.additionalResourcesTemp
+        .filter((x) => x.file) as { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[],
+    );
 
     console.log('artul', this.additionalResourcesToUploadLocal);
-    this.numberOfAdditionalResourcesFiles = 1;
     this.modalToShow = '';
   }
 }
@@ -580,4 +619,41 @@ export default class Metadata extends Vue {
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/_collection.scss";
+
+  .additional-resource-input {
+    position: relative;
+    margin: 10px 0 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    input {
+        margin: 0;
+    }
+    &__remove-btn {
+        z-index: 10;
+        position: absolute;
+        right: 0;
+        margin: 5px 20px 0 0;
+        cursor: pointer;
+    }
+  }
+
+  .additional-resource-label {
+    display: flex;
+    gap: 7px;
+    border: solid 1px $secondColor;
+    color: $secondColor;
+    background: #fff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font-size: em(16);
+    font-weight: 500;
+    &:last-child {
+      margin-right: 0;
+    }
+    &__remove-btn {
+      cursor: pointer;
+    }
+  }
 </style>
