@@ -511,7 +511,7 @@ export default class CreateAsset extends Vue {
 
     if (this.assetMainType === EnumAssetTypeCategory.DATA_FILE) {
       if (this.selectedPricingModelForEditing !== null) return false;
-      if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+      if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.API && this.apiCreationType !== 'TOPIO_DRIVE') {
@@ -523,7 +523,7 @@ export default class CreateAsset extends Vue {
     if (this.apiCreationType === 'TOPIO_DRIVE') {
       console.log('is here');
       if (!this.selectedPublishedFileForApiCreation) return false;
-      if (!this.asset.title || !this.asset.type || !this.asset.version) return false;
+      if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
     }
 
     if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) return false;

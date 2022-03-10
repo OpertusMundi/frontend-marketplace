@@ -52,10 +52,11 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider name="Abstract">
+          <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
             <div class="form-group">
-              <label for="">Abstract</label>
+              <label for="">Abstract *</label>
               <textarea v-model="assetLocal.abstract" placeholder="Short asset description"></textarea>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
           <validation-provider v-slot="{ errors }" name="Type" rules="required">
