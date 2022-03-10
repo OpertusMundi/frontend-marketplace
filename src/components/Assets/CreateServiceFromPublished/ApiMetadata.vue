@@ -45,7 +45,7 @@
           </validation-provider>
           <validation-provider name="Abstract">
             <div class="form-group">
-              <label for="">Abstract</label>
+              <label for="">Abstract *</label>
               <textarea class="form-group__text" disabled :value="asset.abstract"></textarea>
             </div>
           </validation-provider>
