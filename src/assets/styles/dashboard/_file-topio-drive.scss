@@ -40,4 +40,6 @@
 }
 .selected-file {
   background-color: white !important;
+  border-radius: 5px;
+  outline: solid 2px $secondColor;
 }
