@@ -14,12 +14,12 @@
             <template v-slot:body>
               <h1>Upload files</h1>
 
-              <div v-for="(additionalResource, i) in additionalResourcesTemp" :key="i" class="form-group mt-sm-20">
+              <div v-for="(additionalResource, i) in additionalResourcesTemp" :key="additionalResource.key" class="form-group mt-sm-20">
                 <div class="form-group additional-resource-input">
                   <input @input="onAdditionalResourceFileInput(i, $event.target.files[0])" class="form-group__text input-additional-resource-file" type="file">
                   <div
                     v-if="additionalResourcesTemp.length > 1"
-                    @click.prevent="removeInputFromAdditionalResources(i)"
+                    @click.prevent="removeInputFromAdditionalResources(additionalResource.key)"
                     class="additional-resource-input__remove-btn"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="13.061" height="13.061" viewBox="0 0 13.061 13.061"><g data-name="Group 762" fill="none" stroke="#333" stroke-width="1.5"><path data-name="Line 135" d="m0 0 12 12" transform="translate(.53 .53)"/><path data-name="Line 136" d="M0 12 12 0" transform="translate(.53 .53)"/></g>
@@ -307,7 +307,7 @@ export default class Metadata extends Vue {
 
   assetLocal: CatalogueItemCommand;
 
-  additionalResourcesTemp: { resourceCommand: AssetFileAdditionalResourceCommand, file: File | null }[];
+  additionalResourcesTemp: { resourceCommand: AssetFileAdditionalResourceCommand, file: File | null, key: string }[];
 
   additionalResourcesToUploadLocal: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
@@ -573,6 +573,7 @@ export default class Metadata extends Vue {
         fileName: '',
         description: '',
       },
+      key: `${Date.now()}${Math.random()}`,
     }];
   }
 
@@ -583,11 +584,13 @@ export default class Metadata extends Vue {
         fileName: '',
         description: '',
       },
+      key: `${Date.now()}${Math.random()}`,
     });
   }
 
-  removeInputFromAdditionalResources(i: number): void {
-    this.additionalResourcesTemp = this.additionalResourcesTemp.filter((x, j) => j !== i);
+  removeInputFromAdditionalResources(key: string): void {
+    // this.additionalResourcesTemp = this.additionalResourcesTemp.filter((x, j) => j !== i);
+    this.additionalResourcesTemp = this.additionalResourcesTemp.filter((x) => x.key !== key);
   }
 
   removeAdditionalResourceFile(i: number): void {
@@ -601,12 +604,17 @@ export default class Metadata extends Vue {
         fileName: file.name,
         description: this.additionalResourcesTemp[i].resourceCommand.description,
       },
+      key: this.additionalResourcesTemp[i].key,
     };
   }
 
   onSubmitAdditionalResourceFiles(): void {
     this.additionalResourcesToUploadLocal = this.additionalResourcesToUploadLocal.concat(
       this.additionalResourcesTemp
+        .map((x) => ({
+          resourceCommand: x.resourceCommand,
+          file: x.file,
+        }))
         .filter((x) => x.file) as { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[],
     );
 
