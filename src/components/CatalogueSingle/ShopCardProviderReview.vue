@@ -11,7 +11,10 @@
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'"><span>{{ `monthly: ${selectedPricingModel.monthlyPriceExcludingTax}€, annually: ${selectedPricingModel.annualPriceExcludingTax}€` }}</span></span>
+        <div v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
+          <div class="mb-xs-20"><span></span>monthly<span></span><span>{{ selectedPricingModel.monthlyPriceExcludingTax }}</span><span>€</span></div>
+          <div class="mb-xs-20"><span></span>annually<span></span><span>{{ selectedPricingModel.annualPriceExcludingTax }}</span><span>€</span></div>
+        </div>
       </div>
 
       <!-- <div v-if="catalogueItem.pricingModels.length === 1" class="asset__shopcard__variations__row mt-xs-20">
@@ -238,16 +241,16 @@ export default class ShopCardProviderReview extends Vue {
   }
 
   getCoverageRestrictions(): string[] {
-    const continents = this.selectedPricingModel?.coverageRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase());
-    const countries = this.selectedPricingModel?.coverageRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[];
+    const continents = Array.isArray(this.selectedPricingModel?.coverageRestrictionContinents) ? this.selectedPricingModel?.coverageRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(this.selectedPricingModel?.coverageRestrictionCountries) ? this.selectedPricingModel?.coverageRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
 
     if (continents && countries) return continents.concat(countries);
     return continents || countries || [];
   }
 
   getConsumerRestrictions(): string[] {
-    const continents = this.selectedPricingModel?.consumerRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase());
-    const countries = this.selectedPricingModel?.consumerRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[];
+    const continents = Array.isArray(this.selectedPricingModel?.consumerRestrictionContinents) ? this.selectedPricingModel?.consumerRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(this.selectedPricingModel?.consumerRestrictionCountries) ? this.selectedPricingModel?.consumerRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
 
     if (continents && countries) return continents.concat(countries);
     return continents || countries || [];
