@@ -7,6 +7,7 @@ import {
 import {
   CatalogueItemCommand, DraftApiFromFileCommand, DraftApiFromAssetCommand,
   CatalogueItemMetadataCommand,
+  SentinelHubItemCommand,
   //  Sample,
 } from '@/model/catalogue';
 import {
@@ -77,10 +78,10 @@ export default class DraftAssetApi extends Api {
    * @param command
    * @param lock True if the new record must be also locked
    */
-  public async create(command: CatalogueItemCommand, lock = true, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
+  public async create(command: CatalogueItemCommand | SentinelHubItemCommand, lock = true, config?: AxiosRequestConfig): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts?lock=${lock}`;
 
-    return this.post<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command, config)
+    return this.post<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
@@ -138,11 +139,11 @@ export default class DraftAssetApi extends Api {
    * @param lock True if the record must remain locked after a successful save operation.
    *             If a lock already exists and belongs to another user, an error is returned.
    */
-  public async update(key: string, command: CatalogueItemCommand, lock = false): Promise<ServerResponse<AssetDraft>> {
+  public async update(key: string, command: CatalogueItemCommand | SentinelHubItemCommand, lock = false): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}?lock=${lock}`;
 
 
-    return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
+    return this.put<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
@@ -161,10 +162,10 @@ export default class DraftAssetApi extends Api {
    * @param key
    * @param command
    */
-  public async updateAndSubmit(key: string, command: CatalogueItemCommand): Promise<ServerResponse<AssetDraft>> {
+  public async updateAndSubmit(key: string, command: CatalogueItemCommand | SentinelHubItemCommand): Promise<ServerResponse<AssetDraft>> {
     const url = `/action/drafts/${key}/submit`;
 
-    return this.put<CatalogueItemCommand, ServerResponse<AssetDraft>>(url, command)
+    return this.put<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
 
