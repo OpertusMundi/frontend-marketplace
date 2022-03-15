@@ -700,6 +700,10 @@
 				&--centered {
 					text-align: center;
 				}
+
+				&--no_min_height {
+					min-height: 0;
+				}
 			}
 			h5 {
 				font-weight: 700;
