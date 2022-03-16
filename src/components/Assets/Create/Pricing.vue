@@ -56,7 +56,7 @@
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED'">
                     <h3>Current and all past versions, as well as new versions for a set period</h3>
                     <p class="mt-xs-20">Your product is available for purchase by prospective clients in its current, past, and future versions. Clients automatically get access to newer versions of the product whenever they become available and for a period you define. This is the preferred option for products updated relatively frequently.</p>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <div class="form-group">
                       <label for="fixed_price">Your price</label>
                       <div class="pricing__subnote">This is the price prospective clients will pay for purchasing your product.</div>
@@ -64,7 +64,7 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Number of years" rules="required|integer|min_value:1">
                     <div class="form-group">
                       <label for="number_of_years">Number of years</label>
                       <div class="pricing__subnote">This is the period in years during which prospective clients have access to new versions of your product. After the end of this period, they cannot receive any new versions and must purchase the asset again.</div>
@@ -77,7 +77,7 @@
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FIXED_PER_ROWS'">
                     <h3>Asset subset with pricing per rows</h3>
                     <p class="mt-xs-20">Your product is available for purchase by prospective clients in a piecewise manner if it comprises at least 5,000 rows. Clients can select and purchase only a subset of your product by defining the area of interest (e.g., country, city) they are interested in. You will be remunerated based on the number of rows provided, with a guaranteed minimum per purchase.Optionally, you can also define discounts to incentivize consumers in purchasing more rows of your product.</p>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <div class="form-group">
                       <label for="fpr_price">Your price</label>
                       <div class="pricing__subnote">This is the price prospective clients will pay per 1,000 rows of your product.</div>
@@ -85,7 +85,7 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum rows" rules="required|integer|min_value:1">
                     <div class="form-group">
                       <label for="min_rows">Minimum rows</label>
                       <div class="pricing__subnote">This is the minimum number of rows a client can purchase per transaction.</div>
@@ -96,7 +96,7 @@
                     <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required|min_value:0.00000001">
                           <div class="form-group">
                             <label for="fpr_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="fpr_count" name="fpr_count">
@@ -105,7 +105,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required|min_value:0|max_value:100">
                           <div class="form-group">
                             <label for="fpr_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="fpr_discount" name="fpr_discount">
@@ -126,7 +126,7 @@
                     <p class="mt-xs-20"><span>Your product is available for purchase by prospective clients in a piecewise manner. Clients can select and purchase only a subset of your product by defining the area of interest (e.g., country, city) they are interested in. You will be remunerated based on the population coverage in the selected area, with a guaranteed minimum per purchase.</span>
                     <br><br><span class="mt-xs-10">Optionally, you can also define discounts to incentivize consumers in purchasing larger subsets of your product.</span>
                     <br><br><span class="mt-xs-10">The density of the population is calculated based on the most recent Eurostat census data (2011), the geographical coverage of your file, and the geographical area selected by the user. For example, if your asset covers the entire Europe and a user selects an area covering only the cities of London and Paris, the population coverage is calculated by dividing the total population of Europe with the sum of the populations of London and Paris.</span></p>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <div class="form-group">
                       <label for="ffp_price">Your price per 10,000 people</label>
                       <div class="pricing__subnote">This is the price prospective clients in case they purchase the entire asset.</div>
@@ -134,7 +134,7 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Minimum percentage" rules="required|min_value:0|max_value:100">
                     <div class="form-group">
                       <label for="min_percentage">Minimum population</label>
                       <div class="pricing__subnote">This is the minimum population percentage of the entire asset clients can purchase per transaction. For example, if a user selects an area with only 5% population coverage, and you have set a minimum of 10%, the price will be calculated based on the minimum of 10%.</div>
@@ -145,7 +145,7 @@
                     <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount threshold" rules="required|min_value:0.00000001">
                           <div class="form-group">
                             <label for="ffp_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="ffp_count" name="ffp_count">
@@ -154,7 +154,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount percent" rules="required|min_value:0|max_value:100">
                           <div class="form-group">
                             <label for="ffp_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="ffp_discount" name="ffp_discount">
@@ -249,7 +249,14 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
+import {
+  required,
+  // eslint-disable-next-line
+  min_value,
+  // eslint-disable-next-line
+  max_value,
+  integer,
+} from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
 import {
   BasePricingModelCommand,
@@ -264,6 +271,9 @@ import store from '@/store';
 import { EnumContinent } from '@/model/enum';
 
 extend('required', required);
+extend('min_value', min_value);
+extend('max_value', max_value);
+extend('integer', integer);
 
 @Component({
   components: {
