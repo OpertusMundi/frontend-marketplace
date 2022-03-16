@@ -216,13 +216,13 @@
 		&__price {
 			color: $secondColor;
 			display: inline-flex;
-			span {
+			span, >div {
 				font-weight: 400;
 				line-height: 72%;
-				&:nth-child(1) {
+				&:nth-child(odd) {
 					font-size: em(30);
 				}
-				&:nth-child(2) {
+				&:nth-child(even) {
 					margin-left: 10px;
 					font-size: em(16);
 				}
@@ -699,6 +699,10 @@
 
 				&--centered {
 					text-align: center;
+				}
+
+				&--no_min_height {
+					min-height: 0;
 				}
 			}
 			h5 {

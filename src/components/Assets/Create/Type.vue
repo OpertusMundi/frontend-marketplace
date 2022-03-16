@@ -22,6 +22,11 @@
             <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="COLLECTION" />
             <div class="control_indicator"></div>
           </label>
+          <label class="control control-radio" v-if="$store.getters.hasRole(['ROLE_SENTINEL_HUB'])">
+            Sentinel Hub
+            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="SENTINEL_HUB" />
+            <div class="control_indicator"></div>
+          </label>
           <div class="errors" v-if="errors">
             <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
           </div>

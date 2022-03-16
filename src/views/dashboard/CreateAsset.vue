@@ -35,7 +35,7 @@
       </div>
 
       <div class="dashboard__form">
-        <ul v-if="assetMainType !== 'API'" class="dashboard__form__nav">
+        <ul v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Delivery</a></li>
@@ -45,7 +45,7 @@
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
 
-        <ul v-else class="dashboard__form__nav">
+        <ul v-if="assetMainType === 'API'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Metadata</a></li>
@@ -54,12 +54,18 @@
           <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
+
+        <ul v-if="assetMainType === 'SENTINEL_HUB'" class="dashboard__form__nav">
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
+        </ul>
+
         <div class="dashboard__form__steps">
           <transition name="fade" mode="out-in">
             <div class="dashboard__form__steps__inner">
               <type ref="step1" :assetMainType.sync="assetMainType" :disabled="isEditingExistingDraft" v-if="currentStep == 1"></type>
 
-              <template v-if="assetMainType !== 'API'">
+              <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
                 <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
@@ -72,6 +78,10 @@
                 <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-else-if="currentStep === 3 && selectedPublishedAssetForApiCreation == null"></metadata>
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
                 <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+              </template>
+
+              <template v-if="assetMainType === 'SENTINEL_HUB'">
+                <sentinel-hub-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></sentinel-hub-metadata>
               </template>
 
               <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
@@ -87,7 +97,7 @@
         </div>
         <div class="dashboard__form__navbuttons">
           <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
-          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and submit for review' : 'NEXT' }}</button>
+          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB' && currentStep === 2) ? 'confirm and submit for review' : 'NEXT' }}</button>
         </div>
       </div>
     </div>
@@ -126,7 +136,7 @@ import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import { AssetDraft } from '@/model/draft';
 import {
-  CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand,
+  CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand, SentinelHubItemCommand,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand } from '@/model/asset';
@@ -141,6 +151,7 @@ import Review from '@/components/Assets/Create/Review.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
 import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
+import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
 
 Vue.use(VueCardFormat);
@@ -178,6 +189,7 @@ interface FileToUpload {
     ApiDetails,
     ApiPricing,
     ApiMetadata,
+    SentinelHubMetadata,
     Modal,
   },
 })
@@ -202,7 +214,7 @@ export default class CreateAsset extends Vue {
 
   assetId: string; // if editing existing draft, the asset id (key) of draft asset
 
-  asset: CatalogueItemCommand;
+  asset: CatalogueItemCommand | SentinelHubItemCommand;
 
   assetMainType: EnumAssetTypeCategory; // Data File / API / Collection
 
@@ -298,6 +310,8 @@ export default class CreateAsset extends Vue {
     // console.log('View: Type -> CreateAsset =', assetMainType);
     // console.log('this.asset : ', this.asset);
     console.info('STEP 1 => this.assetMainType: ', this.assetMainType, assetMainType);
+
+    this.initAsset();
   }
 
   @Watch('apiCreationType')
@@ -359,69 +373,138 @@ export default class CreateAsset extends Vue {
   created(): void {
     console.log('created');
 
-    this.asset = {
-      abstract: '',
-      additionalResources: [],
-      conformity: EnumConformity.NOT_EVALUATED,
-      contractTemplateKey: '',
-      creationDate: '',
-      dateEnd: '',
-      dateStart: '',
-      deliveryMethod: EnumDeliveryMethod.NONE,
-      format: '',
-      ingested: false,
-      keywords: [],
-      language: '',
-      license: '',
-      lineage: '',
-      metadataDate: '',
-      metadataLanguage: '',
-      metadataPointOfContactEmail: '',
-      metadataPointOfContactName: '',
-      openDataset: false,
-      parentId: '',
-      pricingModels: [],
-      publicAccessLimitations: '',
-      publicationDate: '',
-      publisherEmail: '',
-      publisherName: '',
-      referenceSystem: '',
-      resourceLocator: '',
-      responsibleParty: [],
-      revisionDate: '',
-      resources: [],
-      scales: [],
-      spatialDataServiceOperations: [],
-      spatialDataServiceQueryables: [],
-      spatialDataServiceType: null,
-      spatialDataServiceVersion: null,
-      spatialResolution: null,
-      suitableFor: [],
-      title: '',
-      topicCategory: [],
-      type: '' as EnumAssetType,
-      userOnlyForVas: false,
-      version: '',
-      vettingRequired: false,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [20.94818115234375, 36.40359962073253],
-            [23.57940673828125, 36.40359962073253],
-            [23.57940673828125, 38.31795595794451],
-            [20.94818115234375, 38.31795595794451],
-            [20.94818115234375, 36.40359962073253],
-          ],
-        ],
-      } as GeoJSON.Polygon,
-    };
+    this.initAsset();
 
     this.assetId = this.$route.params.id ? this.$route.params.id : '';
     this.isEditingExistingDraft = !!this.assetId;
 
     if (this.isEditingExistingDraft) {
       this.loadExistingDraftAsset();
+    }
+  }
+
+  initAsset(): void {
+    if (this.assetMainType as string !== 'SENTINEL_HUB') {
+      this.asset = {
+        abstract: '',
+        additionalResources: [],
+        conformity: EnumConformity.NOT_EVALUATED,
+        contractTemplateKey: '',
+        creationDate: '',
+        dateEnd: '',
+        dateStart: '',
+        deliveryMethod: EnumDeliveryMethod.NONE,
+        format: '',
+        ingested: false,
+        keywords: [],
+        language: '',
+        license: '',
+        lineage: '',
+        metadataDate: '',
+        metadataLanguage: '',
+        metadataPointOfContactEmail: '',
+        metadataPointOfContactName: '',
+        openDataset: false,
+        parentId: '',
+        pricingModels: [],
+        publicAccessLimitations: '',
+        publicationDate: '',
+        publisherEmail: '',
+        publisherName: '',
+        referenceSystem: '',
+        resourceLocator: '',
+        responsibleParty: [],
+        revisionDate: '',
+        resources: [],
+        scales: [],
+        spatialDataServiceOperations: [],
+        spatialDataServiceQueryables: [],
+        spatialDataServiceType: null,
+        spatialDataServiceVersion: null,
+        spatialResolution: null,
+        suitableFor: [],
+        title: '',
+        topicCategory: [],
+        type: '' as EnumAssetType,
+        userOnlyForVas: false,
+        version: '',
+        vettingRequired: false,
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [20.94818115234375, 36.40359962073253],
+              [23.57940673828125, 36.40359962073253],
+              [23.57940673828125, 38.31795595794451],
+              [20.94818115234375, 38.31795595794451],
+              [20.94818115234375, 36.40359962073253],
+            ],
+          ],
+        } as GeoJSON.Polygon,
+      } as CatalogueItemCommand;
+    } else {
+      this.asset = {
+        abstract: '',
+        additionalResources: [],
+        conformity: EnumConformity.NOT_EVALUATED,
+        contractTemplateKey: '',
+        creationDate: '',
+        dateEnd: '',
+        dateStart: '',
+        extensions: {
+          sentinelHub: {
+            type: 'OPEN_DATA',
+            open: true,
+            collection: 'sentinel-1-grd',
+          },
+        },
+        ingested: false,
+        keywords: [],
+        language: '',
+        license: '',
+        lineage: '',
+        metadataDate: '',
+        metadataLanguage: '',
+        metadataPointOfContactEmail: '',
+        metadataPointOfContactName: '',
+        openDataset: false,
+        parentId: '',
+        // pricingModels: [],
+        publicAccessLimitations: '',
+        publicationDate: '',
+        publisherEmail: '',
+        publisherName: '',
+        referenceSystem: '',
+        resourceLocator: '',
+        responsibleParty: [],
+        revisionDate: '',
+        resources: [],
+        scales: [],
+        spatialDataServiceOperations: [],
+        spatialDataServiceQueryables: [],
+        spatialDataServiceType: null,
+        spatialDataServiceVersion: null,
+        spatialResolution: null,
+        suitableFor: [],
+        title: '',
+        topicCategory: [],
+        type: EnumAssetType.SENTINEL_HUB_OPEN_DATA,
+        userOnlyForVas: false,
+        version: '',
+        vettingRequired: false,
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [20.94818115234375, 36.40359962073253],
+              [23.57940673828125, 36.40359962073253],
+              [23.57940673828125, 38.31795595794451],
+              [20.94818115234375, 38.31795595794451],
+              [20.94818115234375, 36.40359962073253],
+            ],
+          ],
+        } as GeoJSON.Polygon,
+      } as SentinelHubItemCommand;
     }
   }
 
@@ -479,6 +562,10 @@ export default class CreateAsset extends Vue {
     // console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
+        if (this.assetMainType as string === 'SENTINEL_HUB' && this.currentStep === 2) {
+          this.submitSentinelHubForm();
+          return;
+        }
         if (this.currentStep === this.totalSteps) {
           console.log(this.asset);
           if (this.assetMainType === EnumAssetTypeCategory.API) {
@@ -526,7 +613,8 @@ export default class CreateAsset extends Vue {
       if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
     }
 
-    if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) return false;
+    // todo: add 'SENTINEL_HUB' in Enumeration
+    if (this.assetMainType === EnumAssetTypeCategory.COLLECTION || this.assetMainType as string === 'SENTINEL_HUB') return false;
 
     return true;
   }
@@ -550,7 +638,7 @@ export default class CreateAsset extends Vue {
   }
 
   isSelectedFormatCompatibleWithFileExtension(): boolean {
-    const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === this.asset.format.toUpperCase());
+    const fileTypeInfo = store.getters.getConfig.configuration.asset.fileTypes.find((x) => x.format.toUpperCase() === (this.asset as CatalogueItemCommand).format.toUpperCase());
     const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
     if (acceptedExtensions.includes(this.fileToUpload.fileExtension)) return true;
     return false;
@@ -558,7 +646,7 @@ export default class CreateAsset extends Vue {
 
   async createDraft(): Promise<AssetDraft> {
     console.log(this.asset, 'ASSET ON CREATE');
-    const draftAssetResponse = await this.draftAssetApi.create(this.asset);
+    const draftAssetResponse = await this.draftAssetApi.create(this.asset as CatalogueItemCommand);
 
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
@@ -568,7 +656,7 @@ export default class CreateAsset extends Vue {
   }
 
   async saveDraftAfterEditingExistingDraft(): Promise<AssetDraft> {
-    const draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset);
+    const draftAssetResponse = await this.draftAssetApi.update(this.assetId, this.asset as CatalogueItemCommand);
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
     console.log('err', draftAssetResponse);
@@ -584,7 +672,7 @@ export default class CreateAsset extends Vue {
       version: this.asset.version,
       serviceType: serviceType as 'WMS' | 'WFS' | 'DATA_API',
       path: this.selectedPublishedFileForApiCreation ? this.selectedPublishedFileForApiCreation.path : '',
-      format: this.asset.format,
+      format: (this.asset as CatalogueItemCommand).format,
     };
     console.log(draftApi, 'draft API for file');
     const draftAssetResponse = await this.draftAssetApi.createApi(draftApi);
@@ -618,7 +706,7 @@ export default class CreateAsset extends Vue {
   }
 
   async submitAsset(draftAssetKey: string): Promise<void> {
-    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset);
+    const submitResponse = await this.draftAssetApi.updateAndSubmit(draftAssetKey, this.asset as CatalogueItemCommand);
 
     if (submitResponse.success) {
       this.showUploadingMessage(true, 'Asset created!');
@@ -672,7 +760,7 @@ export default class CreateAsset extends Vue {
     // todo: currently, file CRS is ignored (when support for multiple resources is implemented, we should consider adding a CRS for each resource)
     const fileInfo: FileResourceCommand = {
       fileName: this.fileToUpload.fileName,
-      format: this.asset.format,
+      format: (this.asset as CatalogueItemCommand).format,
       ...(this.fileToUpload.encoding && { encoding: this.fileToUpload.encoding }),
     };
 
@@ -693,7 +781,7 @@ export default class CreateAsset extends Vue {
 
     const filetFromTopioDrive: UserFileResourceCommand = {
       path: this.selectedPublishedFileForDataFileCreation?.path as string,
-      format: this.asset.format,
+      format: (this.asset as CatalogueItemCommand).format,
     };
 
     const addResourceFromFileSystemResponse = await this.draftAssetApi.addResourceFromFileSystem(draftKey, filetFromTopioDrive);
@@ -706,6 +794,56 @@ export default class CreateAsset extends Vue {
 
     const asset = addResourceFromFileSystemResponse.result.command;
     return asset;
+  }
+
+  async submitSentinelHubForm(): Promise<void> {
+    this.showUploadingMessage(false, 'Creating Sentinel Hub Asset...');
+
+    // TODO: IMPORTANT, contract key is hardcoded
+    const asset = {
+      ...this.asset,
+      contractTemplateKey: '877a5a19-2768-49dd-b7a6-59a9f0474d67',
+    } as SentinelHubItemCommand;
+
+    console.log('SH ASSET', asset);
+
+    let assetKey: string | null = null;
+    let draftCommand: SentinelHubItemCommand | null = null;
+    try {
+      const response = await this.draftAssetApi.create(asset);
+
+      if (response.success) {
+        console.log('YEAP!');
+        assetKey = response.result.key;
+        draftCommand = response.result.command;
+      } else {
+        console.log('err', response);
+        this.showUploadingMessage(true, 'An error occurred.');
+        return;
+      }
+    } catch (err) {
+      console.log('err', err);
+      this.showUploadingMessage(true, 'An error occurred.');
+      return;
+    }
+
+    try {
+      const response = await this.draftAssetApi.updateAndSubmit(assetKey, draftCommand);
+
+      if (response.success) {
+        console.log('YEAP2');
+      } else {
+        console.log('err', response);
+        this.showUploadingMessage(true, 'An error occurred.');
+        return;
+      }
+    } catch (err) {
+      console.log('err', err);
+      this.showUploadingMessage(true, 'An error occurred.');
+      return;
+    }
+
+    this.showUploadingMessage(true, 'Sentinel Hub Asset is created!');
   }
 
   async submitApiForm(isDraft = false): Promise<void> {
@@ -728,7 +866,7 @@ export default class CreateAsset extends Vue {
         return;
       }
 
-      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: this.asset.pricingModels } };
+      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: (this.asset as CatalogueItemCommand).pricingModels } };
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);

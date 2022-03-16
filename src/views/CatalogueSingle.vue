@@ -17,8 +17,9 @@
             <terms-and-restrictions v-if="mode === 'catalogue'" :catalogueItem="catalogueItem"></terms-and-restrictions>
 
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
-            <data-profiling-and-samples v-if="catalogueItem.type !== 'SERVICE'" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
+            <data-profiling-and-samples v-if="!['SERVICE', 'SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
             <api-layer-profiler v-if="catalogueItem.type === 'SERVICE'" :mode="mode" :catalogueItem="catalogueItem"></api-layer-profiler>
+            <satellite-images-explorer v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type) && mode === 'catalogue'" :collectionId="catalogueItem.extensions.sentinelHub.collection"></satellite-images-explorer>
 
             <!-- <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata> -->
             <metadata :catalogueItem="catalogueItem"></metadata>
@@ -78,6 +79,7 @@ import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableO
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
 import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
+import SatelliteImagesExplorer from '../components/CatalogueSingle/SatelliteImagesExplorer.vue';
 import Metadata from '../components/CatalogueSingle/Metadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 
@@ -95,6 +97,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     RelatedAssets,
     ApiUsageExample,
     ApiLayerProfiler,
+    SatelliteImagesExplorer,
     Metadata,
     SelectAreas,
     Modal,

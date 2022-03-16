@@ -272,18 +272,10 @@ interface BaseCatalogueItem {
    * The temporal extent of the resource (start date)
    */
   dateStart: string;
-  /*
-   * Channel of asset distribution
-   */
-  deliveryMethod: EnumDeliveryMethod;
   /**
    * Collection of custom properties required for external data provider integration
    */
   extensions?: Extensions;
-  /*
-   * The file format, physical medium, or dimensions of the resource
-   */
-  format: string;
   /*
    * Geometry as GeoJSON
    */
@@ -882,6 +874,14 @@ export interface ResourceIngestionData {
 
 export interface CatalogueItem extends BaseCatalogueItem {
   /*
+   * Channel of asset distribution
+   */
+  deliveryMethod: EnumDeliveryMethod;
+  /*
+   * The file format, physical medium, or dimensions of the resource
+   */
+  format: string;
+  /*
    * Catalogue item identifier (UUID)
    */
   id: string;
@@ -1011,7 +1011,7 @@ export interface Extensions {
   sentinelHub?: SHCommercialDataSentinelHubProperties | SHOpenDataSentinelHubProperties;
 }
 
-export interface CatalogueItemCommand extends BaseCatalogueItem {
+interface BaseCatalogueItemCommand extends BaseCatalogueItem {
   /**
    * Auxiliary files or additional resources to the dataset
    */
@@ -1034,10 +1034,6 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    * Provides the identifier of a parent data source resource
    */
   parentDataSourceId?: string;
-  /*
-   * Pricing model available for the asset
-   */
-  pricingModels: BasePricingModelCommand[];
   /**
    * A list of resources of the dataset
    */
@@ -1051,6 +1047,24 @@ export interface CatalogueItemCommand extends BaseCatalogueItem {
    */
   visibility?: string[];
 }
+
+export interface CatalogueItemCommand extends BaseCatalogueItemCommand {
+  /*
+   * Channel of asset distribution
+   */
+  deliveryMethod: EnumDeliveryMethod;
+  /*
+   * The file format, physical medium, or dimensions of the resource
+   */
+  format: string;
+  /*
+   * Pricing model available for the asset
+   */
+  pricingModels: BasePricingModelCommand[];
+}
+
+// eslint-disable-next-line
+export interface SentinelHubItemCommand extends BaseCatalogueItemCommand {}
 
 export enum EnumDraftCommandType {
   ASSET = 'ASSET',

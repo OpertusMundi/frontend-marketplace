@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-md-4">
             <template v-if="!searchResults">
-              <h4 class="mt-xs-20">Data source: <span class="collection_name">sentinel-1-grd</span></h4>
+              <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
 
               <h4 class="mt-xs-20 mb-xs-10">Date Selection</h4>
               <div class="d-flex space-between">
@@ -88,6 +88,8 @@ interface RectangleEditable extends L.Rectangle {
 export default class EOExplorer extends Vue {
   sentinelHubApi = new SentinelHubApi();
 
+  collectionId = '';
+
   map: L.Map = {} as L.Map;
 
   bboxSelectionRect: L.Rectangle | null = null;
@@ -109,6 +111,10 @@ export default class EOExplorer extends Vue {
   searchResults: SentinelHubCatalogueResponse | null = null;
 
   mapShades: any | null = null;
+
+  created(): void {
+    this.collectionId = this.$route.params.collectionId;
+  }
 
   mounted(): void {
     this.map = L.map('eo-map', { editable: true } as ExtendedMapOptions);
@@ -206,7 +212,7 @@ export default class EOExplorer extends Vue {
     const toDateTime = this.date.to.split('T')[0].concat('T23:59:59.999Z');
 
     const queryData: ClientCatalogueQuery = {
-      collection: 'sentinel-1-grd',
+      collection: this.collectionId,
       fromDateTime,
       toDateTime,
       bbox: [this.bbox.minLon, this.bbox.minLat, this.bbox.maxLon, this.bbox.maxLat],

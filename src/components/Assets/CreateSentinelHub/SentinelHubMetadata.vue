@@ -38,6 +38,13 @@
           </modal>
           <!-- END OF MODALS -->
 
+          <validation-provider v-slot="{ errors }" name="Collection ID" rules="required">
+          <div class="form-group">
+            <label for="metadata_title">Collection ID *</label>
+            <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" v-model="assetLocal.extensions.sentinelHub.collection">
+            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+          </div>
+          </validation-provider>
           <validation-provider v-slot="{ errors }" name="Title" rules="required">
           <div class="form-group">
             <label for="metadata_title">Title *</label>
@@ -45,25 +52,11 @@
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
           </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Type" rules="required">
-            <div class="form-group">
-              <label for="multiselect_type">Type *</label>
-              <multiselect id="multiselect_type" v-model="assetLocal.type" :options="menusData.assetTypes" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-            </div>
-          </validation-provider>
           <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
             <div class="form-group">
               <label for="">Abstract *</label>
               <textarea v-model="assetLocal.abstract" placeholder="Short asset description"></textarea>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Type" rules="required">
-            <div class="form-group">
-              <label for="multiselect_type">Format *</label>
-              <multiselect :disabled="!asset.type" id="multiselect_type" v-model="assetLocal.format" :options="menusData.availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select asset type"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
           <!-- <validation-provider v-slot="{ errors }" name="Language">
@@ -298,7 +291,7 @@ extend('required', required);
     Modal,
   },
 })
-export default class Metadata extends Vue {
+export default class SentinelHubMetadata extends Vue {
   @Prop({ required: true }) private asset!: CatalogueItemCommand;
 
   @Prop({ required: true }) private additionalResourcesToUpload!: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
