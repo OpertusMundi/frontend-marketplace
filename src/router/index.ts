@@ -25,7 +25,7 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
-    path: '/eo-explorer',
+    path: '/eo-explorer/:collectionId',
     name: 'EOExplorer',
     component: (): Promise<any> => import(/* webpackChunkName: "eoexplorer" */ '../views/EOExplorer.vue'),
   },

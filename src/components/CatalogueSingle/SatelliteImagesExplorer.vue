@@ -6,18 +6,17 @@
     </div>
     <div class="asset__section__content">
       <div class="asset__section__content__inner asset__section__content__inner--no_min_height d-flex justify-content-center">
-        <button class="btn btn--std btn--blue">open explorer</button>
+        <router-link :to="`/eo-explorer/${collectionId}`" class="btn btn--std btn--blue">open explorer</router-link>
       </div>
     </div>
   </section>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-// import { CatalogueItem } from '@/model';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class SatelliteImagesExplorer extends Vue {
-  // @Prop({ required: true }) catalogueItem!: CatalogueItem;
+  @Prop({ required: true }) collectionId!: string;
 }
 </script>
 <style lang="scss">
