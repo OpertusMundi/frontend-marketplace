@@ -75,6 +75,10 @@ interface OrderItem {
    */
   assetVersion?: string;
   /**
+   * Asset contract signature date in ISO format e.g. 2020-06-10T16:01:04.991+03:00
+   */
+  contractSignedOn?: string;
+  /**
    * Index of the specific item in the order
    */
   index: number;
