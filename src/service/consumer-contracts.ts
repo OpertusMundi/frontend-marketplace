@@ -13,4 +13,12 @@ export default class ConsumerContractsApi extends Api {
       responseType: 'blob',
     });
   }
+
+  public async downloadContract(key: string, index: number, signed: boolean): Promise<AxiosServerResponse<BinaryType>> {
+    const url = `/action/contract/consumer/order/${key}?index=${index}&signed=${signed}`;
+
+    return this.get<ServerResponse<BinaryType>>(url, {
+      responseType: 'blob',
+    });
+  }
 }
