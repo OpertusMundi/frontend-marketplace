@@ -3,7 +3,7 @@ interface State {
 }
 
 const initialState: State = {
-  loading: true,
+  loading: false,
 };
 
 const getters = {
