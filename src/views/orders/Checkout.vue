@@ -582,20 +582,14 @@ export default class Checkout extends Vue {
 
   onDownloadContract(): void {
     store.commit('setLoading', true);
-    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1).then((response) => {
-      console.log('pdf', response.data);
-      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
-
-      const assetId = this.cart ? this.cart.items[this.currentItemToReviewContract].asset.id : '';
-      this.catalogueApi.findOne(assetId).then((assetResponse) => {
-        const title = (assetResponse.result as CatalogueItemDetails).contract.title.replaceAll(' ', '_');
-        saveAs(blob, title);
-        store.commit('setLoading', false);
-      }).catch((err) => {
+    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, true)
+      .catch((err) => {
         console.log('err', err);
         store.commit('setLoading', false);
+      })
+      .finally(() => {
+        store.commit('setLoading', false);
       });
-    });
 
     // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {
     //   console.log('pdf', response.data);

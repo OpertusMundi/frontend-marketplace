@@ -107,23 +107,13 @@ export default class DashboardPurchases extends Vue {
 
   // TODO: ATTENTION: currently works for only one asset item (index: 1);
   onDownloadContract(): void {
-    console.log('d');
     store.commit('setLoading', true);
-    this.consumerContractsApi.printContract(this.order.key, 1).then((response) => {
-      console.log('pdf', response.data);
-      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
-
-      const assetId = this.order.items[0].assetId ? this.order.items[0].assetId : '';
-      console.log('asset id', assetId, this.order);
-      this.catalogueApi.findOne(assetId).then((assetResponse) => {
-        const title = (assetResponse.result as CatalogueItemDetails).contract.title.replaceAll(' ', '_');
-        saveAs(blob, title);
-        store.commit('setLoading', false);
-      }).catch((err) => {
+    this.consumerContractsApi.downloadContract(this.order.key, 1, true, true)
+      .catch((err) => {
         console.log('err', err);
+      }).finally(() => {
         store.commit('setLoading', false);
       });
-    });
   }
 
   onOrderDeliveredConfirmation(): void {
