@@ -29,7 +29,10 @@
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
         <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
         <!-- <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span> -->
-        <span class="info-table__field">Contract</span><span class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
+
+        <span class="info-table__field">Contract</span>
+        <span v-if="order.items[0].contractSignedOn" class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
+        <span v-else class="info-table__value">Contract is not ready</span>
         <!-- <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span> -->
       </div>
     </div>
@@ -109,7 +112,7 @@ export default class DashboardPurchases extends Vue {
   onDownloadContract(): void {
     console.log('d');
     store.commit('setLoading', true);
-    this.consumerContractsApi.printContract(this.order.key, 1).then((response) => {
+    this.consumerContractsApi.downloadContract(this.order.key, 1, true).then((response) => {
       console.log('pdf', response.data);
       const blob = new Blob([(response as any).data], { type: 'application/pdf' });
 
@@ -123,6 +126,8 @@ export default class DashboardPurchases extends Vue {
         console.log('err', err);
         store.commit('setLoading', false);
       });
+    }).then((err) => {
+      console.log('err', err);
     });
   }
 

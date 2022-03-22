@@ -17,14 +17,6 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" name="VAT Number" :rules="`required|vat:${vendorData.headquartersAddress.country}`">
-                  <div class="form-group">
-                    <label for="vat_number">VAT number *</label>
-                    <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider>
-
                 <validation-provider v-slot="{ errors }" :custom-messages="{ unique_name: 'This company is already registered as a vendor' }" name="Name" mode="lazy" rules="required|unique_name">
                   <div class="form-group">
                     <label for="name">Name *</label>
@@ -66,16 +58,6 @@
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                    <div class="form-group">
-                      <label for="country">Country *</label>
-                      <select class="form-group__select" name="country" id="country" v-model="vendorData.headquartersAddress.country">
-                        <option v-for="country in countries" :key="country"> {{country}} </option>
-                      </select>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider> -->
-
                   <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                     <div class="form-group">
                       <label for="multiselect_headquarters_country">Country *</label>
@@ -111,6 +93,17 @@
                     </div>
                   </validation-provider>
                 </div>
+
+                <validation-provider v-slot="{ errors }" name="VAT Number" :rules="`required|vat:${vendorData.headquartersAddress.country}`">
+                  <div class="form-group">
+                    <label for="vat_number">VAT number *</label>
+                    <div class="input-prefix-container">
+                      <span>{{ vendorData.headquartersAddress.country }}</span>
+                      <input type="text" class="form-group__text" name="vat_number" id="vat_number" v-model="vendorData.companyNumber" :placeholder="getVatPlaceholderPerCountry(vendorData.headquartersAddress.country)">
+                    </div>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
 
               </div>
             </validation-observer>
@@ -697,7 +690,8 @@ export default class BecomeVendor extends Vue {
 
   onSelectHeadquartersCountry(): void {
     // if (!(Object.values(validateVatCountryCodes) as string[]).includes(this.selectedHeadquartersCountry.code)) throw new Error('Country incompatible with vat-validate library');
-    this.vendorData.headquartersAddress.country = this.selectedHeadquartersCountry.code;
+    Vue.set(this.vendorData.headquartersAddress, 'country', this.selectedHeadquartersCountry.code);
+    // this.vendorData.headquartersAddress.country = this.selectedHeadquartersCountry.code;
   }
 
   onSelectRepresentativeNationality(): void {
@@ -764,7 +758,7 @@ export default class BecomeVendor extends Vue {
     if (this.vendorData.representative.address.line2 === '') this.vendorData.representative.address.line2 = null;
   }
 
-  submitForm() {
+  submitForm(): void {
     this.fixDataForSubmitting();
 
     console.log('submit form', this.vendorData);
@@ -781,11 +775,78 @@ export default class BecomeVendor extends Vue {
         console.log('error in submitting form: ', err);
       })
   }
+
+  getVatPlaceholderPerCountry(country: string): string {
+    // source: https://www.avalara.com/vatlive/en/eu-vat-rules/eu-vat-number-registration/eu-vat-number-formats.html
+
+    const placeholders = {
+      AT: { charactersNum: 9, format: 'U12345678' },
+      BE: { charactersNum: 10, format: '1234567890' },
+      BG: { charactersNum: [9, 10], format: ['123456789', '1234567890'] },
+      HR: { charactersNum: 11, format: '12345678901' },
+      CY: { charactersNum: 9, format: '12345678X' },
+      CZ: { charactersNum: [8, 10], format: ['12345678', '123456789', '1234567890'] },
+      DK: { charactersNum: 8, format: '12345678' },
+      EE: { charactersNum: 9, format: '123456789' },
+      FI: { charactersNum: 8, format: '12345678' },
+      FR: { charactersNum: 11, format: ['12345678901', 'X1234567890', '1X123456789', 'XX123456789'] },
+      DE: { charactersNum: 9, format: '123456789' },
+      EL: { charactersNum: 9, format: '123456789' },
+      HU: { charactersNum: 8, format: '12345678' },
+      IE: { charactersNum: [8, 9], format: ['1234567WA', '1234567FA'] },
+      IT: { charactersNum: 11, format: '12345678901' },
+      LV: { charactersNum: 11, format: '12345678901' },
+      LT: { charactersNum: 12, format: ['123456789', '123456789012'] },
+      LU: { charactersNum: 8, format: '12345678' },
+      MT: { charactersNum: 8, format: '12345678' },
+      NL: { charactersNum: 12, format: ['123456789B01', '123456789BO2'] },
+      PL: { charactersNum: 10, format: '1234567890' },
+      PT: { charactersNum: 9, format: '123456789' },
+      RO: { charactersNum: 10, format: '1234567890' },
+      SK: { charactersNum: 10, format: '1234567890' },
+      SI: { charactersNum: 8, format: '12345678' },
+      ES: { charactersNum: 9, format: ['X12345678', '12345678X', 'X1234567X'] },
+      SE: { charactersNum: 12, format: '123456789012' },
+    }
+
+    if (!placeholders[country]) return '';
+
+    const partA = `${Array.isArray(placeholders[country].charactersNum) ? `${placeholders[country].charactersNum[0]}-${placeholders[country].charactersNum[1]}` : `${placeholders[country].charactersNum}`} characters`;
+    const partB = Array.isArray(placeholders[country].format) ? `${placeholders[country].format.join(', ')}` : `${placeholders[country].format}`;
+
+    return `${partA} (e.g. ${partB})`;
+  }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/_page.scss";
   @import "@/assets/styles/_becomevendor.scss";
   @import "@/assets/styles/_forms.scss";
+
+  .input-prefix-container {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid $darkColor;
+    border-radius: 25px;
+    padding-left: 0.5rem;
+    overflow: hidden;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+
+    >span {
+      font-weight: 300;
+      font-size: 14px;
+      color: $labelColor;
+    }
+
+    input {
+      flex-grow: 1;
+      background: #fff;
+      border: none;
+      outline: none;
+      margin-bottom: 0;
+    }
+  }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

@@ -27,7 +27,13 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card v-if="mode === 'catalogue' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal" @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"></shop-card>
+          <shop-card
+            v-if="mode === 'catalogue' && isItemLoaded"
+            :catalogueItem="catalogueItem"
+            @openSelectAreaModal="openSelectAreaModal"
+            @openSelectSentinelHubPlanModal="openSelectSentinelHubPlanModal"
+            @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
+          ></shop-card>
           <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
 
           <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
@@ -41,6 +47,7 @@
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>
+    <select-sentinel-hub-plan v-if="isSelectSentinelHubPlanModalOn" @close="closeSelectSentinelHubPlanModal"></select-sentinel-hub-plan>
 
     <modal :withSlots="true" :show="modalToShow === 'modalLoginToAddAssetToCart'" @dismiss="modalToShow = ''">
       <template v-slot:body>
@@ -82,6 +89,7 @@ import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue
 import SatelliteImagesExplorer from '../components/CatalogueSingle/SatelliteImagesExplorer.vue';
 import Metadata from '../components/CatalogueSingle/Metadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
+import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelHubPlan.vue';
 
 @Component({
   components: {
@@ -100,6 +108,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
     SatelliteImagesExplorer,
     Metadata,
     SelectAreas,
+    SelectSentinelHubPlan,
     Modal,
   },
 })
@@ -119,6 +128,8 @@ export default class CatalogueSingle extends Vue {
   selectedPricingModelForAreaSelection: FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | null;
 
   isSelectAreasModalOn: boolean;
+
+  isSelectSentinelHubPlanModalOn: boolean;
 
   modalToShow: string;
 
@@ -140,6 +151,7 @@ export default class CatalogueSingle extends Vue {
     this.selectedPricingModelForAreaSelection = null;
 
     this.isSelectAreasModalOn = false;
+    this.isSelectSentinelHubPlanModalOn = false;
 
     this.modalToShow = '';
   }
@@ -192,8 +204,16 @@ export default class CatalogueSingle extends Vue {
     this.isSelectAreasModalOn = !this.isSelectAreasModalOn;
   }
 
+  openSelectSentinelHubPlanModal(): void {
+    this.isSelectSentinelHubPlanModalOn = !this.isSelectSentinelHubPlanModalOn;
+  }
+
   closeSelectAreaModal(): void {
     this.isSelectAreasModalOn = false;
+  }
+
+  closeSelectSentinelHubPlanModal(): void {
+    this.isSelectSentinelHubPlanModalOn = false;
   }
 }
 </script>

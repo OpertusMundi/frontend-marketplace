@@ -120,7 +120,8 @@
       </div>
     </div>
 
-    <div v-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
+    <div v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SUBSCRIBE</a></div>
+    <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
     <ul v-if="selectedPricingModel" class="asset__shopcard__buyinfo pt-sm-10">
@@ -286,6 +287,10 @@ export default class ShopCard extends Vue {
     // eslint-disable-next-line
     this.$emit('openSelectAreaModal', this.selectedPricingModel);
     // this.$emit('openSelectAreaModal', this.selectedPricingModel!.key);
+  }
+
+  openSelectSentinelHubPlanModal(): void {
+    this.$emit('openSelectSentinelHubPlanModal');
   }
 
   getDomainRestrictions(): string[] {

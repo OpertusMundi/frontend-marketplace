@@ -595,6 +595,9 @@ export default class Checkout extends Vue {
         console.log('err', err);
         store.commit('setLoading', false);
       });
+    }).catch((err) => {
+      console.log('err', err);
+      store.commit('setLoading', false);
     });
 
     // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {

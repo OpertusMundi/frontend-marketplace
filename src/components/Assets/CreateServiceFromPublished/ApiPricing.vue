@@ -53,7 +53,7 @@
                   </div> -->
                   <!-- per call with prepaid -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_PREPAID'">
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key. You simply set the price per individual call of the service.</p>
                     <p>Optionally, you can allow consumers to prepay a given number of calls at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid calls at any point in time. If their prepaid calls are depleted, then they are charged with the standard price.</p>
                     <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer.</p>
@@ -69,7 +69,7 @@
                     <div v-for="(prePaidTier, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|integer|min_value:1">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwp_count">Number of calls</label>
                             <p>Number of prepaid service calls offered for this tier</p>
@@ -79,7 +79,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwp_discount">Discount %</label>
                             <p>This is the discount you provide for the prepaid calls</p>
@@ -97,7 +97,7 @@
                   </div>
                   <!-- per call with block rate -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_BLOCK_RATE'">
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key.</p>
                     <p>You simply set the price per individual call of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
                     <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer.</p>
@@ -113,7 +113,7 @@
                     <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|min_value:0">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwbr_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="pcwbr_count" name="pcwbr_count">
@@ -122,7 +122,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="pcwbr_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="pcwbr_discount" name="pcwbr_discount">
@@ -139,7 +139,7 @@
                   </div>
                   <!-- per row with prepaid -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_PREPAID'">
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to your service and receive an API key. You simply set the price per individual returned row of the service.</p>
                     <p>Optionally, you can allow consumers to prepay a given number of rows at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid rows at any point in time. If their prepaid rows are depleted, then they are charged with the standard price.</p>
                     <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement between Topio and the Consumer. Consumers may cancel their subscription at any point time. If they had any prepaid rows still left, they will not be reimbursed.</p>
@@ -154,7 +154,7 @@
                     <div v-for="(prePaidTier, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|integer|min_value:0">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwp_count">Number of rows</label>
                             <p>Number of prepaid service rows offered for this tier</p>
@@ -164,7 +164,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwp_discount">Discount %</label>
                             <p>This is the discount you provide for the prepaid rows</p>
@@ -182,7 +182,7 @@
                   </div>
                   <!-- per row with block rate -->
                   <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
-                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required">
+                    <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key.</p>
                     <p>You simply set the price per individual row returned by service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
                     <p>Topio will add a [30%] overhead to the price you set, which covers the costs of service provision according to the Service Level Agreement (SLA) between Topio and the Consumer.</p>
@@ -198,7 +198,7 @@
                     <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|min_value:0">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwbr_count">Threshold</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="prwbr_count" name="prwbr_count">
@@ -207,7 +207,7 @@
                           </validation-provider>
                         </div>
                         <div class="col-xs-6">
-                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwbr_discount">Discount %</label>
                             <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="prwbr_discount" name="prwbr_discount">
@@ -302,7 +302,14 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
+import {
+  required,
+  // eslint-disable-next-line
+  min_value,
+  // eslint-disable-next-line
+  max_value,
+  integer,
+} from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
 import {
   BasePricingModelCommand,
@@ -319,6 +326,9 @@ import store from '@/store';
 import { EnumContinent } from '@/model/enum';
 
 extend('required', required);
+extend('min_value', min_value);
+extend('max_value', max_value);
+extend('integer', integer);
 
 @Component({
   components: {

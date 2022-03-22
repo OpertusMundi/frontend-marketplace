@@ -4,6 +4,7 @@ import createPersistedState from 'vuex-persistedstate';
 
 import User from './modules/user.module';
 import Config from './modules/config.module';
+import Loading from './modules/loading.module';
 import Shop from './modules/shop.module';
 import Router from './modules/router.module';
 import CatalogueFilters from './modules/catalogue-filters.module';
@@ -18,6 +19,7 @@ const store = new Vuex.Store({
   modules: {
     user: User,
     config: Config,
+    loading: Loading,
     shop: Shop,
     router: Router,
     catalogueFilters: CatalogueFilters,
@@ -25,7 +27,7 @@ const store = new Vuex.Store({
     globalModals: GlobalModals,
   },
   plugins: [createPersistedState({
-    // paths: ['user'],
+    paths: ['user', 'config', 'shop', 'router', 'catalogueFilters', 'notifications', 'globalModals'],
   })],
   strict: debug,
 });

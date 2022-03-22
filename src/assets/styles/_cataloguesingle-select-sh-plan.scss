@@ -1,0 +1,75 @@
+.select-sh-plan-modal {
+  height: 100%;
+  width: 100%;
+  background: $lightBgColor;
+  border: solid 2px $secondColor;
+  border-radius: 13px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+
+  &__wrapper {
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    padding: 20px;
+  }
+
+  &__btn-close {
+    cursor: pointer;
+  }
+
+  &__header {
+    width: 100%;
+    display: flex;
+    margin-bottom: 20px;
+
+    h1, h2, h3 {
+      flex-grow: 1;
+    }
+  }
+
+  &__subheading {
+    font-size: em(14);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: $darkColor;
+  }
+
+  &__billing_type_selection {
+    margin: 20px 0 0 0;
+    display: flex;
+    justify-content: center;
+
+    .form-group {
+      margin-bottom: 0;
+
+      .control {
+        padding-left: 35px;
+      }
+
+      label {
+        width: auto;
+      }
+    }
+
+    .form-group:nth-child(1) {
+      margin-right: 30px;
+    }
+  }
+
+  &__body {
+    background: #fff;
+    margin: 10px 40px 30px 40px;
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    border-radius: 12px;
+  }
+}
