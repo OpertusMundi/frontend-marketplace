@@ -37,7 +37,7 @@
 
   &__subheading {
     font-size: em(14);
-    font-weight: 500;
+    font-weight: 800;
     letter-spacing: 0.03em;
     color: $darkColor;
   }
@@ -71,5 +71,114 @@
     display: flex;
     flex-grow: 1;
     border-radius: 12px;
+    overflow: hidden;
+
+    .container {
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 0;
+
+      .row {
+        height: 100%;
+
+        .col--no-padding {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  .subscription-plan-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-right: solid 1px $darkColor;
+
+    &--no-border-right {
+      border-right: none;
+    }
+
+    button {
+      align-self: center;
+      margin: 30px 0;
+    }
+
+    &__title {
+      font-size: em(19);
+      color: $secondColor;
+      font-weight: 900;
+      margin: 20px 0 10px 0;
+    }
+
+    &__description {
+      color: $labelColor;
+      font-size: em(14);
+    }
+
+    &__price-monthly {
+      color: $secondColor;
+      font-size: em(30);
+      font-weight: 800;
+      margin: 20px 0 5px 0;
+    }
+
+    &__price-annual {
+      color: $secondColor;
+      font-size: em(13);
+      margin: 0 0 20px 0;
+    }
+
+    &__features-container {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      span {
+        color: $darkColor;
+        font-size: em(16);
+        font-weight: 800;
+
+        &::before {
+          content: "\2022";
+          color: $secondColor;
+          font-weight: bold;
+          display: inline-block;
+          width: 1em;
+          margin-left: -1em;
+        }
+      }
+    }
+
+    &__processing-units, &__requests {
+      display: flex;
+      flex-direction: column;
+      margin: 30px 0 0 0;
+
+      &__label {
+        color: $labelColor;
+        font-size: em(16);
+        margin-bottom: 5px;
+      }
+
+      &__value {
+        color: $darkColor;
+        font-size: em(16);
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      &__value:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    &__license {
+      color: $labelColor;
+      font-size: em(13);
+      margin-bottom: 5px;
+      max-width: 80%;
+      margin: 0 auto;
+    }
   }
 }
