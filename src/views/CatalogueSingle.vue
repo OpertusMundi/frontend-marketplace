@@ -47,7 +47,7 @@
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>
-    <select-sentinel-hub-plan v-if="isSelectSentinelHubPlanModalOn" @close="closeSelectSentinelHubPlanModal"></select-sentinel-hub-plan>
+    <select-sentinel-hub-plan v-if="isSelectSentinelHubPlanModalOn" @close="closeSelectSentinelHubPlanModal" :assetId="catalogueItem.id"></select-sentinel-hub-plan>
 
     <modal :withSlots="true" :show="modalToShow === 'modalLoginToAddAssetToCart'" @dismiss="modalToShow = ''">
       <template v-slot:body>

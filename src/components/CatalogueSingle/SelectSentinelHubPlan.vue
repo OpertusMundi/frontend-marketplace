@@ -4,7 +4,7 @@
       <div class="select-sh-plan-modal">
         <div class="select-sh-plan-modal__header">
           <h1>Sentinel Hub</h1>
-          <div @click="onCloseModal" class="select-sh-plan-modal__btn-close">
+          <div @click="closeModal" class="select-sh-plan-modal__btn-close">
             <svg xmlns="http://www.w3.org/2000/svg" width="31.121" height="31.121" viewBox="0 0 31.121 31.121">
               <g id="Group_506" data-name="Group 506" transform="translate(-1737.939 -45.939)">
                 <path id="Path_815" data-name="Path 815" d="M0,0H41.012" transform="translate(1739 47) rotate(45)" fill="none" stroke="#190aff" stroke-width="3"/>
@@ -60,7 +60,7 @@
                     </template>
                     <span v-else class="subscription-plan-card__requests__value">(unknown)</span>
                   </div>
-                  <button class="btn btn--std btn--blue" style="flex-grow: 0">select tier</button>
+                  <button class="btn btn--std btn--blue" @click="onSelectTier(subscriptionPlan.id)">select tier</button>
                   <span class="subscription-plan-card__license">{{ subscriptionPlan.license }}</span>
                 </div>
               </div>
@@ -75,16 +75,23 @@
 import {
   Component,
   Vue,
-  // Prop,
+  Prop,
 } from 'vue-property-decorator';
 import { chunk } from 'lodash';
 import SentinelHubApi from '@/service/sentinel-hub';
+import CartApi from '@/service/cart';
 import { SubscriptionPlan } from '@/model/sentinel-hub';
+import { CartAddItemCommand } from '@/model';
+import { EnumPricingModel } from '@/model/pricing-model';
+import store from '@/store';
 
 @Component
 export default class SelectSentinelHubPlan extends Vue {
-  // @Prop() private assetId!: string;
+  @Prop({ required: true }) private assetId!: string;
+
   sentinelHubApi = new SentinelHubApi();
+
+  cartApi = new CartApi();
 
   show = false;
 
@@ -93,6 +100,8 @@ export default class SelectSentinelHubPlan extends Vue {
   billingType: 'ANNUAL' | 'MONTHLY' = 'ANNUAL';
 
   mounted(): void {
+    console.log(this.assetId);
+
     this.show = true;
 
     this.sentinelHubApi.getSubscriptionPlans().then((response) => {
@@ -110,7 +119,7 @@ export default class SelectSentinelHubPlan extends Vue {
     this.show = false;
   }
 
-  onCloseModal(): void {
+  closeModal(): void {
     this.$emit('close');
   }
 
@@ -120,6 +129,29 @@ export default class SelectSentinelHubPlan extends Vue {
 
   computeAnnualPrice(monthlyPrice: number): number {
     return monthlyPrice * 12;
+  }
+
+  onSelectTier(subscriptionPlanId: string): void {
+    const cartItemCommand: CartAddItemCommand = {
+      assetId: this.assetId,
+      pricingModelKey: subscriptionPlanId,
+      parameters: {
+        type: EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION,
+        frequency: this.billingType,
+      },
+    };
+
+    this.cartApi.addItem(cartItemCommand).then((response) => {
+      console.log('add item');
+      if (response.success) {
+        console.log('success', response);
+        store.commit('setCartItems', response.result);
+        console.log('added to store');
+        this.closeModal();
+      } else {
+        console.log('err', response);
+      }
+    });
   }
 }
 </script>
