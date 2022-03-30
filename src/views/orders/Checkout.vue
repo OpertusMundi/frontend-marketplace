@@ -250,7 +250,7 @@
                           <h4>{{ cartItem.asset.title }}</h4>
                           <h4>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</h4>
                         </div>
-                        <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Vendor:</strong> {{ cartItem.asset.publisherName }}</span></p>
+                        <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Supplier:</strong> {{ cartItem.asset.publisherName }}</span></p>
                         <p class="d-flex align-items-center">
                           <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
                           <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
@@ -274,7 +274,7 @@
                           <h4>{{ item.description }}</h4>
                           <h4>{{ item.totalPrice === 0 ? 'FREE' : `${item.totalPrice}€` }}</h4>
                         </div>
-                        <p><span><strong>Version:</strong> {{ item.assetVersion }}</span> <span><strong>Vendor:</strong> {{ item.provider.name }}</span></p>
+                        <p><span><strong>Version:</strong> {{ item.assetVersion }}</span> <span><strong>Supplier:</strong> {{ item.provider.name }}</span></p>
                         <p class="d-flex align-items-center">
                           <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="item.type === 'VECTOR'">
                           <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="item.type === 'RASTER'">
@@ -353,7 +353,6 @@ import store from '@/store';
 import { ServerResponse } from '@/model';
 import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
 import { ConsumerOrder } from '@/model/order';
-import { saveAs } from 'file-saver';
 
 extend('required', required);
 extend('email', email);
@@ -582,23 +581,14 @@ export default class Checkout extends Vue {
 
   onDownloadContract(): void {
     store.commit('setLoading', true);
-    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1).then((response) => {
-      console.log('pdf', response.data);
-      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
-
-      const assetId = this.cart ? this.cart.items[this.currentItemToReviewContract].asset.id : '';
-      this.catalogueApi.findOne(assetId).then((assetResponse) => {
-        const title = (assetResponse.result as CatalogueItemDetails).contract.title.replaceAll(' ', '_');
-        saveAs(blob, title);
-        store.commit('setLoading', false);
-      }).catch((err) => {
+    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, true)
+      .catch((err) => {
         console.log('err', err);
         store.commit('setLoading', false);
+      })
+      .finally(() => {
+        store.commit('setLoading', false);
       });
-    }).catch((err) => {
-      console.log('err', err);
-      store.commit('setLoading', false);
-    });
 
     // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {
     //   console.log('pdf', response.data);

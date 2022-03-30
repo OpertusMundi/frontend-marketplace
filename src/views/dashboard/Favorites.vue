@@ -10,7 +10,7 @@
       <div class="collection__menu">
         <ul>
           <li :class="{'active': selectedTab === 'ASSET'}"><a href="#" @click.prevent="selectTab('ASSET')">Assets</a></li>
-          <li :class="{'active': selectedTab === 'PROVIDER'}"><a href="#" @click.prevent="selectTab('PROVIDER')">Vendors</a></li>
+          <li :class="{'active': selectedTab === 'PROVIDER'}"><a href="#" @click.prevent="selectTab('PROVIDER')">Suppliers</a></li>
         </ul>
       </div>
 
@@ -27,7 +27,7 @@
 
       <!-- VENDORS -->
       <div v-if="selectedTab === 'PROVIDER'">
-        <div class="collection__total"><p>{{ providersPagination.itemsTotal }} {{ providersPagination.itemsTotal === 1 ? 'vendor' : 'vendors' }}</p></div>
+        <div class="collection__total"><p>{{ providersPagination.itemsTotal }} {{ providersPagination.itemsTotal === 1 ? 'supplier' : 'suppliers' }}</p></div>
 
         <vendor-favorite-card v-for="provider in providers" :key="provider.key" :provider="provider" @reload="onTabSelection('PROVIDER')"></vendor-favorite-card>
 

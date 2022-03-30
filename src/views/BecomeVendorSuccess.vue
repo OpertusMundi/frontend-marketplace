@@ -4,7 +4,7 @@
       <div class="confirm-email__hero">
         <shape></shape>
         <div class="confirm-email__hero__content">
-          <h1 class="confirm-email__hero__content__title">Your topio vendor account has been initiated!</h1>
+          <h1 class="confirm-email__hero__content__title">Your topio supplier account has been initiated!</h1>
           <div class="confirm-email__hero__content__text">
             <p>Your can review the information you provided in your Settings. We will process your information and notify you for the additional documentation needed. These documents will be your company’s Identity Proof, Registration Proof and Articles of Association. </p>
             <!-- <p class="mt-xs-50"><router-link to="/dashboard" class="btn btn--std btn--teal">GO TO DASHBOARD</router-link></p> -->

@@ -13,7 +13,7 @@
                 <li><a id="side5" :class="{active: activeMenuItem == 5}" href="#" @click.prevent="scrollToSection('5')">3. Site and platform accessibility</a></li>
                 <li><a id="side6" :class="{active: activeMenuItem == 6}" href="#" @click.prevent="scrollToSection('6')">4. Infrastructure location and security</a></li>
                 <li><a id="side7" :class="{active: activeMenuItem == 7}" href="#" @click.prevent="scrollToSection('7')">5. Description of services provided</a></li>
-                <li><a id="side8" :class="{active: activeMenuItem == 8}" href="#" @click.prevent="scrollToSection('8')">6. Creating a Vendor account</a></li>
+                <li><a id="side8" :class="{active: activeMenuItem == 8}" href="#" @click.prevent="scrollToSection('8')">6. Creating a Supplier account</a></li>
               </ul>
             </div>
         </div>
@@ -64,7 +64,7 @@
             <p>The company Dawex Systems, a simplified joint-stock company under French law, with headquarters at 20 place Louis Pradel, 69001 LYON (France), registered at the Lyon RCS under the number 810 307 207, represented by its acting legal representatives (hereafter “Dawex”); and any legal person acting in his/her capacity as a professional governed by private or public law desiring to benefit from one or more services provided by the company Dawex.</p>
             <p>To use the services provided by Dawex on the Platform, the Client must acknowledge and accept these General Terms and Conditions without limitation or reservation. This acceptance is confirmed when the Client creates his/her account on the site.</p>
           </div>
-          <h2 class="terms__main__title" id="main8">6. Creating a Vendor account</h2>
+          <h2 class="terms__main__title" id="main8">6. Creating a Supplier account</h2>
           <div class="terms__main__text">
             <p>These General Terms and Conditions apply to all uses of the Service, and all contractual relationships established between the company Dawex and its Clients on the site that is accessible at the address https://www.dawex.com, between:</p>
             <p>The company Dawex Systems, a simplified joint-stock company under French law, with headquarters at 20 place Louis Pradel, 69001 LYON (France), registered at the Lyon RCS under the number 810 307 207, represented by its acting legal representatives (hereafter “Dawex”); and any legal person acting in his/her capacity as a professional governed by private or public law desiring to benefit from one or more services provided by the company Dawex.</p>

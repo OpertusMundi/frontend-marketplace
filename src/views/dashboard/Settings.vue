@@ -15,7 +15,7 @@
 
       <modal :show="modalToShow == 'companyName'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company name'" :modalId="'companyName'" :inputs="[{id: 'companyName', name: 'Company Name', value: getCurrentOrDraftValue('name'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'companyImage'" @dismiss="modalToShow = ''" @submit="onSubmitProviderOptionalField" :title="'Change your company image'" :modalId="'companyImage'" :inputs="[{id: 'image', name: 'Image', type: 'file', returnType: 'base64'}]"></modal>
-      <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change vendor VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: getCurrentOrDraftValue('companyNumber'), type: 'text'}]"></modal>
+      <modal :show="modalToShow == 'vatNumber'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change supplier VAT number'" :modalId="'vatNumber'" :inputs="[{id: 'vatNumber', name: 'VAT Number', value: getCurrentOrDraftValue('companyNumber'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'domain'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company type'" :modalId="'companyType'" :inputs="[{id: 'companyType', name: 'Company Type', value: getCurrentOrDraftValue('companyType'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'companyEmail'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your company email'" :modalId="'companyEmail'" :inputs="[{id: 'companyEmail', name: 'Company Email', value: getCurrentOrDraftValue('email'), type: 'text'}]"></modal>
       <modal :show="modalToShow == 'website'" @dismiss="modalToShow = ''" @submit="onSubmitMangoPayField" :title="'Change your website'" :modalId="'siteUrl'" :inputs="[{id: 'siteUrl', name: 'Site URL', value: getCurrentOrDraftValue('siteUrl'), type: 'text'}]"></modal>
@@ -287,7 +287,7 @@
     <div class="settings">
 
       <div v-if="isUserDraft && draftStatus=='DRAFT'" class="mt-xs-20 mb-xs-20">
-        <h3 class="settings__alert--gray">You have unapplied changes in your draft, related to your vendor profile. If you have finsished editing, you need to
+        <h3 class="settings__alert--gray">You have unapplied changes in your draft, related to your supplier profile. If you have finsished editing, you need to
           <button @click="submitRegistrationFromDraft" class="btn btn--std btn--blue">SUBMIT CHANGES</button>
         </h3>
       </div>
@@ -581,7 +581,7 @@
                     </div>
                   </div>
 
-                  <span class="text-black"><strong>{{ kycViewAsRole === 'PROVIDER' ? 'Vendor' : 'Consumer' }} validation status</strong></span>
+                  <span class="text-black"><strong>{{ kycViewAsRole === 'PROVIDER' ? 'Supplier' : 'Consumer' }} validation status</strong></span>
                   <div class="mt-xs-20" v-if="isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--validated">KYC VALIDATED</span></div>
                   <div class="mt-xs-20" v-if="!isKycValidated()"><span class="tabs__tab__kyc__status-label tabs__tab__kyc__status-label--not-validated">NOT KYC VALIDATED</span></div>
                   <div class="mt-xs-30 d-flex" v-if="!isKycValidated()">

@@ -651,7 +651,7 @@ export default class CreateAsset extends Vue {
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
     console.log('err => create draft', draftAssetResponse);
-    this.showUploadingMessage(true, 'An error occurred.');
+    this.showUploadingMessage(true, 'An error occurred');
     throw new Error('error');
   }
 
@@ -660,7 +660,7 @@ export default class CreateAsset extends Vue {
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
     console.log('err', draftAssetResponse);
-    this.showUploadingMessage(true, 'An error occurred.');
+    this.showUploadingMessage(true, 'An error occurred');
     throw new Error('error');
   }
 
@@ -681,7 +681,7 @@ export default class CreateAsset extends Vue {
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
     console.log('err', draftAssetResponse);
-    this.showUploadingMessage(true, 'An error occurred.');
+    this.showUploadingMessage(true, 'An error occurred');
     throw new Error('error');
   }
 
@@ -701,7 +701,7 @@ export default class CreateAsset extends Vue {
     if (draftAssetResponse.success) return draftAssetResponse.result;
 
     console.log('err', draftAssetResponse);
-    this.showUploadingMessage(true, 'An error occurred.');
+    this.showUploadingMessage(true, 'An error occurred');
     throw new Error('error');
   }
 
@@ -714,7 +714,7 @@ export default class CreateAsset extends Vue {
       // Passing error response to review component as prop
       this.errors = submitResponse.messages;
       console.log('error submitting service', submitResponse.messages);
-      // this.showUploadingMessage(true, 'An error occurred.');
+      // this.showUploadingMessage(true, 'An error occurred');
     }
   }
 
@@ -744,7 +744,7 @@ export default class CreateAsset extends Vue {
 
       if (!uploadAdditionalResourceResponse.success) {
         console.log('err', uploadAdditionalResourceResponse);
-        this.showUploadingMessage(true, 'An error occurred.');
+        this.showUploadingMessage(true, 'An error occurred');
         throw new Error('error');
       }
 
@@ -768,7 +768,7 @@ export default class CreateAsset extends Vue {
 
     if (!uploadResourceResponse.success) {
       console.log('err', uploadResourceResponse);
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
       throw new Error('error');
     }
 
@@ -788,7 +788,7 @@ export default class CreateAsset extends Vue {
 
     if (!addResourceFromFileSystemResponse.success) {
       console.log('err', addResourceFromFileSystemResponse);
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
       throw new Error('error');
     }
 
@@ -818,12 +818,12 @@ export default class CreateAsset extends Vue {
         draftCommand = response.result.command;
       } else {
         console.log('err', response);
-        this.showUploadingMessage(true, 'An error occurred.');
+        this.showUploadingMessage(true, 'An error occurred');
         return;
       }
     } catch (err) {
       console.log('err', err);
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
       return;
     }
 
@@ -834,12 +834,12 @@ export default class CreateAsset extends Vue {
         console.log('YEAP2');
       } else {
         console.log('err', response);
-        this.showUploadingMessage(true, 'An error occurred.');
+        this.showUploadingMessage(true, 'An error occurred');
         return;
       }
     } catch (err) {
       console.log('err', err);
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
       return;
     }
 
@@ -870,7 +870,7 @@ export default class CreateAsset extends Vue {
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
     }
   }
 
@@ -926,7 +926,7 @@ export default class CreateAsset extends Vue {
     } catch (err) {
       console.error((err as any).message);
 
-      this.showUploadingMessage(true, 'An error occurred.');
+      this.showUploadingMessage(true, 'An error occurred');
     }
   }
 

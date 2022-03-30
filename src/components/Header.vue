@@ -90,10 +90,10 @@
                 <div class="header__mobile-submenu" v-if="showSubmenuSell">
                   <ul>
                     <li>
-                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for vendors</span></router-link>
+                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for suppliers</span></router-link>
                     </li>
                     <li>
-                      <router-link :to="navigationForBecomeVendor()"><span @click="toggleMobileMenu">BECOME A VENDOR</span></router-link>
+                      <router-link :to="navigationForBecomeVendor()"><span @click="toggleMobileMenu">BECOME A SUPPLIER</span></router-link>
                     </li>
                   </ul>
                 </div>
@@ -121,11 +121,11 @@
                             </g>
                           </svg>
                           <!-- <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/become-vendor" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p> -->
-                          <p @click="showSubmenuSell = !showSubmenuSell"><router-link :to="navigationForBecomeVendor()" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p>
+                          <p @click="showSubmenuSell = !showSubmenuSell"><router-link :to="navigationForBecomeVendor()" class="btn btn--std btn--blue">BECOME A SUPPLIER</router-link></p>
                         </div>
                       </div>
                       <div class="header__submenu__block">
-                        <h4 class="header__submenu__block__title">Benefits for vendors</h4>
+                        <h4 class="header__submenu__block__title">Benefits for suppliers</h4>
                         <div class="header__submenu__block__text">
                           <ul>
                             <li>Easily upload, promote and trade your data assets</li>
