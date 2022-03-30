@@ -9,7 +9,7 @@
           <div class="login__form__group">
             <input @input="onEmailChange" type="text" name="Email" id="email" v-model="account.email" placeholder="Email">
             <span class="login__form__group__error">{{ errors[0] }}</span>
-            <span class="login__form__group__error" v-if="emailTakenError">An account with this email already exists.</span>
+            <span class="login__form__group__error" v-if="emailTakenError">An account with this email already exists</span>
           </div>
         </validation-provider>
         <validation-provider name="Password" rules="required" v-slot="{ errors }" vid="password">
@@ -32,7 +32,7 @@
               <label for="terms">I 've read and accept the <strong><a class="login__helpers" href="/terms">Terms & Conditions</a></strong></label>
             </div>
           </div>
-          <span class="login__form__errors" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register.</span>
+          <span class="login__form__errors" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register</span>
         </div>
 
         <div class="login__form__errors" v-if="formErrors">{{ formErrors }}</div>
