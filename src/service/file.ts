@@ -5,6 +5,7 @@ import Api from '@/service/api';
 import { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import { DirectoryInfo, FilePathCommand, FileUploadCommand } from '@/model/file';
+import { blobToJson } from '@/helper/file';
 
 export default class FileSystemApi extends Api {
   constructor() {
@@ -62,7 +63,7 @@ export default class FileSystemApi extends Api {
           messages: [],
         });
       })
-      .catch((err: AxiosError) => this.blobToJson(err.response?.data));
+      .catch((err: AxiosError) => blobToJson(err.response?.data));
   }
 
   /**
@@ -102,20 +103,5 @@ export default class FileSystemApi extends Api {
 
       return data;
     });
-  }
-
-  private blobToJson<T>(blob: Blob): Promise<T> {
-    const reader = new FileReader();
-
-    const promise = new Promise((resolve: (data: T) => void) => {
-      reader.onload = () => {
-        const data: T = JSON.parse(<string>reader.result);
-        resolve(data);
-      };
-    });
-
-    reader.readAsText(blob);
-
-    return promise;
   }
 }

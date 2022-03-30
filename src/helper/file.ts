@@ -64,3 +64,18 @@ export default async function csvToSample(file: File, delimiter = ',', quote = '
 
   return promise;
 }
+
+export function blobToJson<T>(blob: Blob): Promise<T> {
+  const reader = new FileReader();
+
+  const promise = new Promise((resolve: (data: T) => void) => {
+    reader.onload = () => {
+      const data: T = JSON.parse(<string>reader.result);
+      resolve(data);
+    };
+  });
+
+  reader.readAsText(blob);
+
+  return promise;
+}
