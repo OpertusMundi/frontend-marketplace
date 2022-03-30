@@ -29,7 +29,7 @@
             <span><strong>Version: </strong>1.0.1</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
           </div> -->
           <div class="asset_card__bottom__left__info">
-            <span><strong>Version: </strong>{{ item.asset.version }}</span><span><strong>Vendor: </strong>{{ item.asset.publisherName }}</span>
+            <span><strong>Version: </strong>{{ item.asset.version }}</span><span><strong>Supplier: </strong>{{ item.asset.publisherName }}</span>
           </div>
         </div>
         <!-- <div class="asset_card__bottom__right">

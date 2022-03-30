@@ -14,7 +14,7 @@
               <p>Upload, promote, and trade your data assets with ease </p>
               <p>Gain new clients & increase your profits </p>
               <p>Turn your assets into services</p>
-              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</router-link>
+              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR SUPPLIERS</router-link>
             </div>
           </div>
           <div class="vendorpromo__item over">
@@ -39,7 +39,7 @@
               <p>Upload, promote, and trade your data assets with ease </p>
               <p>Gain new clients & increase your profits </p>
               <p>Turn your assets into services</p>
-              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR VENDORS</router-link>
+              <router-link to="/vendor-benefits" class="btn btn--std btn--blue">BENEFITS FOR SUPPLIERS</router-link>
             </div>
           </div>
           <div class="vendorpromo__center" v-bind:class="promoClasses[1]">
@@ -67,7 +67,7 @@
             </div>
             <div class="footer__upper__item">
               <h6>Sell Geodata</h6>
-              <router-link to="/vendor-benefits">Benefits for vendors</router-link>
+              <router-link to="/vendor-benefits">Benefits for suppliers</router-link>
               <a href="#">Get started</a>
             </div>
             <div class="footer__upper__item">

@@ -17,7 +17,7 @@
             <validation-observer ref="step1">
               <div class="dashboard__form__step" v-if="currentStep == 1">
 
-                <validation-provider v-slot="{ errors }" :custom-messages="{ unique_name: 'This company is already registered as a vendor' }" name="Name" mode="lazy" rules="required|unique_name">
+                <validation-provider v-slot="{ errors }" :custom-messages="{ unique_name: 'This company is already registered as a supplier' }" name="Name" mode="lazy" rules="required|unique_name">
                   <div class="form-group">
                     <label for="name">Name *</label>
                     <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">

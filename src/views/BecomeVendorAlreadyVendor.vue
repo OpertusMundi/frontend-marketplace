@@ -37,9 +37,9 @@ export default class BecomeVendorAlreadyVendor extends Vue {
   created(): void {
     // eslint-disable-next-line
     this.vendorStateMsg = store.getters.hasRole([EnumRole.ROLE_PROVIDER])
-      ? 'You are already a vendor!'
+      ? 'You are already a supplier!'
       : store.getters.getProfile.provider.draft
-        ? 'Your vendor registration is pending!'
+        ? 'Your supplier registration is pending!'
         : '';
   }
 

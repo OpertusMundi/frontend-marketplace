@@ -290,10 +290,10 @@
               <!-- VENDOR -->
               <div v-show="filterMoreSubmenuItemSelected == 'vendor'">
                 <div class="form-group">
-                  <label>Search by Vendor</label>
+                  <label>Search by Supplier</label>
                   <div class="d-flex">
                     <div>
-                      <input v-for="(vendor, i) in filters.vendors" :key="i" v-model="filters.vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Vendor name">
+                      <input v-for="(vendor, i) in filters.vendors" :key="i" v-model="filters.vendors[i]" type="text" class="form-group__text" :name="'search_vendor_' + i" :id="'search_vendor_' + i" placeholder="Supplier name">
                     </div>
                     <button @click="addVendor" class="fab-button align-self-end ml-xs-15 mb-xs-10">+</button>
                   </div>
@@ -530,7 +530,7 @@ export default class Catalogue extends Vue {
     super();
 
     this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
-    this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Vendor' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
+    this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Supplier' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
 
     // this.query = '';
     this.queryResults = [];
@@ -986,7 +986,7 @@ export default class Catalogue extends Vue {
     // VENDOR
     if (filters.vendors.some((x) => (x !== ''))) {
       result.push({
-        label: `Vendors: ${this.getInputsAsOneLabel(filters.vendors)}`,
+        label: `Suppliers: ${this.getInputsAsOneLabel(filters.vendors)}`,
         category: 'vendor',
       });
     }

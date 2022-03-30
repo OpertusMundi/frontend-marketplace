@@ -19,7 +19,7 @@
       <div class="asset_card__bottom">
         <div class="asset_card__bottom__left">
           <div class="asset_card__bottom__left__info">
-            <span><strong>Version: </strong>{{ item.asset.version }}</span><span><strong>Vendor: </strong>{{ item.asset.publisherName }}</span>
+            <span><strong>Version: </strong>{{ item.asset.version }}</span><span><strong>Supplier: </strong>{{ item.asset.publisherName }}</span>
           </div>
         </div>
       </div>

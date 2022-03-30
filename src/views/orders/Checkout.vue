@@ -250,7 +250,7 @@
                           <h4>{{ cartItem.asset.title }}</h4>
                           <h4>{{ cartItem.pricingModel.quotation.totalPrice === 0 ? 'FREE' : `${cartItem.pricingModel.quotation.totalPrice}€` }}</h4>
                         </div>
-                        <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Vendor:</strong> {{ cartItem.asset.publisherName }}</span></p>
+                        <p><span><strong>Version:</strong> {{ cartItem.asset.version }}</span> <span><strong>Supplier:</strong> {{ cartItem.asset.publisherName }}</span></p>
                         <p class="d-flex align-items-center">
                           <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="cartItem.asset.type === 'VECTOR'">
                           <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="cartItem.asset.type === 'RASTER'">
@@ -274,7 +274,7 @@
                           <h4>{{ item.description }}</h4>
                           <h4>{{ item.totalPrice === 0 ? 'FREE' : `${item.totalPrice}€` }}</h4>
                         </div>
-                        <p><span><strong>Version:</strong> {{ item.assetVersion }}</span> <span><strong>Vendor:</strong> {{ item.provider.name }}</span></p>
+                        <p><span><strong>Version:</strong> {{ item.assetVersion }}</span> <span><strong>Supplier:</strong> {{ item.provider.name }}</span></p>
                         <p class="d-flex align-items-center">
                           <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="item.type === 'VECTOR'">
                           <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="item.type === 'RASTER'">
