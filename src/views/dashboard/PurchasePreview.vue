@@ -48,9 +48,7 @@ import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
 import { EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
-import { CatalogueItemDetails } from '@/model/catalogue';
 import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
-import { saveAs } from 'file-saver';
 
 @Component({
   components: {

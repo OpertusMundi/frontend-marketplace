@@ -353,7 +353,6 @@ import store from '@/store';
 import { ServerResponse } from '@/model';
 import { CatalogueItem, CatalogueItemDetails, Contract } from '@/model/catalogue';
 import { ConsumerOrder } from '@/model/order';
-import { saveAs } from 'file-saver';
 
 extend('required', required);
 extend('email', email);

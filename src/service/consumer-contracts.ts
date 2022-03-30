@@ -68,11 +68,11 @@ export default class ConsumerContractsApi extends Api {
     return filenamePart.split('filename')[1].split('=')[1].trim();
   }
 
-  public async downloadContract(key: string, index: number, signed: boolean): Promise<AxiosServerResponse<BinaryType>> {
-    const url = `/action/contract/consumer/order/${key}?index=${index}&signed=${signed}`;
+  // public async downloadContract(key: string, index: number, signed: boolean): Promise<AxiosServerResponse<BinaryType>> {
+  //   const url = `/action/contract/consumer/order/${key}?index=${index}&signed=${signed}`;
 
-    return this.get<ServerResponse<BinaryType>>(url, {
-      responseType: 'blob',
-    });
-  }
+  //   return this.get<ServerResponse<BinaryType>>(url, {
+  //     responseType: 'blob',
+  //   });
+  // }
 }
