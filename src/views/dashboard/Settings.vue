@@ -786,7 +786,8 @@
                         <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                           <div class="form-group">
                             <label for="birthdate">Birthdate *</label>
-                            <input type="date" v-model="uboToAdd.birthdate" class="form-group__text" name="birthdate" id="birthdate">
+                            <!-- <input type="date" v-model="uboToAdd.birthdate" class="form-group__text" name="birthdate" id="birthdate"> -->
+                            <datepicker input-class="form-group__text" :value="uboToAdd.birthdate" @input="uboToAdd.birthdate = formatDate($event)"></datepicker>
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                         </validation-provider>
@@ -862,6 +863,7 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
+import moment from 'moment';
 import store from '@/store';
 import Datepicker from 'vuejs-datepicker';
 // eslint-disable-next-line
@@ -1192,6 +1194,10 @@ export default class DashboardHome extends Vue {
 
   defaultLogo(): string {
     return getDefaultLogo();
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('YYYY-MM-DD');
   }
 
   /*
@@ -1733,8 +1739,11 @@ export default class DashboardHome extends Vue {
   }
 
   submitUbo(): void {
-    // OVERWRITE FOR DEVELOPMENT PURPOSE (TODO: submit birthdate in right format)
-    this.uboToAdd.birthdate = '1980-01-01T00:00:00.000Z';
+    // fix date format (birthday)
+    const d = new Date(this.uboToAdd.birthdate);
+    const isoString = d.toISOString();
+    this.uboToAdd.birthdate = isoString;
+    /* */
 
     // eslint-disable-next-line
     const declarationId = this.uboDeclarations![this.selectedDeclaration!].id;
