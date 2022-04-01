@@ -50,7 +50,12 @@
                     <button v-if="filters.updated.dateFrom" @click="removeFilter(false, 'update', 'date_from')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
-                <datepicker :inline="true" v-model="filters.updated.dateFrom" placeholder="select date"></datepicker>
+                <datepicker
+                  :inline="true"
+                  :disabled-dates="{from: filters.updated.dateTo ? new Date(filters.updated.dateTo) : new Date()}"
+                  v-model="filters.updated.dateFrom"
+                  placeholder="select date"
+                ></datepicker>
                 <div class="mt-xs-30" v-if="filters.updated.dateFrom">
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">From time</small>
@@ -68,7 +73,12 @@
                     <button v-if="filters.updated.dateTo" @click="removeFilter(false, 'update', 'date_to')"><font-awesome-icon icon="times" /></button>
                   </div>
                 </div>
-                <datepicker :inline="true" v-model="filters.updated.dateTo" placeholder="select date"></datepicker>
+                <datepicker
+                  :inline="true"
+                  :disabled-dates="{...(filters.updated.dateFrom && {to: new Date(filters.updated.dateFrom)}), from: new Date()}"
+                  v-model="filters.updated.dateTo"
+                  placeholder="select date"
+                ></datepicker>
                 <div class="mt-xs-30" v-if="filters.updated.dateTo">
                   <div class="d-flex space-between mb-xs-5">
                     <small class="date-labels">To time</small>
@@ -887,14 +897,14 @@ export default class Catalogue extends Vue {
     if (filters.updated.dateFrom && !filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `After ${this.dateFormatter(filters.updated.dateFrom)}${filters.updated.timeFrom !== '00:00 AM' ? ', ' + filters.updated.timeFrom : ''}`,
+        label: `From ${this.dateFormatter(filters.updated.dateFrom)}${filters.updated.timeFrom !== '00:00 AM' ? ', ' + filters.updated.timeFrom : ''}`,
         category: 'update',
       });
     }
     if (!filters.updated.dateFrom && filters.updated.dateTo) {
       result.push({
         // eslint-disable-next-line
-        label: `Before ${this.dateFormatter(filters.updated.dateTo)}${filters.updated.timeTo !== '23:59 PM' ? ', ' + filters.updated.timeTo : ''}`,
+        label: `Up to ${this.dateFormatter(filters.updated.dateTo)}${filters.updated.timeTo !== '23:59 PM' ? ', ' + filters.updated.timeTo : ''}`,
         category: 'update',
       });
     }
