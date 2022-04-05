@@ -24,7 +24,7 @@
           <div class="terms__sidebar__menu">
             <ul v-if="page[0].acf.faq.length > 0">
               <li v-for="(item_title, index) in page[0].acf.faq" v-bind:key="`${index}_title`">
-                <a :id="'side' + index" :class="{ active: activeMenuItem == index }" href="#" @click.prevent="scrollToSection(index)">{{ item_title.title }}</a>
+                <a class="terms__sidebar__menu__item" :id="'side' + index" :class="{ active: activeMenuItem == index }" href="#" @click.prevent="scrollToSection(index)">{{ item_title.title }}</a>
               </li>
             </ul>
           </div>

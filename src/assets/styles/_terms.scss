@@ -37,7 +37,9 @@
         li{
           margin-bottom: 5px;
           a{
-            font-size: em(14);
+            font-size: 14px;
+            line-height: 17px;
+            letter-spacing: 0;
             color:$darkColor;
             &.active{
               font-weight: 500;
@@ -60,7 +62,10 @@
       font-size: em(16);
     }
     h2{
-      font-size: em(30);
+      font-family: $mainFont;
+      font-size: 25px;
+      line-height: 30px;
+      letter-spacing: 0.3px;
       padding-top: 10px;
       margin-bottom: 20px;
       @media(max-width:576px){
@@ -94,6 +99,13 @@
     }
     ol{
       margin-left: 20px;
+    }
+    &__text {
+      font-family: $mainFont;
+      font-size: 16px !important;
+      line-height: 22px !important;
+      letter-spacing: 0.2px !important;
+      margin-bottom: 30px;
     }
   }
 }

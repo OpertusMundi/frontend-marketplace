@@ -61,7 +61,8 @@
                   <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
                     <div class="form-group">
                       <label for="multiselect_headquarters_country">Country *</label>
-                      <!-- IMPORTANT NOTE: dropdown is populated by europe countries -->
+                      <!-- IMPORTANT NOTE: dropdown is populated by europe countries for VAT validation -->
+                      <!-- on submission, it is converted to ISO code -->
                       <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="europeCountries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false" open-direction="top"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
@@ -139,7 +140,8 @@
                 <validation-provider v-slot="{ errors }" name="Birthdate" rules="required">
                   <div class="form-group">
                     <label for="birthdate">Birthdate *</label>
-                    <input type="date" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.representative.birthdate">
+                    <!-- <input type="date" class="form-group__text" name="birthdate" id="birthdate" v-model="vendorData.representative.birthdate"> -->
+                    <datepicker input-class="form-group__text" :value="vendorData.representative.birthdate" @input="vendorData.representative.birthdate = formatDate($event)"></datepicker>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -452,13 +454,16 @@ import {
   extend,
   localize,
 } from 'vee-validate';
+import moment from 'moment';
 import { isValidIBAN, isValidBIC } from 'ibantools';
 import { checkVAT, countries as countriesForVatValidation } from 'jsvat';
 // import validateVat, { CountryCodes as validateVatCountryCodes } from 'validate-vat-ts';
 import Multiselect from 'vue-multiselect';
+import Datepicker from 'vuejs-datepicker';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
 import ProviderAPI from '@/service/provider';
+import { europeanCodeToISOCode } from '@/helper/country';
 import store from '@/store';
 
 extend('required', required);
@@ -553,6 +558,7 @@ extend('bic', bicValidator);
     ValidationObserver,
     VuePhoneNumberInput,
     Multiselect,
+    Datepicker,
   },
   filters: {
     // input format: yyyy-mm-dd
@@ -749,6 +755,10 @@ export default class BecomeVendor extends Vue {
     this.vendorData.representative.birthdate = isoString;
     /* */
 
+    // fix country code
+    this.vendorData.headquartersAddress.country = europeanCodeToISOCode(this.vendorData.headquartersAddress.country);
+    /* */
+
     Object.keys(this.vendorData).forEach((x) => {
       if (this.vendorData[x] === '') delete this.vendorData[x];
     })
@@ -815,6 +825,10 @@ export default class BecomeVendor extends Vue {
     const partB = Array.isArray(placeholders[country].format) ? `${placeholders[country].format.join(', ')}` : `${placeholders[country].format}`;
 
     return `${partA} (e.g. ${partB})`;
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('YYYY-MM-DD');
   }
 }
 </script>
