@@ -108,26 +108,28 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="dashboard__form__review__item__head dashboard__form__review__item__head--no-border">
-              <h5>Vetting purchase</h5>
-            </div>
-            <div class="dashboard__form__review__item__body">
-              <ul>
-                <span>Do you want to vet the sale of the asset to prospective consumers, before the sale is processed? This allows you to accept or deny the sale of the asset by examining the profile information of a prospective consumer.</span>
-              </ul>
-              <div class="form-group mt-xs-20">
-                <label class="control control-radio">
-                  Yes, I want to approve a purchase first
-                  <input type="radio" name="vetting_true" v-model="vettingRequiredLocal" :value="true" />
-                  <div class="control_indicator"></div>
-                </label>
-                <label class="control control-radio">
-                  No, I do not want to approve a purchase first
-                  <input type="radio" name="vetting_false" v-model="vettingRequiredLocal" :value="false" />
-                  <div class="control_indicator"></div>
-                </label>
+            <template v-if="!asset.openDataset">
+              <div class="dashboard__form__review__item__head dashboard__form__review__item__head--no-border">
+                <h5>Vetting purchase</h5>
               </div>
-            </div>
+              <div class="dashboard__form__review__item__body">
+                <ul>
+                  <span>Do you want to vet the sale of the asset to prospective consumers, before the sale is processed? This allows you to accept or deny the sale of the asset by examining the profile information of a prospective consumer.</span>
+                </ul>
+                <div class="form-group mt-xs-20">
+                  <label class="control control-radio">
+                    Yes, I want to approve a purchase first
+                    <input type="radio" name="vetting_true" v-model="vettingRequiredLocal" :value="true" />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    No, I do not want to approve a purchase first
+                    <input type="radio" name="vetting_false" v-model="vettingRequiredLocal" :value="false" />
+                    <div class="control_indicator"></div>
+                  </label>
+                </div>
+              </div>
+            </template>
           </div>
           <div class="col-md-4">
             <div v-for="error in errors" :key="error.id" style="color: red;" class="dashboard__form__review__item__head dashboard__form__review__item__head--no-border">
