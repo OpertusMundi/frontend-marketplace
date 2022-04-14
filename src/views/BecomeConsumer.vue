@@ -284,7 +284,7 @@ const phoneNumber = {
     return `Phone field ${phone.toJSON().possibility.replace(/-/g, ' ')}`;
   },
 };
-extend('phoneNumber', phoneNumber);
+extend('phone_number', phoneNumber);
 
 @Component({
   components: {

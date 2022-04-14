@@ -45,6 +45,14 @@
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
 
+        <ul v-if="assetMainType === 'OPEN'" class="dashboard__form__nav">
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">License</a></li>
+          <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Delivery</a></li>
+          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Review</a></li>
+        </ul>
+
         <ul v-if="assetMainType === 'API'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">API details</a></li>
@@ -70,6 +78,15 @@
                 <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+                <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
+                <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
+              </template>
+
+              <template v-if="assetMainType === 'OPEN'">
+                <open-asset-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></open-asset-metadata>
+                <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
+                <delivery ref="step4" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></delivery>
+                <review ref="step5" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'API'">
@@ -78,14 +95,13 @@
                 <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-else-if="currentStep === 3 && selectedPublishedAssetForApiCreation == null"></metadata>
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
                 <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+                <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
+                <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'SENTINEL_HUB'">
                 <sentinel-hub-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></sentinel-hub-metadata>
               </template>
-
-              <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep == 6"></payout>
-              <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="assetMainType === 'API' ? { ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } } : asset" v-if="currentStep == 7" @goToStep="goToStep"></review>
 
               <div class="dashboard__form__errors" v-if="uploading.errors.length">
                 <ul>
@@ -97,7 +113,9 @@
         </div>
         <div class="dashboard__form__navbuttons">
           <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
-          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB' && currentStep === 2) ? 'confirm and submit for review' : 'NEXT' }}</button>
+          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">
+            {{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB' && currentStep === 2) || (assetMainType === 'OPEN' && currentStep === 5) ? 'confirm and submit for review' : 'NEXT' }}
+          </button>
         </div>
       </div>
     </div>
@@ -148,6 +166,8 @@ import Pricing from '@/components/Assets/Create/Pricing.vue';
 import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
+import OpenAssetMetadata from '@/components/Assets/CreateOpen/OpenAssetMetadata.vue';
+import License from '@/components/Assets/CreateOpen/License.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
 import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
@@ -186,6 +206,8 @@ interface FileToUpload {
     Delivery,
     Payout,
     Review,
+    OpenAssetMetadata,
+    License,
     ApiDetails,
     ApiPricing,
     ApiMetadata,
@@ -311,7 +333,7 @@ export default class CreateAsset extends Vue {
     // console.log('this.asset : ', this.asset);
     console.info('STEP 1 => this.assetMainType: ', this.assetMainType, assetMainType);
 
-    this.initAsset();
+    if (!this.isEditingExistingDraft) this.initAsset();
   }
 
   @Watch('apiCreationType')
@@ -404,9 +426,16 @@ export default class CreateAsset extends Vue {
         metadataLanguage: '',
         metadataPointOfContactEmail: '',
         metadataPointOfContactName: '',
-        openDataset: false,
+        openDataset: this.assetMainType as string === 'OPEN',
         parentId: '',
-        pricingModels: [],
+        pricingModels: this.assetMainType as string === 'OPEN' ? [{
+          type: 'FREE',
+          domainRestrictions: [],
+          coverageRestrictionContinents: [],
+          coverageRestrictionCountries: [],
+          consumerRestrictionContinents: [],
+          consumerRestrictionCountries: [],
+        }] : [],
         publicAccessLimitations: '',
         publicationDate: '',
         publisherEmail: '',
@@ -455,7 +484,7 @@ export default class CreateAsset extends Vue {
           sentinelHub: {
             type: 'OPEN_DATA',
             open: true,
-            collection: 'sentinel-1-grd',
+            collection: '',
           },
         },
         ingested: false,
@@ -533,7 +562,8 @@ export default class CreateAsset extends Vue {
 
       // todo (Enums may have to be fixed to include NetCDF)
       if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
-        this.assetMainType = EnumAssetTypeCategory.DATA_FILE;
+        // todo: add 'OPEN' to enum
+        this.assetMainType = this.asset.openDataset ? 'OPEN' as any : EnumAssetTypeCategory.DATA_FILE;
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
         this.assetMainType = EnumAssetTypeCategory.API;
         console.log('ΕΔΩ');
@@ -564,6 +594,10 @@ export default class CreateAsset extends Vue {
       if (isValid) {
         if (this.assetMainType as string === 'SENTINEL_HUB' && this.currentStep === 2) {
           this.submitSentinelHubForm();
+          return;
+        }
+        if (this.assetMainType as string === 'OPEN' && this.currentStep === 5) {
+          this.submitDataFileForm();
           return;
         }
         if (this.currentStep === this.totalSteps) {
@@ -598,6 +632,11 @@ export default class CreateAsset extends Vue {
 
     if (this.assetMainType === EnumAssetTypeCategory.DATA_FILE) {
       if (this.selectedPricingModelForEditing !== null) return false;
+      if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
+    }
+
+    // todo: not checked
+    if (this.assetMainType as string === 'OPEN') {
       if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
     }
 
@@ -921,6 +960,7 @@ export default class CreateAsset extends Vue {
 
       if (this.selectedPublishedFileForDataFileCreation) this.asset = await this.addResourceFromFileSystem(draftAsset.key);
 
+      console.log('dak', draftAsset.key);
       await this.submitAsset(draftAsset.key);
       console.log(this.asset, 'ON TYEY SUBMISSION');
     } catch (err) {

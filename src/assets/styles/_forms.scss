@@ -437,6 +437,12 @@
   }
 }
 
+.dashboard__form-metadata {
+  hr {
+    border-top: solid 2px $darkColor;
+  }
+}
+
 .form-group {
   margin-bottom: 25px;
   position: relative;
