@@ -5,40 +5,40 @@
       <h1>Register</h1>
       <validation-observer ref="registrationForm">
       <form class="login__form login__form--small-margin" @submit.prevent="submitRegistration()">
-          <validation-provider name="Email" rules="required|email" v-slot="{ errors }">
+          <validation-provider :name="getInputData('email', 'label')" rules="required|email" v-slot="{ errors }">
             <div class="login__form__group">
-              <input @input="onEmailChange" type="text" name="Email" id="email" v-model="account.email" placeholder="Email">
+              <input @input="onEmailChange" type="text" name="Email" id="email" v-model="account.email" :placeholder="getInputData('email', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
               <span class="login__form__group__error" v-if="emailTakenError">An account with this email already exists</span>
             </div>
           </validation-provider>
-          <validation-provider name="Password" rules="required" v-slot="{ errors }" vid="password">
+          <validation-provider :name="getInputData('password', 'label')" rules="required" v-slot="{ errors }" vid="password">
             <div class="login__form__group">
-              <input type="password" name="Password" id="password" v-model="account.password" placeholder="Password">
+              <input type="password" name="Password" id="password" v-model="account.password" :placeholder="getInputData('password', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
-          <validation-provider name="Password verification" rules="required|confirmed:password" v-slot="{ errors }">
+          <validation-provider :name="getInputData('passwordConfirmation', 'label')" rules="required|confirmed:password" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="password" name="Password verification" id="passwordVerification" v-model="account.verifyPassword" placeholder="Re-enter password">
+              <input type="password" name="Password verification" id="passwordVerification" v-model="account.verifyPassword" :placeholder="getInputData('passwordConfirmation', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
-          <validation-provider name="First name" rules="required" v-slot="{ errors }">
+          <validation-provider :name="getInputData('firstName', 'label')" rules="required" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="text" name="First name" v-model="account.profile.firstName" id="firstName" placeholder="First Name">
+              <input type="text" name="First name" v-model="account.profile.firstName" id="firstName" :placeholder="getInputData('firstName', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
-          <validation-provider name="Last name" rules="required" v-slot="{ errors }">
+          <validation-provider :name="getInputData('lastName', 'label')" rules="required" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="text" name="Last name" v-model="account.profile.lastName" id="lastName" placeholder="Last Name">
+              <input type="text" name="Last name" v-model="account.profile.lastName" id="lastName" :placeholder="getInputData('lastName', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
-          <validation-provider name="Mobile" rules="required" v-slot="{ errors }">
+          <validation-provider :name="getInputData('mobile', 'label')" rules="required" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="text" name="Mobile" v-model="account.profile.mobile" id="mobile" placeholder="Mobile">
+              <input type="text" name="Mobile" v-model="account.profile.mobile" id="mobile" :placeholder="getInputData('mobile', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
@@ -73,14 +73,15 @@ import { required, email, confirmed } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import store from '@/store';
 import AccountApi from '@/service/account';
+import { inputsConfig } from '@/config/register';
 import { fetchUserProfileAndCart } from '@/helper/user';
+import { getFormInputData } from '@/helper/form-config';
 // import { ServerResponse } from '@/model';
 import { PlatformAccountCommand, AccountProfileCommand } from '@/model/account';
 
 extend('required', required);
 extend('email', email);
 extend('confirmed', confirmed);
-
 
 @Component({
   components: { ValidationProvider, ValidationObserver },
@@ -129,6 +130,10 @@ export default class Login extends Vue {
 
   mounted(): void {
     console.log('ok');
+  }
+
+  getInputData(id: string, type: 'label' | 'placeholder' | 'customErrorMessages'): string | {[key: string]: string} | null {
+    return getFormInputData(inputsConfig, type, id);
   }
 
   onEmailChange(): void {

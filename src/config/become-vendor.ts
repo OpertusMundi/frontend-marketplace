@@ -1,26 +1,4 @@
-type ValidationType =
-| 'required'
-| 'email'
-| 'confirmed'
-| 'min'
-| 'phone_number'
-| 'vat'
-| 'unique_name'
-| 'iban'
-| 'bic'
-
-interface InputData {
-  id: string,
-  label: string,
-  placeholder?: string,
-  customErrorMessages?: {
-    [key in ValidationType]?: string;
-  },
-}
-
-interface InputsConfig {
-  [key: string]: InputData[],
-}
+import { InputsConfig } from '@/model/forms-config';
 
 const inputsConfig: InputsConfig = {
   step1: [
@@ -48,6 +26,7 @@ const inputsConfig: InputsConfig = {
     {
       id: 'headquarters_country',
       label: 'Country',
+      placeholder: 'Select country',
     },
     {
       id: 'headquarters_region',
@@ -86,10 +65,12 @@ const inputsConfig: InputsConfig = {
     {
       id: 'representative_nationality',
       label: 'Nationality',
+      placeholder: 'Select country',
     },
     {
       id: 'representative_country_residence',
       label: 'Country of residence',
+      placeholder: 'Select country',
     },
     {
       id: 'representative_address_line_1',
@@ -102,6 +83,7 @@ const inputsConfig: InputsConfig = {
     {
       id: 'representative_country',
       label: 'Country',
+      placeholder: 'Select country',
     },
     {
       id: 'representative_region',
@@ -140,6 +122,7 @@ const inputsConfig: InputsConfig = {
     {
       id: 'bankaccount_country',
       label: 'Country',
+      placeholder: 'Select country',
     },
     {
       id: 'bankaccount_region',

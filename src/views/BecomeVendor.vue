@@ -20,7 +20,7 @@
                 <validation-provider v-slot="{ errors }" :custom-messages="getInputData('step1', 'name', 'customErrorMessages')" :name="getInputData('step1', 'name', 'label')" mode="lazy" rules="required|unique_name">
                   <div class="form-group">
                     <label for="name">{{ getInputData('step1', 'name', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="name" id="name" v-model="vendorData.name">
+                    <input type="text" class="form-group__text" name="name" id="name" :placeholder="getInputData('step1', 'name', 'placeholder') || ''" v-model="vendorData.name">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -28,7 +28,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'email', 'label')" rules="required|email">
                   <div class="form-group">
                     <label for="vendor_email">{{ getInputData('step1', 'email', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="email" id="vendor_email" v-model="vendorData.email">
+                    <input type="text" class="form-group__text" name="email" id="vendor_email" :placeholder="getInputData('step1', 'email', 'placeholder') || ''" v-model="vendorData.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -36,7 +36,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'site_url', 'label')">
                   <div class="form-group">
                     <label for="website">{{ getInputData('step1', 'site_url', 'label') }}</label>
-                    <input type="text" class="form-group__text" name="website" id="website" v-model="vendorData.siteUrl">
+                    <input type="text" class="form-group__text" name="website" id="website" :placeholder="getInputData('step1', 'site_url', 'placeholder') || ''" v-model="vendorData.siteUrl">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -44,7 +44,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'headquarters_address_line_1', 'label')" rules="required">
                   <div class="form-group">
                     <label for="address_line_1">{{ getInputData('step1', 'headquarters_address_line_1', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="address_line_1" id="address_line_1" v-model="vendorData.headquartersAddress.line1">
+                    <input type="text" class="form-group__text" name="address_line_1" id="address_line_1" :placeholder="getInputData('step1', 'headquarters_address_line_1', 'placeholder') || ''" v-model="vendorData.headquartersAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -52,7 +52,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'headquarters_address_line_2', 'label')">
                   <div class="form-group">
                     <label for="address_line_2">{{ getInputData('step1', 'headquarters_address_line_2', 'label') }}</label>
-                    <input type="text" class="form-group__text" name="address_line_2" id="address_line_2" v-model="vendorData.headquartersAddress.line2">
+                    <input type="text" class="form-group__text" name="address_line_2" id="address_line_2" :placeholder="getInputData('step1', 'headquarters_address_line_2', 'placeholder') || ''" v-model="vendorData.headquartersAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -63,7 +63,7 @@
                       <label for="multiselect_headquarters_country">{{ getInputData('step1', 'headquarters_country', 'label') }} *</label>
                       <!-- IMPORTANT NOTE: dropdown is populated by europe countries for VAT validation -->
                       <!-- on submission, it is converted to ISO code -->
-                      <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="europeCountries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false" open-direction="top"></multiselect>
+                      <multiselect id="multiselect_headquarters_country" @input="onSelectHeadquartersCountry" v-model="selectedHeadquartersCountry" :options="europeCountries" label="name" track-by="code" :placeholder="getInputData('step1', 'headquarters_country', 'placeholder') || ''" :multiple="false" :close-on-select="true" :show-labels="false" open-direction="top"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
@@ -71,7 +71,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'headquarters_region', 'label')" rules="required">
                     <div class="form-group">
                       <label for="region">{{ getInputData('step1', 'headquarters_region', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="region" id="region" v-model="vendorData.headquartersAddress.region">
+                      <input type="text" class="form-group__text" name="region" id="region" :placeholder="getInputData('step1', 'headquarters_region', 'placeholder') || ''" v-model="vendorData.headquartersAddress.region">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -81,7 +81,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'headquarters_city', 'label')" rules="required">
                     <div class="form-group">
                       <label for="city">{{ getInputData('step1', 'headquarters_city', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="city" id="city" v-model="vendorData.headquartersAddress.city">
+                      <input type="text" class="form-group__text" name="city" id="city" :placeholder="getInputData('step1', 'headquarters_city', 'placeholder') || ''" v-model="vendorData.headquartersAddress.city">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -89,7 +89,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step1', 'headquarters_postal_code', 'label')" rules="required">
                     <div class="form-group">
                       <label for="postal_code">{{ getInputData('step1', 'headquarters_postal_code', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="postal_code" id="postal_code" v-model="vendorData.headquartersAddress.postalCode">
+                      <input type="text" class="form-group__text" name="postal_code" id="postal_code" :placeholder="getInputData('step1', 'headquarters_postal_code', 'placeholder') || ''" v-model="vendorData.headquartersAddress.postalCode">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -116,7 +116,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_first_name', 'label')" rules="required">
                   <div class="form-group">
                     <label for="first_name">{{ getInputData('step2', 'representative_first_name', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="first_name" id="first_name" v-model="vendorData.representative.firstName">
+                    <input type="text" class="form-group__text" name="first_name" id="first_name" :placeholder="getInputData('step2', 'representative_first_name', 'placeholder') || ''" v-model="vendorData.representative.firstName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -124,7 +124,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_last_name', 'label')" rules="required">
                   <div class="form-group">
                     <label for="last_name">{{ getInputData('step2', 'representative_last_name', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="last_name" id="last_name" v-model="vendorData.representative.lastName">
+                    <input type="text" class="form-group__text" name="last_name" id="last_name" :placeholder="getInputData('step2', 'representative_last_name', 'placeholder') || ''" v-model="vendorData.representative.lastName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -132,7 +132,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_email', 'label')" rules="required|email">
                   <div class="form-group">
                     <label for="email">{{ getInputData('step2', 'representative_email', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="email" id="email" v-model="vendorData.representative.email">
+                    <input type="text" class="form-group__text" name="email" id="email" :placeholder="getInputData('step2', 'representative_email', 'placeholder') || ''" v-model="vendorData.representative.email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -146,34 +146,18 @@
                   </div>
                 </validation-provider>
 
-                <!-- <validation-provider v-slot="{ errors }" name="Nationality" rules="required">
-                  <div class="form-group">
-                    <label for="nationality">Nationality *</label>
-                    <input type="text" class="form-group__text" name="nationality" id="nationality" v-model="vendorData.representative.nationality">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider> -->
-
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_nationality', 'label')" rules="required">
                   <div class="form-group">
                     <label for="multiselect_representative_nationality">{{ getInputData('step2', 'representative_nationality', 'label') }} *</label>
-                    <multiselect id="multiselect_representative_nationality" @input="onSelectRepresentativeNationality" v-model="selectedRepresentativeNationality" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                    <multiselect id="multiselect_representative_nationality" @input="onSelectRepresentativeNationality" v-model="selectedRepresentativeNationality" :options="countries" label="name" track-by="code" :placeholder="getInputData('step2', 'representative_nationality', 'placeholder') || ''" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
 
-                <!-- <validation-provider v-slot="{ errors }" name="Country of residence" rules="required">
-                  <div class="form-group">
-                    <label for="lr_country_of_residence">Country of residence *</label>
-                    <input type="text" class="form-group__text" name="lr_country_of_residence" id="lr_country_of_residence" v-model="vendorData.representative.countryOfResidence">
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                  </div>
-                </validation-provider> -->
-
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_country_residence', 'label')" rules="required">
                   <div class="form-group">
                     <label for="multiselect_representative_country_residence">{{ getInputData('step2', 'representative_country_residence', 'label') }} *</label>
-                    <multiselect id="multiselect_representative_country_residence" @input="onSelectRepresentativeCountryOfResidence" v-model="selectedRepresentativeCountryOfResidence" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                    <multiselect id="multiselect_representative_country_residence" @input="onSelectRepresentativeCountryOfResidence" v-model="selectedRepresentativeCountryOfResidence" :options="countries" label="name" track-by="code" :placeholder="getInputData('step2', 'representative_country_residence', 'placeholder') || ''" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                   </div>
                 </validation-provider>
@@ -181,7 +165,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_address_line_1', 'label')" rules="required">
                   <div class="form-group">
                     <label for="lr_address_line_1">{{ getInputData('step2', 'representative_address_line_1', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="lr_address_line_1" id="lr_address_line_1" v-model="vendorData.representative.address.line1">
+                    <input type="text" class="form-group__text" name="lr_address_line_1" id="lr_address_line_1" :placeholder="getInputData('step2', 'representative_address_line_1', 'placeholder') || ''" v-model="vendorData.representative.address.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -189,34 +173,16 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_address_line_2', 'label')">
                   <div class="form-group">
                     <label for="lr_address_line_2">{{ getInputData('step2', 'representative_address_line_2', 'label') }}</label>
-                    <input type="text" class="form-group__text" name="lr_address_line_2" id="lr_address_line_2" v-model="vendorData.representative.address.line2">
+                    <input type="text" class="form-group__text" name="lr_address_line_2" id="lr_address_line_2" :placeholder="getInputData('step2', 'representative_address_line_2', 'placeholder') || ''" v-model="vendorData.representative.address.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
-                <!-- <validation-provider v-slot="{ errors }" name="Legal Person type" rules="required">
-                  <div class="form-group">
-                    <label for="multiselect_legal_person_type">Legal Person type *</label>
-                    <multiselect id="multiselect_legal_person_type" @input="onSelectLegalPersonType" v-model="selectedLegalPersonType" :options="legalPersonTypeOptions" label="name" track-by="code" placeholder="Select type" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
-                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                  </div>
-                </validation-provider> -->
-
                 <div class="wrapper-50-50">
-                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                    <div class="form-group">
-                      <label for="lr_country">Country *</label>
-                      <select class="form-group__select" name="lr_country" id="lr_country" v-model="vendorData.representative.address.country">
-                        <option v-for="country in countries" :key="country"> {{country}} </option>
-                      </select>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider> -->
-
                   <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_country', 'label')" rules="required">
                     <div class="form-group">
                       <label for="multiselect_representative_address_country">{{ getInputData('step2', 'representative_country', 'label') }} *</label>
-                      <multiselect id="multiselect_representative_address_country" @input="onSelectRepresentativeAddressCountry" v-model="selectedRepresentativeAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <multiselect id="multiselect_representative_address_country" @input="onSelectRepresentativeAddressCountry" v-model="selectedRepresentativeAddressCountry" :options="countries" label="name" track-by="code" :placeholder="getInputData('step2', 'representative_country', 'placeholder') || ''" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
@@ -224,7 +190,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_region', 'label')" rules="required">
                     <div class="form-group">
                       <label for="lr_region">{{ getInputData('step2', 'representative_region', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="lr_region" id="lr_region" v-model="vendorData.representative.address.region">
+                      <input type="text" class="form-group__text" name="lr_region" id="lr_region" :placeholder="getInputData('step2', 'representative_region', 'placeholder') || ''" v-model="vendorData.representative.address.region">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -234,7 +200,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_city', 'label')" rules="required">
                     <div class="form-group">
                       <label for="lr_city">{{ getInputData('step2', 'representative_city', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="lr_city" id="lr_city" v-model="vendorData.representative.address.city">
+                      <input type="text" class="form-group__text" name="lr_city" id="lr_city" :placeholder="getInputData('step2', 'representative_city', 'placeholder') || ''" v-model="vendorData.representative.address.city">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -242,7 +208,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step2', 'representative_postal_code', 'label')" rules="required">
                     <div class="form-group">
                       <label for="lr_postal_code">{{ getInputData('step2', 'representative_postal_code', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="lr_postal_code" id="lr_postal_code" v-model="vendorData.representative.address.postalCode">
+                      <input type="text" class="form-group__text" name="lr_postal_code" id="lr_postal_code" :placeholder="getInputData('step2', 'representative_postal_code', 'placeholder') || ''" v-model="vendorData.representative.address.postalCode">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -258,7 +224,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_owner_name', 'label')" rules="required">
                   <div class="form-group">
                     <label for="holder_name">{{ getInputData('step3', 'bankaccount_owner_name', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="holder_name" id="holder_name" v-model="vendorData.bankAccount.ownerName">
+                    <input type="text" class="form-group__text" name="holder_name" id="holder_name" :placeholder="getInputData('step3', 'bankaccount_owner_name', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -266,7 +232,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_iban', 'label')" rules="required|iban">
                   <div class="form-group">
                     <label for="iban">{{ getInputData('step3', 'bankaccount_iban', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="iban" id="iban" v-model="vendorData.bankAccount.iban">
+                    <input type="text" class="form-group__text" name="iban" id="iban" :placeholder="getInputData('step3', 'bankaccount_iban', 'placeholder') || ''" v-model="vendorData.bankAccount.iban">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -274,7 +240,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_bic', 'label')" rules="required|bic">
                   <div class="form-group">
                     <label for="bic">{{ getInputData('step3', 'bankaccount_bic', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="bic" id="bic" v-model="vendorData.bankAccount.bic">
+                    <input type="text" class="form-group__text" name="bic" id="bic" :placeholder="getInputData('step3', 'bankaccount_bic', 'placeholder') || ''" v-model="vendorData.bankAccount.bic">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -282,7 +248,7 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_address_line_1', 'label')" rules="required">
                   <div class="form-group">
                     <label for="ba_address_line_1">{{ getInputData('step3', 'bankaccount_address_line_1', 'label') }} *</label>
-                    <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" v-model="vendorData.bankAccount.ownerAddress.line1">
+                    <input type="text" class="form-group__text" name="ba_address_line_1" id="ba_address_line_1" :placeholder="getInputData('step3', 'bankaccount_address_line_1', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerAddress.line1">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -290,26 +256,16 @@
                 <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_address_line_2', 'label')">
                   <div class="form-group">
                     <label for="ba_address_line_2">{{ getInputData('step3', 'bankaccount_address_line_2', 'label') }}</label>
-                    <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" v-model="vendorData.bankAccount.ownerAddress.line2">
+                    <input type="text" class="form-group__text" name="ba_address_line_2" id="ba_address_line_2" :placeholder="getInputData('step3', 'bankaccount_address_line_2', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerAddress.line2">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
 
                 <div class="wrapper-50-50">
-                  <!-- <validation-provider v-slot="{ errors }" name="Country" rules="required">
-                    <div class="form-group">
-                      <label for="ba_country">Country *</label>
-                      <select class="form-group__select" name="ba_country" id="ba_country" v-model="vendorData.bankAccount.ownerAddress.country">
-                        <option v-for="country in countries" :key="country"> {{country}} </option>
-                      </select>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider> -->
-
                   <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_country', 'label')" rules="required">
                     <div class="form-group">
                       <label for="multiselect_representative_bank_account_country">{{ getInputData('step3', 'bankaccount_country', 'label') }} *</label>
-                      <multiselect id="multiselect_representative_bank_account_country" @input="onSelectBankAccountAddressCountry" v-model="selectedBankAccountAddressCountry" :options="countries" label="name" track-by="code" placeholder="Select country" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
+                      <multiselect id="multiselect_representative_bank_account_country" @input="onSelectBankAccountAddressCountry" v-model="selectedBankAccountAddressCountry" :options="countries" label="name" track-by="code" :placeholder="getInputData('step3', 'bankaccount_country', 'placeholder') || ''" :multiple="false" :close-on-select="true" :show-labels="false"></multiselect>
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
                     </div>
                   </validation-provider>
@@ -317,7 +273,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_region', 'label')" rules="required">
                     <div class="form-group">
                       <label for="ba_region">{{ getInputData('step3', 'bankaccount_region', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="ba_region" id="ba_region" v-model="vendorData.bankAccount.ownerAddress.region">
+                      <input type="text" class="form-group__text" name="ba_region" id="ba_region" :placeholder="getInputData('step3', 'bankaccount_region', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerAddress.region">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -327,7 +283,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_city', 'label')" rules="required">
                     <div class="form-group">
                       <label for="ba_city">{{ getInputData('step3', 'bankaccount_city', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="ba_city" id="ba_city" v-model="vendorData.bankAccount.ownerAddress.city">
+                      <input type="text" class="form-group__text" name="ba_city" id="ba_city" :placeholder="getInputData('step3', 'bankaccount_city', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerAddress.city">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -335,7 +291,7 @@
                   <validation-provider v-slot="{ errors }" :name="getInputData('step3', 'bankaccount_postal_code', 'label')" rules="required">
                     <div class="form-group">
                       <label for="ba_postal_code">{{ getInputData('step3', 'bankaccount_postal_code', 'label') }} *</label>
-                      <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" v-model="vendorData.bankAccount.ownerAddress.postalCode">
+                      <input type="text" class="form-group__text" name="ba_postal_code" id="ba_postal_code" :placeholder="getInputData('step3', 'bankaccount_postal_code', 'placeholder') || ''" v-model="vendorData.bankAccount.ownerAddress.postalCode">
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                   </validation-provider>
@@ -464,6 +420,7 @@ import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
 import ProviderAPI from '@/service/provider';
 import { europeanCodeToISOCode } from '@/helper/country';
+import { getFormInputData } from '@/helper/form-config';
 import { inputsConfig } from '@/config/become-vendor';
 import store from '@/store';
 
@@ -695,9 +652,8 @@ export default class BecomeVendor extends Vue {
     return true;
   }
 
-  getInputData(step: string, id: string, type: 'label' | 'placeholder' | 'customErrorMessages'): string | {[key: string]: string} {
-    if (!inputsConfig[step].some((x) => x.id === id) || !inputsConfig[step].find((x) => x.id === id)![type]) return 'ERR';
-    return inputsConfig[step].find((x) => x.id === id)![type] as string | {[key: string]: string};
+  getInputData(step: string, id: string, type: 'label' | 'placeholder' | 'customErrorMessages'): string | {[key: string]: string} | null {
+    return getFormInputData(inputsConfig, type, id, step);
   }
 
   onSelectHeadquartersCountry(): void {

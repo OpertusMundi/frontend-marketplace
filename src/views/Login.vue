@@ -4,22 +4,22 @@
       <router-link to="/" class="login__content__logo"><img src="@/assets/images/logo_blue.svg" alt=""></router-link>
       <h1>Login</h1>
       <validation-observer ref="loginForm">
-      <form class="login__form" @submit.prevent="submitLogin()">
-          <validation-provider name="email" mode="passive" rules="required|email" v-slot="{ errors }">
+        <form class="login__form" @submit.prevent="submitLogin()">
+          <validation-provider :name="getInputData('email', 'label')" mode="passive" rules="required|email" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="email" name="email" id="" v-model="email" placeholder="email">
+              <input type="email" name="email" id="" v-model="email" :placeholder="getInputData('email', 'placeholder')">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
-          <validation-provider name="password"  mode="passive" rules="required" v-slot="{ errors }">
+          <validation-provider :name="getInputData('password', 'label')"  mode="passive" rules="required" v-slot="{ errors }">
             <div class="login__form__group">
-              <input type="password" name="password" v-model="password" id="" placeholder="password">
+              <input type="password" name="password" v-model="password" id="" :placeholder="getInputData('password', 'placeholder')">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
           <div class="login__form__errors" v-if="formErrors">{{ formErrors }}</div>
           <button type="submit" class="btn btn--std btn--blue" :disabled="loading" v-html="loading ? 'PLEASE WAIT..' : 'LOGIN'"></button>
-      </form>
+        </form>
       </validation-observer>
       <div class="login__helpers">
         <router-link to="/forgot-password">Forgot your password?</router-link><br>
@@ -36,11 +36,12 @@ import store from '@/store';
 import AccountApi from '@/service/account';
 import { fetchUserProfileAndCart } from '@/helper/user';
 import { ServerResponse, LoginResult } from '@/model';
+import { inputsConfig } from '@/config/login';
+import { getFormInputData } from '@/helper/form-config';
 import { AxiosError } from 'axios';
 
 extend('required', required);
 extend('email', email);
-
 
 @Component({
   components: { ValidationProvider, ValidationObserver },
@@ -77,11 +78,16 @@ export default class Login extends Vue {
     this.redirectPath = this.$route.params.pathToNavigateAfterLogin || '/';
   }
 
+  getInputData(id: string, type: 'label' | 'placeholder' | 'customErrorMessages'): string | {[key: string]: string} | null {
+    return getFormInputData(inputsConfig, type, id);
+  }
+
   async submitLogin():Promise<void> {
     this.loading = true;
     this.formErrors = '';
     const valid = await this.$refs.loginForm.validate();
-    if (valid) {
+    if (!valid) this.loading = false;
+    else {
       this.accountApi
         .login(this.email, this.password)
         .then((loginResponse: ServerResponse<LoginResult>) => {
