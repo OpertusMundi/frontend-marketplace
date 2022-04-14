@@ -11,6 +11,22 @@ export default class SentinelHubApi extends Api {
   }
 
   /**
+   * Get all open data collections
+   *
+   * @returns
+   */
+  public async getOpenDataCollections(): Promise<ServerResponse<{ id: string, name: string }[]>> {
+    const url = `${baseUri}/open-data/collections`;
+
+    return this.get<ServerResponse<{ id: string, name: string }[]>>(url)
+      .then((response) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  /**
    * Get all available subscription plans for open data collections.
    *
    * Required role: `ROLE_USER`

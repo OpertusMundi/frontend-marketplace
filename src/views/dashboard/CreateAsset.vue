@@ -484,7 +484,7 @@ export default class CreateAsset extends Vue {
           sentinelHub: {
             type: 'OPEN_DATA',
             open: true,
-            collection: 'sentinel-1-grd', // TODO, IMPORTANT
+            collection: '',
           },
         },
         ingested: false,

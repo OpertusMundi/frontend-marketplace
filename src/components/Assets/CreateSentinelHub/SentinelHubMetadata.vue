@@ -41,10 +41,18 @@
           <validation-provider v-slot="{ errors }" name="Collection ID" rules="required">
           <div class="form-group">
             <label for="metadata_title">Collection ID *</label>
-            <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" v-model="assetLocal.extensions.sentinelHub.collection">
+            <multiselect id="multiselect_language" @input="onSelectCollection" v-model="selectedCollection" label="name" track-by="id" :options="availableCollections" :multiple="false" :close-on-select="true" :show-labels="false" :allow-empty="false" placeholder="Select collection"></multiselect>
             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
           </div>
           </validation-provider>
+
+          <!-- <validation-provider v-slot="{ errors }" name="Collection ID" rules="required">
+          <div class="form-group">
+            <label for="metadata_title">Collection ID *</label>
+            <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" v-model="assetLocal.extensions.sentinelHub.collection">
+            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+          </div>
+          </validation-provider> -->
           <validation-provider v-slot="{ errors }" name="Title" rules="required">
           <div class="form-group">
             <label for="metadata_title">Title *</label>
@@ -267,6 +275,7 @@ import {
   Watch,
   Prop,
 } from 'vue-property-decorator';
+import SentinelHubApi from '@/service/sentinel-hub';
 import SpatialApi from '@/service/spatial';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
@@ -275,7 +284,7 @@ import Datepicker from 'vuejs-datepicker';
 import Modal from '@/components/Modal.vue';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
-import { EnumTopicCategory } from '@/model/catalogue';
+import { EnumTopicCategory, SHOpenDataSentinelHubProperties } from '@/model/catalogue';
 import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
@@ -296,9 +305,15 @@ export default class SentinelHubMetadata extends Vue {
 
   @Prop({ required: true }) private additionalResourcesToUpload!: { resourceCommand: AssetFileAdditionalResourceCommand, file: File }[];
 
+  sentinelHubApi: SentinelHubApi;
+
   spatialApi: SpatialApi;
 
   assetLocal: CatalogueItemCommand;
+
+  availableCollections: { id: string, name: string }[];
+
+  selectedCollection: { code: string, name: string } | null;
 
   additionalResourcesTemp: { resourceCommand: AssetFileAdditionalResourceCommand, file: File | null, key: string }[];
 
@@ -344,9 +359,15 @@ export default class SentinelHubMetadata extends Vue {
   constructor() {
     super();
 
+    this.sentinelHubApi = new SentinelHubApi();
+
     this.spatialApi = new SpatialApi();
 
     this.assetLocal = this.asset;
+
+    this.availableCollections = [];
+
+    this.selectedCollection = null;
 
     this.additionalResourcesTemp = [];
 
@@ -402,7 +423,13 @@ export default class SentinelHubMetadata extends Vue {
     this.menusData.assetTypes = [...new Set(store.getters.getConfig.configuration.asset.fileTypes.map((x) => x.category))] as string[];
   }
 
-  created(): void {
+  async created(): Promise<void> {
+    store.commit('setLoading', true);
+    const collectionsResponse = await this.sentinelHubApi.getOpenDataCollections();
+    if (!collectionsResponse.success) console.log('err', collectionsResponse);
+    else this.availableCollections = collectionsResponse.result;
+    store.commit('setLoading', false);
+
     this.populateAvailableFormatsForSelectedType();
 
     if (this.assetLocal.referenceSystem) {
@@ -431,6 +458,11 @@ export default class SentinelHubMetadata extends Vue {
       this.epsgList = epsgResponse.result.map((x) => ({ code: `${x.code}`, name: `EPSG:${x.code} | ${x.name}` }));
       this.isLoadingEpsg = false;
     });
+  }
+
+  onSelectCollection(collection: { id: string, name: string }): void {
+    // eslint-disable-next-line
+    if (collection && collection.id) (this.assetLocal!.extensions!.sentinelHub! as SHOpenDataSentinelHubProperties).collection = collection.id;
   }
 
   onSelectLanguage(language: { code: string, name: string }): void {
