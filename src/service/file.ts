@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import Api from '@/service/api';
 
 import { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
@@ -21,6 +21,7 @@ export default class FileSystemApi extends Api {
     return this.get<ServerResponse<DirectoryInfo>>(url)
       .then((response: AxiosServerResponse<DirectoryInfo>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -37,6 +38,7 @@ export default class FileSystemApi extends Api {
     return this.post<FilePathCommand, ServerResponse<DirectoryInfo>>(url, { path })
       .then((response: AxiosServerResponse<DirectoryInfo>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -77,6 +79,7 @@ export default class FileSystemApi extends Api {
     return this.delete<ServerResponse<DirectoryInfo>>(url)
       .then((response: AxiosServerResponse<DirectoryInfo>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -100,6 +103,7 @@ export default class FileSystemApi extends Api {
 
     return this.post<FormData, ServerResponse<DirectoryInfo>>(url, form, config).then((response: AxiosServerResponse<DirectoryInfo>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });

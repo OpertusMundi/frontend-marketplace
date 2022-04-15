@@ -5,6 +5,7 @@ import { AxiosServerResponse, ServerResponse, PageResult } from '@/model/respons
 import {
   EnumAccountSortField, Account, VendorAccountCommand, JoinVendorCommand,
 } from '@/model/account';
+import { showApiErrorModal } from '@/helper/api-errors';
 
 export default class AccountVendorApi extends Api {
   constructor() {
@@ -34,6 +35,7 @@ export default class AccountVendorApi extends Api {
 
     return this.get<ServerResponse<PageResult<Account>>>(url).then((response) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -51,6 +53,7 @@ export default class AccountVendorApi extends Api {
     return this.post<VendorAccountCommand, ServerResponse<Account>>(url, command)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -69,6 +72,7 @@ export default class AccountVendorApi extends Api {
     return this.put<VendorAccountCommand, ServerResponse<Account>>(url, command)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -87,6 +91,7 @@ export default class AccountVendorApi extends Api {
     return this.post<unknown, ServerResponse<Account>>(url, null)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -109,6 +114,7 @@ export default class AccountVendorApi extends Api {
     return this.post<JoinVendorCommand, ServerResponse<void>>(url, command)
       .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -130,6 +136,7 @@ export default class AccountVendorApi extends Api {
     return this.put<unknown, ServerResponse<Account>>(url, null)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -150,6 +157,7 @@ export default class AccountVendorApi extends Api {
     return this.delete<ServerResponse<Account>>(url)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

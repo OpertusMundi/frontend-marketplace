@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios';
 import { CatalogueQueryResponse } from '@/model';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { ProviderDraftQuery } from '@/model/provider-assets';
+import { showApiErrorModal } from '@/helper/api-errors';
 
 export default class ProviderAssetsApi extends Api {
   constructor() {
@@ -22,6 +23,7 @@ export default class ProviderAssetsApi extends Api {
     return this.get<CatalogueQueryResponse>(url)
       .then((response: AxiosResponse<CatalogueQueryResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

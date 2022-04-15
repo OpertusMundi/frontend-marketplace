@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { Sorting } from '@/model/request';
 import {
   AxiosPageResponse,
@@ -41,6 +41,7 @@ export default class FavoriteApi extends Api {
     return this.post<FavoriteCommand, ServerResponse<Favorite>>(url, command)
       .then((response: AxiosServerResponse<Favorite>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -52,6 +53,7 @@ export default class FavoriteApi extends Api {
     return this.delete<SimpleResponse>(url)
       .then((response: AxiosResponse<SimpleResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

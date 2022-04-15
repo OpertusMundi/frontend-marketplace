@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import { AxiosResponse } from 'axios';
 import { EnumNotificationSortField, NotificationQueryResponse } from '@/model/notification';
@@ -30,6 +30,7 @@ export default class NotificationApi extends Api {
     return this.get<NotificationQueryResponse>(url)
       .then((response: AxiosResponse<NotificationQueryResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -41,6 +42,7 @@ export default class NotificationApi extends Api {
     return this.put<unknown, ServerResponse<Notification>>(url, null)
       .then((response: AxiosServerResponse<Notification>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -52,6 +54,7 @@ export default class NotificationApi extends Api {
     return this.put<unknown, SimpleResponse>(url, null)
       .then((response: AxiosResponse<SimpleResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

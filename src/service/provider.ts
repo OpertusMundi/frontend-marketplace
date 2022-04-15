@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { ProviderProfessionalCommand, Profile, ProviderProfileCommand } from '@/model/account';
 
@@ -19,6 +19,7 @@ export default class ProviderApi extends Api {
     return this.post<ProviderProfileCommand, ServerResponse<Profile>>(url, command)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -38,6 +39,7 @@ export default class ProviderApi extends Api {
     return this.post<ProviderProfessionalCommand, ServerResponse<Profile>>(url, command)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -57,6 +59,7 @@ export default class ProviderApi extends Api {
     return this.put<ProviderProfessionalCommand, ServerResponse<Profile>>(url, command)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -71,6 +74,7 @@ export default class ProviderApi extends Api {
     return this.delete<ServerResponse<Profile>>(url)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -88,6 +92,7 @@ export default class ProviderApi extends Api {
     return this.get<ServerResponse<boolean>>(url)
       .then((response: AxiosServerResponse<boolean>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data.result;
       });

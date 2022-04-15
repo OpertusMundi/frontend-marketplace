@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import {
   SalesQuery,
@@ -67,6 +67,7 @@ export default class AnalyticsApi extends Api {
     return this.post<SalesQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -78,6 +79,7 @@ export default class AnalyticsApi extends Api {
     return this.post<AssetQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -89,6 +91,7 @@ export default class AnalyticsApi extends Api {
     return this.post<CoverageQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -100,6 +103,7 @@ export default class AnalyticsApi extends Api {
     return this.post<AssetTotalValueQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -111,6 +115,7 @@ export default class AnalyticsApi extends Api {
     return this.post<AssetQuery, ServerResponse<PopularAsset[]>>(url, query)
       .then((response: AxiosServerResponse<PopularAsset[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -122,6 +127,7 @@ export default class AnalyticsApi extends Api {
     return this.get<ServerResponse<PopularTerm[]>>(url)
       .then((response: AxiosServerResponse<PopularTerm[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

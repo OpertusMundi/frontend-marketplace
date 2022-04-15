@@ -10,6 +10,7 @@ import Router from './modules/router.module';
 import CatalogueFilters from './modules/catalogue-filters.module';
 import Notifications from './modules/notifications.module';
 import GlobalModals from './modules/global-modals.module';
+import ApiErrors from './modules/api-errors.module';
 
 Vue.use(Vuex);
 
@@ -25,9 +26,10 @@ const store = new Vuex.Store({
     catalogueFilters: CatalogueFilters,
     notifications: Notifications,
     globalModals: GlobalModals,
+    apiErrors: ApiErrors,
   },
   plugins: [createPersistedState({
-    paths: ['user', 'config', 'shop', 'router', 'catalogueFilters', 'notifications', 'globalModals'],
+    paths: ['user', 'config', 'shop', 'router', 'catalogueFilters', 'notifications'],
   })],
   strict: debug,
 });

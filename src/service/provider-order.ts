@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -33,6 +33,7 @@ export default class ProviderOrderApi extends Api {
     return this.get<ServerResponse<ProviderOrder>>(url)
       .then((response: AxiosServerResponse<ProviderOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -77,6 +78,7 @@ export default class ProviderOrderApi extends Api {
     return this.put<{ rejected: boolean, reason?: string }, ServerResponse<ProviderOrder>>(url, command)
       .then((response: AxiosServerResponse<ProviderOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -95,6 +97,7 @@ export default class ProviderOrderApi extends Api {
     return this.put<OrderShippingCommand, ServerResponse<ProviderOrder>>(url, command || {})
       .then((response: AxiosServerResponse<ProviderOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { CatalogueItemDetails } from '@/model/catalogue';
 
@@ -19,6 +19,7 @@ export default class HelpdeskDraftApi extends Api {
     return this.get<ServerResponse<CatalogueItemDetails>>(url)
       .then((response: AxiosServerResponse<CatalogueItemDetails>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

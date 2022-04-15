@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -38,6 +38,7 @@ export default class ConsumerPayInApi extends Api {
     return this.post<void, ServerResponse<ConsumerOrder>>(url)
       .then((response: AxiosServerResponse<ConsumerOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -59,6 +60,7 @@ export default class ConsumerPayInApi extends Api {
     return this.get<ServerResponse<Card[]>>(url)
       .then((response: AxiosServerResponse<Card[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -78,6 +80,7 @@ export default class ConsumerPayInApi extends Api {
     return this.post<void, ServerResponse<CardRegistration>>(url)
       .then((response: AxiosServerResponse<CardRegistration>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

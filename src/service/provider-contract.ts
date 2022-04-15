@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { Sorting } from '@/model/request';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
@@ -51,6 +51,7 @@ export default class ContractApi extends Api {
 
     return this.get<ServerResponse<MasterContract>>(url).then((response: AxiosServerResponse<MasterContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -85,6 +86,7 @@ export default class ContractApi extends Api {
 
     return this.get<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -101,6 +103,7 @@ export default class ContractApi extends Api {
 
     return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -118,6 +121,7 @@ export default class ContractApi extends Api {
 
     return this.post<ProviderTemplateContractCommand, ServerResponse<ProviderTemplateContract>>(url, command).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -134,6 +138,7 @@ export default class ContractApi extends Api {
 
     return this.delete<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -151,6 +156,7 @@ export default class ContractApi extends Api {
 
     return this.put<unknown, ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -185,6 +191,7 @@ export default class ContractApi extends Api {
 
     return this.get<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -201,6 +208,7 @@ export default class ContractApi extends Api {
 
     return this.delete<ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -217,6 +225,7 @@ export default class ContractApi extends Api {
 
     return this.post<unknown, ServerResponse<ProviderTemplateContract>>(url).then((response: AxiosServerResponse<ProviderTemplateContract>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });

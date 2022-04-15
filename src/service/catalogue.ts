@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import {
   CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
@@ -97,6 +97,7 @@ export default class CatalogueApi extends Api {
     return this.get<ServerResponse<CatalogueItem | CatalogueItemDetails>>(url)
       .then((response: AxiosServerResponse<CatalogueItem | CatalogueItemDetails>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -134,6 +135,7 @@ export default class CatalogueApi extends Api {
       type: command.type || EnumCatalogueType.CSW,
     }).then((response: AxiosResponse<SimpleResponse>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -145,6 +147,7 @@ export default class CatalogueApi extends Api {
     return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>): CatalogueQueryResponse => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         // Ignore publishers
         return data as CatalogueQueryResponse;
@@ -157,6 +160,7 @@ export default class CatalogueApi extends Api {
     return this.post<CatalogueHarvestImportCommand, HarvestImportResponse>(url, command)
       .then((response: AxiosResponse<HarvestImportResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -165,6 +169,7 @@ export default class CatalogueApi extends Api {
   public async getAssetHeatmap(url: string): Promise<GeoJsonObject> {
     return this.get(url).then((response: AxiosResponse) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -173,6 +178,7 @@ export default class CatalogueApi extends Api {
   public async getAssetSamples(url: string): Promise<Sample[]> {
     return this.get(url).then((response: AxiosResponse) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
