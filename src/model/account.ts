@@ -658,7 +658,7 @@ export interface Consumer {
   /**
    * Consumer unique key
    */
-  id: string;
+  key: string;
   /**
    * Consumer name
    */
