@@ -71,7 +71,7 @@ export default class ProviderOrderApi extends Api {
    * @param rejectionReason
    */
   public async acceptOrRejectOrder(orderKey: string, accepted: boolean, rejectionReason?: string): Promise<ServerResponse<ProviderOrder>> {
-    const url = `/action/provider/orders/${orderKey}`;
+    const url = `/action/provider/orders/${orderKey}/confirmation`;
 
     const command = accepted ? { rejected: false } : { rejected: true, reason: rejectionReason };
 

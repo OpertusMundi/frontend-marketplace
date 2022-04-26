@@ -66,7 +66,7 @@ export default class ConsumerOrderApi extends Api {
    * @returns
    */
   public async confirmDelivery(orderKey: string): Promise<ServerResponse<ConsumerOrder>> {
-    const url = `/action/consumer/orders/${orderKey}/delivery`;
+    const url = `/action/consumer/orders/${orderKey}/confirm-delivery`;
 
     return this.put<void, ServerResponse<ConsumerOrder>>(url)
       .then((response: AxiosServerResponse<ConsumerOrder>) => {
