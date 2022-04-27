@@ -4,12 +4,12 @@ const inputsConfig: InputsConfig = [
   {
     id: 'email',
     label: 'Email',
-    placeholder: 'email',
+    placeholder: 'Email *',
   },
   {
     id: 'password',
     label: 'Password',
-    placeholder: 'password',
+    placeholder: 'Password *',
   },
 ];
 

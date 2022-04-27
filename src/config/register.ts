@@ -4,32 +4,32 @@ const inputsConfig: InputsConfig = [
   {
     id: 'email',
     label: 'Email',
-    placeholder: 'email',
+    placeholder: 'Email *',
   },
   {
     id: 'password',
     label: 'Password',
-    placeholder: 'password',
+    placeholder: 'Password *',
   },
   {
     id: 'passwordConfirmation',
     label: 'Password',
-    placeholder: 're-enter password',
+    placeholder: 'Re-enter password *',
   },
   {
     id: 'firstName',
     label: 'First Name',
-    placeholder: 'first name',
+    placeholder: 'First name *',
   },
   {
     id: 'lastName',
     label: 'Last Name',
-    placeholder: 'last name',
+    placeholder: 'Last name *',
   },
   {
     id: 'mobile',
     label: 'Mobile',
-    placeholder: 'mobile',
+    placeholder: 'Phone number *',
   },
 ];
 
