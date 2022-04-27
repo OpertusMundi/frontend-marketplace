@@ -3,7 +3,7 @@
     <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW ORDER</span></div>
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
-        <div class="asset_card__title">{{ `Order #${index}` }}</div>
+        <div class="asset_card__title">{{ `Order #${order.referenceNumber}` }}</div>
         <div class="asset_card__top__right asset_card__top__right--blue"><span>{{ order.status }}</span></div>
       </div>
       <div class="asset_card__center">
@@ -35,8 +35,6 @@ import moment from 'moment';
 @Component
 export default class OrderCard extends Vue {
   @Prop({ required: true }) readonly order!: Order;
-
-  @Prop({ required: true }) readonly index!: number;
 
   // TODO
   getColor(): string {

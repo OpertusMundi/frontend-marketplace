@@ -21,7 +21,7 @@
     </div>
 
     <!-- <purchase-card v-for="order in orders" :key="order.key" :purchase="order"></purchase-card> -->
-    <order-card v-for="(order, i) in orders" :key="order.key" :order="order" :index="currentPage * itemsPerPage + i + 1"></order-card>
+    <order-card v-for="order in orders" :key="order.key" :order="order"></order-card>
 
     <pagination :currentPage="currentPage" :itemsPerPage="5" :itemsTotal="totalOrders" @pageSelection="getOrders(null, $event, true)"></pagination>
 
