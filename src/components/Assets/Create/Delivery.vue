@@ -122,7 +122,7 @@
             </div>
             <div v-else-if="byPlatform === 'TOPIO_DRIVE' && byOwnMeans === 'DIGITAL_PLATFORM'" class="col-md-4">
               <div class="dashboard__form__step__title">
-                <p>Select an asset from your topio Drive. ssss</p>
+                <p>Select an asset from your topio Drive.</p>
               </div>
               <div>
                 <file-topio-drive :fileApi.sync="fileTopioDrive"></file-topio-drive>

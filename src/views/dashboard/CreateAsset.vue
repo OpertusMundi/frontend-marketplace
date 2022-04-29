@@ -50,7 +50,7 @@
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">License</a></li>
           <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Delivery</a></li>
-          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Review</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Review</a></li>
         </ul>
 
         <ul v-if="assetMainType === 'API'" class="dashboard__form__nav">
@@ -85,7 +85,8 @@
               <template v-if="assetMainType === 'OPEN'">
                 <open-asset-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></open-asset-metadata>
                 <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
-                <delivery ref="step4" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></delivery>
+                <!-- <delivery ref="step4" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></delivery> -->
+                <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></open-asset-delivery>
                 <review ref="step5" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
 
@@ -154,7 +155,7 @@ import { AxiosRequestConfig } from 'axios';
 import Datepicker from 'vuejs-datepicker';
 import { AssetDraft } from '@/model/draft';
 import {
-  CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand, SentinelHubItemCommand,
+  CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand, SentinelHubItemCommand, EnumResponsiblePartyRole,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand } from '@/model/asset';
@@ -167,6 +168,7 @@ import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
 import OpenAssetMetadata from '@/components/Assets/CreateOpen/OpenAssetMetadata.vue';
+import OpenAssetDelivery from '@/components/Assets/CreateOpen/OpenAssetDelivery.vue';
 import License from '@/components/Assets/CreateOpen/License.vue';
 import ApiDetails from '@/components/Assets/CreateServiceFromPublished/ApiDetails.vue';
 import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricing.vue';
@@ -207,6 +209,7 @@ interface FileToUpload {
     Payout,
     Review,
     OpenAssetMetadata,
+    OpenAssetDelivery,
     License,
     ApiDetails,
     ApiPricing,
@@ -442,7 +445,23 @@ export default class CreateAsset extends Vue {
         publisherName: '',
         referenceSystem: '',
         resourceLocator: '',
-        responsibleParty: [],
+        responsibleParty: this.assetMainType as string === 'OPEN' ? [{
+          address: '',
+          email: 'hello@opertusmundi.eu',
+          name: 'topio',
+          organizationName: 'topio',
+          phone: '',
+          role: EnumResponsiblePartyRole.PUBLISHER,
+          serviceHours: '',
+        }, {
+          address: '',
+          email: '',
+          name: '',
+          organizationName: '',
+          phone: '',
+          role: '' as EnumResponsiblePartyRole,
+          serviceHours: '',
+        }] : [],
         revisionDate: '',
         resources: [],
         scales: [],
@@ -914,6 +933,17 @@ export default class CreateAsset extends Vue {
   }
 
   async submitDataFileForm(isDraft = false): Promise<void> {
+    // fix open dataset
+    if (this.assetMainType as string === 'OPEN') {
+      this.asset = {
+        ...this.asset,
+        // remove empty responsible parties
+        responsibleParty: this.asset.responsibleParty ? this.asset.responsibleParty.filter((x) => x.role) : null,
+        deliveryMethod: EnumDeliveryMethod.DIGITAL_PLATFORM,
+        contractTemplateKey: '993ae6c5-6dc2-4f53-bbc0-b7d7ed2c7b03', // todo
+      };
+    }
+
     console.log('DATA FILE SUBMISSION =>');
     console.log(this.fileToUpload.isFileSelected, 'IS FILE SELECTED');
     try {

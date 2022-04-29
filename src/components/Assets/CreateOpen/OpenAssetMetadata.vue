@@ -165,7 +165,68 @@
 
           <h3>Responsible party</h3>
           <hr>
-          <validation-provider v-slot="{ errors }" name="Editor's name">
+
+          <div v-for="responsibleParty, i in assetLocal.responsibleParty" :key="responsibleParty.key">
+            <template v-if="i > 0"> <!-- exclude 1st responsible party (topio) -->
+              <validation-observer>
+                <hr v-if="i > 1">
+                <h4 class="mb-xs-20">Responsible party #{{i}}</h4>
+                <validation-provider v-slot="{ errors }" name="Name" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_name_${i}`">Name</label>
+                    <input type="text" :name="`rp_name_${i}`" class="form-group__text" :id="`rp_name_${i}`" v-model="assetLocal.responsibleParty[i].name">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Organisation" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_organisation_${i}`">Organisation</label>
+                    <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organisationName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Role" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_role_${i}`"></label>
+                    <multiselect :id="`rp_role_${i}`" v-model="assetLocal.responsibleParty[i].role" :options="['OWNER', 'CUSTODIAN', 'USER', 'DISTRIBUTOR', 'ORIGINATOR', 'POINT_OF_CONTACT', 'PROCESSOR', 'AUTHOR']" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Role"></multiselect>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Email" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required|email':'email'">
+                  <div class="form-group">
+                    <label :for="`rp_email_${i}`">Email</label>
+                    <input type="text" :name="`rp_email_${i}`" class="form-group__text" :id="`rp_email_${i}`" v-model="assetLocal.responsibleParty[i].email">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Phone" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_phone_${i}`">Phone</label>
+                    <input type="text" :name="`rp_phone_${i}`" class="form-group__text" :id="`rp_phone_${i}`" v-model="assetLocal.responsibleParty[i].phone">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Address" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_address_${i}`">Address</label>
+                    <input type="text" :name="`rp_address_${i}`" class="form-group__text" :id="`rp_address_${i}`" v-model="assetLocal.responsibleParty[i].address">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Service hours" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_service_hours_${i}`">Service hours</label>
+                    <input type="text" :name="`rp_service_hours_${i}`" class="form-group__text" :id="`rp_service_hours_${i}`" v-model="assetLocal.responsibleParty[i].serviceHours">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+              </validation-observer>
+            </template>
+          </div>
+
+          <button class="btn btn--std btn--dark mb-xs-20" @click="addResponsibleParty">add responsible party</button>
+
+          <!-- <validation-provider v-slot="{ errors }" name="Editor's name">
             <div class="form-group">
               <label for="editor">Editor</label>
               <input type="text" name="publisherName" class="form-group__text" id="" v-model="assetLocal.publisherName">
@@ -192,7 +253,7 @@
               <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="assetLocal.metadataPointOfContactEmail">
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
-          </validation-provider>
+          </validation-provider> -->
 
           <h3>Conformity & Lineage</h3>
           <hr>
@@ -222,7 +283,7 @@
           </template>
         </div>
         <div class="col-md-5">
-          <div class="dashboard__form__step__title">
+          <!-- <div class="dashboard__form__step__title">
             <h3>Additional Resources</h3>
             <p>Provide any additional files for the documentation of your asset.</p>
 
@@ -254,22 +315,7 @@
               </div>
               <button class="btn btn--std btn--dark" :disabled="isAddAdditionalUriResourceDisabled()" @click="onAddAdditionalUriResource">ADD MORE</button>
             </div>
-
-            <!-- <div class="form-group mt-xs-20">
-              <h4>Upload files</h4>
-              <div class="mt-xs-10 mb-xs-20 ml-xs-40 d-flex flex-column" v-if="additionalResourcesOption === 'upload_files'">
-                <span v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="mb-xs-10">{{ resource.resourceCommand.fileName }}</span>
-                <div><button class="btn btn--std btn--dark" @click="modalToShow = 'uploadAdditionalResources'">UPLOAD FILES</button></div>
-              </div>
-              <h4>External links</h4>
-              <div v-if="additionalResourcesOption === 'external_link'" class="form-group ml-xs-40">
-                <label for="additional_resources_link">Add a link</label>
-                <input id="additional_resources_link" type="text" class="form-group__text" placeholder="https://" v-model="additionalUriResource.uri">
-                <label for="additional_resources_link_text">Displayed text for URI</label>
-                <textarea id="additional_resources_link_text" type="text" class="form-group__text" :disabled="!additionalUriResource.uri" v-model="additionalUriResource.text"></textarea>
-              </div>
-            </div> -->
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -291,7 +337,7 @@ import Datepicker from 'vuejs-datepicker';
 import Modal from '@/components/Modal.vue';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
-import { EnumTopicCategory } from '@/model/catalogue';
+import { EnumResponsiblePartyRole, EnumTopicCategory, ResponsibleParty } from '@/model/catalogue';
 import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
@@ -362,7 +408,12 @@ export default class OpenAssetMetadata extends Vue {
 
     this.spatialApi = new SpatialApi();
 
-    this.assetLocal = this.asset;
+    this.assetLocal = {
+      ...this.asset,
+      responsibleParty: this.asset.responsibleParty
+        ? this.asset.responsibleParty.map((x, i) => ({ ...x, key: i > 0 ? `${Date.now()}${Math.random()}` : 'topio' }))
+        : null,
+    };
 
     this.additionalResourcesTemp = [];
 
@@ -436,6 +487,35 @@ export default class OpenAssetMetadata extends Vue {
     if (this.assetLocal.metadataLanguage && this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)) this.selectedMetadataLanguage = this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)!;
   }
 
+  isSomeResponsiblePartyDataFilled(key: string): boolean {
+    if (!this.assetLocal.responsibleParty) return false;
+
+    const responsibleParty = (this.assetLocal.responsibleParty as (ResponsibleParty & { key: string })[]).find((x) => x.key === key);
+    if (!responsibleParty) return false;
+
+    if (Object.entries(responsibleParty)
+      .filter((x) => x[0] !== 'key')
+      .some((x) => x[1])
+    ) return true;
+
+    return false;
+  }
+
+  addResponsibleParty(): void {
+    if (!this.assetLocal.responsibleParty) return;
+
+    this.assetLocal.responsibleParty.push({
+      address: '',
+      email: '',
+      name: '',
+      organizationName: '',
+      phone: '',
+      role: '' as EnumResponsiblePartyRole,
+      serviceHours: '',
+      key: `${Date.now()}${Math.random()}`,
+    } as ResponsibleParty & { key: string });
+  }
+
   asyncFindEpsg(q: string): void {
     if (!q) return;
     console.log(q);
@@ -465,8 +545,32 @@ export default class OpenAssetMetadata extends Vue {
 
   @Watch('assetLocal', { deep: true })
   onAssetChange(asset: CatalogueItemCommand): void {
+    // remove key from each responsibleParty item
+    const assetFixed: CatalogueItemCommand = {
+      ...asset,
+      responsibleParty: asset.responsibleParty
+        ? asset.responsibleParty.map((x) => ({
+          address: x.address,
+          email: x.email,
+          name: x.name,
+          organizationName: x.organizationName,
+          phone: x.phone,
+          role: x.role,
+          serviceHours: x.serviceHours,
+        })) : null,
+    };
+
     console.log('updated metadata');
-    this.$emit('update:asset', asset);
+    this.$emit('update:asset', assetFixed);
+  }
+
+  @Watch('responsibleParty', { deep: true })
+  onResponsiblePartyChange(responsibleParty: ResponsibleParty): void {
+    if (!this.asset.responsibleParty) return;
+
+    this.asset.responsibleParty = this.asset.responsibleParty.length > 1
+      ? { ...this.asset.responsibleParty, 1: responsibleParty }
+      : this.asset.responsibleParty.concat(responsibleParty);
   }
 
   @Watch('assetLocal.type', { immediate: false })

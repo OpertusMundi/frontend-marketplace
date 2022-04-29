@@ -208,7 +208,7 @@ interface Scale {
   description: string;
 }
 
-enum EnumResponsiblePartyRole {
+export enum EnumResponsiblePartyRole {
   PUBLISHER = 'PUBLISHER',
   OWNER = 'OWNER',
   CUSTODIAN = 'CUSTODIAN',
@@ -220,7 +220,7 @@ enum EnumResponsiblePartyRole {
   AUTHOR = 'AUTHOR',
 }
 
-interface ResponsibleParty {
+export interface ResponsibleParty {
   /**
    * Address of entity responsible for making the resource available
    */
