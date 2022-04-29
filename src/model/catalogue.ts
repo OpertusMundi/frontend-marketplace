@@ -4,7 +4,9 @@ import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { Provider } from '@/model/account';
 import { BasePricingModelCommand, EffectivePricingModel } from '@/model/pricing-model';
 import { Resource, AssetFileAdditionalResource, AssetUriAdditionalResource } from '@/model/asset';
-import { EnumContractIcon, EnumContractIconCategory } from '@/model/contract';
+import {
+  AssetContractAnnex, EnumContractIcon, EnumContractIconCategory, EnumContractType,
+} from '@/model/contract';
 
 export enum EnumConformity {
   CONFORMANT = 'CONFORMANT',
@@ -923,7 +925,7 @@ export interface ContractTerm {
   description: string;
 }
 
-export interface Contract {
+export interface TemplateContract {
   /**
    * Unique key
    */
@@ -941,6 +943,23 @@ export interface Contract {
    */
   terms: ContractTerm[];
 }
+
+export interface UploadedContract {
+  /**
+   * Uploaded file name
+   */
+  fileName?: string;
+  /**
+   * Uploaded file size
+   */
+  fileSize?: number;
+  /**
+   * Contract annexes
+   */
+  annexes: AssetContractAnnex[];
+}
+
+export type Contract = TemplateContract | UploadedContract;
 
 export interface CatalogueItemDetails extends CatalogueItem {
   /**
@@ -1021,6 +1040,18 @@ interface BaseCatalogueItemCommand extends BaseCatalogueItem {
    */
   automatedMetadata?: Metadata[];
   /**
+   * Custom contract annex files
+   */
+  contractAnnexes: AssetContractAnnex[];
+  /**
+   * Contract template key
+   */
+  contractTemplateKey: string;
+  /**
+   * Contract type
+   */
+  contractTemplateType: EnumContractType;
+  /**
    * True if the resource files should be imported into PostGIS database and published using WMS/WFS
    * endpoints. Ingest operation is only supported for formats of category VECTOR
    */
@@ -1038,10 +1069,6 @@ interface BaseCatalogueItemCommand extends BaseCatalogueItem {
    * A list of resources of the dataset
    */
   resources: Resource[];
-  /**
-   * Contract template key
-   */
-  contractTemplateKey: string;
   /**
    * Metadata fields to be hidden by vendor
    */
@@ -1064,7 +1091,7 @@ export interface CatalogueItemCommand extends BaseCatalogueItemCommand {
 }
 
 // eslint-disable-next-line
-export interface SentinelHubItemCommand extends BaseCatalogueItemCommand {}
+export interface SentinelHubItemCommand extends BaseCatalogueItemCommand { }
 
 export enum EnumDraftCommandType {
   ASSET = 'ASSET',

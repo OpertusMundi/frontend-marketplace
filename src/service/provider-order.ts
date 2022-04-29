@@ -1,3 +1,5 @@
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+
 import Api from '@/service/api';
 
 import {
@@ -10,6 +12,7 @@ import {
   ProviderOrder,
   OrderShippingCommand,
 } from '@/model/order';
+import { blobToJson } from '@/helper/file';
 
 /**
  * Service for querying provider orders.
@@ -98,5 +101,75 @@ export default class ProviderOrderApi extends Api {
 
         return data;
       });
+  }
+
+  /**
+   * Upload order contract
+   *
+   * @param orderKey Order key
+   * @param resource File to upload
+   * @param submit True if this is the final contract version
+   */
+  public async uploadOrderContract(
+    orderKey: string, resource: File, submit = false, config?: AxiosRequestConfig,
+  ): Promise<ServerResponse<ProviderOrder>> {
+    const url = `/action/provider/orders/${orderKey}/contract`;
+
+    const form = new FormData();
+
+    form.append('file', resource);
+
+    const requestConfig = {
+      ...config,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    };
+
+    return (submit
+      ? this.post<FormData, ServerResponse<ProviderOrder>>(url, form, requestConfig)
+      : this.put<FormData, ServerResponse<ProviderOrder>>(url, form, requestConfig)
+    ).then((response: AxiosServerResponse<ProviderOrder>) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
+
+  /**
+   * Download provider contract file
+   *
+   * @param orderKey
+   */
+  public async downloadContract(orderKey: string, save = true): Promise<ServerResponse<Blob>> {
+    const url = `/action/provider/orders${orderKey}/contract`;
+
+    return this.get<Blob>(url, {
+      responseType: 'blob',
+    }).then((response: AxiosResponse<Blob>) => {
+      if (save) {
+        const contentDisposition = response.headers['content-disposition'];
+        const filename = this.getFilenameFromHeader(contentDisposition);
+
+        saveAs(response.data, filename);
+      }
+
+      return Promise.resolve({
+        success: true,
+        messages: [],
+        result: response.data,
+      });
+    })
+      .catch((err: AxiosError) => blobToJson(err.response?.data));
+  }
+
+  private getFilenameFromHeader(header: string | null): string {
+    const defaultName = 'download.pdf';
+    if (!header) {
+      return defaultName;
+    }
+    const filenamePart = header.split(';')[1];
+    if (!filenamePart) {
+      return defaultName;
+    }
+    return filenamePart.split('filename')[1].split('=')[1].trim();
   }
 }

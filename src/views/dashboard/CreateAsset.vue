@@ -173,6 +173,7 @@ import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricin
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
 import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
+import { EnumContractType } from '@/model/contract';
 
 Vue.use(VueCardFormat);
 
@@ -412,6 +413,8 @@ export default class CreateAsset extends Vue {
         additionalResources: [],
         conformity: EnumConformity.NOT_EVALUATED,
         contractTemplateKey: '',
+        contractTemplateType: EnumContractType.MASTER_CONTRACT,
+        contractAnnexes: [],
         creationDate: '',
         dateEnd: '',
         dateStart: '',
@@ -477,6 +480,8 @@ export default class CreateAsset extends Vue {
         additionalResources: [],
         conformity: EnumConformity.NOT_EVALUATED,
         contractTemplateKey: '',
+        contractTemplateType: EnumContractType.MASTER_CONTRACT,
+        contractAnnexes: [],
         creationDate: '',
         dateEnd: '',
         dateStart: '',
