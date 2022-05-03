@@ -54,7 +54,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { EnumContractIconCategory } from '@/model/contract';
-import { CatalogueItemDetails, ContractTerm } from '@/model/catalogue';
+import { CatalogueItemDetails, ContractTerm, TemplateContract } from '@/model/catalogue';
 import { chunk as lodashChunk } from 'lodash';
 
 @Component
@@ -74,9 +74,12 @@ export default class TermsAndRestrictions extends Vue {
 
     this.activeTab = 1;
 
-    const terms = this.catalogueItem.contract.terms.filter((x) => x.category === EnumContractIconCategory.Terms);
-    const countries = this.catalogueItem.contract.terms.filter((x) => x.category === EnumContractIconCategory.Countries);
-    const restrictions = this.catalogueItem.contract.terms.filter((x) => x.category === EnumContractIconCategory.Restrictions);
+    // TODO: Update code for handling UploadedContract
+    const contract = this.catalogueItem.contract as TemplateContract;
+
+    const terms = contract.terms.filter((x) => x.category === EnumContractIconCategory.Terms);
+    const countries = contract.terms.filter((x) => x.category === EnumContractIconCategory.Countries);
+    const restrictions = contract.terms.filter((x) => x.category === EnumContractIconCategory.Restrictions);
 
     this.termsChunked = lodashChunk(terms, 4);
     this.countriesChunked = lodashChunk(countries, 4);

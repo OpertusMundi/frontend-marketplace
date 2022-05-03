@@ -76,4 +76,21 @@ export default class ConsumerOrderApi extends Api {
         return data;
       });
   }
+
+  /**
+   * Accept order contract
+   *
+   * @param orderKey
+   * @returns
+   */
+  public async acceptContract(orderKey: string): Promise<ServerResponse<ConsumerOrder>> {
+    const url = `/action/consumer/orders/${orderKey}/accept-contract`;
+
+    return this.put<void, ServerResponse<ConsumerOrder>>(url)
+      .then((response: AxiosServerResponse<ConsumerOrder>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
 }

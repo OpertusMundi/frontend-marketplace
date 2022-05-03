@@ -148,7 +148,6 @@ export default class ContractApi extends Api {
    * Update existing contract template draft
    *
    * @param key Draft unique key
-   * @param command
    * @returns
    */
   public async publishDraft(key: string): Promise<ServerResponse<ProviderTemplateContract>> {

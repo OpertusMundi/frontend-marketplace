@@ -1,6 +1,7 @@
 import { EnumRole, EnumVendorRole } from './role';
 import { EnumAuthProvider } from './configuration';
 import { Quota } from './file';
+import { ServerMessage } from './error';
 
 export enum EnumAccountType {
   OPERTUSMUNDI = 'OPERTUSMUNDI',
@@ -241,6 +242,7 @@ export interface ProviderProfessionalCommand extends ConsumerProfessionalCommand
 interface CustomerDraft {
   createdAt: string;
   email: string;
+  errorDetails: ServerMessage[] | null;
   modifiedAt: string;
   status: EnumCustomerRegistrationStatus;
   type: EnumMangopayUserType;

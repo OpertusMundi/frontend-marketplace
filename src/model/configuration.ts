@@ -1,5 +1,5 @@
-import { EnumAssetType } from './enum';
 import { PricingModelSettings } from '@/model/pricing-model';
+import { EnumAssetType } from './enum';
 
 export enum EnumAuthProvider {
   Forms = 'Forms',
