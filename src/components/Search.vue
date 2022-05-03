@@ -18,6 +18,8 @@
           <a
             href="#"
             @click.prevent="
+              query = '';
+              queryResults = [];
               showRecent = true;
               showPopular = false;
             "
@@ -29,6 +31,8 @@
           <a
             href="#"
             @click.prevent="
+              query = '';
+              queryResults = [];
               showRecent = false;
               showPopular = true;
             "
@@ -231,12 +235,15 @@ export default class Search extends Vue {
   }
 
   searchAssets(): void {
-    if (this.query.length <= 2) return;
+    if (this.query.length <= 2) {
+      this.queryResults = [];
+      return;
+    }
     this.loading = true;
-    this.queryResults = [];
+    // this.queryResults = [];
     this.catalogQuery.query = this.query;
     this.catalogueApi
-      .find(this.query)
+      .findAdvanced({ text: this.query })
       .then((queryResponse: CatalogueQueryResponse) => {
         this.showRecent = false;
         this.showPopular = false;
