@@ -27,14 +27,20 @@
         </div>
         <div class="asset__sidebar">
 
-          <shop-card
-            v-if="mode === 'catalogue' && isItemLoaded"
-            :catalogueItem="catalogueItem"
-            @openSelectAreaModal="openSelectAreaModal"
-            @openSelectSentinelHubPlanModal="openSelectSentinelHubPlanModal"
-            @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
-          ></shop-card>
-          <shop-card-provider-review v-if="mode === 'review' && isItemLoaded" :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
+          <template v-if="isItemLoaded && mode === 'catalogue'">
+            <shop-card-open v-if="catalogueItem.openDataset" :catalogueItem="catalogueItem"></shop-card-open>
+            <shop-card
+              v-else
+              :catalogueItem="catalogueItem"
+              @openSelectAreaModal="openSelectAreaModal"
+              @openSelectSentinelHubPlanModal="openSelectSentinelHubPlanModal"
+              @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
+            ></shop-card>
+          </template>
+          <template v-if="isItemLoaded && mode === 'review'">
+            <shop-card-provider-review-open v-if="catalogueItem.openDataset" :catalogueItem="catalogueItem"></shop-card-provider-review-open>
+            <shop-card-provider-review v-else :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
+          </template>
 
           <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
 
@@ -80,7 +86,9 @@ import Overview from '../components/CatalogueSingle/Overview.vue';
 import TermsAndRestrictions from '../components/CatalogueSingle/TermsAndRestrictions.vue';
 import DataProfilingAndSamples from '../components/CatalogueSingle/DataProfilingAndSamples.vue';
 import ShopCard from '../components/CatalogueSingle/ShopCard.vue';
+import ShopCardOpen from '../components/CatalogueSingle/ShopCardOpen.vue';
 import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProviderReview.vue';
+import ShopCardProviderReviewOpen from '../components/CatalogueSingle/ShopCardProviderReviewOpen.vue';
 import VendorInformation from '../components/CatalogueSingle/VendorInformation.vue';
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
@@ -99,7 +107,9 @@ import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelH
     TermsAndRestrictions,
     DataProfilingAndSamples,
     ShopCard,
+    ShopCardOpen,
     ShopCardProviderReview,
+    ShopCardProviderReviewOpen,
     VendorInformation,
     OtherAvailableOptions,
     RelatedAssets,

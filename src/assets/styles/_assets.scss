@@ -229,6 +229,15 @@
 			}
 		}
 
+		&__label-open {
+			color: $secondColor;
+			display: inline-flex;
+			font-size: em(40);
+			line-height: 72%;
+			margin: 0 auto;
+			font-weight: 500;
+		}
+
 		&__errors {
 			color: red;
 			margin-top: -20px;
@@ -322,11 +331,38 @@
 				}
 			}
 		}
+		&__open-asset-delivery-info {
+			font-size: em(13);
+			margin-bottom: 15px;
+			li {
+				margin-bottom: 5px;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				img {
+					display: block;
+					margin-left: 5px;
+				}
+				span {
+					margin-left: 30px;
+					color: $secondColor;
+					font-weight: 400;
+				}
+			}
+		}
 
 		&__pid {
 			color: #6c6c6c;
 			font-size: em(13);
 			padding: 20px 0 30px;
+		}
+
+		&__license {
+			text-align: center;
+			margin: 15px auto;
+			display: flex;
+			align-items: center;
+			color: $secondColor;
 		}
 	}
 
