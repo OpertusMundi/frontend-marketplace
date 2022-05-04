@@ -164,23 +164,42 @@ small {
     width: 100%;
     position: relative;
     margin: 0 10px 0 10px;
+
+    &__tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        z-index: 2000;
+        position: absolute;
+        top: 0;
+        padding: 10px;
+        select {
+            margin-right: 10px !important;
+            width: auto;
+            margin: 0;
+        }
+        > div {
+            display: flex;
+        }
+    }
 }
 
-.map-coverage-wrapper input {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 5px;
-    width: 200px;
-    z-index: 2000;
-}
+// .map-coverage-wrapper input {
+//     position: absolute;
+//     right: 0;
+//     top: 0;
+//     margin: 5px;
+//     width: 200px;
+//     z-index: 2000;
+// }
 
-.map-coverage-wrapper button {
-    bottom: 0;
-    margin: 5px;
-    position: absolute;
-    z-index: 2000;
-}
+// .map-coverage-wrapper button {
+//     bottom: 0;
+//     margin: 5px;
+//     position: absolute;
+//     z-index: 2000;
+// }
 
 #mapCoverage {
     height: 100%;
