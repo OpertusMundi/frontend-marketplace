@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import {
   Account, AccountProfileCommand,
@@ -35,6 +35,7 @@ export default class ProfileApi extends Api {
     return this.post<AccountProfileCommand, ServerResponse<Account>>(url, command)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

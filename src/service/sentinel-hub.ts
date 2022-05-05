@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse, SubscriptionPlan } from '@/model/sentinel-hub';
 
@@ -21,6 +21,7 @@ export default class SentinelHubApi extends Api {
     return this.get<ServerResponse<{ id: string, name: string }[]>>(url)
       .then((response) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -39,6 +40,7 @@ export default class SentinelHubApi extends Api {
     return this.get<ServerResponse<SubscriptionPlan[]>>(url)
       .then((response: AxiosServerResponse<SubscriptionPlan[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -58,6 +60,7 @@ export default class SentinelHubApi extends Api {
     return this.post<ClientCatalogueQuery, ServerResponse<SentinelHubCatalogueResponse>>(url, query)
       .then((response: AxiosServerResponse<SentinelHubCatalogueResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -76,6 +79,7 @@ export default class SentinelHubApi extends Api {
     return this.get<ServerResponse<boolean>>(url)
       .then((response: AxiosServerResponse<boolean>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

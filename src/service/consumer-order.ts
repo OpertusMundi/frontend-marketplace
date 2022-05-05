@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -30,6 +30,7 @@ export default class ConsumerOrderApi extends Api {
     return this.get<ServerResponse<ConsumerOrder>>(url)
       .then((response: AxiosServerResponse<ConsumerOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -70,6 +71,7 @@ export default class ConsumerOrderApi extends Api {
     return this.put<void, ServerResponse<ConsumerOrder>>(url)
       .then((response: AxiosServerResponse<ConsumerOrder>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

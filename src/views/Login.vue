@@ -17,6 +17,7 @@
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
           </validation-provider>
+          <label class="login__form__mandatory-msg">Fields marked with * are mandatory</label>
           <div class="login__form__errors" v-if="formErrors">{{ formErrors }}</div>
           <button type="submit" class="btn btn--std btn--blue" :disabled="loading" v-html="loading ? 'PLEASE WAIT..' : 'LOGIN'"></button>
         </form>

@@ -5,6 +5,7 @@ import { LoginResult, LogoutResult } from '@/model/auth';
 import {
   Account, PlatformAccountCommand, ActivationTokenCommand, PasswordChangeCommand,
 } from '@/model/account';
+import { showApiErrorModal } from '@/helper/api-errors';
 
 export default class AccountApi extends Api {
   constructor() {
@@ -21,6 +22,7 @@ export default class AccountApi extends Api {
     return this.submit<ServerResponse<LoginResult>>(url, form)
       .then((response: AxiosServerResponse<LoginResult>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -34,6 +36,7 @@ export default class AccountApi extends Api {
     return this.submit(url, form)
       .then((response: AxiosServerResponse<LogoutResult>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -50,6 +53,7 @@ export default class AccountApi extends Api {
     return this.post<PlatformAccountCommand, ServerResponse<Account>>(url, command)
       .then((response: AxiosServerResponse<Account>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -67,6 +71,7 @@ export default class AccountApi extends Api {
     return this.post<ActivationTokenCommand, ServerResponse<void>>(url, command)
       .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -90,6 +95,7 @@ export default class AccountApi extends Api {
     })
       .then((response: AxiosServerResponse<void>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

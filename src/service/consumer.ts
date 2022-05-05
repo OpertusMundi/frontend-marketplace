@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import { Sorting } from '@/model/request';
 import {
@@ -33,6 +33,7 @@ export default class ConsumerApi extends Api {
     return this.post<ConsumerIndividualCommand | ConsumerProfessionalCommand, ServerResponse<Profile>>(url, command)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -52,6 +53,7 @@ export default class ConsumerApi extends Api {
     return this.put<ConsumerIndividualCommand | ConsumerProfessionalCommand, ServerResponse<Profile>>(url, command)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -66,6 +68,7 @@ export default class ConsumerApi extends Api {
     return this.delete<ServerResponse<Profile>>(url)
       .then((response: AxiosServerResponse<Profile>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

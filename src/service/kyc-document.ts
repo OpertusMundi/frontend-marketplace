@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { EnumCustomerType } from '@/model/account';
@@ -26,6 +26,7 @@ export default class KycDocumentApi extends Api {
     return this.get<KycDocumentQueryResponse>(url)
       .then((response: AxiosResponse<KycDocumentQueryResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -37,6 +38,7 @@ export default class KycDocumentApi extends Api {
     return this.get<ServerResponse<KycDocument>>(url)
       .then((response: AxiosServerResponse<KycDocument>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -54,6 +56,7 @@ export default class KycDocumentApi extends Api {
     return this.post<KycDocumentCommand, ServerResponse<KycDocument>>(url, command)
       .then((response: AxiosServerResponse<KycDocument>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -83,6 +86,7 @@ export default class KycDocumentApi extends Api {
 
     return this.post<FormData, SimpleResponse>(url, form, config).then((response: AxiosResponse<SimpleResponse>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -99,6 +103,7 @@ export default class KycDocumentApi extends Api {
 
     return this.put<KycDocumentCommand, ServerResponse<KycDocument>>(url, command).then((response: AxiosServerResponse<KycDocument>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });

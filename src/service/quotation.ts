@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { QuotationCommand, EffectivePricingModel } from '@/model/pricing-model';
 
@@ -20,6 +20,7 @@ export default class QuotationApi extends Api {
     return this.post<QuotationCommand, ServerResponse<EffectivePricingModel>>(url, command)
       .then((response: AxiosServerResponse<EffectivePricingModel>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

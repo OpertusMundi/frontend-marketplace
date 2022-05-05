@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -34,6 +34,7 @@ export default class ProviderPayOutApi extends Api {
     return this.get<ServerResponse<PayOut>>(url)
       .then((response: AxiosServerResponse<PayOut>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

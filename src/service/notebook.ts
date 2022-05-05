@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, SimpleResponse, ServerResponse } from '@/model/response';
 import { AxiosResponse } from 'axios';
 import { JupyterConfiguration, JupyterUserStatus } from '@/model/notebook';
@@ -17,6 +17,7 @@ export default class NotebooksApi extends Api {
     return this.get<ServerResponse<JupyterConfiguration>>(url)
       .then((response: AxiosResponse<ServerResponse<JupyterConfiguration>>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -28,6 +29,7 @@ export default class NotebooksApi extends Api {
     return this.get<ServerResponse<JupyterUserStatus>>(url)
       .then((response: AxiosServerResponse<JupyterUserStatus>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -39,6 +41,7 @@ export default class NotebooksApi extends Api {
     return this.post<unknown, ServerResponse<JupyterUserStatus>>(url, null)
       .then((response: AxiosServerResponse<JupyterUserStatus>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -50,6 +53,8 @@ export default class NotebooksApi extends Api {
     return this.delete<SimpleResponse>(url)
       .then((response: AxiosResponse<SimpleResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
         return data;
       });
   }

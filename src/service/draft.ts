@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { PageRequest, Sorting } from '@/model/request';
 import {
   AxiosServerResponse, AxiosPageResponse, ServerResponse, PageResult,
@@ -67,6 +67,7 @@ export default class DraftAssetApi extends Api {
     return this.get<ServerResponse<AssetDraft>>(url)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -84,6 +85,7 @@ export default class DraftAssetApi extends Api {
     return this.post<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -104,6 +106,7 @@ export default class DraftAssetApi extends Api {
 
     return this.post<{ pid: string }, ServerResponse<AssetDraft>>(url, command).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -123,6 +126,7 @@ export default class DraftAssetApi extends Api {
     return this.post<DraftApiFromAssetCommand | DraftApiFromFileCommand, ServerResponse<AssetDraft>>(url, command, config)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -146,6 +150,7 @@ export default class DraftAssetApi extends Api {
     return this.put<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -168,6 +173,7 @@ export default class DraftAssetApi extends Api {
     return this.put<CatalogueItemCommand | SentinelHubItemCommand, ServerResponse<AssetDraft>>(url, command)
       .then((response: AxiosServerResponse<AssetDraft>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -263,6 +269,7 @@ export default class DraftAssetApi extends Api {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -280,6 +287,7 @@ export default class DraftAssetApi extends Api {
 
     return this.post<UserFileResourceCommand, ServerResponse<AssetDraft>>(url, command).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -311,6 +319,7 @@ export default class DraftAssetApi extends Api {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -338,7 +347,6 @@ export default class DraftAssetApi extends Api {
    */
   public async releaseLock(key: string): Promise<AxiosServerResponse<void>> {
     const url = `/action/drafts/${key}/lock`;
-
 
     return this.delete<ServerResponse<void>>(url);
   }

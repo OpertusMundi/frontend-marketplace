@@ -61,7 +61,7 @@
       }
     }
     .btn {
-      margin-top: 20px;
+      margin-top: 40px;
       min-width: 200px;
       font-weight: 500;
       font-size: em(17);
@@ -76,6 +76,11 @@
       text-decoration: none;
       transition: color 0.2s ease;
       color: $secondColor;
+    }
+
+    &__mandatory-msg {
+      font-size: em(13);
+      color: $labelColor;
     }
   }
 

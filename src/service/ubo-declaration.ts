@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
 import { AxiosResponse } from 'axios';
 import {
@@ -30,6 +30,7 @@ export default class UboDeclarationApi extends Api {
     return this.get<UboDeclarationQueryResponse>(url)
       .then((response: AxiosResponse<UboDeclarationQueryResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -43,6 +44,7 @@ export default class UboDeclarationApi extends Api {
     return this.get<ServerResponse<UboDeclaration>>(url)
       .then((response: AxiosServerResponse<UboDeclaration>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -60,6 +62,7 @@ export default class UboDeclarationApi extends Api {
     return this.post<unknown, ServerResponse<UboDeclaration>>(url, null)
       .then((response: AxiosServerResponse<UboDeclaration>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -70,6 +73,7 @@ export default class UboDeclarationApi extends Api {
 
     return this.post<UboCommand, ServerResponse<Ubo>>(url, command).then((response: AxiosServerResponse<Ubo>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -80,6 +84,7 @@ export default class UboDeclarationApi extends Api {
 
     return this.put<UboCommand, ServerResponse<Ubo>>(url, command).then((response: AxiosServerResponse<Ubo>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -92,6 +97,7 @@ export default class UboDeclarationApi extends Api {
 
     return this.delete<SimpleResponse>(url).then((response: AxiosResponse<SimpleResponse>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });
@@ -102,6 +108,7 @@ export default class UboDeclarationApi extends Api {
 
     return this.post<unknown, ServerResponse<UboDeclaration>>(url, null).then((response: AxiosServerResponse<UboDeclaration>) => {
       const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
 
       return data;
     });

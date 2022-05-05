@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -36,6 +36,7 @@ export default class ProviderPayInItemApi extends Api {
     return this.get<ServerResponse<ProviderPayInItem>>(url)
       .then((response: AxiosServerResponse<ProviderPayInItem>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

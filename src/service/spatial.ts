@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosResponse } from 'axios';
 
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
@@ -22,6 +22,7 @@ export default class SpatialApi extends Api {
     return this.get<ServerResponse<EpsgCode[]>>(url)
       .then((response: AxiosServerResponse<EpsgCode[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -36,6 +37,7 @@ export default class SpatialApi extends Api {
     return this.get<ServerResponse<NutsRegionFeature>>(url)
       .then((response: AxiosServerResponse<NutsRegionFeature>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -50,6 +52,7 @@ export default class SpatialApi extends Api {
     return this.get<ServerResponse<NutsRegionFeatureCollection>>(url)
       .then((response: AxiosServerResponse<NutsRegionFeatureCollection>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -64,6 +67,7 @@ export default class SpatialApi extends Api {
     return this.get<ServerResponse<NutsRegionProperties[]>>(url)
       .then((response: AxiosServerResponse<NutsRegionProperties[]>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
@@ -84,6 +88,7 @@ export default class SpatialApi extends Api {
     return this.get<ServerResponse<NutsRegionFeatureCollection>>(url)
       .then((response: AxiosServerResponse<NutsRegionFeatureCollection>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });

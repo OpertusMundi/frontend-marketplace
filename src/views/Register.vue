@@ -43,7 +43,9 @@
             </div>
           </validation-provider>
 
-          <div>
+          <label class="login__form__mandatory-msg">Fields marked with * are mandatory</label>
+
+          <div class="mt-xs-40">
             <!-- <div class="d-flex align-items-center justify-content-center">
               <input class="mr-xs-10" @change="onAcceptTermsChange" type="checkbox" v-model="termsAccepted" id="terms">
               <label for="terms">I 've read and accept <strong><a class="login__helpers" href="/terms">Terms & Conditions</a></strong></label>

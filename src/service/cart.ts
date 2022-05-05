@@ -1,5 +1,5 @@
 import Api from '@/service/api';
-
+import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
 import { AxiosResponse } from 'axios';
 import { Cart, CartAddItemCommand } from '@/model/cart';
@@ -37,6 +37,7 @@ export default class CartApi extends Api {
     return this.delete<ServerResponse<Cart>>(url)
       .then((response: AxiosServerResponse<Cart>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
       });
