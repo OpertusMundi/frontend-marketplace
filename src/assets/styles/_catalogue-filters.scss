@@ -183,6 +183,31 @@ small {
             display: flex;
         }
     }
+
+    select {
+        background: #fff;
+        border: solid 2px $darkColor;
+        &:disabled {
+            cursor: not-allowed;
+        }
+        &.active {
+            border-color: $secondColor;
+        }
+    }
+
+    .btn-draw-area {
+        border-radius: 3px !important;
+        background: #fff;
+        border: 2px solid $darkColor;
+        &:disabled {
+            cursor: not-allowed;
+        }
+        &--active {
+            color: $secondColor;
+            border-color: $secondColor;
+            cursor: not-allowed;
+        }
+    }
 }
 
 // .map-coverage-wrapper input {

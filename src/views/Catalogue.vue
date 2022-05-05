@@ -228,15 +228,15 @@
                 <div id="mapCoverage"></div>
                 <div class="map-coverage-wrapper__tools">
                   <div>
-                    <select @change="onCountrySelected($event.target.value)" :disabled="filters.mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
+                    <select :class="{'active': mapCoverageSelectCountryMode}" @change="onCountrySelected($event.target.value)" :disabled="filters.mapCoverageSelectionBBox || mapCoverageDrawMode ? true : false" v-model="countrySelected" class="form-group__select">
                       <option value="">(Select country)</option>
                       <option v-for="country in countries" :value="country.code" :key="country.code"> {{ country.name }} </option>
                     </select>
-                    <button v-if="!mapCoverageSelectionRectangle && !mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn--blue"><font-awesome-icon class="mr-xs-10" icon="vector-square" /> DRAW AREA ON MAP</button>
+                    <button :disabled="mapCoverageSelectionRectangle || mapCoverageDrawMode" @click="onDrawArea" class="btn--std btn-draw-area" :class="{'btn-draw-area--active': mapCoverageDrawMode}"><font-awesome-icon class="mr-xs-10" icon="vector-square" /> DRAW AREA ON MAP</button>
                   </div>
                   <div v-if="mapCoverageSelectionIsDrawn && !filters.mapCoverageSelectionBBox">
                     <button @click="onCancelArea" class="btn--std btn--light">Cancel</button>
-                    <button @click="onSetArea" class="btn--std btn--dark">Set Area</button>
+                    <button @click="onSetArea" class="btn--std btn--dark ml-xs-10">Set Area</button>
                   </div>
                   <!-- <input type="text" class="form-group__text" placeholder="Search City/Area"> -->
                 </div>
@@ -505,6 +505,8 @@ export default class Catalogue extends Vue {
 
   mapCoverageSelectionRectangle: any;
 
+  mapCoverageSelectCountryMode: boolean;
+
   mapCoverageDrawMode: boolean;
 
   mapCoverageSelectionIsDrawn: boolean;
@@ -651,9 +653,12 @@ export default class Catalogue extends Vue {
 
     this.filters.mapCoverageSelectionBBox = '';
 
+    // UI for changing spatialOperation value is disabled. Currently, only INTERSECTS is supported.
     this.filters.spatialOperation = EnumSpatialOperation.INTERSECTS;
 
     this.filters.isOpen = false;
+
+    this.mapCoverageSelectCountryMode = false;
 
     this.mapCoverageDrawMode = false;
 
@@ -1123,6 +1128,7 @@ export default class Catalogue extends Vue {
       this.initMapView();
       return;
     }
+    this.mapCoverageSelectCountryMode = true;
 
     // eslint-disable-next-line
     const coords = this.countries
@@ -1149,6 +1155,9 @@ export default class Catalogue extends Vue {
     if (this.mapCoverageSelectionRectangle) this.mapCoverageSelectionRectangle.removeFrom(this.mapCoverage);
     this.mapCoverageSelectionRectangle = null;
     this.mapCoverageSelectionIsDrawn = false;
+
+    this.mapCoverageSelectCountryMode = false;
+    this.mapCoverageDrawMode = false;
   }
 
   onSetArea(): void {
@@ -1175,16 +1184,20 @@ export default class Catalogue extends Vue {
     this.filters.mapCoverageSelectionBBox = '';
 
     this.countrySelected = '';
+
+    this.mapCoverageSelectCountryMode = false;
+    this.mapCoverageDrawMode = false;
   }
 
   onDrawArea(): void {
+    this.mapCoverageSelectCountryMode = false;
     this.mapCoverageDrawMode = true;
     this.mapCoverageSelectionRectangle = this.mapCoverage.editTools.startRectangle();
     this.mapCoverageSelectionRectangle.setStyle({ color: '#190AFF', fillColor: 'transparent' });
     this.mapCoverageSelectionRectangle.on('editable:vertex:dragend', () => {
       this.countrySelected = '';
       this.mapCoverageSelectionIsDrawn = true;
-      this.mapCoverageDrawMode = false;
+      // this.mapCoverageDrawMode = false;
       this.mapCoverage.fitBounds(this.mapCoverageSelectionRectangle.getBounds(), { padding: [50, 50] });
     });
   }
