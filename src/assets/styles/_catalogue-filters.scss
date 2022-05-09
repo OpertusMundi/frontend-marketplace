@@ -127,14 +127,17 @@ input[type="checkbox"]:checked {
 .pill {
     width: auto;
     // background: #190AFF;
-    background: $secondColor;
-    color: #fff;
+    border: solid 1px $secondColor;
+    color: $secondColor;
+    background: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 5px 10px 5px 10px;
+    padding: 5px 10px;
     margin: 5px;
     border-radius: 7px;
+    font-size: em(16);
+    font-weight: 500;
 }
 
 .close-button {
