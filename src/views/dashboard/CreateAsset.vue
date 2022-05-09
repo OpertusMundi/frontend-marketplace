@@ -416,7 +416,7 @@ export default class CreateAsset extends Vue {
         additionalResources: [],
         conformity: EnumConformity.NOT_EVALUATED,
         contractTemplateKey: '',
-        contractTemplateType: EnumContractType.MASTER_CONTRACT,
+        contractTemplateType: this.assetMainType as string === 'OPEN' ? 'OPEN_DATASET' : EnumContractType.MASTER_CONTRACT,
         contractAnnexes: [],
         creationDate: '',
         dateEnd: '',
@@ -945,7 +945,7 @@ export default class CreateAsset extends Vue {
         // remove empty responsible parties
         responsibleParty: this.asset.responsibleParty ? this.asset.responsibleParty.filter((x) => x.role) : null,
         deliveryMethod: EnumDeliveryMethod.DIGITAL_PLATFORM,
-        contractTemplateKey: '993ae6c5-6dc2-4f53-bbc0-b7d7ed2c7b03', // todo
+        // contractTemplateKey: '',
       };
     }
 
