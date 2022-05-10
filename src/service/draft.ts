@@ -294,6 +294,35 @@ export default class DraftAssetApi extends Api {
   }
 
   /**
+   * Upload contract
+   *
+   * Uploads a contract file and links it to selected draft instance. On success, an updated draft is returned. If the record is locked by another user, the operation will fail.
+   *
+   * @param key Draft unique key
+   * @param resource File to upload
+   * @param lock if the record must remain locked after a successful save operation. If a lock already exists and belongs to another user, an error is returned.
+   */
+  public async uploadContract(
+    key: string, resource: File, lock = false, config?: AxiosRequestConfig,
+  ): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/contract?lock=${lock}`;
+
+    const form = new FormData();
+
+    form.append('file', resource);
+
+    return this.post<FormData, ServerResponse<AssetDraft>>(url, form, {
+      ...config,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
+
+      return data;
+    });
+  }
+
+  /**
    * Upload additional file resource
    *
    * If the record is locked by another user, the operation will fail.

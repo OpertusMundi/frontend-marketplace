@@ -55,8 +55,14 @@
               <div v-if="contractModeOption === 'create_new'">
                 <router-link class="btn btn--std btn--blue" target='_blank' to="/dashboard/contracts/create-template">CREATE NEW CONTRACT TEMPLATE</router-link>
               </div>
-              <div v-if="contractModeOption === 'upload_own'">
-                upload own
+              <div v-if="contractModeOption === 'upload_own'" class="d-flex flex-column align-items-start">
+                <p>You can upload the pdf file of your own contract.</p>
+                <div v-if="customContractToUploadLocal" class="custom-contract-label">
+                  {{ customContractToUploadLocal.name }}
+                  <div @click="removeCustomContract"><font-awesome-icon icon="times" /></div>
+                </div>
+                <button @click="openFileUploadWindow" class="btn btn--std btn--blue" :disabled="customContractToUploadLocal">upload file</button>
+                <input hidden id="contract-upload-own" type="file" @change="onOwnContractFileSelection($event)" />
               </div>
             </div>
             <div class="col-sm-4">
@@ -100,6 +106,7 @@ import { required } from 'vee-validate/dist/rules';
 import ContractApi from '@/service/provider-contract';
 import { Sorting } from '@/model/request';
 import { EnumProviderContractSortField, ProviderTemplateContract } from '@/model/provider-contract';
+import { EnumContractType } from '@/model/contract';
 import moment from 'moment';
 
 extend('required', required);
@@ -112,7 +119,11 @@ extend('required', required);
   },
 })
 export default class Contract extends Vue {
+  @Prop({ required: true }) private contractTemplateType!: EnumContractType;
+
   @Prop({ required: true }) private contractTemplateKey!: string;
+
+  @Prop({ required: true }) private customContractToUpload!: File | null;
 
   contractApi: ContractApi;
 
@@ -121,6 +132,10 @@ export default class Contract extends Vue {
   selectedContractTemplateIndex: number | null;
 
   contractModeOption: string;
+
+  contractTemplateTypeLocal: EnumContractType;
+
+  customContractToUploadLocal: File | null;
 
   constructor() {
     super();
@@ -131,6 +146,10 @@ export default class Contract extends Vue {
 
     this.contractTemplates = [];
     this.selectedContractTemplateIndex = null;
+
+    this.contractTemplateTypeLocal = this.contractTemplateType;
+
+    this.customContractToUploadLocal = this.customContractToUpload;
 
     console.log('c', this.contractTemplateKey);
     if (this.contractTemplateKey) {
@@ -144,6 +163,9 @@ export default class Contract extends Vue {
 
   @Watch('contractModeOption', { immediate: true })
   onContractModeOptionChange(option: string): void {
+    this.selectedContractTemplateIndex = null;
+    this.customContractToUploadLocal = null;
+
     if (option === 'select_existing') {
       this.loadContractTemplates();
     }
@@ -153,6 +175,24 @@ export default class Contract extends Vue {
     if (option === 'upload_own') {
       console.log('upload own');
     }
+  }
+
+  @Watch('selectedContractTemplateIndex')
+  onSelectedContractTemplateChange(i: number): void {
+    const key = i !== null ? this.contractTemplates[i].key : '';
+    this.$emit('update:contractTemplateKey', key);
+  }
+
+  @Watch('contractTemplateTypeLocal')
+  onContractTemplateTypeLocalChange(contractTemplateTypeLocal: EnumContractType): void {
+    this.$emit('update:contractTemplateType', contractTemplateTypeLocal);
+  }
+
+  @Watch('customContractToUploadLocal', { deep: true })
+  onCustomContractToUploadLocalChange(): void {
+    if (this.customContractToUploadLocal) this.selectedContractTemplateIndex = null;
+    this.contractTemplateTypeLocal = this.customContractToUploadLocal ? EnumContractType.UPLOADED_CONTRACT : EnumContractType.MASTER_CONTRACT;
+    this.$emit('update:customContractToUpload', this.customContractToUploadLocal);
   }
 
   loadContractTemplates(): void {
@@ -182,10 +222,23 @@ export default class Contract extends Vue {
     this.$emit('update:contractTemplateKey', this.contractTemplates[i].key);
   }
 
-  @Watch('selectedContractTemplateIndex')
-  onSelectedContractTemplateChange(i: number): void {
-    const key = i !== null ? this.contractTemplates[i].key : '';
-    this.$emit('update:contractTemplateKey', key);
+  onOwnContractFileSelection(e: Event): void {
+    if (!e || !e.target || !(e.target as HTMLInputElement).files || !(e.target as HTMLInputElement).files?.length) return;
+
+    // eslint-disable-next-line
+    const file = (e.target as HTMLInputElement).files![0];
+    console.log(file);
+
+    this.customContractToUploadLocal = file;
+  }
+
+  openFileUploadWindow(): void {
+    // eslint-disable-next-line
+    document.getElementById('contract-upload-own')!.click();
+  }
+
+  removeCustomContract(): void {
+    this.customContractToUploadLocal = null;
   }
 
   formatDate(date: string): string {
@@ -195,6 +248,7 @@ export default class Contract extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
 
   // todo: move to external css file
   .contract-template-card {
@@ -225,6 +279,27 @@ export default class Contract extends Vue {
 
     &__details {
       font-size: .7em;
+    }
+  }
+
+  .custom-contract-label {
+    width: auto;
+    // background: #190AFF;
+    border: solid 1px $secondColor;
+    color: $secondColor;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    margin: 0 5px 20px 5px;
+    border-radius: 7px;
+    font-size: em(16);
+    font-weight: 500;
+
+    > div {
+      cursor: pointer;
+      margin-left: 5px;
     }
   }
 </style>

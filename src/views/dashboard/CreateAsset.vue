@@ -77,7 +77,7 @@
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
                 <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
-                <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+                <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
                 <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
               </template>
@@ -95,7 +95,7 @@
                 <api-metadata ref="step3" :asset="selectedPublishedAssetForApiCreation" :additionalResourcesToUpload.sync="additionalResourcesToUpload" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 3 && selectedPublishedAssetForApiCreation != null"></api-metadata>
                 <metadata ref="step3" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-else-if="currentStep === 3 && selectedPublishedAssetForApiCreation == null"></metadata>
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
-                <contract ref="step5" :contractTemplateKey.sync="asset.contractTemplateKey" v-if="currentStep === 5"></contract>
+                <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
                 <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
               </template>
@@ -159,6 +159,7 @@ import {
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
 import { AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand } from '@/model/asset';
+import { EnumContractType } from '@/model/contract';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
 import Metadata from '@/components/Assets/Create/Metadata.vue';
@@ -175,7 +176,6 @@ import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricin
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
 import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
-import { EnumContractType } from '@/model/contract';
 
 Vue.use(VueCardFormat);
 
@@ -262,6 +262,8 @@ export default class CreateAsset extends Vue {
 
   currentStep = 1;
 
+  customContractToUpload: File | null;
+
   additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand; file: File }[];
 
   fileToUpload: FileToUpload;
@@ -272,6 +274,8 @@ export default class CreateAsset extends Vue {
 
   errors: any;
 
+  uploadConfig: AxiosRequestConfig;
+
   constructor() {
     super();
 
@@ -281,6 +285,8 @@ export default class CreateAsset extends Vue {
     this.modalToShow = '';
 
     this.apiCreationType = '';
+
+    this.customContractToUpload = null;
 
     this.additionalResourcesToUpload = [];
 
@@ -326,6 +332,15 @@ export default class CreateAsset extends Vue {
 
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
+
+    this.uploadConfig = {
+      onUploadProgress: (progressEvent: any): void => {
+        const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+        if (totalLength !== null) {
+          this.showUploadingProgress(Math.round((progressEvent.loaded * 100) / totalLength));
+        }
+      },
+    };
   }
 
   /**
@@ -781,6 +796,22 @@ export default class CreateAsset extends Vue {
     }
   }
 
+  async uploadCustomContract(draftAssetKey: string, config: AxiosRequestConfig): Promise<CatalogueItemCommand> {
+    this.showUploadingMessage(false, 'Your contract is being uploaded');
+
+    if (!this.customContractToUpload) return {} as CatalogueItemCommand;
+    const uploadContractResponse = await this.draftAssetApi.uploadContract(draftAssetKey, this.customContractToUpload, false, config);
+
+    if (!uploadContractResponse.success) {
+      console.log('err', uploadContractResponse);
+      this.showUploadingMessage(true, 'An error occurred');
+      throw new Error('error');
+    }
+
+    const asset = uploadContractResponse.result.command;
+    return asset;
+  }
+
   async uploadAdditionalResources(draftAssetKey: string, config: AxiosRequestConfig): Promise<CatalogueItemCommand> {
     this.showUploadingMessage(false, 'Your additional metadata resources are being uploaded');
 
@@ -929,6 +960,9 @@ export default class CreateAsset extends Vue {
         return;
       }
 
+      // bug (todo: important)
+      if (this.customContractToUpload) this.asset = await this.uploadCustomContract(draftAsset.key, this.uploadConfig);
+
       this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: (this.asset as CatalogueItemCommand).pricingModels } };
       await this.submitAsset(draftAsset.key);
     } catch (err) {
@@ -980,18 +1014,11 @@ export default class CreateAsset extends Vue {
         return;
       }
 
-      const uploadConfig: AxiosRequestConfig = {
-        onUploadProgress: (progressEvent: any): void => {
-          const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
-          if (totalLength !== null) {
-            this.showUploadingProgress(Math.round((progressEvent.loaded * 100) / totalLength));
-          }
-        },
-      };
+      if (this.customContractToUpload) this.asset = await this.uploadCustomContract(draftAsset.key, this.uploadConfig);
 
-      if (this.additionalResourcesToUpload.length) this.asset = await this.uploadAdditionalResources(draftAsset.key, uploadConfig);
+      if (this.additionalResourcesToUpload.length) this.asset = await this.uploadAdditionalResources(draftAsset.key, this.uploadConfig);
 
-      if (this.fileToUpload.isFileSelected) this.asset = await this.uploadResource(draftAsset.key, uploadConfig);
+      if (this.fileToUpload.isFileSelected) this.asset = await this.uploadResource(draftAsset.key, this.uploadConfig);
 
       if (this.selectedPublishedFileForDataFileCreation) this.asset = await this.addResourceFromFileSystem(draftAsset.key);
 
