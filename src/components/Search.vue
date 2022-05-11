@@ -53,31 +53,25 @@
         <li class="no_results"><i>No results found for your query</i></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showRecent">
-        <li>
-          <a href="#"
-            ><h5>Administrative boundaries in Greece</h5>
-            <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a
+        <template v-if="!$store.getters.isAuthenticated"><li class="no_results"><i>Login to view your recent searches</i></li></template>
+        <template v-else>
+          <li
+            v-for="recentSearch in $store.getters.getProfile.recentSearches"
+            :key="recentSearch"
           >
-        </li>
-        <li>
-          <a href="#"
-            ><h5>POIs in Luxembourg</h5>
-            <span>POI, Points of Interest, Luxembourg, OpenStreetMap</span></a
-          >
-        </li>
-        <li>
-          <a href="#"
-            ><h5>Athens road network WFS</h5>
-            <span>Roads, Street names, Athens, Greece, WFS</span></a
-          >
-        </li>
+            <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(recentSearch)">
+              <h5>{{ recentSearch }}</h5>
+              <!-- <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a -->
+            </a>
+          </li>
+        </template>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showPopular">
         <li
           v-for="popularTerm in popularTerms"
           :key="popularTerm.term"
         >
-          <a href="#" @click.prevent="selectPopularTerm(popularTerm.term)">
+          <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(popularTerm.term)">
             <h5>{{ popularTerm.term }}</h5>
             <!-- <span>{{ popularTerm.amount }} {{ popularTerm.amount === 1 ? 'search' : 'searches' }}</span> -->
           </a>
@@ -230,8 +224,8 @@ export default class Search extends Vue {
   //   }
   // }
 
-  selectPopularTerm(popularTerm: string): void {
-    this.$router.push({ name: 'Catalogue', params: { termShortcut: popularTerm } });
+  selectRecentSearchOrPopularTerm(term: string): void {
+    this.$router.push({ name: 'Catalogue', params: { termShortcut: term } });
   }
 
   searchAssets(): void {
