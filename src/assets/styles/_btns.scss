@@ -105,20 +105,28 @@
     }
 
     &--checkbox-type {
+        background: #fff;
+        width: auto;
         border: solid 1px $darkColor;
         border-radius: 5px;
         color: $darkColor;
         padding: 5px 10px;
-        margin-right: 10px;
+        margin: 5px;
         font-size: em(16);
         font-weight: 500;
         cursor: pointer;
+        display: flex;
+        align-items: center;
         &:last-child {
             margin-right: 0;
         }
         &--selected {
             border: solid 1px $secondColor;
             color: $secondColor;
+            cursor: default;
+        }
+        .svg-container {
+            margin-left: 6px;
         }
     }
 

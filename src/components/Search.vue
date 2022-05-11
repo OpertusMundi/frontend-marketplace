@@ -9,7 +9,7 @@
         <input type="text" name="query" autocomplete="off" v-model="query" id="" placeholder="Search for Geospatial Assets" class="asset_search__upper__input" @focus="showSearchResults" @input="debouncedInput" />
       </form>
       <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading"><img src="@/assets/images/icons/search_black.svg" alt="" /></div>
-      <div class="asset_search__upper__icon" v-if="searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
+      <div class="asset_search__upper__icon" v-if="query && searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
       <div class="asset_search__upper__icon" v-if="loading"><div class="loader_icon"></div></div>
     </div>
     <div class="asset_search__resultscont" v-if="searchResultsActive">
@@ -45,39 +45,33 @@
         <li v-for="item in queryResults" :key="item.id">
           <router-link :to="`/catalogue/${item.id}`"
             ><h5>{{ item.title }}</h5>
-            <span>Country: Greece, Language: {{ item.language }}, Price: {{ showItemPrice(item) }}</span></router-link
-          >
+            <span>Country: Greece, Language: {{ item.language }}, Price: {{ showItemPrice(item) }}</span>
+          </router-link>
         </li>
       </ul>
-      <ul class="asset_search__resultscont__results" v-if="!queryHasResults && !showRecent && !showPopular">
+      <ul class="asset_search__resultscont__results" v-if="query && !queryHasResults && !showRecent && !showPopular">
         <li class="no_results"><i>No results found for your query</i></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showRecent">
-        <li>
-          <a href="#"
-            ><h5>Administrative boundaries in Greece</h5>
-            <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a
+        <template v-if="!$store.getters.isAuthenticated"><li class="no_results"><i><router-link to="/signin" class="login_link">Login</router-link> to view your recent searches</i></li></template>
+        <template v-else>
+          <li
+            v-for="recentSearch in getRecentSearches()"
+            :key="recentSearch"
           >
-        </li>
-        <li>
-          <a href="#"
-            ><h5>POIs in Luxembourg</h5>
-            <span>POI, Points of Interest, Luxembourg, OpenStreetMap</span></a
-          >
-        </li>
-        <li>
-          <a href="#"
-            ><h5>Athens road network WFS</h5>
-            <span>Roads, Street names, Athens, Greece, WFS</span></a
-          >
-        </li>
+            <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(recentSearch)">
+              <h5>{{ recentSearch }}</h5>
+              <!-- <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a -->
+            </a>
+          </li>
+        </template>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showPopular">
         <li
           v-for="popularTerm in popularTerms"
           :key="popularTerm.term"
         >
-          <a href="#" @click.prevent="selectPopularTerm(popularTerm.term)">
+          <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(popularTerm.term)">
             <h5>{{ popularTerm.term }}</h5>
             <!-- <span>{{ popularTerm.amount }} {{ popularTerm.amount === 1 ? 'search' : 'searches' }}</span> -->
           </a>
@@ -107,12 +101,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import AnalyticsApi from '@/service/analytics';
 import CatalogueApi from '@/service/catalogue';
+import ProfileApi from '@/service/profile';
 import { CatalogueQueryResponse, CatalogueQuery, CatalogueItem } from '@/model';
 import { AxiosError } from 'axios';
 import { Debounce } from 'vue-debounce-decorator';
+import store from '@/store';
 
 @Component
 export default class Search extends Vue {
@@ -133,6 +129,8 @@ export default class Search extends Vue {
   analyticsApi: AnalyticsApi;
 
   catalogueApi: CatalogueApi;
+
+  profileApi: ProfileApi;
 
   popularTerms: { term: string, amount: number }[] = [];
 
@@ -156,9 +154,12 @@ export default class Search extends Vue {
 
     this.analyticsApi = new AnalyticsApi();
     this.catalogueApi = new CatalogueApi();
+    this.profileApi = new ProfileApi();
   }
 
   created(): void {
+    this.updateProfile();
+
     this.analyticsApi.getMostPopularTerms().then((response) => {
       if (response.success) {
         this.popularTerms = response.result
@@ -173,6 +174,13 @@ export default class Search extends Vue {
         console.log('err', response);
       }
     });
+  }
+
+  @Watch('query')
+  onQueryChange(query: string): void {
+    if (!query) return;
+    this.showRecent = false;
+    this.showPopular = false;
   }
 
   clearInput(): void {
@@ -230,8 +238,12 @@ export default class Search extends Vue {
   //   }
   // }
 
-  selectPopularTerm(popularTerm: string): void {
-    this.$router.push({ name: 'Catalogue', params: { termShortcut: popularTerm } });
+  getRecentSearches(): string[] {
+    return [...new Set(this.$store.getters.getProfile.recentSearches)] as string[];
+  }
+
+  selectRecentSearchOrPopularTerm(term: string): void {
+    this.$router.push({ name: 'Catalogue', params: { termShortcut: term } });
   }
 
   searchAssets(): void {
@@ -252,8 +264,10 @@ export default class Search extends Vue {
           this.showRecent = false;
           this.showPopular = false;
         } else {
-          this.queryHasResults = true;
+          // this.queryHasResults = true;
+          this.queryHasResults = !!queryResponse.result.items.length;
           this.queryResults = queryResponse.result.items;
+          this.updateProfile();
         }
         if (!this.searchResultsActive) {
           setTimeout(() => {
@@ -266,6 +280,14 @@ export default class Search extends Vue {
         console.log(error);
         this.loading = false;
       });
+  }
+
+  // used to reload recent searches (they are included inside profile)
+  updateProfile(): void {
+    this.profileApi.getProfile().then((response) => {
+      if (!response.success) return;
+      store.commit('setUserData', response.result);
+    });
   }
 }
 </script>

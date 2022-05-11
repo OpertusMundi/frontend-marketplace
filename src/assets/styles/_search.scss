@@ -145,6 +145,13 @@
                 }
                 &.no_results {
                     padding: 15px;
+
+                    .login_link {
+                        display: inline;
+                        padding: 0;
+                        color: $secondColor;
+                        background: transparent;
+                    }
                 }
                 a {
                     display: block;

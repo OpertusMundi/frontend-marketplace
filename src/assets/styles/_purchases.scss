@@ -143,8 +143,11 @@
                 @media(max-width: 576px) {  
                     display: none;
                 }
-                span {
+                span:nth-child(2) {
                     margin-left: 20px;
+                }
+                &__ref-num {
+                    font-weight: 500;
                 }
             }
         }

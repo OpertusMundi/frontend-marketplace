@@ -21,7 +21,10 @@
           <div class="purchase_card__bottom__left__info">
             <span><strong>Version: </strong>1.0.1</span><span><strong>Last updated: </strong>20 Nov. 2020 </span>
           </div> -->
-          <div class="purchase_card__bottom__left__info">{{ formatDate(purchase.createdOn) }}</div>
+          <div class="purchase_card__bottom__left__info">
+            <span>{{ formatDate(purchase.createdOn) }}</span>
+            <span>Order <span class="purchase_card__bottom__left__info__ref-num">#{{ purchase.referenceNumber }}</span></span>
+          </div>
         </div>
         <div class="purchase_card__bottom__right">
           <!-- <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt=""> -->

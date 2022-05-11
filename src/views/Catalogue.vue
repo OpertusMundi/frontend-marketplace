@@ -4,17 +4,17 @@
       <div class="assets__head">
         <h1>Assets</h1>
       </div>
-      <div class="d-flex space-between">
+      <div class="d-flex justify-content-start">
         <div class="form-group catalogue_search">
           <input v-model="catalogQuery.query" v-on:keyup.enter="searchTextOnly" placeholder="Search in Assets" type="text" class="form-group__text" name="search_assets" id="search_assets">
           <div class="catalogue_search__button" @click="searchTextOnly"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
         </div>
-        <div class="d-inline-flex align-items-center">
+        <!-- <div class="d-inline-flex align-items-center">
           <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.isOpen}" @click="onToggleFilterShortcut('OPEN')">Open</div>
           <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'VECTOR').isChecked}" @click="onToggleFilterShortcut('VECTOR')">Vector</div>
           <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'RASTER').isChecked}" @click="onToggleFilterShortcut('RASTER')">Raster</div>
           <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'SERVICE').isChecked}" @click="onToggleFilterShortcut('SERVICE')">APIs</div>
-        </div>
+        </div> -->
       </div>
 
       <!-- FILTERS MENU TAB-BAR -->
@@ -379,11 +379,45 @@
         </div>
       </div>
 
-      <div class="assets__top-info">
-        <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
+      <div class="assets__top-info d-flex">
+        <!-- FILTER SHORTCUTS -->
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.isOpen}" @click="filters.isOpen ? '' : onToggleFilterShortcut('OPEN')">
+          Open license
+          <div v-if="!filters.isOpen" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
+          <div v-else class="close-button" @click.stop="onToggleFilterShortcut('OPEN')"><font-awesome-icon icon="times" /></div>
+        </div>
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'VECTOR').isChecked}" @click="filters.types.find((x) => x.id === 'VECTOR').isChecked ? '' : onToggleFilterShortcut('VECTOR')">
+          Vector
+          <div v-if="!filters.types.find((x) => x.id === 'VECTOR').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
+          <div v-else class="close-button" @click.stop="onToggleFilterShortcut('VECTOR')"><font-awesome-icon icon="times" /></div>
+        </div>
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'RASTER').isChecked}" @click="filters.types.find((x) => x.id === 'RASTER').isChecked ? '' : onToggleFilterShortcut('RASTER')">
+          Raster
+          <div v-if="!filters.types.find((x) => x.id === 'RASTER').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
+          <div v-else class="close-button" @click.stop="onToggleFilterShortcut('RASTER')"><font-awesome-icon icon="times" /></div>
+        </div>
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'SERVICE').isChecked}" @click="filters.types.find((x) => x.id === 'SERVICE').isChecked ? '' : onToggleFilterShortcut('SERVICE')">
+          APIs
+          <div v-if="!filters.types.find((x) => x.id === 'SERVICE').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
+          <div v-else class="close-button" @click.stop="onToggleFilterShortcut('SERVICE')"><font-awesome-icon icon="times" /></div>
+        </div>
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': getSelectedFilters(true).some(x => x.label === '10€ - 100€')}" @click="getSelectedFilters(true).some(x => x.label === '10€ - 100€') ? '' : onToggleFilterShortcut('PRICING')">
+          10€ - 100€
+          <div v-if="!getSelectedFilters(true).some(x => x.label === '10€ - 100€')" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
+          <div v-else class="close-button" @click.stop="onToggleFilterShortcut('PRICING')"><font-awesome-icon icon="times" /></div>
+        </div>
+
+        <div v-for="filter in getSelectedFilters(true)" :key="filter.label">
+          <div class="pill" v-if="!isFilterPillAlreadyShownInShortcut(filter)">
+            {{ filter.label }}
+            <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
+          </div>
+        </div>
+
+        <!-- <div class="pill" v-for="filter in getSelectedFilters(true)" :key="filter.label">
           {{ filter.label }}
           <div class="close-button" @click="removeFilter(true, filter.category, filter.filterName)"><font-awesome-icon icon="times" /></div>
-        </div>
+        </div> -->
       </div>
 
       <div class="filters mt-xs-30">
@@ -774,6 +808,10 @@ export default class Catalogue extends Vue {
       case 'OPEN':
         this.filters.isOpen = !this.filters.isOpen;
         break;
+      case 'PRICING':
+        this.filters.priceMin = this.filters.priceMin === 10 ? null : 10;
+        this.filters.priceMax = this.filters.priceMax === 100 ? null : 100;
+        break;
       default:
     }
 
@@ -1036,6 +1074,16 @@ export default class Catalogue extends Vue {
     }
 
     return result;
+  }
+
+  isFilterPillAlreadyShownInShortcut(filter: { label: string, category: string, filterName?: string }): boolean {
+    if (filter.category === 'type' && filter.filterName === EnumAssetType.VECTOR) return true;
+    if (filter.category === 'type' && filter.filterName === EnumAssetType.RASTER) return true;
+    if (filter.category === 'type' && filter.filterName === EnumAssetType.SERVICE) return true;
+    if (filter.category === 'price' && filter.label === '10€ - 100€') return true;
+    if (filter.category === 'open') return true;
+
+    return false;
   }
 
   shownFormatCategories(): string[] {

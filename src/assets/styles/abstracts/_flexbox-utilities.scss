@@ -13,8 +13,16 @@
     flex-direction: row;
 }
 
+.align-items-start {
+    align-items: start;
+}
+
 .align-items-center {
     align-items: center;
+}
+
+.align-items-end {
+    align-items: end;
 }
 
 .align-self-start {
