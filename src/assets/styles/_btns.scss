@@ -123,6 +123,7 @@
         &--selected {
             border: solid 1px $secondColor;
             color: $secondColor;
+            cursor: default;
         }
         .svg-container {
             margin-left: 6px;
