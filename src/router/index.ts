@@ -287,12 +287,12 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "confirmemail" */ '../views/ConfirmEmail.vue'),
   },
   {
-    path: '/account/registration/success',
+    path: '/account/verify-email/success',
     name: 'RegistrationSuccess',
     component: (): Promise<any> => import(/* webpackChunkName: "registrationsuccess" */ '../views/RegistrationSuccess.vue'),
   },
   {
-    path: '/account/registration/failure',
+    path: '/account/verify-email/failure',
     name: 'RegistrationFailure',
     component: (): Promise<any> => import(/* webpackChunkName: "registrationfailure" */ '../views/RegistrationFailure.vue'),
   },
