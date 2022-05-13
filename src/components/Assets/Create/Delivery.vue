@@ -294,6 +294,15 @@ export default class Delivery extends Vue {
 
   @Watch('fileTopioDrive', { deep: true })
   onfileTopioDriveChange(fileTopioDrive: DraftApiFromFileCommand | null): void {
+    this.fileToUpload = {
+      isFileSelected: false,
+      file: {} as File,
+      fileName: '',
+      fileExtension: '',
+      crs: '',
+      encoding: '',
+    };
+
     this.$emit('update:selectedPublishedFileForDataFileCreation', fileTopioDrive);
     console.log('Emit file from storage to CreatAsset component topio drive => ', fileTopioDrive);
   }

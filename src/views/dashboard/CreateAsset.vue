@@ -79,7 +79,7 @@
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
-                <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'OPEN'">
@@ -87,7 +87,7 @@
                 <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
                 <!-- <delivery ref="step4" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></delivery> -->
                 <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></open-asset-delivery>
-                <review ref="step5" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
+                <review ref="step5" :accessToFileType="getAccessToFileType" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'API'">
@@ -97,7 +97,7 @@
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
-                <review ref="step7" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'SENTINEL_HUB'">
@@ -436,7 +436,7 @@ export default class CreateAsset extends Vue {
         creationDate: '',
         dateEnd: '',
         dateStart: '',
-        deliveryMethod: EnumDeliveryMethod.NONE,
+        deliveryMethod: this.assetMainType as string === 'OPEN' ? EnumDeliveryMethod.DIGITAL_PLATFORM : EnumDeliveryMethod.NONE,
         format: '',
         ingested: false,
         keywords: [],
@@ -713,6 +713,12 @@ export default class CreateAsset extends Vue {
 
   onCancelDraft(): void {
     this.$router.push('/dashboard/assets');
+  }
+
+  get getAccessToFileType(): string {
+    if (this.fileToUpload.isFileSelected) return 'Direct upload';
+    if (this.selectedPublishedFileForApiCreation || this.selectedPublishedFileForDataFileCreation) return 'topio Drive';
+    return '';
   }
 
   isSelectedFormatCompatibleWithFileExtension(): boolean {
