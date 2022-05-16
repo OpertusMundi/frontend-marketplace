@@ -1,6 +1,18 @@
 <template>
   <div class="wrapper">
     <div class="eo_explorer_page">
+      <div class="eo_explorer_page__header">
+        <div class="d-flex align-items-center">
+          <div @click="$router.go(-1)" class="eo_explorer_page__header__btn_back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11.06" height="15.144" viewBox="0 0 11.06 15.144"><path data-name="Path 13446" d="m10.102 1.154-7.75 6.429 7.75 6.4" fill="none" stroke="#333" stroke-width="3"/></svg>
+          </div>
+          <h1>{{ assetTitle }}</h1>
+        </div>
+        <div class="d-flex align-items-center">
+          <span v-if="fromPrice !== null" class="eo_explorer_page__header__price">from <h1>{{ fromPrice }}€/month</h1></span>
+          <button class="btn btn--std btn--blue ml-xs-10" @click="isSelectSentinelHubPlanModalOn = true">subscribe</button>
+        </div>
+      </div>
       <div class="container-fluid p-0">
         <div class="row">
           <div class="col-md-4">
@@ -56,6 +68,8 @@
         </div>
       </div>
     </div>
+
+    <select-sentinel-hub-plan v-if="isSelectSentinelHubPlanModalOn" @close="isSelectSentinelHubPlanModalOn = false" :assetId="assetId"></select-sentinel-hub-plan>
   </div>
 </template>
 
@@ -66,6 +80,7 @@ import * as L from 'leaflet';
 import 'leaflet-shades';
 import Datepicker from 'vuejs-datepicker';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
+import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse } from '@/model/sentinel-hub';
 import store from '@/store';
@@ -83,12 +98,21 @@ interface RectangleEditable extends L.Rectangle {
   components: {
     Datepicker,
     'eo-explorer-card': EOExplorerCard,
+    SelectSentinelHubPlan,
   },
 })
 export default class EOExplorer extends Vue {
   sentinelHubApi = new SentinelHubApi();
 
+  assetId = '';
+
+  assetTitle = '';
+
   collectionId = '';
+
+  fromPrice: number | null = null;
+
+  isSelectSentinelHubPlanModalOn = false;
 
   map: L.Map = {} as L.Map;
 
@@ -113,7 +137,18 @@ export default class EOExplorer extends Vue {
   mapShades: any | null = null;
 
   created(): void {
-    this.collectionId = this.$route.params.collectionId;
+    const { assetId, assetTitle, collectionId } = this.$route.query;
+
+    this.assetId = assetId as string;
+    this.assetTitle = assetTitle as string;
+    this.collectionId = collectionId as string;
+
+    this.sentinelHubApi.getSubscriptionPlans().then((response) => {
+      if (!response.success) return;
+      const subscriptionPlans = response.result;
+
+      this.fromPrice = subscriptionPlans.reduce((p, c) => (c.billing.monthly < p ? c.billing.monthly : p), Infinity);
+    });
   }
 
   mounted(): void {

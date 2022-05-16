@@ -2,9 +2,34 @@
   background: $lightBgColor;
   padding-top: $header_height;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    background: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &__btn_back {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    &__price {
+      color: $secondColor;
+
+      h1 {
+        display: inline;
+      }
+    }
+  }
   
   >.container-fluid {
-    height: 100%;
+    height: 0;
+    width: 100%;
+    flex-grow: 1;
     padding: 0;
 
     >.row {
@@ -43,7 +68,7 @@
 
   .collection_name {
     color: $secondColor;
-    font-weight: 300;
+    font-weight: 700;
     font-size: em(20);
   }
 }

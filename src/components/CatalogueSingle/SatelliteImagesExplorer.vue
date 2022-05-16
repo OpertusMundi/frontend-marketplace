@@ -6,7 +6,12 @@
     </div>
     <div class="asset__section__content">
       <div class="asset__section__content__inner asset__section__content__inner--no_min_height d-flex justify-content-center">
-        <router-link :to="`/eo-explorer/${collectionId}`" class="btn btn--std btn--blue">open explorer</router-link>
+        <button
+          @click="$store.getters.isAuthenticated ? openEOExplorer() : $emit('showModalLoginToOpenEOExplorer')"
+          class="btn btn--std btn--blue"
+        >
+          open explorer
+        </button>
       </div>
     </div>
   </section>
@@ -16,7 +21,15 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class SatelliteImagesExplorer extends Vue {
+  @Prop({ required: true }) assetId!: string;
+
+  @Prop({ required: true }) assetTitle!: string;
+
   @Prop({ required: true }) collectionId!: string;
+
+  openEOExplorer(): void {
+    this.$router.push(`/eo-explorer?assetId=${this.assetId}&assetTitle=${this.assetTitle}&collectionId=${this.collectionId}`);
+  }
 }
 </script>
 <style lang="scss">
