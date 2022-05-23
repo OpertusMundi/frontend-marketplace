@@ -75,6 +75,10 @@
     font-weight: 700;
     font-size: em(20);
   }
+
+  .metadata-property {
+    font-size: em(16);
+  }
 }
 
 .eo_card {
@@ -113,4 +117,8 @@
       text-transform: uppercase;
     }
   }
+}
+
+.break-word-anywhere {
+  overflow-wrap: anywhere;
 }

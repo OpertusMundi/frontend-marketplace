@@ -16,9 +16,9 @@
       <div class="container-fluid p-0">
         <div class="row">
           <div class="col-md-4">
-            <template v-if="!searchResults">
-              <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
+            <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
 
+            <template v-if="!searchResults">
               <h4 class="mt-xs-20 mb-xs-10">Date Selection</h4>
               <div class="d-flex space-between">
                 <div>
@@ -72,7 +72,7 @@
                 <button class="btn btn--std btn--blue" @click="searchCollection()">SEARCH</button>
               </div>
             </template>
-            <template v-else>
+            <template v-if="searchResults && !selectedFeatureToShowMetadata">
               <a href="" @click.prevent="resetResults" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
               <div class="d-flex">
                 <div class="pill pill--blue" v-for="filter in getSelectedFilters()" :key="filter.id">
@@ -81,7 +81,16 @@
                 </div>
               </div>
               <hr>
-              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature"></eo-explorer-card>
+              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature" @viewAllMetadata="selectedFeatureToShowMetadata = $event"></eo-explorer-card>
+            </template>
+            <template v-if="selectedFeatureToShowMetadata">
+              <a href="" @click.prevent="selectedFeatureToShowMetadata = ''" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+              <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
+              <hr>
+              <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
+              <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
+                <span class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
+              </div>
             </template>
           </div>
           <div class="col-md-8">
@@ -139,6 +148,8 @@ export default class EOExplorer extends Vue {
   fromPrice: number | null = null;
 
   isAdvancedFiltersShown = false;
+
+  selectedFeatureToShowMetadata = '';
 
   isSelectSentinelHubPlanModalOn = false;
 
@@ -395,6 +406,12 @@ export default class EOExplorer extends Vue {
     this.searchResults = null;
     this.featureGroup.clearLayers();
     (this.bboxSelectionRect as RectangleEditable).enableEdit();
+  }
+
+  formatMetadataProperty(property: string): string {
+    if (property === 'datetime') return 'DATE & TIME';
+
+    return property.split('_').join(' ').toUpperCase();
   }
 }
 </script>
