@@ -164,7 +164,10 @@ export default class ApiDetails extends Vue {
     this.assetLocal = this.asset;
     this.serviceTypeLocal = this.serviceType;
 
-    this.creationType = this.apiCreationType;
+    // this.creationType = this.apiCreationType;
+    this.creationType = this.asset.parentDataSourceId ? CreationType.PUBLISHED_ASSET : '' as CreationType;
+    console.log('assssssset', this.asset);
+    console.log('apicreationtype', this.apiCreationType);
 
     this.publishedAssets = [];
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
