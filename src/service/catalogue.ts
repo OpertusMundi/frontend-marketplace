@@ -1,9 +1,7 @@
 import Api from '@/service/api';
 import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse, SimpleResponse } from '@/model/response';
-import {
-  CatalogueQuery, CatalogueQueryResponse, CatalogueItem, QueryResultPage,
-} from '@/model';
+import { CatalogueQueryResponse, CatalogueItem, QueryResultPage } from '@/model';
 import { AxiosResponse } from 'axios';
 import { Provider } from '@/model/account';
 import {
@@ -26,30 +24,19 @@ export default class CatalogueApi extends Api {
     super({ withCredentials: true });
   }
 
-  public async find(query: string | CatalogueQuery, page = 0, size = 10): Promise<CatalogueQueryResponse> {
-    const data: CatalogueQuery = typeof query === 'string' ? { query, page, size } : query;
+  public async find(query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
+    const baseUrl = '/action/catalogue';
 
-    const params = Object.keys(data).map((k) => `${k}=${data[k]}`);
-
-    const url = `/action/catalogue?${params.join('&')}`;
-
-    return this.get<CatalogueQueryResponseInternal>(url)
-      .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {
-        const { data: serverResponse } = response;
-
-        // Inject publishers
-        if (serverResponse.success) {
-          serverResponse.result.items = serverResponse.result.items.map((item) => ({
-            ...item,
-            publisher: serverResponse.publishers[item.publisherId],
-          }));
-        }
-
-        return serverResponse;
-      });
+    return this.findImpl(baseUrl, query);
   }
 
-  public async findAdvanced(query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
+  public async findAutocomplete(query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
+    const baseUrl = '/action/catalogue/autocomplete';
+
+    return this.findImpl(baseUrl, query);
+  }
+
+  private async findImpl(baseUrl: string, query: Partial<ElasticCatalogueQuery>): Promise<CatalogueQueryResponse> {
     // Set defaults
     const queryWithDefaults: Partial<ElasticCatalogueQuery> = {
       page: 0,
@@ -62,7 +49,7 @@ export default class CatalogueApi extends Api {
     const params = Object.keys(queryWithDefaults)
       .map((k) => `${k}=${Array.isArray(queryWithDefaults[k]) ? queryWithDefaults[k].join(',') : queryWithDefaults[k]}`);
 
-    const url = `/action/catalogue/advanced?${params.join('&')}`;
+    const url = `${baseUrl}?${params.join('&')}`;
 
     return this.get<CatalogueQueryResponseInternal>(url)
       .then((response: AxiosResponse<CatalogueQueryResponseInternal>) => {

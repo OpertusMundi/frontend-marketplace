@@ -255,7 +255,7 @@ export default class Search extends Vue {
     // this.queryResults = [];
     this.catalogQuery.query = this.query;
     this.catalogueApi
-      .findAdvanced({ text: this.query })
+      .find({ text: this.query })
       .then((queryResponse: CatalogueQueryResponse) => {
         this.showRecent = false;
         this.showPopular = false;

@@ -1462,7 +1462,7 @@ export default class Catalogue extends Vue {
       behavior: 'smooth',
     });
 
-    this.catalogueApi.findAdvanced(filterSet).then((advancedQueryResponse: CatalogueQueryResponse) => {
+    this.catalogueApi.find(filterSet).then((advancedQueryResponse: CatalogueQueryResponse) => {
       console.log('aqr', advancedQueryResponse);
       this.queryResults = advancedQueryResponse.result.items;
       this.queryResultsCount = advancedQueryResponse.result.count;
