@@ -43,10 +43,11 @@
       </ul>
       <ul class="asset_search__resultscont__results" v-if="queryHasResults">
         <li v-for="item in queryResults" :key="item.id">
-          <router-link :to="`/catalogue/${item.id}`"
-            ><h5>{{ item.title }}</h5>
-            <span>Country: Greece, Language: {{ item.language }}, Price: {{ showItemPrice(item) }}</span>
-          </router-link>
+          <!-- <router-link :to="`/catalogue/${item.id}`" [...] -->
+          <a class="cursor-pointer" @click.prevent="selectAsset(item.id)">
+            <h5>{{ item.title }}</h5>
+            <span>Language: {{ item.language }}, Price: {{ showItemPrice(item) }}</span>
+          </a>
         </li>
       </ul>
       <ul class="asset_search__resultscont__results" v-if="query && !queryHasResults && !showRecent && !showPopular">
@@ -242,6 +243,11 @@ export default class Search extends Vue {
     return [...new Set(this.$store.getters.getProfile.recentSearches)] as string[];
   }
 
+  selectAsset(id: string): void {
+    this.catalogueApi.find({ text: this.query }); // dummy call, only to add query text to recent searches
+    this.$router.push(`/catalogue/${id}`);
+  }
+
   selectRecentSearchOrPopularTerm(term: string): void {
     this.$router.push({ name: 'Catalogue', params: { termShortcut: term } });
   }
@@ -255,7 +261,7 @@ export default class Search extends Vue {
     // this.queryResults = [];
     this.catalogQuery.query = this.query;
     this.catalogueApi
-      .find({ text: this.query })
+      .findAutocomplete({ text: this.query })
       .then((queryResponse: CatalogueQueryResponse) => {
         this.showRecent = false;
         this.showPopular = false;
