@@ -138,6 +138,11 @@ input[type="checkbox"]:checked {
     border-radius: 7px;
     font-size: em(16);
     font-weight: 500;
+
+    &--blue {
+        background: $secondColor;
+        color: #fff;
+    }
 }
 
 .close-button {

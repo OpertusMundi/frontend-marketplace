@@ -6,15 +6,15 @@
         <div class="confirm-email__hero__content">
           <h1 class="confirm-email__hero__content__title">Welcome!</h1>
           <div class="confirm-email__hero__content__text">
-            <p>Your email has been confirmed</p>
-            <p class="mt-xs-50">
+            <p>Your email has been confirmed<br>Check your email and follow the instructions to login and set your password</p>
+            <!-- <p class="mt-xs-50">
               <router-link
                 :to="$store.getters.isAuthenticated ? '/dashboard' : {name: 'Login', params: { pathToNavigateAfterLogin: '/dashboard' }}"
                 class="btn btn--std btn--teal"
               >
                 GO TO DASHBOARD
               </router-link>
-            </p>
+            </p> -->
           </div>
       </div>
       </div>

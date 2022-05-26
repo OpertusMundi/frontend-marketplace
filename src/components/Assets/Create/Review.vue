@@ -57,56 +57,6 @@
               </div>
             </div>
 
-            <div class="dashboard__form__review__item" v-if="!asset.openDataset">
-              <div class="dashboard__form__review__item__head">
-                <h5>Pricing</h5>
-                <a href="#" @click.prevent="goToStep(4)">EDIT</a>
-              </div>
-              <div class="dashboard__form__review__item__body">
-                <ul>
-                  <!-- <li><strong>Pricing type:</strong>{{ priceModelType }}</li> -->
-                  <li v-for="(pricingModel, index) in asset.pricingModels" v-bind:key="`pricingmodel${index}`">
-                    <span v-if="pricingModel.type === 'FREE'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>FREE
-                    </span>
-                    <span v-if="pricingModel.type === 'FIXED'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€, {{ pricingModel.yearsOfUpdates }} {{ pricingModel.yearsOfUpdates == 1 ? 'year' : 'years' }} of updates
-                    </span>
-                    <span v-if="pricingModel.type === 'FIXED_PER_ROWS'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€, minimum rows: {{ pricingModel.minRows }} <br />
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-                    </span>
-                    <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br />
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-                    </span>
-                    <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per call<br />
-                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
-                    </span>
-                    <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per call<br />
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
-                    </span>
-                    <span v-if="pricingModel.type === 'PER_ROW_WITH_PREPAID'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per row<br />
-                      <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-                    </span>
-                    <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
-                      <strong>Pricing model {{ index + 1 }}:</strong>
-                      {{ pricingModel.price }}€ per row<br />
-                      <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
             <div class="dashboard__form__review__item" v-if="asset.openDataset">
               <div class="dashboard__form__review__item__head">
                 <h5>License</h5>
@@ -160,6 +110,79 @@
                       </div>
                     </template>
                   </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="dashboard__form__review__item">
+              <div class="dashboard__form__review__item__head">
+                <h5>Pricing</h5>
+                <a href="#" @click.prevent="goToStep(4)" v-if="!asset.openDataset">EDIT</a>
+              </div>
+              <div class="dashboard__form__review__item__body">
+                <ul>
+                  <li v-if="asset.openDataset"><span><strong>Pricing model:</strong>FREE</span></li>
+                  <template v-else>
+                    <li v-for="(pricingModel, index) in asset.pricingModels" v-bind:key="`pricingmodel${index}`">
+                      <span v-if="pricingModel.type === 'FREE'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>FREE
+                      </span>
+                      <span v-if="pricingModel.type === 'FIXED'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>{{ pricingModel.totalPriceExcludingTax }}€, {{ pricingModel.yearsOfUpdates }} {{ pricingModel.yearsOfUpdates == 1 ? 'year' : 'years' }} of updates
+                      </span>
+                      <span v-if="pricingModel.type === 'FIXED_PER_ROWS'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€, minimum rows: {{ pricingModel.minRows }} <br />
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                      </span>
+                      <span v-if="pricingModel.type === 'FIXED_FOR_POPULATION'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br />
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                      </span>
+                      <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€ per call<br />
+                        <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+                      </span>
+                      <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€ per call<br />
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+                      </span>
+                      <span v-if="pricingModel.type === 'PER_ROW_WITH_PREPAID'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€ per row<br />
+                        <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                      </span>
+                      <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
+                        <strong>Pricing model {{ index + 1 }}:</strong>
+                        {{ pricingModel.price }}€ per row<br />
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                      </span>
+                    </li>
+                  </template>
+                </ul>
+              </div>
+            </div>
+            <div class="dashboard__form__review__item">
+              <div class="dashboard__form__review__item__head">
+                <h5>Delivery</h5>
+                <a href="#" @click.prevent="asset.openDataset ? goToStep(4) : goToStep(3)">EDIT</a>
+              </div>
+              <div class="dashboard__form__review__item__body">
+                <ul>
+                  <li><span><strong>Mean of delivery:</strong>
+                    {{
+                      asset.deliveryMethod === 'DIGITAL_PLATFORM'
+                        ? 'Through the platform'
+                        : asset.deliveryMethod === 'DIGITAL_PROVIDER'
+                          ? 'Through digital provider'
+                          : asset.deliveryMethod === 'PHYSICAL_PROVIDER'
+                            ? 'Through physical provider' : ''
+                    }}</span>
+                  </li>
+                  <li><span><strong>Access to asset: </strong>{{ accessToFileType }}</span></li>
                 </ul>
               </div>
             </div>
@@ -225,6 +248,8 @@ export default class Review extends Vue {
 
   @Prop({ required: true }) private vettingRequired!: boolean;
 
+  @Prop({ required: true }) private accessToFileType!: string;
+
   @Prop({ required: false }) private errors: any;
 
   contractApi: ContractApi;
@@ -244,6 +269,8 @@ export default class Review extends Vue {
 
   created(): void {
     this.setContractTitle();
+
+    console.log('asset', this.asset);
   }
 
   @Watch('vettingRequiredLocal')

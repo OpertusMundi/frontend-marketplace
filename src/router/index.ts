@@ -3,10 +3,14 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 import store from '@/store';
 
+import ProfileApi from '@/service/profile';
+
 import Home from '@/views/Home.vue';
 import { EnumRole } from '@/model/role';
 
 Vue.use(VueRouter);
+
+const profileApi = new ProfileApi();
 
 const routes: RouteConfig[] = [
   {
@@ -25,7 +29,7 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "cataloguesingle" */ '../views/CatalogueSingle.vue'),
   },
   {
-    path: '/eo-explorer/:collectionId',
+    path: '/eo-explorer',
     name: 'EOExplorer',
     component: (): Promise<any> => import(/* webpackChunkName: "eoexplorer" */ '../views/EOExplorer.vue'),
   },
@@ -305,6 +309,9 @@ const routes: RouteConfig[] = [
     path: '/become-vendor',
     name: 'BecomeVendor',
     component: (): Promise<any> => import(/* webpackChunkName: "becomevendor" */ '../views/BecomeVendor.vue'),
+    meta: {
+      requiresRole: [EnumRole.ROLE_USER],
+    },
   },
   {
     path: '/become-vendor-success',
@@ -387,13 +394,34 @@ router.beforeEach((to, from, next) => {
     next({ name: 'User' });
   }
 
-  if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
+  const routeToNavigateAfterLogin = sessionStorage.getItem('routeToNavigateAfterLogin');
+  // handle keycloak redirection
+  if (to.name === 'Home' && routeToNavigateAfterLogin) {
+    sessionStorage.removeItem('routeToNavigateAfterLogin');
+    sessionStorage.setItem('tryToFetchProfile', 'y');
+    next(routeToNavigateAfterLogin);
+  } else if (role && !store.getters.hasRole(role)) {
+    const tryToFetchProfile = sessionStorage.getItem('tryToFetchProfile');
+    if (tryToFetchProfile !== 'y') {
+      next('/error/401');
+    } else {
+      store.commit('setLoading', true);
+      sessionStorage.setItem('tryToFetchProfile', 'n');
+      profileApi.getProfile().then((response) => {
+        if (response.success) {
+          next();
+        } else {
+          next('/error/401');
+        }
+        store.commit('setLoading', false);
+      });
+    }
+  // end of handle keycloak redirection
+  } else if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
     next('/error/401');
   // If already a vendor, do not navigate to /become-vendor
   } else if (to.name === 'BecomeVendor' && (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft)) {
     next('/vendor-already');
-  } else if (role && !store.getters.hasRole(role)) {
-    next('/error/401');
   } else {
     next();
   }

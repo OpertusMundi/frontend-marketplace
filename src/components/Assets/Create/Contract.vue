@@ -21,7 +21,7 @@
                     <input type="radio" name="asset_type" v-model="contractModeOption" value="create_new" />
                     <div class="control_indicator"></div>
                   </label>
-                  <label class="control control-radio">
+                  <label class="control control-radio" v-if="assetMainType !== 'API'">
                     Upload own contract
                     <input type="radio" name="asset_type" v-model="contractModeOption" value="upload_own" />
                     <div class="control_indicator"></div>
@@ -107,6 +107,7 @@ import ContractApi from '@/service/provider-contract';
 import { Sorting } from '@/model/request';
 import { EnumProviderContractSortField, ProviderTemplateContract } from '@/model/provider-contract';
 import { EnumContractType } from '@/model/contract';
+import { EnumAssetTypeCategory } from '@/model/enum';
 import moment from 'moment';
 
 extend('required', required);
@@ -124,6 +125,8 @@ export default class Contract extends Vue {
   @Prop({ required: true }) private contractTemplateKey!: string;
 
   @Prop({ required: true }) private customContractToUpload!: File | null;
+
+  @Prop({ required: true }) private assetMainType!: EnumAssetTypeCategory;
 
   contractApi: ContractApi;
 

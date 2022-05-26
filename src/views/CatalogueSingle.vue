@@ -19,7 +19,13 @@
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
             <data-profiling-and-samples v-if="!['SERVICE', 'SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
             <api-layer-profiler v-if="catalogueItem.type === 'SERVICE'" :mode="mode" :catalogueItem="catalogueItem"></api-layer-profiler>
-            <satellite-images-explorer v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type) && mode === 'catalogue'" :collectionId="catalogueItem.extensions.sentinelHub.collection"></satellite-images-explorer>
+            <satellite-images-explorer
+              v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type) && mode === 'catalogue'"
+              :assetId="catalogueItem.id"
+              :assetTitle="catalogueItem.title"
+              :collectionId="catalogueItem.extensions.sentinelHub.collection"
+              @showModalLoginToOpenEOExplorer="modalToShow='modalLoginToOpenEOExplorer'"
+            ></satellite-images-explorer>
 
             <!-- <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata> -->
             <metadata :catalogueItem="catalogueItem"></metadata>
@@ -61,7 +67,17 @@
       </template>
 
       <template v-slot:footer>
-        <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link>
+        <button @click="loginWithKeycloak" class="btn btn--std btn--blue ml-xs-20">Log In</button>
+      </template>
+    </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'modalLoginToOpenEOExplorer'" @dismiss="modalToShow = ''">
+      <template v-slot:body>
+        <h3>Your have to be logged in to open explorer</h3>
+      </template>
+
+      <template v-slot:footer>
+        <button @click="loginWithKeycloak" class="btn btn--std btn--blue ml-xs-20">Log In</button>
       </template>
     </modal>
     <!-- END OF MODALS -->
@@ -79,6 +95,8 @@ import DraftAssetApi from '@/service/draft';
 import store from '@/store';
 
 import Modal from '@/components/Modal.vue';
+
+import { navigateToKeycloakLogin } from '@/helper/login';
 
 import AssetHead from '../components/CatalogueSingle/AssetHead.vue';
 import AssetHeadMap from '../components/CatalogueSingle/AssetHeadMap.vue';
@@ -224,6 +242,10 @@ export default class CatalogueSingle extends Vue {
 
   closeSelectSentinelHubPlanModal(): void {
     this.isSelectSentinelHubPlanModalOn = false;
+  }
+
+  loginWithKeycloak(): void {
+    navigateToKeycloakLogin(this.$route.path);
   }
 }
 </script>

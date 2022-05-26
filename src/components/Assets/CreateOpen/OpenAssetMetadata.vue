@@ -181,7 +181,7 @@
                 <validation-provider v-slot="{ errors }" name="Organisation" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
                   <div class="form-group">
                     <label :for="`rp_organisation_${i}`">Organisation</label>
-                    <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organisationName">
+                    <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organizationName">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
@@ -192,28 +192,28 @@
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Email" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required|email':'email'">
+                <validation-provider v-slot="{ errors }" name="Email" rules="email">
                   <div class="form-group">
                     <label :for="`rp_email_${i}`">Email</label>
                     <input type="text" :name="`rp_email_${i}`" class="form-group__text" :id="`rp_email_${i}`" v-model="assetLocal.responsibleParty[i].email">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Phone" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <validation-provider v-slot="{ errors }" name="Phone">
                   <div class="form-group">
                     <label :for="`rp_phone_${i}`">Phone</label>
                     <input type="text" :name="`rp_phone_${i}`" class="form-group__text" :id="`rp_phone_${i}`" v-model="assetLocal.responsibleParty[i].phone">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Address" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <validation-provider v-slot="{ errors }" name="Address">
                   <div class="form-group">
                     <label :for="`rp_address_${i}`">Address</label>
                     <input type="text" :name="`rp_address_${i}`" class="form-group__text" :id="`rp_address_${i}`" v-model="assetLocal.responsibleParty[i].address">
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" name="Service hours" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <validation-provider v-slot="{ errors }" name="Service hours">
                   <div class="form-group">
                     <label :for="`rp_service_hours_${i}`">Service hours</label>
                     <input type="text" :name="`rp_service_hours_${i}`" class="form-group__text" :id="`rp_service_hours_${i}`" v-model="assetLocal.responsibleParty[i].serviceHours">
@@ -283,7 +283,7 @@
           </template>
         </div>
         <div class="col-md-5">
-          <!-- <div class="dashboard__form__step__title">
+          <div class="dashboard__form__step__title">
             <h3>Additional Resources</h3>
             <p>Provide any additional files for the documentation of your asset.</p>
 
@@ -315,7 +315,7 @@
               </div>
               <button class="btn btn--std btn--dark" :disabled="isAddAdditionalUriResourceDisabled()" @click="onAddAdditionalUriResource">ADD MORE</button>
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
 
@@ -493,10 +493,11 @@ export default class OpenAssetMetadata extends Vue {
     const responsibleParty = (this.assetLocal.responsibleParty as (ResponsibleParty & { key: string })[]).find((x) => x.key === key);
     if (!responsibleParty) return false;
 
-    if (Object.entries(responsibleParty)
-      .filter((x) => x[0] !== 'key')
-      .some((x) => x[1])
-    ) return true;
+    // if (Object.entries(responsibleParty)
+    //   .filter((x) => x[0] !== 'key')
+    //   .some((x) => x[1])
+    // ) return true;
+    if (responsibleParty.organizationName || responsibleParty.name || responsibleParty.role) return true;
 
     return false;
   }

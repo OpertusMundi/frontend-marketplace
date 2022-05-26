@@ -479,17 +479,9 @@ export interface PlatformAccountCommand {
    */
   email: string;
   /**
-   * Account password
-   */
-  password: string;
-  /**
    * Account profile
    */
   profile: AccountProfileCommand;
-  /**
-   * Account password verification. Must match property password
-   */
-  verifyPassword: string;
 }
 
 /**

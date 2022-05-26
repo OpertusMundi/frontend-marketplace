@@ -7,7 +7,8 @@
       </template>
 
       <template v-slot:footer>
-        <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link>
+        <!-- <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link> -->
+        <button @click="loginWithKeycloak" class="btn btn--std btn--blue ml-xs-20">Log In</button>
       </template>
     </modal>
     <!-- END OF MODALS -->
@@ -93,7 +94,7 @@
                       <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for suppliers</span></router-link>
                     </li>
                     <li>
-                      <router-link :to="navigationForBecomeVendor()"><span @click="toggleMobileMenu">BECOME A SUPPLIER</span></router-link>
+                      <a @click.prevent="navigateToBecomeVendor"><span @click="toggleMobileMenu">BECOME A SUPPLIER</span></a>
                     </li>
                   </ul>
                 </div>
@@ -121,7 +122,7 @@
                             </g>
                           </svg>
                           <!-- <p @click="showSubmenuSell = !showSubmenuSell"><router-link to="/become-vendor" class="btn btn--std btn--blue">BECOME A VENDOR</router-link></p> -->
-                          <p @click="showSubmenuSell = !showSubmenuSell"><router-link :to="navigationForBecomeVendor()" class="btn btn--std btn--blue">BECOME A SUPPLIER</router-link></p>
+                          <p @click="showSubmenuSell = !showSubmenuSell"><button @click="navigateToBecomeVendor" class="btn btn--std btn--blue">BECOME A SUPPLIER</button></p>
                         </div>
                       </div>
                       <div class="header__submenu__block">
@@ -341,7 +342,10 @@
               </transition>
             </div>
           </div>
-          <div class="header__login" v-else><router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link></div>
+          <div class="header__login" v-else>
+            <!-- <a :href="getSSOAuthUrl()">SSO Login</a>/ -->
+            <a @click.prevent="loginWithKeycloak">SSO Login</a>/
+            <router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link></div>
         </div>
       </div>
       <div class="modal-search" v-bind:class="{ open: showSearchModal }">
@@ -406,7 +410,7 @@ import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import Modal from '@/components/Modal.vue';
 import moment from 'moment';
-import { RawLocation } from 'vue-router';
+import { navigateToKeycloakLogin } from '@/helper/login';
 // import { EnumRole } from '@/model/role';
 
 @Component({
@@ -486,10 +490,16 @@ export default class Header extends Vue {
     }
   }
 
-  navigationForBecomeVendor(): RawLocation {
-    if (!store.getters.isAuthenticated) return { name: 'Login', params: { pathToNavigateAfterLogin: '/become-vendor' } };
-    // if (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft) return { name: 'BecomeVendorAlreadyVendor' };
-    return { name: 'BecomeVendor' };
+  loginWithKeycloak(): void {
+    navigateToKeycloakLogin(this.$route.path);
+  }
+
+  navigateToBecomeVendor(): void {
+    if (!store.getters.isAuthenticated) {
+      navigateToKeycloakLogin('/become-vendor');
+      return;
+    }
+    this.$router.push({ name: 'BecomeVendor' });
   }
 
   pollNotifications(): void {

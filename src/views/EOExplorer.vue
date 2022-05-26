@@ -1,21 +1,33 @@
 <template>
   <div class="wrapper">
     <div class="eo_explorer_page">
+      <div class="eo_explorer_page__header">
+        <div class="d-flex align-items-center">
+          <div @click="$router.go(-1)" class="eo_explorer_page__header__btn_back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11.06" height="15.144" viewBox="0 0 11.06 15.144"><path data-name="Path 13446" d="m10.102 1.154-7.75 6.429 7.75 6.4" fill="none" stroke="#333" stroke-width="3"/></svg>
+          </div>
+          <h1>{{ assetTitle }}</h1>
+        </div>
+        <div class="d-flex align-items-center">
+          <span v-if="fromPrice !== null" class="eo_explorer_page__header__price">from <h1>{{ fromPrice }}€/month</h1></span>
+          <button class="btn btn--std btn--blue ml-xs-10" @click="isSelectSentinelHubPlanModalOn = true">subscribe</button>
+        </div>
+      </div>
       <div class="container-fluid p-0">
         <div class="row">
           <div class="col-md-4">
-            <template v-if="!searchResults">
-              <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
+            <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
 
+            <template v-if="!searchResults">
               <h4 class="mt-xs-20 mb-xs-10">Date Selection</h4>
               <div class="d-flex space-between">
                 <div>
                   <label>From date</label>
-                  <datepicker input-class="form-group__text" :value="date.from" @input="date.from = formatDate($event)"></datepicker>
+                  <datepicker input-class="form-group__text" :value="date.from" @input="date.from = formatDateForDatePicker($event)"></datepicker>
                 </div>
                 <div>
                   <label>To date</label>
-                  <datepicker input-class="form-group__text" :value="date.to" @input="date.to = formatDate($event)"></datepicker>
+                  <datepicker input-class="form-group__text" :value="date.to" @input="date.to = formatDateForDatePicker($event)"></datepicker>
                 </div>
               </div>
 
@@ -39,15 +51,46 @@
                 <div><input id="bboxSouth" type="number" v-model="bbox.minLat" class="form-group__text"></div>
               </div>
 
-              <div class="d-flex justify-content-center mt-xs-50">
-                <button class="btn btn--std btn--outlineblue mr-xs-20">CANCEL</button>
-                <button class="btn btn--std btn--blue" @click="searchCollection">SEARCH</button>
+              <h4 class="btn-show-advanced-filters mt-xs-10 mb-xs-10" @click="isAdvancedFiltersShown = !isAdvancedFiltersShown">{{ isAdvancedFiltersShown ? 'Hide advanced filters' : 'Show advanced filters' }}</h4>
+              <div v-if="isAdvancedFiltersShown">
+                <div class="form-group">
+                  <label for="multiselect_include_fields">Include fields</label>
+                  <multiselect id="multiselect_include_fields" v-model="fieldsToInclude" tag-placeholder="Press enter to add field" :options="fieldsToInclude" :multiple="true" :taggable="true" @tag="(x) => fieldsToInclude.push(x)" :close-on-select="true" :show-labels="false" placeholder="e.g. id, type"></multiselect>
+                </div>
+                <div class="form-group">
+                  <label for="multiselect_exclude_fields">Exclude fields</label>
+                  <multiselect id="multiselect_exclude_fields" v-model="fieldsToExclude" tag-placeholder="Press enter to add field" :options="fieldsToExclude" :multiple="true" :taggable="true" @tag="(x) => fieldsToExclude.push(x)" :close-on-select="true" :show-labels="false" placeholder="e.g. id, type"></multiselect>
+                </div>
+                <div class="form-group">
+                  <label for="multiselect_product_ids">Product ids</label>
+                  <multiselect id="multiselect_product_ids" v-model="productIDs" tag-placeholder="Press enter to add id" :options="productIDs" :multiple="true" :taggable="true" @tag="(x) => productIDs.push(x)" :close-on-select="true" :show-labels="false" placeholder="Add product id"></multiselect>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-center mt-xs-50 mb-xs-20">
+                <button class="btn btn--std btn--outlineblue mr-xs-20" :disabled="!isAdvancedFiltersShown" @click="isAdvancedFiltersShown = false">CANCEL</button>
+                <button class="btn btn--std btn--blue" @click="searchCollection()">SEARCH</button>
               </div>
             </template>
-            <template v-else>
+            <template v-if="searchResults && !selectedFeatureToShowMetadata">
               <a href="" @click.prevent="resetResults" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+              <div class="d-flex">
+                <div class="pill pill--blue" v-for="filter in getSelectedFilters()" :key="filter.id">
+                  {{ filter.label }}
+                  <div class="close-button" @click="removeFilter(filter.id)"><font-awesome-icon icon="times" /></div>
+                </div>
+              </div>
               <hr>
-              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature"></eo-explorer-card>
+              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature" @viewAllMetadata="selectedFeatureToShowMetadata = $event"></eo-explorer-card>
+            </template>
+            <template v-if="selectedFeatureToShowMetadata">
+              <a href="" @click.prevent="selectedFeatureToShowMetadata = ''" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+              <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
+              <hr>
+              <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
+              <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
+                <span class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
+              </div>
             </template>
           </div>
           <div class="col-md-8">
@@ -56,6 +99,8 @@
         </div>
       </div>
     </div>
+
+    <select-sentinel-hub-plan v-if="isSelectSentinelHubPlanModalOn" @close="isSelectSentinelHubPlanModalOn = false" :assetId="assetId"></select-sentinel-hub-plan>
   </div>
 </template>
 
@@ -65,7 +110,11 @@ import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import 'leaflet-shades';
 import Datepicker from 'vuejs-datepicker';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
+import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
+import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse } from '@/model/sentinel-hub';
 import store from '@/store';
@@ -82,13 +131,27 @@ interface RectangleEditable extends L.Rectangle {
 @Component({
   components: {
     Datepicker,
+    Multiselect,
     'eo-explorer-card': EOExplorerCard,
+    SelectSentinelHubPlan,
   },
 })
 export default class EOExplorer extends Vue {
   sentinelHubApi = new SentinelHubApi();
 
+  assetId = '';
+
+  assetTitle = '';
+
   collectionId = '';
+
+  fromPrice: number | null = null;
+
+  isAdvancedFiltersShown = false;
+
+  selectedFeatureToShowMetadata = '';
+
+  isSelectSentinelHubPlanModalOn = false;
 
   map: L.Map = {} as L.Map;
 
@@ -112,8 +175,27 @@ export default class EOExplorer extends Vue {
 
   mapShades: any | null = null;
 
+  fieldsToInclude: string[] = [];
+
+  fieldsToExclude: string[] = [];
+
+  productIDs: string[] = [];
+
+  lastQueryData: ClientCatalogueQuery | null = null;
+
   created(): void {
-    this.collectionId = this.$route.params.collectionId;
+    const { assetId, assetTitle, collectionId } = this.$route.query;
+
+    this.assetId = assetId as string;
+    this.assetTitle = assetTitle as string;
+    this.collectionId = collectionId as string;
+
+    this.sentinelHubApi.getSubscriptionPlans().then((response) => {
+      if (!response.success) return;
+      const subscriptionPlans = response.result;
+
+      this.fromPrice = subscriptionPlans.reduce((p, c) => (c.billing.monthly < p ? c.billing.monthly : p), Infinity);
+    });
   }
 
   mounted(): void {
@@ -128,6 +210,13 @@ export default class EOExplorer extends Vue {
     this.map.attributionControl.setPrefix('');
 
     this.drawRectangle();
+  }
+
+  @Watch('isAdvancedFiltersShown')
+  onAdvancedFitersShownChange(): void {
+    this.fieldsToInclude = [];
+    this.fieldsToExclude = [];
+    this.productIDs = [];
   }
 
   get bboxString(): string {
@@ -201,25 +290,103 @@ export default class EOExplorer extends Vue {
     };
   }
 
-  formatDate(v: string): string {
+  formatDateForDatePicker(v: string): string {
     return (new Date(v)).toISOString();
   }
 
-  searchCollection(): void {
+  formatDateForLabel(dateString: string): string {
+    return moment(dateString).format('MMM Do YY');
+  }
+
+  getSelectedFilters(): { id: string, label: string }[] {
+    if (!this.lastQueryData) return [];
+
+    let selectedFilters: { id: string, label: string }[] = [];
+
+    if (this.lastQueryData.fromDateTime || this.lastQueryData.toDateTime) {
+      const id = 'temporal_extent';
+      // eslint-disable-next-line
+      const label = this.lastQueryData.fromDateTime && this.lastQueryData.toDateTime
+        ? `${this.formatDateForLabel(this.lastQueryData.fromDateTime)} - ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
+        : this.lastQueryData.fromDateTime
+          ? `From ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
+          // eslint-disable-next-line
+          : `To ${this.formatDateForLabel(this.lastQueryData.toDateTime!)}`;
+
+      selectedFilters.push({ id, label });
+    }
+
+    selectedFilters = this.lastQueryData.fields?.include ? selectedFilters.concat(this.lastQueryData.fields.include.map((x) => ({
+      id: `include_${x}`,
+      label: `include: ${x}`,
+    }))) : selectedFilters;
+
+    selectedFilters = this.lastQueryData.fields?.exclude ? selectedFilters.concat(this.lastQueryData.fields.exclude.map((x) => ({
+      id: `exclude_${x}`,
+      label: `exclude: ${x}`,
+    }))) : selectedFilters;
+
+    selectedFilters = this.lastQueryData.ids ? selectedFilters.concat(this.lastQueryData.ids.map((x) => ({
+      id: `id_${x}`,
+      label: `id: ${x}`,
+    }))) : selectedFilters;
+
+    return selectedFilters;
+  }
+
+  removeFilter(filterId: string): void {
+    const queryData = {
+      ...this.lastQueryData,
+    } as ClientCatalogueQuery;
+
+    if (filterId === 'temporal_extent') {
+      queryData.fromDateTime = undefined;
+      queryData.toDateTime = undefined;
+    } else if (filterId.startsWith('include_')) {
+      const includeString = filterId.split('_')[1];
+      if (!queryData.fields || !queryData.fields.include) return;
+      queryData.fields.include = queryData.fields.include.filter((x) => x !== includeString);
+    } else if (filterId.startsWith('exclude_')) {
+      const excludeString = filterId.split('_')[1];
+      if (!queryData.fields || !queryData.fields.exclude) return;
+      queryData.fields.exclude = queryData.fields.exclude.filter((x) => x !== excludeString);
+      console.log('e', excludeString, queryData);
+    } else if (filterId.startsWith('id_')) {
+      const idString = filterId.split('_')[1];
+      if (!queryData.ids) return;
+      queryData.ids = queryData.ids.filter((x) => x !== idString);
+    }
+
+    this.searchCollection(queryData);
+  }
+
+  searchCollection(data: ClientCatalogueQuery | null = null): void {
     store.commit('setLoading', true);
+
+    this.resetResults();
 
     const fromDateTime = this.date.from.split('T')[0].concat('T00:00:00.000Z');
     const toDateTime = this.date.to.split('T')[0].concat('T23:59:59.999Z');
 
-    const queryData: ClientCatalogueQuery = {
+    const queryData = data || {
       collection: this.collectionId,
       fromDateTime,
       toDateTime,
       bbox: [this.bbox.minLon, this.bbox.minLat, this.bbox.maxLon, this.bbox.maxLat],
-    };
+      ...((this.fieldsToInclude.length || this.fieldsToExclude.length) && {
+        fields: {
+          ...(this.fieldsToInclude.length && { include: this.fieldsToInclude }),
+          ...(this.fieldsToExclude.length && { exclude: this.fieldsToExclude }),
+        },
+      }),
+      ...(this.productIDs.length && { ids: this.productIDs }),
+    } as ClientCatalogueQuery;
+
+    console.log('q', queryData);
 
     this.sentinelHubApi.search(queryData).then((response) => {
       if (response.success) {
+        this.lastQueryData = queryData;
         console.log(response.result);
         this.searchResults = response.result;
 
@@ -240,10 +407,18 @@ export default class EOExplorer extends Vue {
     this.featureGroup.clearLayers();
     (this.bboxSelectionRect as RectangleEditable).enableEdit();
   }
+
+  formatMetadataProperty(property: string): string {
+    if (property === 'datetime') return 'DATE & TIME';
+
+    return property.split('_').join(' ').toUpperCase();
+  }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/_eo-explorer.scss";
+  @import "@/assets/styles/_catalogue-filters.scss";
+  @import "@/assets/styles/_forms.scss";
   @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
   @import "~flexboxgrid/css/flexboxgrid.min.css";
