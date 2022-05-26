@@ -60,15 +60,20 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "faq" */ '../views/faq/Faq.vue'),
   },
   {
-    path: '/faq/:category',
-    name: 'faq-category',
-    component: (): Promise<any> => import(/* webpackChunkName: "faqcategory" */ '../views/faq/FaqCategory.vue'),
-  },
-  {
-    path: '/faq/:category/:slug',
+    path: '/faq/:slug',
     name: 'single-faq',
     component: (): Promise<any> => import(/* webpackChunkName: "singlefaq" */ '../views/faq/SingleFaq.vue'),
   },
+  // {
+  //   path: '/faq/:category',
+  //   name: 'faq-category',
+  //   component: (): Promise<any> => import(/* webpackChunkName: "faqcategory" */ '../views/faq/FaqCategory.vue'),
+  // },
+  // {
+  //   path: '/faq/:category/:slug',
+  //   name: 'single-faq',
+  //   component: (): Promise<any> => import(/* webpackChunkName: "singlefaq" */ '../views/faq/SingleFaq.vue'),
+  // },
   {
     path: '/vas',
     name: 'vas',
@@ -419,7 +424,7 @@ router.beforeEach((to, from, next) => {
   // end of handle keycloak redirection
   } else if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
     next('/error/401');
-  // If already a vendor, do not navigate to /become-vendor
+    // If already a vendor, do not navigate to /become-vendor
   } else if (to.name === 'BecomeVendor' && (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft)) {
     next('/vendor-already');
   } else {

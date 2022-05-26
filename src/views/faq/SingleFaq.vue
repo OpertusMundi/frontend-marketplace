@@ -6,10 +6,10 @@
           <router-link :to="`/faq/`" class="faq__dreadcrumb__item">
             FAQ
           </router-link>
-          <span> > </span>
-          <router-link :to="`/faq/${$route.params.category}`" class="faq__dreadcrumb__item">
+          <!-- <span> > </span> -->
+          <!-- <router-link :to="`/faq/${$route.params.category}`" class="faq__dreadcrumb__item">
             {{ $route.params.category | slugToName }}
-          </router-link>
+          </router-link> -->
           <span> > </span>
           <div class="faq__dreadcrumb__item">
             {{ page[0].title.rendered }}
