@@ -12,7 +12,7 @@
               <span class="login__form__group__error" v-if="emailTakenError">An account with this email already exists</span>
             </div>
           </validation-provider>
-          <validation-provider :name="getInputData('password', 'label')" rules="required" v-slot="{ errors }" vid="password">
+          <!-- <validation-provider :name="getInputData('password', 'label')" rules="required" v-slot="{ errors }" vid="password">
             <div class="login__form__group">
               <input type="password" name="Password" id="password" v-model="account.password" :placeholder="getInputData('password', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
@@ -23,7 +23,7 @@
               <input type="password" name="Password verification" id="passwordVerification" v-model="account.verifyPassword" :placeholder="getInputData('passwordConfirmation', 'placeholder') || ''">
               <span class="login__form__group__error">{{ errors[0] }}</span>
             </div>
-          </validation-provider>
+          </validation-provider> -->
           <validation-provider :name="getInputData('firstName', 'label')" rules="required" v-slot="{ errors }">
             <div class="login__form__group">
               <input type="text" name="First name" v-model="account.profile.firstName" id="firstName" :placeholder="getInputData('firstName', 'placeholder') || ''">
@@ -73,10 +73,10 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { required, email, confirmed } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import store from '@/store';
+// import store from '@/store';
 import AccountApi from '@/service/account';
 import { inputsConfig } from '@/config/register';
-import { fetchUserProfileAndCart } from '@/helper/user';
+// import { fetchUserProfileAndCart } from '@/helper/user';
 import { getFormInputData } from '@/helper/form-config';
 // import { ServerResponse } from '@/model';
 import { PlatformAccountCommand, AccountProfileCommand } from '@/model/account';
@@ -120,8 +120,8 @@ export default class Login extends Vue {
 
     this.account = {
       email: '',
-      password: '',
-      verifyPassword: '',
+      // password: '',
+      // verifyPassword: '',
       profile: {
         firstName: '',
         lastName: '',
@@ -160,25 +160,26 @@ export default class Login extends Vue {
     this.loading = true;
     this.accountApi.register(this.account).then((registrationResponse) => {
       if (registrationResponse.success) {
-        this.accountApi.login(this.account.email, this.account.password).then((loginResponse) => {
-          if (loginResponse.success) {
-            // Set CSRF Token
-            const { csrfToken: token, csrfHeader: header } = loginResponse.result;
-            store.commit('setCsrfToken', { token, header });
+        this.$router.push('/confirmemail');
+        // this.accountApi.login(this.account.email, this.account.password).then((loginResponse) => {
+        //   if (loginResponse.success) {
+        //     // Set CSRF Token
+        //     const { csrfToken: token, csrfHeader: header } = loginResponse.result;
+        //     store.commit('setCsrfToken', { token, header });
 
-            fetchUserProfileAndCart().then((res) => {
-              if (res.success) {
-                this.loading = false;
-                this.$router.push('/confirmemail');
-              } else {
-                console.log('error fetching user profile and cart');
-              }
-            });
-          } else {
-            // todo: handle error
-            console.log('error loggin in', loginResponse);
-          }
-        });
+        //     fetchUserProfileAndCart().then((res) => {
+        //       if (res.success) {
+        //         this.loading = false;
+        //         this.$router.push('/confirmemail');
+        //       } else {
+        //         console.log('error fetching user profile and cart');
+        //       }
+        //     });
+        //   } else {
+        //     // todo: handle error
+        //     console.log('error loggin in', loginResponse);
+        //   }
+        // });
       } else {
         // todo: handle error
         console.log('error registering', registrationResponse);

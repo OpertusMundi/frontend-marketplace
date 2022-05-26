@@ -27,6 +27,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import CartCard from '@/components/Cart/CartCard.vue';
 import CartApi from '@/service/cart';
 import { Cart as CartModel } from '@/model/cart';
+import { navigateToKeycloakLogin } from '@/helper/login';
 import store from '@/store';
 
 @Component({
@@ -72,7 +73,7 @@ export default class Cart extends Vue {
 
   goToCheckout(): void {
     if (!store.getters.isAuthenticated) {
-      this.$router.push({ name: 'Login', params: { pathToNavigateAfterLogin: '/checkout' } });
+      navigateToKeycloakLogin('/checkout');
       return;
     }
     this.$router.push('/checkout');

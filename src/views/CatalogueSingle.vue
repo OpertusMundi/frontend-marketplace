@@ -67,7 +67,7 @@
       </template>
 
       <template v-slot:footer>
-        <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link>
+        <button @click="loginWithKeycloak" class="btn btn--std btn--blue ml-xs-20">Log In</button>
       </template>
     </modal>
 
@@ -77,7 +77,7 @@
       </template>
 
       <template v-slot:footer>
-        <router-link :to="{name: 'Login', params: { pathToNavigateAfterLogin: $route.path }}" class="btn btn--std btn--blue ml-xs-20">Log In</router-link>
+        <button @click="loginWithKeycloak" class="btn btn--std btn--blue ml-xs-20">Log In</button>
       </template>
     </modal>
     <!-- END OF MODALS -->
@@ -95,6 +95,8 @@ import DraftAssetApi from '@/service/draft';
 import store from '@/store';
 
 import Modal from '@/components/Modal.vue';
+
+import { navigateToKeycloakLogin } from '@/helper/login';
 
 import AssetHead from '../components/CatalogueSingle/AssetHead.vue';
 import AssetHeadMap from '../components/CatalogueSingle/AssetHeadMap.vue';
@@ -240,6 +242,10 @@ export default class CatalogueSingle extends Vue {
 
   closeSelectSentinelHubPlanModal(): void {
     this.isSelectSentinelHubPlanModalOn = false;
+  }
+
+  loginWithKeycloak(): void {
+    navigateToKeycloakLogin(this.$route.path);
   }
 }
 </script>
