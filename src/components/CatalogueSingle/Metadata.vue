@@ -18,9 +18,9 @@
           <li v-if="activeTab == 1 && catalogueItem">
             <div class="asset__section__tabs__info_table">
               <p><strong>Title:</strong><span>{{ catalogueItem.title }}</span></p>
-              <p><strong>Abstract:</strong><span>{{ catalogueItem.abstract }}</span></p>
+              <p><strong>Abstract:</strong><span>{{ catalogueItem.abstractText || catalogueItem.abstract }}</span></p>
               <p><strong>Type:</strong><span>{{ catalogueItem.type }}</span></p>
-              <p><strong>Format:</strong><span>{{ catalogueItem.spatialDataServiceType }}</span></p>
+              <p><strong>Format:</strong><span>{{ catalogueItem.spatialDataServiceType || catalogueItem.format }}</span></p>
               <p><strong>Language:</strong><span>{{ catalogueItem.language ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language).name : '' }}</span></p>
               <p><strong>Resource locator:</strong><span>{{ catalogueItem.resourceLocator }}</span></p>
               <p><strong>Version:</strong><span>{{ catalogueItem.version }}</span></p>
@@ -59,10 +59,26 @@
           </li>
           <li v-if="activeTab == 6">
             <div class="asset__section__tabs__info_table">
-              <p><strong>Publisher name:</strong><span>{{ catalogueItem.publisherName }}</span></p>
-              <p><strong>Publisher E-mail:</strong><span>{{ catalogueItem.publisherEmail }}</span></p>
-              <!-- <p><strong>Additional resources:</strong><span>{{ catalogueItem.additionalResources }}</span></p> -->
-              <p><strong>Public access limitations:</strong><span>{{ catalogueItem.publicAccessLimitations }}</span></p>
+              <template v-if="catalogueItem.openDataset">
+                <p><strong>Publisher name:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').name }}</span></p>
+                <p><strong>Publisher organisation name:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').organizationName }}</span></p>
+                <p><strong>Publisher email:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').email }}</span></p>
+                <p><strong>Publisher phone:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').phone }}</span></p>
+                <p><strong>Publisher address:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').address }}</span></p>
+                <p><strong class="mb-xs-20">Publisher service hours:</strong><span>{{ catalogueItem.responsibleParty.find((x) => x.role === 'PUBLISHER').serviceHours }}</span></p>
+                <p><strong>Owner name:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').name || '' : ''}` }}</span></p>
+                <p><strong>Owner organisation name:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').organizationName || '' : ''}` }}</span></p>
+                <p><strong>Owner email:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').email || '' : ''}` }}</span></p>
+                <p><strong>Owner phone:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').phone || '' : ''}` }}</span></p>
+                <p><strong>Owner address:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').address || '' : ''}` }}</span></p>
+                <p><strong class="mb-xs-20">Owner service hours:</strong><span>{{ `${catalogueItem.responsibleParty.some((x) => x.role === 'OWNER') ? catalogueItem.responsibleParty.find((x) => x.role === 'OWNER').serviceHours || '' : ''}` }}</span></p>
+              </template>
+              <template v-else>
+                <!-- TODO (non-open datasets) -->
+                <p><strong>Publisher name:</strong><span>{{ catalogueItem.publisherName }}</span></p>
+                <p><strong>Publisher E-mail:</strong><span>{{ catalogueItem.publisherEmail }}</span></p>
+                <p><strong>Public access limitations:</strong><span>{{ catalogueItem.publicAccessLimitations }}</span></p>
+              </template>
               <p><strong>Metadata language:</strong><span>{{ catalogueItem.metadataLanguage ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.metadataLanguage).name : '' }}</span></p>
               <p><strong>Metadata version:</strong><span>{{ catalogueItem.version }}</span></p>
               <p><strong>Metadata date:</strong><span>{{ catalogueItem.metadataDate ? formatDate(catalogueItem.metadataDate) : '' }}</span></p>
@@ -118,5 +134,6 @@ export default class Metadata extends Vue {
 }
 </script>
 <style lang="scss">
+  @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/_assets.scss";
 </style>
