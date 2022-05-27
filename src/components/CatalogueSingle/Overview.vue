@@ -8,7 +8,7 @@
       <div class="asset__section__content__inner">
         <div class="asset__section__overview__left">
           <h5>Description</h5>
-          <p>{{ catalogueItem.abstractText }}</p>
+          <p>{{ catalogueItem.abstractText || catalogueItem.abstract }}</p>
           <h5 v-if="catalogueItem.suitableFor">Suitable for:</h5>
           <ul>
             <li v-for="suitableFor in catalogueItem.suitableFor" v-bind:key="`${suitableFor}_suitable`">{{ suitableFor }}</li>

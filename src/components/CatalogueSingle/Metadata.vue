@@ -18,7 +18,7 @@
           <li v-if="activeTab == 1 && catalogueItem">
             <div class="asset__section__tabs__info_table">
               <p><strong>Title:</strong><span>{{ catalogueItem.title }}</span></p>
-              <p><strong>Abstract:</strong><span>{{ catalogueItem.abstractText }}</span></p>
+              <p><strong>Abstract:</strong><span>{{ catalogueItem.abstractText || catalogueItem.abstract }}</span></p>
               <p><strong>Type:</strong><span>{{ catalogueItem.type }}</span></p>
               <p><strong>Format:</strong><span>{{ catalogueItem.spatialDataServiceType || catalogueItem.format }}</span></p>
               <p><strong>Language:</strong><span>{{ catalogueItem.language ? $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === catalogueItem.language).name : '' }}</span></p>
