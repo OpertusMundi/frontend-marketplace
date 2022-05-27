@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="homepage">
+    <div class="homepage" :style="{ transform: `translateY(${$store.getters.getAnnouncementBarHeight}px)` }">
       <section class="homepage__hero">
         <shape></shape>
         <div class="homepage__hero__content">

@@ -76,6 +76,7 @@ interface BuildInformation {
 }
 
 export interface Configuration {
+  announcement?: string,
   asset: AssetConfiguration;
   authProviders: EnumAuthProvider[];
   buildInfo: BuildInformation;

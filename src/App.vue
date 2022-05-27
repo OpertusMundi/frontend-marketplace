@@ -1,6 +1,9 @@
 <template>
   <div id="app">
     <transition name="fade" mode="out-in">
+      <announcement-bar v-if="$route.name === 'Home' && $store.getters.getAnnouncement && !isAnnouncementBarClosed"></announcement-bar>
+    </transition>
+    <transition name="fade" mode="out-in">
       <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu"></app-header>
     </transition>
     <transition name="fade" mode="out-in">
@@ -34,6 +37,7 @@ import {
 } from '@/model';
 // import { AxiosError } from 'axios';
 
+import AnnouncementBar from '@/components/AnnouncementBar.vue';
 import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
@@ -41,6 +45,7 @@ import GlobalModals from '@/components/GlobalModals.vue';
 
 @Component({
   components: {
+    AnnouncementBar,
     AppHeader,
     AppFooter,
     Loader,
@@ -143,6 +148,10 @@ export default class App extends Vue {
     return this.$route.name;
   }
 
+  get isAnnouncementBarClosed(): boolean {
+    return sessionStorage.getItem('isAnnouncementBarClosed') === 'y';
+  }
+
   mounted(): void {
     // Initialize CSRF token
     const token = document.querySelector('meta[name=_csrf]')?.getAttribute('content');
@@ -160,6 +169,8 @@ export default class App extends Vue {
           configuration: configResponse.result,
         });
 
+        if (configResponse.result.announcement) this.showAnnouncementBar(configResponse.result.announcement);
+
         fetchUserProfileAndCart().then((res) => {
           if (res.success) {
             console.log('fetched user profile and cart');
@@ -176,6 +187,15 @@ export default class App extends Vue {
 
   toggleMobileMenu(status: boolean): void {
     this.showMenuMobile = status;
+  }
+
+  showAnnouncementBar(announcement: string): void {
+    store.commit('setAnnouncement', announcement);
+    this.$nextTick(() => {
+      if (!document.getElementById('t-announcement-bar')) return;
+      // eslint-disable-next-line
+      store.commit('setAnnouncementBarHeight', document.getElementById('t-announcement-bar')!.clientHeight);
+    });
   }
 
   // getCartItems(): void {

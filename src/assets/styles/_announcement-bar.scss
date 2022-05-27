@@ -1,0 +1,26 @@
+.announcement-bar {
+    position: fixed;
+    z-index: 1400;
+    top: 0;
+    background: $mainColor;
+    color: $darkColor;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 0;
+
+    &__text {
+        max-width: calc(100% - 100px);
+    }
+
+    &__btn-close {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+
+        svg {
+            display: block;
+        }
+    }
+}

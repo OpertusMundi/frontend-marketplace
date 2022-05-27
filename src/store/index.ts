@@ -11,6 +11,7 @@ import CatalogueFilters from './modules/catalogue-filters.module';
 import Notifications from './modules/notifications.module';
 import GlobalModals from './modules/global-modals.module';
 import ApiErrors from './modules/api-errors.module';
+import Announcement from './modules/announcement';
 
 Vue.use(Vuex);
 
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
     notifications: Notifications,
     globalModals: GlobalModals,
     apiErrors: ApiErrors,
+    announcement: Announcement,
   },
   plugins: [createPersistedState({
     paths: ['user', 'config', 'shop', 'router', 'catalogueFilters', 'notifications'],

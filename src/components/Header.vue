@@ -13,7 +13,7 @@
     </modal>
     <!-- END OF MODALS -->
 
-    <header class="header" v-bind:class="[headerClass, scrollClass, { open: showMenuMobile }]">
+    <header class="header" v-bind:class="[headerClass, scrollClass, { open: showMenuMobile }]" :style="{ transform: `translateY(${ this.$route.name === 'Home' ? $store.getters.getAnnouncementBarHeight : 0}px)` }">
       <div class="header__inner">
         <div class="header__logo">
           <router-link to="/"><img src="@/assets/images/logo.svg" alt=""/></router-link>
@@ -457,6 +457,8 @@ export default class Header extends Vue {
   showSearchModal = false;
 
   modalToShow = '';
+
+  // headerTranslateY = 0;
 
   constructor() {
     super();
