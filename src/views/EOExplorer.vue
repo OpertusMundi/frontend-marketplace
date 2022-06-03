@@ -93,8 +93,17 @@
               </div>
             </template>
           </div>
-          <div class="col-md-8">
-            <div id="eo-map"></div>
+          <div class="col-md-8 p-relative">
+            <div class="eo-map-container">
+              <div id="eo-map"></div>
+              <div class="clicked-features-list" v-if="clickedResultFeatures.length" @click.stop="">
+                <div class="d-flex space-between">
+                  <h3>{{ clickedResultFeatures.length }} {{ clickedResultFeatures.length === 1 ? 'RESULT' : 'RESULTS' }}</h3>
+                  <div class="clicked-features-list__btn-close" @click="clickedResultFeatures = []"><svg xmlns="http://www.w3.org/2000/svg" width="11.414" height="11.414" viewBox="0 0 11.414 11.414"><g data-name="Group 4926" fill="none" stroke="#190aff" stroke-width="2"><path data-name="Path 815" d="m.707.707 10 10"/><path data-name="Path 2030" d="m.707 10.707 10-10"/></g></svg></div>
+                </div>
+                <eo-explorer-card v-for="feature in clickedResultFeatures" :key="feature.id" :feature="feature" @viewAllMetadata="selectedFeatureToShowMetadata = $event; clickedResultFeatures = []"></eo-explorer-card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -109,6 +118,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import 'leaflet-shades';
+import isPointInPolygon from '@turf/boolean-point-in-polygon';
+// eslint-disable-next-line
+import { MultiPolygon, Point, Polygon } from 'geojson';
 import Datepicker from 'vuejs-datepicker';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
@@ -116,7 +128,7 @@ import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
-import { ClientCatalogueQuery, SentinelHubCatalogueResponse } from '@/model/sentinel-hub';
+import { ClientCatalogueQuery, SentinelHubCatalogueResponse, Feature } from '@/model/sentinel-hub';
 import store from '@/store';
 
 interface ExtendedMapOptions extends L.MapOptions {
@@ -173,6 +185,8 @@ export default class EOExplorer extends Vue {
 
   searchResults: SentinelHubCatalogueResponse | null = null;
 
+  clickedResultFeatures: Feature[] = [];
+
   mapShades: any | null = null;
 
   fieldsToInclude: string[] = [];
@@ -208,6 +222,11 @@ export default class EOExplorer extends Vue {
     }).addTo(this.map);
 
     this.map.attributionControl.setPrefix('');
+
+    this.map.on('click', (e) => {
+      const { lat, lng } = (e as L.LeafletMouseEvent).latlng;
+      this.showClickedLayersInfo(lat, lng);
+    });
 
     this.drawRectangle();
   }
@@ -270,6 +289,16 @@ export default class EOExplorer extends Vue {
     this.bboxSelectionRect.on('editable:dragend', () => {
       this.onBboxRectStopEditing();
     });
+  }
+
+  showClickedLayersInfo(lat: number, lon: number): void {
+    if (!this.searchResults) return;
+
+    const pointGeoJSON = {
+      type: 'Point',
+      coordinates: [lon, lat],
+    } as Point;
+    this.clickedResultFeatures = this.searchResults.features.filter((x) => isPointInPolygon(pointGeoJSON, x.geometry as Polygon | MultiPolygon));
   }
 
   onBboxRectStartEditing(): void {
