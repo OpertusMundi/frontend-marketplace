@@ -53,6 +53,8 @@
 
               <h4 class="btn-show-advanced-filters mt-xs-10 mb-xs-10" @click="isAdvancedFiltersShown = !isAdvancedFiltersShown">{{ isAdvancedFiltersShown ? 'Hide advanced filters' : 'Show advanced filters' }}</h4>
               <div v-if="isAdvancedFiltersShown">
+                <advanced-filters-extension v-if="collectionId" :collectionId="collectionId" @querychange="onAdvancedFiltersQueryChange"></advanced-filters-extension>
+
                 <div class="form-group">
                   <label for="multiselect_include_fields">Include fields</label>
                   <multiselect id="multiselect_include_fields" v-model="fieldsToInclude" tag-placeholder="Press enter to add field" :options="fieldsToInclude" :multiple="true" :taggable="true" @tag="(x) => fieldsToInclude.push(x)" :close-on-select="true" :show-labels="false" placeholder="e.g. id, type"></multiselect>
@@ -126,6 +128,7 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
+import AdvancedFiltersExtension from '@/components/EO-Explorer/AdvancedFiltersExtension.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse, Feature } from '@/model/sentinel-hub';
@@ -145,6 +148,7 @@ interface RectangleEditable extends L.Rectangle {
     Datepicker,
     Multiselect,
     'eo-explorer-card': EOExplorerCard,
+    AdvancedFiltersExtension,
     SelectSentinelHubPlan,
   },
 })
@@ -193,6 +197,8 @@ export default class EOExplorer extends Vue {
 
   fieldsToExclude: string[] = [];
 
+  queryExtension: any = {};
+
   productIDs: string[] = [];
 
   lastQueryData: ClientCatalogueQuery | null = null;
@@ -240,6 +246,11 @@ export default class EOExplorer extends Vue {
 
   get bboxString(): string {
     return `${this.bbox.minLon},${this.bbox.minLat},${this.bbox.maxLon},${this.bbox.maxLat}`;
+  }
+
+  // eslint-disable-next-line
+  onAdvancedFiltersQueryChange(q: any): void {
+    this.queryExtension = q;
   }
 
   @Watch('bboxString')
@@ -360,6 +371,38 @@ export default class EOExplorer extends Vue {
       label: `id: ${x}`,
     }))) : selectedFilters;
 
+    /* QUERY EXTENSION */
+
+    if (this.lastQueryData.query && this.lastQueryData.query['sar:instrument_mode']) {
+      selectedFilters.push({
+        id: 'sar:instrument_mode',
+        label: `acquisition mode: ${this.lastQueryData.query['sar:instrument_mode'].eq}`,
+      });
+    }
+
+    if (this.lastQueryData.query && this.lastQueryData.query.polarization) {
+      selectedFilters.push({
+        id: 'polarization',
+        label: `polarization: ${this.lastQueryData.query.polarization.eq}`,
+      });
+    }
+
+    if (this.lastQueryData.query && this.lastQueryData.query['sat:orbit_state']) {
+      selectedFilters.push({
+        id: 'sat:orbit_state',
+        label: `orbit direction: ${this.lastQueryData.query['sat:orbit_state'].eq}`,
+      });
+    }
+
+    if (this.lastQueryData.query && this.lastQueryData.query.resolution) {
+      selectedFilters.push({
+        id: 'resolution',
+        label: `resolution: ${this.lastQueryData.query.resolution.eq}`,
+      });
+    }
+
+    /* END OF QUERY EXTENSION */
+
     return selectedFilters;
   }
 
@@ -384,6 +427,14 @@ export default class EOExplorer extends Vue {
       const idString = filterId.split('_')[1];
       if (!queryData.ids) return;
       queryData.ids = queryData.ids.filter((x) => x !== idString);
+    } else if (filterId === 'sar:instrument_mode') {
+      delete queryData.query['sar:instrument_mode'];
+    } else if (filterId === 'polarization') {
+      delete queryData.query.polarization;
+    } else if (filterId === 'sat:orbit_state') {
+      delete queryData.query['sat:orbit_state'];
+    } else if (filterId === 'resolution') {
+      delete queryData.query.resolution;
     }
 
     this.searchCollection(queryData);
@@ -409,6 +460,7 @@ export default class EOExplorer extends Vue {
         },
       }),
       ...(this.productIDs.length && { ids: this.productIDs }),
+      ...(Object.keys(this.queryExtension).length && { query: this.queryExtension }),
     } as ClientCatalogueQuery;
 
     console.log('q', queryData);
