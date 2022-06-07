@@ -115,6 +115,11 @@
         row-gap: 15px;
         column-gap: 30px;
         color: $labelColor;
+
+        .btn-download-asset {
+            color: $secondColor;
+            cursor: pointer;
+        }
     
         &__field {
             white-space: nowrap;
