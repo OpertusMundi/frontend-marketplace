@@ -76,7 +76,7 @@
             </template>
             <template v-if="searchResults && !selectedFeatureToShowMetadata">
               <a href="" @click.prevent="resetResults" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
-              <div class="d-flex">
+              <div>
                 <div class="pill pill--blue" v-for="filter in getSelectedFilters()" :key="filter.id">
                   {{ filter.label }}
                   <div class="close-button" @click="removeFilter(filter.id)"><font-awesome-icon icon="times" /></div>
@@ -401,6 +401,20 @@ export default class EOExplorer extends Vue {
       });
     }
 
+    if (this.lastQueryData.query && this.lastQueryData.query['eo:cloud_cover']) {
+      selectedFilters.push({
+        id: 'eo:cloud_cover',
+        label: `Max cloud coverage: ${this.lastQueryData.query['eo:cloud_cover'].lte}`,
+      });
+    }
+
+    if (this.lastQueryData.query && this.lastQueryData.query.type) {
+      selectedFilters.push({
+        id: 'type',
+        label: `Type: ${this.lastQueryData.query.type.eq}`,
+      });
+    }
+
     /* END OF QUERY EXTENSION */
 
     return selectedFilters;
@@ -435,6 +449,10 @@ export default class EOExplorer extends Vue {
       delete queryData.query['sat:orbit_state'];
     } else if (filterId === 'resolution') {
       delete queryData.query.resolution;
+    } else if (filterId === 'eo:cloud_cover') {
+      delete queryData.query['eo:cloud_cover'];
+    } else if (filterId === 'type') {
+      delete queryData.query.type;
     }
 
     this.searchCollection(queryData);
@@ -443,7 +461,7 @@ export default class EOExplorer extends Vue {
   searchCollection(data: ClientCatalogueQuery | null = null): void {
     store.commit('setLoading', true);
 
-    this.resetResults();
+    this.resetResults(false);
 
     const fromDateTime = this.date.from.split('T')[0].concat('T00:00:00.000Z');
     const toDateTime = this.date.to.split('T')[0].concat('T23:59:59.999Z');
@@ -483,8 +501,8 @@ export default class EOExplorer extends Vue {
     });
   }
 
-  resetResults(): void {
-    this.searchResults = null;
+  resetResults(totalReset = true): void {
+    this.searchResults = totalReset ? null : {} as SentinelHubCatalogueResponse;
     this.featureGroup.clearLayers();
     (this.bboxSelectionRect as RectangleEditable).enableEdit();
   }

@@ -72,6 +72,7 @@
     z-index: 9999;
     padding: 30px 15px !important;
     border-radius: 7px;
+    overflow-y: auto;
 
     h3 {
       color: $darkColor;

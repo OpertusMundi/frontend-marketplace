@@ -12,14 +12,37 @@
       </div>
       <div class="form-group">
         <label for="multiselect_orbit">Orbit Direction</label>
-        <multiselect v-model="inputValues['orbit']" @input="query = {...query, 'sat:orbit_state': { eq: $event.value }}" id="multiselect_orbit" :options="sentinel1GRD.orbitDirectionModes" label="label" track-by="label" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select polarization"></multiselect>
+        <multiselect v-model="inputValues['orbit']" @input="query = {...query, 'sat:orbit_state': { eq: $event.value }}" id="multiselect_orbit" :options="sentinel1GRD.orbitDirectionModes" label="label" track-by="label" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select orbit direction"></multiselect>
       </div>
       <div class="form-group">
         <label for="multiselect_resolution">Resolution</label>
-        <multiselect v-model="inputValues['resolution']" @input="query = {...query, resolution: { eq: $event.value }}" id="multiselect_resolution" :options="sentinel1GRD.resolutionModes" label="label" track-by="label" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select polarization"></multiselect>
+        <multiselect v-model="inputValues['resolution']" @input="query = {...query, resolution: { eq: $event.value }}" id="multiselect_resolution" :options="sentinel1GRD.resolutionModes" label="label" track-by="label" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select resolution"></multiselect>
       </div>
     </template>
     <!-- end of sentinel-1-grd -->
+
+    <!-- sentinel-2-l1c, sentinel-2-l2a -->
+    <template v-if="['sentinel-2-l1c', 'sentinel-2-l2a'].includes(collectionId)">
+      <div class="form-group">
+        <label for="multiselect_resolution">Max cloud coverage</label>
+        <div class="d-flex">
+          <div class="flex-grow-1 mr-xs-20">
+            <vue-slider @change="query = {...query, 'eo:cloud_cover': { lte: $event }}" v-model="sentinel2L1C.cloudCoverPercentage" tooltip="none"></vue-slider>
+          </div>
+          <span>{{ sentinel2L1C.cloudCoverPercentage }}%</span>
+        </div>
+      </div>
+    </template>
+    <!-- end of sentinel-2-l1c -->
+
+    <!-- sentinel-5p-l2 -->
+    <template v-if="collectionId === 'sentinel-5p-l2'">
+      <div class="form-group">
+        <label for="multiselect_type">Type</label>
+        <multiselect v-model="inputValues['type']" @input="query = {...query, type: { eq: $event.value }}" id="multiselect_type" :options="sentinel5PL2.types" label="label" track-by="label" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select type"></multiselect>
+      </div>
+    </template>
+    <!-- end of sentinel-5p-l2 -->
   </div>
 </template>
 
@@ -31,6 +54,8 @@ import {
   Vue,
 } from 'vue-property-decorator';
 import Multiselect from 'vue-multiselect';
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/antd.css';
 
 interface LabelValue {
   label: string,
@@ -38,7 +63,7 @@ interface LabelValue {
 }
 
 @Component({
-  components: { Multiselect },
+  components: { Multiselect, VueSlider },
 })
 export default class AdvancedFiltersExtension extends Vue {
   @Prop({ required: true }) collectionId!: string;
@@ -73,6 +98,30 @@ export default class AdvancedFiltersExtension extends Vue {
     ],
   }
 
+  sentinel2L1C = {
+    cloudCoverPercentage: null,
+  }
+
+  sentinel5PL2: { types: LabelValue[] } = {
+    types: [
+      { label: 'Carbon monoxide (CO)', value: 'CO' },
+      { label: 'Formaldehyde (HCHO)', value: 'HCHO' },
+      { label: 'Nitrogen oxide (NO2)', value: 'NO2' },
+      { label: 'Ozone (O3)', value: 'O3' },
+      { label: 'Sulphur dioxide (SO2)', value: 'SO2' },
+      { label: 'Methane (CH4)', value: 'CH4' },
+      { label: 'UV (Ultraviolet) Aerosol Index calculated based on wavelengths of 340 nm and 380 nm', value: 'AER_AI_340_380' },
+      { label: 'UV (Ultraviolet) Aerosol Index calculated based on wavelengths of 354 nm and 388 nm', value: 'AER_AI_354_388' },
+      { label: 'Cloud base pressure', value: 'CLOUD_BASE_PRESSURE' },
+      { label: 'Cloud top pressure', value: 'CLOUD_TOP_PRESSURE' },
+      { label: 'Cloud base height', value: 'CLOUD_BASE_HEIGHT' },
+      { label: 'Cloud top height', value: 'CLOUD_TOP_HEIGHT' },
+      { label: 'Cloud optical thickness', value: 'CLOUD_OPTICAL_THICKNESS' },
+      { label: 'Effective radiometric cloud fraction', value: 'CLOUD_FRACTION' },
+      { label: 'The mask of data/no data pixels', value: 'dataMask' },
+    ],
+  }
+
   get getSentinel1GRDPolarizationOptions(): LabelValue[] {
     const options = [
       { label: 'HH', value: 'SH' },
@@ -89,5 +138,7 @@ export default class AdvancedFiltersExtension extends Vue {
 </script>
 
 <style lang="scss">
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
+  @import "@/assets/styles/abstracts/_spacings.scss";
   @import "@/assets/styles/_eo-explorer.scss";
 </style>
