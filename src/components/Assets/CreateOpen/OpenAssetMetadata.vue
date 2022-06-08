@@ -255,8 +255,8 @@
             </div>
           </validation-provider> -->
 
-          <h3>Conformity & Lineage</h3>
-          <hr>
+          <!-- <h3>Conformity & Lineage</h3>
+          <hr> -->
 
           <h3>Metadata info</h3>
           <hr>

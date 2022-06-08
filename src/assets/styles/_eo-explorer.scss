@@ -56,6 +56,33 @@
     width: 100%;
   }
 
+  .eo-map-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  .clicked-features-list {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    max-height: 70%;
+    width: calc(50% - 10px);
+    background: $lightBgColor;
+    z-index: 9999;
+    padding: 30px 15px !important;
+    border-radius: 7px;
+    overflow-y: auto;
+
+    h3 {
+      color: $darkColor;
+    }
+
+    &__btn-close {
+      cursor: pointer;
+    }
+  }
+
   .back_btn_container {
     display: flex;
     align-items: center;

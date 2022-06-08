@@ -23,7 +23,11 @@
       <hr>
 
       <div class="info-table">
-        <span class="info-table__field info-table__field--large">Asset</span><span class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
+        <!-- <span class="info-table__field info-table__field--large">Asset</span><span class="info-table__value info-table__value--large">{{ order.items[0].description }}</span> -->
+        <span class="info-table__field info-table__field--large">Asset</span>
+        <span v-if="['SUCCEEDED', 'PENDING_CONSUMER_RECEIVE_CONFIRMATION'].includes(order.status)"><span @click="onDownloadResource" class="info-table__value info-table__value--large btn-download-asset">{{ order.items[0].description }} <svg class="ml-xs-10" data-name="Group 2117" xmlns="http://www.w3.org/2000/svg" width="14.727" height="15.708" viewBox="0 0 14.727 15.708"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.246 7.16a.49.49 0 0 0-.447-.288H8.838V.491A.491.491 0 0 0 8.345 0H6.381a.491.491 0 0 0-.491.491v6.381H3.926a.491.491 0 0 0-.369.814l3.436 3.927a.49.49 0 0 0 .738 0l3.436-3.927a.489.489 0 0 0 .079-.526Z" fill="#190aff"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M12.763 10.8v2.945h-10.8V10.8H0v3.927a.981.981 0 0 0 .982.982h12.763a.981.981 0 0 0 .982-.982V10.8Z" fill="#190aff"/></g></g></svg></span></span>
+        <span v-else class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
+
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
         <!-- <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span> -->
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
@@ -31,7 +35,7 @@
         <!-- <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span> -->
 
         <span class="info-table__field">Contract</span>
-        <span v-if="order.items[0].contractSignedOn" class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
+        <span v-if="order.items[0].contractSignedOn" class="info-table__value"><button :disabled="!order" class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
         <span v-else class="info-table__value">Contract is not ready</span>
         <!-- <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span> -->
       </div>
@@ -46,9 +50,11 @@ import moment from 'moment';
 import ConsumerOrderApi from '@/service/consumer-order';
 import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
+import ConsumerAssetsApi from '@/service/consumer-assets';
 import { EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
 import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
+import { CatalogueItemDetails } from '@/model/catalogue';
 
 @Component({
   components: {
@@ -62,6 +68,8 @@ export default class DashboardPurchases extends Vue {
 
   catalogueApi: CatalogueApi;
 
+  consumerAssetsApi: ConsumerAssetsApi;
+
   order: Order;
 
   constructor() {
@@ -70,6 +78,7 @@ export default class DashboardPurchases extends Vue {
     this.consumerOrderApi = new ConsumerOrderApi();
     this.consumerContractsApi = new ConsumerContractsApi();
     this.catalogueApi = new CatalogueApi();
+    this.consumerAssetsApi = new ConsumerAssetsApi();
 
     this.order = {} as Order;
   }
@@ -131,6 +140,23 @@ export default class DashboardPurchases extends Vue {
     }).finally(() => {
       store.commit('setLoading', false);
     });
+  }
+
+  onDownloadResource(): void {
+    const { assetId } = this.order.items[0];
+
+    if (!assetId) {
+      console.log('no asset id');
+      return;
+    }
+
+    store.commit('setLoading', true);
+    this.catalogueApi.findOne(assetId)
+      .then((response) => (response.result as CatalogueItemDetails).resources[0].id)
+      .then((response) => (this.consumerAssetsApi.downloadResource(assetId, response)))
+      .then(() => {
+        store.commit('setLoading', false);
+      });
   }
 }
 </script>

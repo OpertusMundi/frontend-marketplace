@@ -28,18 +28,44 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
+                  <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
+                  <li v-if="asset.version"><strong>Version:</strong>{{ asset.version }}</li>
+                  <li v-if="asset.spatialDataServiceType || asset.format"><strong>Format:</strong>{{ asset.spatialDataServiceType || asset.format }}</li>
+                  <li v-if="asset.abstract || asset.abstractText"><strong>Asset short description:</strong>{{ asset.abstract || asset.abstractText }}</li>
                   <li v-if="asset.language"><strong>Language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === asset.language).name || '' }}</li>
-                  <li v-if="asset.publisherName"><strong>Editor:</strong>{{ asset.publisherName }}</li>
+                  <!-- <li v-if="asset.keywords && asset.keywords.length"><strong>Keywords:</strong>{{ asset.keywords.map(x => x.keyword).join(', ') }}</li> -->
+                  <li class="d-flex" v-if="asset.keywords && asset.keywords.length"><strong>Keywords:</strong><div class="d-flex flex-column"><span v-for="(keyword, i) in asset.keywords.map(x => x.keyword)" :key="i">{{ keyword }}</span></div></li>
+                  <li class="d-flex" v-if="asset.topicCategory && asset.topicCategory.length"><strong>Topic:</strong><div class="d-flex flex-column"><span v-for="(topic, i) in asset.topicCategory" :key="i">{{ topic }}</span></div></li>
+                  <li class="d-flex" v-if="asset.suitableFor && asset.suitableFor.length"><strong>Suitable for:</strong><div class="d-flex flex-column"><span v-for="(suitable, i) in asset.suitableFor" :key="i">{{ suitable }}</span></div></li>
+                  <li v-if="asset.referenceSystem"><strong>Reference system:</strong>{{ referenceSystemTitle }}</li>
+                  <li class="d-flex" v-if="asset.scales && asset.scales.length"><strong>Scales:</strong><div class="d-flex flex-column"><span v-for="(scale, i) in asset.scales.map(x => x.description)" :key="i">{{ scale }}</span></div></li>
+                  <li v-if="asset.dateStart"><strong>Date start:</strong>{{ asset.dateStart }}</li>
+                  <li v-if="asset.dateEnd"><strong>Date end:</strong>{{ asset.dateEnd }}</li>
+                  <li v-if="asset.creationDate"><strong>Creation date:</strong>{{ asset.creationDate }}</li>
+                  <li v-if="asset.publicationDate"><strong>Publication date:</strong>{{ asset.publicationDate }}</li>
+                  <li v-if="asset.revisionDate"><strong>Revision date:</strong>{{ asset.revisionDate }}</li>
+                  <li class="d-flex" v-for="(responsibleParty, i) in asset.responsibleParty" :key="i">
+                    <!-- <strong>Responsible party ({{ responsibleParty.role }})</strong>{{ `${responsibleParty.name}, ${responsibleParty.organizationName}${ responsibleParty.email ? ', ' + responsibleParty.email : '' }${ responsibleParty.address ? ', ' + responsibleParty.address : '' }${ responsibleParty.phone ? ', ' + responsibleParty.phone : '' }${responsibleParty.serviceHours ? ', ' + responsibleParty.serviceHours : ''}` }} -->
+                    <strong>Responsible party ({{ responsibleParty.role }})</strong>
+                    <div class="d-flex flex-column">
+                      <span v-if="responsibleParty.name">{{ responsibleParty.name }}</span>
+                      <span v-if="responsibleParty.organizationName">{{ responsibleParty.organizationName }}</span>
+                      <span v-if="responsibleParty.email">{{ responsibleParty.email }}</span>
+                      <span v-if="responsibleParty.address">{{ responsibleParty.address }}</span>
+                      <span v-if="responsibleParty.phone">{{ responsibleParty.phone }}</span>
+                      <span v-if="responsibleParty.serviceHours">{{ responsibleParty.serviceHours }}</span>
+                    </div>
+                  </li>
+                  <li v-if="asset.metadataLanguage"><strong>Metadata language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === asset.metadataLanguage).name || '' }}</li>
+                  <li v-if="asset.metadataDate"><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
+
+                  <!-- <li v-if="asset.publisherName"><strong>Editor:</strong>{{ asset.publisherName }}</li>
                   <li v-if="asset.publisherEmail"><strong>Editor’s email:</strong>{{ asset.publisherEmail }}</li>
                   <li v-if="asset.metadataPointOfContactName"><strong>Maintenance manager:</strong>{{ asset.metadataPointOfContactName }}</li>
                   <li v-if="asset.metadataPointOfContactEmail"><strong>Maintenance manager’s email:</strong>{{ asset.metadataPointOfContactEmail }}</li>
-                  <li v-if="asset.version"><strong>Version:</strong>{{ asset.version }}</li>
-                  <!-- <li><strong>Identifier:</strong>{{ asset.language }}</li> -->
-                  <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
-                  <li v-if="asset.abstractText"><strong>Asset short description:</strong>{{ asset.abstractText }}</li>
                   <li v-if="asset.metadataLanguage"><strong>Metadata language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === asset.metadataLanguage).name || '' }}</li>
                   <li v-if="asset.metadataDate"><strong>Metadata date:</strong>{{ asset.metadataDate }}</li>
-                  <li v-if="asset.scale"><strong>Scale:</strong>{{ asset.scale }}</li>
+                  <li v-if="asset.scale"><strong>Scale:</strong>{{ asset.scale }}</li> -->
                 </ul>
               </div>
             </div>
@@ -172,7 +198,7 @@
               </div>
               <div class="dashboard__form__review__item__body">
                 <ul>
-                  <li><span><strong>Mean of delivery:</strong>
+                  <li><span><strong>Means of delivery:</strong>
                     {{
                       asset.deliveryMethod === 'DIGITAL_PLATFORM'
                         ? 'Through the platform'
@@ -233,10 +259,13 @@
 import {
   Component, Vue, Prop, Watch,
 } from 'vue-property-decorator';
-import { CatalogueItemCommand } from '@/model';
+import { CatalogueItemCommand, ServerResponse } from '@/model';
 import { ValidationObserver } from 'vee-validate';
 import ContractApi from '@/service/provider-contract';
+import SpatialApi from '@/service/spatial';
 import store from '@/store';
+import { ProviderTemplateContract } from '@/model/provider-contract';
+import { EpsgCode } from '@/model/spatial';
 
 @Component({
   components: {
@@ -254,21 +283,27 @@ export default class Review extends Vue {
 
   contractApi: ContractApi;
 
+  spatialApi: SpatialApi;
+
   vettingRequiredLocal: boolean;
 
   contractTitle: string;
+
+  referenceSystemTitle: string;
 
   constructor() {
     super();
 
     this.contractApi = new ContractApi();
+    this.spatialApi = new SpatialApi();
 
     this.vettingRequiredLocal = this.vettingRequired;
     this.contractTitle = '';
+    this.referenceSystemTitle = '';
   }
 
   created(): void {
-    this.setContractTitle();
+    this.setAsyncLabels();
 
     console.log('asset', this.asset);
   }
@@ -283,10 +318,20 @@ export default class Review extends Vue {
     this.$emit('goToStep', step);
   }
 
-  setContractTitle(): void {
+  setAsyncLabels(): void {
     store.commit('setLoading', true);
-    this.contractApi.findOneTemplate(this.asset.contractTemplateKey).then((response) => {
-      this.contractTitle = response.result.title;
+
+    const promises: Promise<ServerResponse<ProviderTemplateContract | EpsgCode[]>>[] = [
+      this.contractApi.findOneTemplate(this.asset.contractTemplateKey),
+    ];
+    if (this.asset.referenceSystem) (promises).push(this.spatialApi.getEpsgCodes(this.asset.referenceSystem));
+
+    Promise.all(promises).then((responses) => {
+      const [contractResponse, referenceSystemResponse] = responses;
+
+      this.contractTitle = (contractResponse.result as ProviderTemplateContract).title;
+      if (referenceSystemResponse) this.referenceSystemTitle = (referenceSystemResponse.result as EpsgCode[]).some((x) => `${x.code}` === this.asset.referenceSystem) ? (referenceSystemResponse.result as EpsgCode[]).find((x) => `${x.code}` === this.asset.referenceSystem)?.name || '' : '';
+
       store.commit('setLoading', false);
     });
   }
