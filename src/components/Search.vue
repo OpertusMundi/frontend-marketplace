@@ -6,7 +6,7 @@
     <div class="asset_search__upper" v-bind:class="{ open: searchResultsActive }">
       <!-- <input type="text" name="" id="" placeholder="Search Assets" class="asset_search__upper__input" @focus="showSearchResults" @blur="hideSearchResults"> -->
       <form v-on:submit.prevent="searchAssets">
-        <input type="text" name="query" autocomplete="off" v-model="query" id="" placeholder="Search for Geospatial Assets" class="asset_search__upper__input" @focus="showSearchResults" @input="debouncedInput" />
+        <input v-on:keyup.enter="searchByTerm($event.target.value)" type="text" name="query" autocomplete="off" v-model="query" id="" placeholder="Search for Geospatial Assets" class="asset_search__upper__input" @focus="showSearchResults" @input="debouncedInput" />
       </form>
       <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading"><img src="@/assets/images/icons/search_black.svg" alt="" /></div>
       <div class="asset_search__upper__icon" v-if="query && searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
@@ -60,7 +60,7 @@
             v-for="recentSearch in getRecentSearches()"
             :key="recentSearch"
           >
-            <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(recentSearch)">
+            <a href="#" @click.prevent="searchByTerm(recentSearch)">
               <h5>{{ recentSearch }}</h5>
               <!-- <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a -->
             </a>
@@ -72,7 +72,7 @@
           v-for="popularTerm in popularTerms"
           :key="popularTerm.term"
         >
-          <a href="#" @click.prevent="selectRecentSearchOrPopularTerm(popularTerm.term)">
+          <a href="#" @click.prevent="searchByTerm(popularTerm.term)">
             <h5>{{ popularTerm.term }}</h5>
             <!-- <span>{{ popularTerm.amount }} {{ popularTerm.amount === 1 ? 'search' : 'searches' }}</span> -->
           </a>
@@ -248,7 +248,7 @@ export default class Search extends Vue {
     this.$router.push(`/catalogue/${id}`);
   }
 
-  selectRecentSearchOrPopularTerm(term: string): void {
+  searchByTerm(term: string): void {
     this.$router.push({ name: 'Catalogue', params: { termShortcut: term } });
   }
 
