@@ -1528,3 +1528,21 @@ table.data-table {
 		}
 	}
 }
+.resource-label {
+	display: flex;
+    gap: 7px;
+    border: solid 1px $secondColor;
+    color: $secondColor;
+    background: #fff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font-size: em(16);
+    font-weight: 500;
+    &:last-child {
+      margin-right: 0;
+    }
+    &__remove-btn {
+      cursor: pointer;
+    }
+}
