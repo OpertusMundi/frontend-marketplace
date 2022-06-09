@@ -197,9 +197,9 @@ export default class EOExplorer extends Vue {
 
   fieldsToExclude: string[] = [];
 
-  queryExtension: any = {};
-
   productIDs: string[] = [];
+
+  queryExtension: any = {};
 
   lastQueryData: ClientCatalogueQuery | null = null;
 
@@ -235,6 +235,11 @@ export default class EOExplorer extends Vue {
     });
 
     this.drawRectangle();
+  }
+
+  @Watch('searchResults', { deep: true, immediate: false })
+  onSerachResultsChange(): void {
+    if (this.searchResults === null) this.resetFilters();
   }
 
   @Watch('isAdvancedFiltersShown')
@@ -347,7 +352,7 @@ export default class EOExplorer extends Vue {
       const id = 'temporal_extent';
       // eslint-disable-next-line
       const label = this.lastQueryData.fromDateTime && this.lastQueryData.toDateTime
-        ? `${this.formatDateForLabel(this.lastQueryData.fromDateTime)} - ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
+        ? `${this.formatDateForLabel(this.lastQueryData.fromDateTime)} - ${this.formatDateForLabel(this.lastQueryData.toDateTime)}`
         : this.lastQueryData.fromDateTime
           ? `From ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
           // eslint-disable-next-line
@@ -456,6 +461,13 @@ export default class EOExplorer extends Vue {
     }
 
     this.searchCollection(queryData);
+  }
+
+  resetFilters(): void {
+    this.fieldsToInclude = [];
+    this.fieldsToExclude = [];
+    this.productIDs = [];
+    this.isAdvancedFiltersShown = false;
   }
 
   searchCollection(data: ClientCatalogueQuery | null = null): void {
