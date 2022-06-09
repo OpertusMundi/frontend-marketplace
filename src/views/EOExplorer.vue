@@ -460,6 +460,12 @@ export default class EOExplorer extends Vue {
       delete queryData.query.type;
     }
 
+    if (queryData.fields && queryData.fields.include && queryData.fields.include.length === 0) delete queryData.fields.include;
+    if (queryData.fields && queryData.fields.exclude && queryData.fields.exclude.length === 0) delete queryData.fields.exclude;
+    if (queryData.fields && Object.entries(queryData.fields).length === 0) delete queryData.fields;
+    if (queryData.ids && queryData.ids.length === 0) delete queryData.ids;
+    if (queryData.query && Object.entries(queryData.query).length === 0) delete queryData.query;
+
     this.searchCollection(queryData);
   }
 
@@ -472,6 +478,8 @@ export default class EOExplorer extends Vue {
 
   searchCollection(data: ClientCatalogueQuery | null = null): void {
     store.commit('setLoading', true);
+
+    console.log('abc', this.fieldsToInclude, this.fieldsToExclude);
 
     this.resetResults(false);
 
