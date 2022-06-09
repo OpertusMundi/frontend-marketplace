@@ -91,7 +91,8 @@
               <hr>
               <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
               <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
-                <span class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
+                <metadata-table v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)" :data="value"></metadata-table>
+                <span v-else class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
               </div>
             </template>
           </div>
@@ -129,6 +130,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
 import AdvancedFiltersExtension from '@/components/EO-Explorer/AdvancedFiltersExtension.vue';
+import MetadataTable from '@/components/EO-Explorer/MetadataTable.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse, Feature } from '@/model/sentinel-hub';
@@ -149,6 +151,7 @@ interface RectangleEditable extends L.Rectangle {
     Multiselect,
     'eo-explorer-card': EOExplorerCard,
     AdvancedFiltersExtension,
+    MetadataTable,
     SelectSentinelHubPlan,
   },
 })
