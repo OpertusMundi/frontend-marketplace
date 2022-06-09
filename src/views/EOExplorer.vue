@@ -482,8 +482,6 @@ export default class EOExplorer extends Vue {
   searchCollection(data: ClientCatalogueQuery | null = null): void {
     store.commit('setLoading', true);
 
-    console.log('abc', this.fieldsToInclude, this.fieldsToExclude);
-
     this.resetResults(false);
 
     const fromDateTime = this.date.from.split('T')[0].concat('T00:00:00.000Z');

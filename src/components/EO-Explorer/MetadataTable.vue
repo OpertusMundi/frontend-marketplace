@@ -21,10 +21,11 @@ import {
 
 @Component
 export default class MetadataTable extends Vue {
-  @Prop({ required: true }) data: any;
+  @Prop({ required: true }) data!: any[];
 
   get headerItems(): string[] {
-    return Object.keys(this.data[0]);
+    // return Object.keys(this.data[0]);
+    return this.data.reduce((p, c) => ([...new Set(p.concat(Object.keys(c)))]), []);
   }
 }
 </script>
