@@ -33,17 +33,16 @@ export default class MetadataTable extends Vue {
 <style lang="scss">
   .eo-metadata-table-container {
     width: 100%;
-    padding: 4px;
     overflow-x: auto;
 
     table {
       // border-spacing: 10px;
       border-radius: 7px;
-      font-size: em(15);
       background: #fff;
       border-collapse: separate;
 
       td, th {
+        font-size: em(15);
         padding: 7px;
         border: solid 1px $lightBgColor;
       }

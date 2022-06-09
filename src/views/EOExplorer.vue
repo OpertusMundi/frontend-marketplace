@@ -91,7 +91,10 @@
               <hr>
               <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
               <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
-                <metadata-table v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)" :data="value"></metadata-table>
+                <template v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)">
+                  <span class="metadata-property"><strong>{{ key.toUpperCase() }}</strong></span>
+                  <metadata-table :data="value"></metadata-table>
+                </template>
                 <span v-else class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
               </div>
             </template>
