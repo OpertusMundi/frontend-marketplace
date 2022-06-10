@@ -87,6 +87,7 @@
   &__helpers {
     margin-top: 50px;
     a {
+      cursor: pointer;
       font-size: em(15);
       display: inline-block;
       color: $darkColor;

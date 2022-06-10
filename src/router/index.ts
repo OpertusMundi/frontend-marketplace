@@ -291,6 +291,11 @@ const routes: RouteConfig[] = [
     },
   },
   {
+    path: '/register-vendor',
+    name: 'RegisterVendor',
+    component: (): Promise<any> => import(/* webpackChunkName: "registervendor" */ '../views/Register.vue'),
+  },
+  {
     path: '/confirmemail',
     name: 'ConfirmEmail',
     component: (): Promise<any> => import(/* webpackChunkName: "confirmemail" */ '../views/ConfirmEmail.vue'),
@@ -317,11 +322,6 @@ const routes: RouteConfig[] = [
     meta: {
       requiresRole: [EnumRole.ROLE_USER],
     },
-  },
-  {
-    path: '/vendor-registration',
-    name: 'BecomeVendorWithRegistration',
-    component: (): Promise<any> => import(/* webpackChunkName: "becomevendorwithregistration" */ '../views/BecomeVendorWithRegistration.vue'),
   },
   {
     path: '/become-vendor-success',

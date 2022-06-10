@@ -110,7 +110,8 @@ export default class App extends Vue {
     // } else if (this.routeName === 'Cart') {
     //   this.showHeader = true;
     //   this.showFooter = false;
-    } else if (this.$route.name === 'BecomeVendorWithRegistration') {
+    } else if (this.$route.name === 'RegisterVendor') {
+      this.headerClass = 'header--dark';
       this.showFooter = false;
     } else if (this.noHeaderBgArray.includes(this.routeName)) {
       this.headerClass = 'header--nobg';
