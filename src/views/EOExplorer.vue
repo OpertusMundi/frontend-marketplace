@@ -440,16 +440,16 @@ export default class EOExplorer extends Vue {
       queryData.fromDateTime = undefined;
       queryData.toDateTime = undefined;
     } else if (filterId.startsWith('include_')) {
-      const includeString = filterId.split('_')[1];
+      const includeString = filterId.split('include_')[1];
       if (!queryData.fields || !queryData.fields.include) return;
       queryData.fields.include = queryData.fields.include.filter((x) => x !== includeString);
     } else if (filterId.startsWith('exclude_')) {
-      const excludeString = filterId.split('_')[1];
+      const excludeString = filterId.split('exclude_')[1];
       if (!queryData.fields || !queryData.fields.exclude) return;
       queryData.fields.exclude = queryData.fields.exclude.filter((x) => x !== excludeString);
       console.log('e', excludeString, queryData);
     } else if (filterId.startsWith('id_')) {
-      const idString = filterId.split('_')[1];
+      const idString = filterId.split('id_')[1];
       if (!queryData.ids) return;
       queryData.ids = queryData.ids.filter((x) => x !== idString);
     } else if (filterId === 'sar:instrument_mode') {
