@@ -498,7 +498,8 @@ export default class Header extends Vue {
 
   navigateToBecomeVendor(): void {
     if (!store.getters.isAuthenticated) {
-      navigateToKeycloakLogin('/become-vendor');
+      // navigateToKeycloakLogin('/become-vendor');
+      this.$router.push({ name: 'RegisterVendor' });
       return;
     }
     this.$router.push({ name: 'BecomeVendor' });

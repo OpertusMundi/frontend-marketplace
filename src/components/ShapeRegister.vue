@@ -1,5 +1,5 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 1400.599 1400.599">
+  <svg class="shape-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 1400.599 1400.599">
     <defs>
       <clipPath id="clip-path">
         <path id="Path_14353" data-name="Path 14353" d="M1400.6,700.3C1400.6,313.536,1087.063,0,700.3,0S0,313.536,0,700.3s313.536,700.3,700.3,700.3,700.3-313.535,700.3-700.3" transform="translate(0 -0.001)" fill="none"/>
