@@ -75,7 +75,7 @@
 
               <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <delivery ref="step3" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 3"></delivery>
+                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
@@ -695,6 +695,10 @@ export default class CreateAsset extends Vue {
     if (this.assetMainType === EnumAssetTypeCategory.COLLECTION || this.assetMainType as string === 'SENTINEL_HUB') return false;
 
     return true;
+  }
+
+  onRemoveResource(id: string): void {
+    this.asset.resources = this.asset.resources.filter((x) => x.id !== id);
   }
 
   onSaveDraft(): void {

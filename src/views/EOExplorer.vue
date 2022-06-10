@@ -91,7 +91,11 @@
               <hr>
               <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
               <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
-                <span class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
+                <template v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)">
+                  <span class="metadata-property"><strong>{{ key.toUpperCase() }}</strong></span>
+                  <metadata-table :data="value"></metadata-table>
+                </template>
+                <span v-else class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
               </div>
             </template>
           </div>
@@ -129,6 +133,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
 import AdvancedFiltersExtension from '@/components/EO-Explorer/AdvancedFiltersExtension.vue';
+import MetadataTable from '@/components/EO-Explorer/MetadataTable.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
 import { ClientCatalogueQuery, SentinelHubCatalogueResponse, Feature } from '@/model/sentinel-hub';
@@ -149,6 +154,7 @@ interface RectangleEditable extends L.Rectangle {
     Multiselect,
     'eo-explorer-card': EOExplorerCard,
     AdvancedFiltersExtension,
+    MetadataTable,
     SelectSentinelHubPlan,
   },
 })
@@ -197,9 +203,9 @@ export default class EOExplorer extends Vue {
 
   fieldsToExclude: string[] = [];
 
-  queryExtension: any = {};
-
   productIDs: string[] = [];
+
+  queryExtension: any = {};
 
   lastQueryData: ClientCatalogueQuery | null = null;
 
@@ -235,6 +241,11 @@ export default class EOExplorer extends Vue {
     });
 
     this.drawRectangle();
+  }
+
+  @Watch('searchResults', { deep: true, immediate: false })
+  onSerachResultsChange(): void {
+    if (this.searchResults === null) this.resetFilters();
   }
 
   @Watch('isAdvancedFiltersShown')
@@ -347,7 +358,7 @@ export default class EOExplorer extends Vue {
       const id = 'temporal_extent';
       // eslint-disable-next-line
       const label = this.lastQueryData.fromDateTime && this.lastQueryData.toDateTime
-        ? `${this.formatDateForLabel(this.lastQueryData.fromDateTime)} - ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
+        ? `${this.formatDateForLabel(this.lastQueryData.fromDateTime)} - ${this.formatDateForLabel(this.lastQueryData.toDateTime)}`
         : this.lastQueryData.fromDateTime
           ? `From ${this.formatDateForLabel(this.lastQueryData.fromDateTime)}`
           // eslint-disable-next-line
@@ -429,16 +440,16 @@ export default class EOExplorer extends Vue {
       queryData.fromDateTime = undefined;
       queryData.toDateTime = undefined;
     } else if (filterId.startsWith('include_')) {
-      const includeString = filterId.split('_')[1];
+      const includeString = filterId.split('include_')[1];
       if (!queryData.fields || !queryData.fields.include) return;
       queryData.fields.include = queryData.fields.include.filter((x) => x !== includeString);
     } else if (filterId.startsWith('exclude_')) {
-      const excludeString = filterId.split('_')[1];
+      const excludeString = filterId.split('exclude_')[1];
       if (!queryData.fields || !queryData.fields.exclude) return;
       queryData.fields.exclude = queryData.fields.exclude.filter((x) => x !== excludeString);
       console.log('e', excludeString, queryData);
     } else if (filterId.startsWith('id_')) {
-      const idString = filterId.split('_')[1];
+      const idString = filterId.split('id_')[1];
       if (!queryData.ids) return;
       queryData.ids = queryData.ids.filter((x) => x !== idString);
     } else if (filterId === 'sar:instrument_mode') {
@@ -455,7 +466,20 @@ export default class EOExplorer extends Vue {
       delete queryData.query.type;
     }
 
+    if (queryData.fields && queryData.fields.include && queryData.fields.include.length === 0) delete queryData.fields.include;
+    if (queryData.fields && queryData.fields.exclude && queryData.fields.exclude.length === 0) delete queryData.fields.exclude;
+    if (queryData.fields && Object.entries(queryData.fields).length === 0) delete queryData.fields;
+    if (queryData.ids && queryData.ids.length === 0) delete queryData.ids;
+    if (queryData.query && Object.entries(queryData.query).length === 0) delete queryData.query;
+
     this.searchCollection(queryData);
+  }
+
+  resetFilters(): void {
+    this.fieldsToInclude = [];
+    this.fieldsToExclude = [];
+    this.productIDs = [];
+    this.isAdvancedFiltersShown = false;
   }
 
   searchCollection(data: ClientCatalogueQuery | null = null): void {

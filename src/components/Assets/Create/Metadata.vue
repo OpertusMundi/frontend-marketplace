@@ -226,9 +226,9 @@
 
             <div class="mt-xs-10 mb-xs-20" v-if="additionalResourceSelectedTab === 'upload_file'">
               <div class="d-inline-flex">
-                <div v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="additional-resource-label">
+                <div v-for="(resource, i) in additionalResourcesToUploadLocal" :key="i" class="resource-label">
                   {{ resource.resourceCommand.fileName }}
-                  <div @click="removeAdditionalResourceFile(i)" class="additional-resource-label__remove-btn">
+                  <div @click="removeAdditionalResourceFile(i)" class="resource-label__remove-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="9.061" height="9.061" viewBox="0 0 9.061 9.061"><g data-name="Group 2880" fill="none" stroke="#190aff" stroke-width="1.5"><path data-name="Line 135" d="m0 0 8 8" transform="translate(.53 .53)"/><path data-name="Line 136" d="m0 8 8-8" transform="translate(.53 .53)"/></g></svg>
                   </div>
                 </div>
@@ -644,25 +644,6 @@ export default class Metadata extends Vue {
         right: 0;
         margin: 5px 20px 0 0;
         cursor: pointer;
-    }
-  }
-
-  .additional-resource-label {
-    display: flex;
-    gap: 7px;
-    border: solid 1px $secondColor;
-    color: $secondColor;
-    background: #fff;
-    border-radius: 5px;
-    padding: 5px 10px;
-    margin-right: 10px;
-    font-size: em(16);
-    font-weight: 500;
-    &:last-child {
-      margin-right: 0;
-    }
-    &__remove-btn {
-      cursor: pointer;
     }
   }
 </style>

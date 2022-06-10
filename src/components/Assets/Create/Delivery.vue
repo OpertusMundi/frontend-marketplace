@@ -89,11 +89,20 @@
                 <p>Please note that hosting your data asset is free for up to 20GB.</p>
               </div>
               <div>
+                <!-- <p v-for="resource in resources" :key="resource.id">{{ resource.fileName }}</p> -->
+                <div class="d-inline-flex mb-xs-20">
+                  <div v-for="resource in resources" :key="resource.id" class="resource-label">
+                    {{ resource.fileName }}
+                    <div @click="removeResource(resource.id)" class="resource-label__remove-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="9.061" height="9.061" viewBox="0 0 9.061 9.061"><g data-name="Group 2880" fill="none" stroke="#190aff" stroke-width="1.5"><path data-name="Line 135" d="m0 0 8 8" transform="translate(.53 .53)"/><path data-name="Line 136" d="m0 8 8-8" transform="translate(.53 .53)"/></g></svg>
+                    </div>
+                  </div>
+                </div>
                 <h1>Upload Asset</h1>
                 <input type="file" @change="readFile($event)" />
 
                 <!-- a dummy hidden input to be cathced by validation observer if no file selected -->
-                <div v-if="!fileToUploadLocal.isFileSelected">
+                <div v-if="!fileToUploadLocal.isFileSelected && resources.length === 0">
                   <validation-provider v-slot="{ errors }" name="Upload" rules="required">
                     <div class="form-group mt-xs-20">
                       <input type="text" hidden />
@@ -221,6 +230,7 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import { EnumDeliveryMethod, DraftApiFromFileCommand } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
+import { FileResource } from '@/model/asset';
 
 extend('required', required);
 
@@ -244,6 +254,8 @@ export default class Delivery extends Vue {
   @Prop({ required: true }) private deliveryMethod!: EnumDeliveryMethod;
 
   @Prop({ required: true }) private fileToUpload!: FileToUpload;
+
+  @Prop({ required: true }) private resources!: FileResource[];
 
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>;
@@ -318,9 +330,15 @@ export default class Delivery extends Vue {
 
     this.$emit('update:fileToUpload', this.fileToUploadLocal);
   }
+
+  removeResource(id: string): void {
+    console.log(id);
+    this.$emit('removeResource', id);
+  }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/_assets.scss';
 @import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/abstracts/_flexbox-utilities.scss';
 </style>
