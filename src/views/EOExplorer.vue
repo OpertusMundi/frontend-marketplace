@@ -55,7 +55,7 @@
               <div v-if="isAdvancedFiltersShown">
                 <advanced-filters-extension v-if="collectionId" :collectionId="collectionId" @querychange="onAdvancedFiltersQueryChange"></advanced-filters-extension>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                   <label for="multiselect_include_fields">Include fields</label>
                   <multiselect id="multiselect_include_fields" v-model="fieldsToInclude" tag-placeholder="Press enter to add field" :options="fieldsToInclude" :multiple="true" :taggable="true" @tag="(x) => fieldsToInclude.push(x)" :close-on-select="true" :show-labels="false" placeholder="e.g. id, type"></multiselect>
                 </div>
@@ -66,7 +66,7 @@
                 <div class="form-group">
                   <label for="multiselect_product_ids">Product ids</label>
                   <multiselect id="multiselect_product_ids" v-model="productIDs" tag-placeholder="Press enter to add id" :options="productIDs" :multiple="true" :taggable="true" @tag="(x) => productIDs.push(x)" :close-on-select="true" :show-labels="false" placeholder="Add product id"></multiselect>
-                </div>
+                </div> -->
               </div>
 
               <div class="d-flex justify-content-center mt-xs-50 mb-xs-20">
