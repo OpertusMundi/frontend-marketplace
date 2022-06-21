@@ -9,8 +9,8 @@ export default class ConsumerContractsApi extends Api {
     super({ withCredentials: true });
   }
 
-  public async printContract(key: string, index = 1, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
-    const url = `/action/contract/consumer/order/${key}?index=${index}`;
+  public async printContract(key: string, index = 1, signed: boolean, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
+    const url = `/action/contract/consumer/order/${key}?index=${index}&signed=${signed}`;
 
     const response = this.post<void, Blob>(url, null, {
       responseType: 'blob',

@@ -581,7 +581,7 @@ export default class Checkout extends Vue {
 
   onDownloadContract(): void {
     store.commit('setLoading', true);
-    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, true)
+    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, false, true)
       .catch((err) => {
         console.log('err', err);
         store.commit('setLoading', false);
