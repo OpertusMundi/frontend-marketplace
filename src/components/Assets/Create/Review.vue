@@ -321,15 +321,15 @@ export default class Review extends Vue {
   setAsyncLabels(): void {
     store.commit('setLoading', true);
 
-    const promises: Promise<ServerResponse<ProviderTemplateContract | EpsgCode[]>>[] = [
-      this.contractApi.findOneTemplate(this.asset.contractTemplateKey),
+    const promises: (Promise<ServerResponse<ProviderTemplateContract | EpsgCode[]>> | null)[] = [
+      this.asset.openDataset ? null : this.contractApi.findOneTemplate(this.asset.contractTemplateKey),
+      this.asset.referenceSystem ? this.spatialApi.getEpsgCodes(this.asset.referenceSystem) : null,
     ];
-    if (this.asset.referenceSystem) (promises).push(this.spatialApi.getEpsgCodes(this.asset.referenceSystem));
 
     Promise.all(promises).then((responses) => {
       const [contractResponse, referenceSystemResponse] = responses;
 
-      this.contractTitle = (contractResponse.result as ProviderTemplateContract).title;
+      if (contractResponse) this.contractTitle = (contractResponse.result as ProviderTemplateContract).title;
       if (referenceSystemResponse) this.referenceSystemTitle = (referenceSystemResponse.result as EpsgCode[]).some((x) => `${x.code}` === this.asset.referenceSystem) ? (referenceSystemResponse.result as EpsgCode[]).find((x) => `${x.code}` === this.asset.referenceSystem)?.name || '' : '';
 
       store.commit('setLoading', false);
