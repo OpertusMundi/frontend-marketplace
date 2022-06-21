@@ -316,10 +316,8 @@ import {
   DiscountRate,
   EnumPricingModel,
   FreePricingModelCommand,
-  CallPrePaidPricingModelCommand,
-  CallBlockRatePricingModelCommand,
-  RowPrePaidPricingModelCommand,
-  RowBlockRatePricingModelCommand,
+  PerCallPricingModelCommand,
+  PerRowPricingModelCommand,
   PrePaidTier,
 } from '@/model/pricing-model';
 import store from '@/store';
@@ -405,14 +403,13 @@ export default class ApiPricing extends Vue {
 
     this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
 
+    // TODO: Redundant check?
     this.pricingModelTypes = this.serviceType === 'WFS' ? [
-      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
-      { name: 'Subscription, fixed price per row', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per row', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
+      { name: 'Subscription, price per call', priceModel: EnumPricingModel.PER_CALL },
+      { name: 'Subscription, price per row', priceModel: EnumPricingModel.PER_ROW },
     ] : [
-      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
+      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL },
+      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_ROW },
     ];
 
     console.log('constructor');
@@ -504,24 +501,16 @@ export default class ApiPricing extends Vue {
         (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
         break;
       }
-      case EnumPricingModel.PER_CALL_WITH_PREPAID: {
-        (pricingModel as CallPrePaidPricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_PREPAID;
-        (pricingModel as CallPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
+      case EnumPricingModel.PER_CALL: {
+        (pricingModel as PerCallPricingModelCommand).type = EnumPricingModel.PER_CALL;
+        (pricingModel as PerCallPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        (pricingModel as PerCallPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
         break;
       }
-      case EnumPricingModel.PER_CALL_WITH_BLOCK_RATE: {
-        (pricingModel as CallBlockRatePricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_BLOCK_RATE;
-        (pricingModel as CallBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
-        break;
-      }
-      case EnumPricingModel.PER_ROW_WITH_PREPAID: {
-        (pricingModel as RowPrePaidPricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_PREPAID;
-        (pricingModel as RowPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
-        break;
-      }
-      case EnumPricingModel.PER_ROW_WITH_BLOCK_RATE: {
-        (pricingModel as RowBlockRatePricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_BLOCK_RATE;
-        (pricingModel as RowBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
+      case EnumPricingModel.PER_ROW: {
+        (pricingModel as PerRowPricingModelCommand).type = EnumPricingModel.PER_ROW;
+        (pricingModel as PerRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        (pricingModel as PerRowPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
         break;
       }
       default:
@@ -532,16 +521,16 @@ export default class ApiPricing extends Vue {
 
   addDiscountRate(): void {
     // eslint-disable-next-line
-    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.push({} as DiscountRate);
+    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).discountRates.push({} as DiscountRate);
     // eslint-disable-next-line
-    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.push({} as DiscountRate);
+    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).prePaidTiers.push({} as DiscountRate);
   }
 
   onRemoveDiscount(i: number): void {
     // eslint-disable-next-line
-    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.splice(i, 1);
+    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).discountRates.splice(i, 1);
     // eslint-disable-next-line
-    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.splice(i, 1);
+    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).prePaidTiers.splice(i, 1);
   }
 
   async setPricingModel(): Promise<void> {

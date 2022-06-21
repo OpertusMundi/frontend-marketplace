@@ -172,9 +172,9 @@ import CartApi from '@/service/cart';
 import { CatalogueItem } from '@/model';
 import {
   BasePricingModelCommand,
-  CallPrePaidQuotationParameters,
   EnumPricingModel,
-  RowPrePaidQuotationParameters,
+  PerCallQuotationParameters,
+  PerRowQuotationParameters,
 } from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
 import store from '@/store';
@@ -235,8 +235,8 @@ export default class ShopCard extends Vue {
       },
     };
 
-    if ([EnumPricingModel.PER_CALL_WITH_PREPAID, EnumPricingModel.PER_ROW_WITH_PREPAID].includes(this.selectedPricingModel.type)) {
-      (cartItem.parameters as CallPrePaidQuotationParameters | RowPrePaidQuotationParameters).prePaidTier = this.selectedPrepaidTierIndex;
+    if ([EnumPricingModel.PER_CALL, EnumPricingModel.PER_ROW].includes(this.selectedPricingModel.type)) {
+      (cartItem.parameters as PerCallQuotationParameters | PerRowQuotationParameters).prePaidTier = this.selectedPrepaidTierIndex;
     }
 
     this.cartApi.addItem(cartItem)
