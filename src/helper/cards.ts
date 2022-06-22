@@ -1,15 +1,13 @@
 import { CatalogueItem, CatalogueItemCommand } from '@/model/catalogue';
 import {
   BasePricingModelCommand,
-  CallBlockRatePricingModelCommand,
-  CallPrePaidPricingModelCommand,
   EnumPricingModel,
   FixedPopulationPricingModelCommand,
   FixedPricingModelCommand,
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
-  RowBlockRatePricingModelCommand,
-  RowPrePaidPricingModelCommand,
+  PerCallPricingModelCommand,
+  PerRowPricingModelCommand,
 } from '@/model/pricing-model';
 
 const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { prefix: string, value: string, suffix: string } => {
@@ -27,7 +25,7 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
     // const x = asset.pricingModels[i] as EffectivePricingModel;
     const x = asset.pricingModels[i];
 
-    let pricingModel = {} as BasePricingModelCommand | FreePricingModelCommand | FixedPricingModelCommand | FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | CallPrePaidPricingModelCommand | CallBlockRatePricingModelCommand | RowPrePaidPricingModelCommand | RowBlockRatePricingModelCommand;
+    let pricingModel = {} as BasePricingModelCommand | FreePricingModelCommand | FixedPricingModelCommand | FixedRowPricingModelCommand | FixedPopulationPricingModelCommand | PerCallPricingModelCommand | PerRowPricingModelCommand;
     // CatalogueItem
     if ('model' in x) pricingModel = x.model;
     // CatalogueItemCommand
@@ -54,24 +52,14 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
       res.value = `${(pricingModel as FixedPopulationPricingModelCommand).price}`;
       res.suffix = '10,000 people';
     }
-    if (pricingModel.type === EnumPricingModel.PER_CALL_WITH_PREPAID && (pricingModel as CallPrePaidPricingModelCommand).price < minPrice) {
-      minPrice = (pricingModel as CallPrePaidPricingModelCommand).price;
-      res.value = `${(pricingModel as CallPrePaidPricingModelCommand).price}`;
+    if (pricingModel.type === EnumPricingModel.PER_CALL && (pricingModel as PerCallPricingModelCommand).price < minPrice) {
+      minPrice = (pricingModel as PerCallPricingModelCommand).price;
+      res.value = `${(pricingModel as PerCallPricingModelCommand).price}`;
       res.suffix = 'per call';
     }
-    if (pricingModel.type === EnumPricingModel.PER_CALL_WITH_BLOCK_RATE && (pricingModel as CallBlockRatePricingModelCommand).price < minPrice) {
-      minPrice = (pricingModel as CallBlockRatePricingModelCommand).price;
-      res.value = `${(pricingModel as CallBlockRatePricingModelCommand).price}`;
-      res.suffix = 'per call';
-    }
-    if (pricingModel.type === EnumPricingModel.PER_ROW_WITH_PREPAID && (pricingModel as RowPrePaidPricingModelCommand).price < minPrice) {
-      minPrice = (pricingModel as RowPrePaidPricingModelCommand).price;
-      res.value = `${(pricingModel as RowPrePaidPricingModelCommand).price}`;
-      res.suffix = 'per row';
-    }
-    if (pricingModel.type === EnumPricingModel.PER_ROW_WITH_BLOCK_RATE && (pricingModel as RowBlockRatePricingModelCommand).price < minPrice) {
-      minPrice = (pricingModel as RowBlockRatePricingModelCommand).price;
-      res.value = `${(pricingModel as RowBlockRatePricingModelCommand).price}`;
+    if (pricingModel.type === EnumPricingModel.PER_ROW && (pricingModel as PerRowPricingModelCommand).price < minPrice) {
+      minPrice = (pricingModel as PerRowPricingModelCommand).price;
+      res.value = `${(pricingModel as PerRowPricingModelCommand).price}`;
       res.suffix = 'per row';
     }
   }
