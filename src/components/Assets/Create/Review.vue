@@ -166,26 +166,28 @@
                         {{ pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br />
                         <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
                       </span>
-                      <span v-if="pricingModel.type === 'PER_CALL_WITH_PREPAID'">
+                      <span v-if="pricingModel.type === 'PER_CALL'">
                         <strong>Pricing model {{ index + 1 }}:</strong>
                         {{ pricingModel.price }}€ per call<br />
-                        <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+                        <div v-for="prePaidTier in pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} calls<br /></div>
                       </span>
-                      <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
+                      <!-- <span v-if="pricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'">
                         <strong>Pricing model {{ index + 1 }}:</strong>
                         {{ pricingModel.price }}€ per call<br />
                         <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
-                      </span>
-                      <span v-if="pricingModel.type === 'PER_ROW_WITH_PREPAID'">
+                      </span> -->
+                      <span v-if="pricingModel.type === 'PER_ROW'">
                         <strong>Pricing model {{ index + 1 }}:</strong>
                         {{ pricingModel.price }}€ per row<br />
-                        <div v-for="discountRate in pricingModel.prePaidTiers" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                        <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                        <div v-for="prePaidTier in pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} rows<br /></div>
                       </span>
-                      <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
+                      <!-- <span v-if="pricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'">
                         <strong>Pricing model {{ index + 1 }}:</strong>
                         {{ pricingModel.price }}€ per row<br />
                         <div v-for="discountRate in pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-                      </span>
+                      </span> -->
                     </li>
                   </template>
                 </ul>

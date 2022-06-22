@@ -6,10 +6,8 @@
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'"><span>{{ selectedPricingModel.totalPriceExcludingTax }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">{{ selectedPricingModel.price }} <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
         <div v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
           <div class="mb-xs-20"><span></span>monthly<span></span><span>{{ selectedPricingModel.monthlyPriceExcludingTax }}</span><span>€</span></div>
@@ -54,7 +52,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="pr_model.type === 'PER_CALL_WITH_PREPAID'">
+            <!-- <div v-if="pr_model.type === 'PER_CALL_WITH_PREPAID'">
               Subscription, fixed price per call<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
@@ -64,10 +62,11 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div v-if="pr_model.type === 'PER_CALL_WITH_BLOCK_RATE'">
-              Subscription, blocking rates per call<br>
-              <div class="asset__shopcard__variations__row__discounts">
+            </div> -->
+            <div v-if="pr_model.type === 'PER_CALL'">
+              Subscription, price per call<br>
+              <!-- TODO: to be checked -->
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.discountRates && pr_model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.discountRates" :key="i">
@@ -75,10 +74,7 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div v-if="pr_model.type === 'PER_ROW_WITH_PREPAID'">
-              Subscription, fixed price per row<br>
-              <div class="asset__shopcard__variations__row__discounts">
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.prePaidTiers && pr_model.prePaidTiers.length">
                 <div><strong>Prepaid Tiers:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.prePaidTiers" :key="i">
@@ -87,7 +83,27 @@
                 </div>
               </div>
             </div>
-            <div v-if="pr_model.type === 'PER_ROW_WITH_BLOCK_RATE'">
+            <div v-if="pr_model.type === 'PER_ROW'">
+              Subscription, price per row<br>
+              <!-- TODO: to be checked -->
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.discountRates && pr_model.discountRates.length">
+                <div><strong>Discounts:</strong></div>
+                <div class="asset__shopcard__variations__row__discounts__table">
+                  <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.discountRates" :key="i">
+                    <span>{{ discount.count }} rows</span><span>{{ discount.discount }} %</span>
+                  </div>
+                </div>
+              </div>
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.prePaidTiers && pr_model.prePaidTiers.length">
+                <div><strong>Prepaid Tiers:</strong></div>
+                <div class="asset__shopcard__variations__row__discounts__table">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.prePaidTiers" :key="i">
+                    <span>{{ prePaidTier.count }} rows</span><span>{{ prePaidTier.discount }} %</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div v-if="pr_model.type === 'PER_ROW_WITH_BLOCK_RATE'">
               Subscription, blocking rates per row<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Discounts:</strong></div>
@@ -97,7 +113,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
           </label>
         </div>
       </div>
@@ -212,10 +228,8 @@ export default class ShopCardProviderReview extends Vue {
       FIXED: 'FIXED',
       FIXED_PER_ROWS: 'FIXED PER ROWS',
       FIXED_FOR_POPULATION: 'FIXED FOR POPULATION',
-      PER_CALL_WITH_PREPAID: 'PER CALL',
-      PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
-      PER_ROW_WITH_PREPAID: 'PER ROW',
-      PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+      PER_CALL: 'PER CALL',
+      PER_ROW: 'PER ROW',
       SENTINEL_HUB_IMAGES: 'SENTINEL HUB IMAGES',
       SENTINEL_HUB_SUBSCRIPTION: 'SENTINEL HUB SUBSCRIPTION',
     };

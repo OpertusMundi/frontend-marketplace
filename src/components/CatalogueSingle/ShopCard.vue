@@ -10,10 +10,8 @@
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'"><span>{{ selectedPricingModel.totalPriceExcludingTax }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_BLOCK_RATE'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
         <div v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
           <div class="mb-xs-20"><span></span>monthly<span></span><span>{{ selectedPricingModel.monthlyPriceExcludingTax }}</span><span>€</span></div>
@@ -48,7 +46,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="pr_model.model.type === 'PER_CALL_WITH_PREPAID'">
+            <!-- <div v-if="pr_model.model.type === 'PER_CALL_WITH_PREPAID'">
               Subscription, fixed price per call<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
@@ -62,15 +60,13 @@
                       <span>{{ prePaidTier.count }} calls, </span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
-                  <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
-                  </div> -->
                 </div>
               </div>
-            </div>
-            <div v-if="pr_model.model.type === 'PER_CALL_WITH_BLOCK_RATE'">
-              Subscription, blocking rates per call<br>
-              <div class="asset__shopcard__variations__row__discounts">
+            </div> -->
+            <div v-if="pr_model.model.type === 'PER_CALL'">
+              Subscription, price per call<br>
+              <!-- TODO: to be checked -->
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
@@ -78,8 +74,22 @@
                   </div>
                 </div>
               </div>
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+                <div><strong>Prepaid Tiers:</strong></div>
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
+                </div>
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                    <label :for="`prepaid_tier_pcwp_${i}`">
+                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls, </span><span>{{ prePaidTier.discount }}% discount</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div v-if="pr_model.model.type === 'PER_ROW_WITH_PREPAID'">
+            <!-- <div v-if="pr_model.model.type === 'PER_ROW_WITH_PREPAID'">
               Subscription, fixed price per row<br>
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Prepaid Tiers:</strong></div>
@@ -93,24 +103,31 @@
                       <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }}% discount</span>
                     </label>
                   </div>
-                  <!-- <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }} %</span>
-                  </div> -->
                 </div>
-                <!-- <div class="asset__shopcard__variations__row__discounts__table">
-                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <span>{{ prePaidTier.count }} rows</span><span>{{ prePaidTier.discount }} %</span>
-                  </div>
-                </div> -->
               </div>
-            </div>
-            <div v-if="pr_model.model.type === 'PER_ROW_WITH_BLOCK_RATE'">
-              Subscription, blocking rates per row<br>
-              <div class="asset__shopcard__variations__row__discounts">
+            </div> -->
+            <div v-if="pr_model.model.type === 'PER_ROW'">
+              Subscription, price per row<br>
+              <!-- TODO: to be checked -->
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
                     <span>{{ discount.count }} rows</span><span>{{ discount.discount }}% discount</span>
+                  </div>
+                </div>
+              </div>
+              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+                <div><strong>Prepaid Tiers:</strong></div>
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
+                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
+                </div>
+                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                    <label :for="`prepaid_tier_prwp_${i}`">
+                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
+                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }}% discount</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -172,9 +189,9 @@ import CartApi from '@/service/cart';
 import { CatalogueItem } from '@/model';
 import {
   BasePricingModelCommand,
-  CallPrePaidQuotationParameters,
   EnumPricingModel,
-  RowPrePaidQuotationParameters,
+  PerCallQuotationParameters,
+  PerRowQuotationParameters,
 } from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
 import store from '@/store';
@@ -235,8 +252,8 @@ export default class ShopCard extends Vue {
       },
     };
 
-    if ([EnumPricingModel.PER_CALL_WITH_PREPAID, EnumPricingModel.PER_ROW_WITH_PREPAID].includes(this.selectedPricingModel.type)) {
-      (cartItem.parameters as CallPrePaidQuotationParameters | RowPrePaidQuotationParameters).prePaidTier = this.selectedPrepaidTierIndex;
+    if ([EnumPricingModel.PER_CALL, EnumPricingModel.PER_ROW].includes(this.selectedPricingModel.type)) {
+      (cartItem.parameters as PerCallQuotationParameters | PerRowQuotationParameters).prePaidTier = this.selectedPrepaidTierIndex;
     }
 
     this.cartApi.addItem(cartItem)
@@ -273,10 +290,8 @@ export default class ShopCard extends Vue {
       FIXED: 'FIXED',
       FIXED_PER_ROWS: 'FIXED PER ROWS',
       FIXED_FOR_POPULATION: 'FIXED FOR POPULATION',
-      PER_CALL_WITH_PREPAID: 'PER CALL',
-      PER_CALL_WITH_BLOCK_RATE: 'PER CALL',
-      PER_ROW_WITH_PREPAID: 'PER ROW',
-      PER_ROW_WITH_BLOCK_RATE: 'PER ROW',
+      PER_CALL: 'PER CALL',
+      PER_ROW: 'PER ROW',
       SENTINEL_HUB_IMAGES: 'SENTINEL HUB IMAGES',
       SENTINEL_HUB_SUBSCRIPTION: 'SENTINEL HUB SUBSCRIPTION',
     };

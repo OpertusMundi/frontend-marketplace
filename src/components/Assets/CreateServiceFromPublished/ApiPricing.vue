@@ -52,7 +52,7 @@
                   <!-- <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'FREE'">
                   </div> -->
                   <!-- per call with prepaid -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_PREPAID'">
+                  <!-- <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_PREPAID'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key. You simply set the price per individual call of the service.</p>
                     <p>Optionally, you can allow consumers to prepay a given number of calls at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid calls at any point in time. If their prepaid calls are depleted, then they are charged with the standard price.</p>
@@ -90,13 +90,13 @@
                         </div>
                       </div>
                       <div class="align-self-center ml-xs-30">
-                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                        <button class="btn btn--std btn--outlineblue" @click="removeDiscountRate(i)">REMOVE</button>
                       </div>
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Prepaid Tier</button>
-                  </div>
-                  <!-- per call with block rate -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL_WITH_BLOCK_RATE'">
+                  </div> -->
+                  <!-- per call -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_CALL'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key.</p>
                     <p>You simply set the price per individual call of the service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
@@ -110,7 +110,7 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="i" class="d-flex">
+                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="`pcwbr_${i}`" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|min_value:0">
@@ -132,13 +132,41 @@
                         </div>
                       </div>
                       <div class="align-self-center ml-xs-30">
-                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                        <button class="btn btn--std btn--outlineblue" @click="removeDiscountRate(i)">REMOVE</button>
                       </div>
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Blocking Rate</button>
+                    <div v-for="(prePaidTier, j) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="`pcwp_${j}`" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|integer|min_value:1">
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="pcwp_count">Number of calls</label>
+                            <p>Number of prepaid service calls offered for this tier</p>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[j].count" type="number" class="form-group__text" id="pcwp_count" name="pcwp_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="pcwp_discount">Discount %</label>
+                            <p>This is the discount you provide for the prepaid calls</p>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[j].discount" type="number" class="form-group__text" id="pcwp_discount" name="pcwp_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="removePrepaidTier(i)">REMOVE</button>
+                      </div>
+                    </div>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addPrepaidTier">Add Prepaid Tier</button>
                   </div>
-                  <!-- per row with prepaid -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_PREPAID'">
+                  <!-- per row -->
+                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to your service and receive an API key. You simply set the price per individual returned row of the service.</p>
                     <p>Optionally, you can allow consumers to prepay a given number of rows at a discount. You can define up to three such tiers, with different discounts for each one. Once a consumer is subscribed, they can purchase additional prepaid rows at any point in time. If their prepaid rows are depleted, then they are charged with the standard price.</p>
@@ -151,14 +179,40 @@
                       <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                     </div>
                     </validation-provider>
-                    <div v-for="(prePaidTier, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="i" class="d-flex">
+                    <div v-for="(discountRate, i) in pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates" :key="`prwbr_${i}`" class="d-flex">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|min_value:0">
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="prwbr_count">Threshold</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].count" type="number" class="form-group__text" id="prwbr_count" name="prwbr_count">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                        <div class="col-xs-6">
+                          <validation-provider mode="lazy" v-slot="{ errors }" name="Discount" rules="required|min_value:0|max_value:100">
+                          <div class="form-group form-group--paragraph-small-margin">
+                            <label for="prwbr_discount">Discount %</label>
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].discountRates[i].discount" type="number" class="form-group__text" id="prwbr_discount" name="prwbr_discount">
+                            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                          </div>
+                          </validation-provider>
+                        </div>
+                      </div>
+                      <div class="align-self-center ml-xs-30">
+                        <button class="btn btn--std btn--outlineblue" @click="removeDiscountRate(i)">REMOVE</button>
+                      </div>
+                    </div>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Blocking Rate</button>
+                    <div v-for="(prePaidTier, j) in pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers" :key="`prwp_${j}`" class="d-flex">
                       <div class="row">
                         <div class="col-xs-6">
                           <validation-provider mode="lazy" v-slot="{ errors }" name="Count" rules="required|integer|min_value:0">
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwp_count">Number of rows</label>
                             <p>Number of prepaid service rows offered for this tier</p>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].count" type="number" class="form-group__text" id="prwp_count" name="prwp_count">
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[j].count" type="number" class="form-group__text" id="prwp_count" name="prwp_count">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
@@ -168,20 +222,20 @@
                           <div class="form-group form-group--paragraph-small-margin">
                             <label for="prwp_discount">Discount %</label>
                             <p>This is the discount you provide for the prepaid rows</p>
-                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[i].discount" type="number" class="form-group__text" id="prwp_discount" name="prwp_discount">
+                            <input v-model.number="pricingModelsLocal[selectedPricingModelForEditingLocal].prePaidTiers[j].discount" type="number" class="form-group__text" id="prwp_discount" name="prwp_discount">
                             <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                           </div>
                           </validation-provider>
                         </div>
                       </div>
                       <div class="align-self-center ml-xs-30">
-                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                        <button class="btn btn--std btn--outlineblue" @click="removePrepaidTier(i)">REMOVE</button>
                       </div>
                     </div>
-                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Prepaid Tier</button>
+                    <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addPrepaidTier">Add Prepaid Tier</button>
                   </div>
                   <!-- per row with block rate -->
-                  <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
+                  <!-- <div v-if="pricingModelsLocal[selectedPricingModelForEditingLocal].type === 'PER_ROW_WITH_BLOCK_RATE'">
                     <validation-provider mode="lazy" v-slot="{ errors }" name="Price" rules="required|min_value:0.00000001">
                     <p>Customers subscribe to the service and receive an API key.</p>
                     <p>You simply set the price per individual row returned by service at different block rates, providing increasing discounts the more the service is used. In this manner, you reward consumers for their loyalty.</p>
@@ -217,11 +271,11 @@
                         </div>
                       </div>
                       <div class="align-self-center ml-xs-30">
-                        <button class="btn btn--std btn--outlineblue" @click="onRemoveDiscount(i)">REMOVE</button>
+                        <button class="btn btn--std btn--outlineblue" @click="removeDiscountRate(i)">REMOVE</button>
                       </div>
                     </div>
                     <button class="btn btn--std btn--outlineblue mb-xs-20" @click="addDiscountRate">Add Blocking Rate</button>
-                  </div>
+                  </div> -->
                   <!-- common fields for all pricing models -->
                   <div class="form-group-checkbox">
                     <input v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].includeDomainRestrictions" type="checkbox" id="include_domain_restrictions" name="include_domain_restrictions">
@@ -316,10 +370,8 @@ import {
   DiscountRate,
   EnumPricingModel,
   FreePricingModelCommand,
-  CallPrePaidPricingModelCommand,
-  CallBlockRatePricingModelCommand,
-  RowPrePaidPricingModelCommand,
-  RowBlockRatePricingModelCommand,
+  PerCallPricingModelCommand,
+  PerRowPricingModelCommand,
   PrePaidTier,
 } from '@/model/pricing-model';
 import store from '@/store';
@@ -406,13 +458,10 @@ export default class ApiPricing extends Vue {
     this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
 
     this.pricingModelTypes = this.serviceType === 'WFS' ? [
-      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
-      { name: 'Subscription, fixed price per row', priceModel: EnumPricingModel.PER_ROW_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per row', priceModel: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE },
+      { name: 'Subscription, price per call', priceModel: EnumPricingModel.PER_CALL },
+      { name: 'Subscription, price per row', priceModel: EnumPricingModel.PER_ROW },
     ] : [
-      { name: 'Subscription, fixed price per call', priceModel: EnumPricingModel.PER_CALL_WITH_PREPAID },
-      { name: 'Subscription, blocking rates per call', priceModel: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE },
+      { name: 'Subscription, price per call', priceModel: EnumPricingModel.PER_CALL },
     ];
 
     console.log('constructor');
@@ -504,24 +553,16 @@ export default class ApiPricing extends Vue {
         (pricingModel as FreePricingModelCommand).type = EnumPricingModel.FREE;
         break;
       }
-      case EnumPricingModel.PER_CALL_WITH_PREPAID: {
-        (pricingModel as CallPrePaidPricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_PREPAID;
-        (pricingModel as CallPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
+      case EnumPricingModel.PER_CALL: {
+        (pricingModel as PerCallPricingModelCommand).type = EnumPricingModel.PER_CALL;
+        (pricingModel as PerCallPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        (pricingModel as PerCallPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
         break;
       }
-      case EnumPricingModel.PER_CALL_WITH_BLOCK_RATE: {
-        (pricingModel as CallBlockRatePricingModelCommand).type = EnumPricingModel.PER_CALL_WITH_BLOCK_RATE;
-        (pricingModel as CallBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
-        break;
-      }
-      case EnumPricingModel.PER_ROW_WITH_PREPAID: {
-        (pricingModel as RowPrePaidPricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_PREPAID;
-        (pricingModel as RowPrePaidPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
-        break;
-      }
-      case EnumPricingModel.PER_ROW_WITH_BLOCK_RATE: {
-        (pricingModel as RowBlockRatePricingModelCommand).type = EnumPricingModel.PER_ROW_WITH_BLOCK_RATE;
-        (pricingModel as RowBlockRatePricingModelCommand).discountRates = [{}] as DiscountRate[];
+      case EnumPricingModel.PER_ROW: {
+        (pricingModel as PerRowPricingModelCommand).type = EnumPricingModel.PER_ROW;
+        (pricingModel as PerRowPricingModelCommand).discountRates = [{}] as DiscountRate[];
+        (pricingModel as PerRowPricingModelCommand).prePaidTiers = [{}] as PrePaidTier[];
         break;
       }
       default:
@@ -532,16 +573,22 @@ export default class ApiPricing extends Vue {
 
   addDiscountRate(): void {
     // eslint-disable-next-line
-    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.push({} as DiscountRate);
-    // eslint-disable-next-line
-    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.push({} as DiscountRate);
+    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).discountRates.push({} as DiscountRate);
   }
 
-  onRemoveDiscount(i: number): void {
+  addPrepaidTier(): void {
     // eslint-disable-next-line
-    if ('discountRates' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallBlockRatePricingModelCommand | RowBlockRatePricingModelCommand).discountRates.splice(i, 1);
+    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).prePaidTiers.push({} as DiscountRate);
+  }
+
+  removeDiscountRate(i: number): void {
     // eslint-disable-next-line
-    if ('prePaidTiers' in this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!]) (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as CallPrePaidPricingModelCommand | RowPrePaidPricingModelCommand).prePaidTiers.splice(i, 1);
+    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).discountRates.splice(i, 1);
+  }
+
+  removePrepaidTier(i: number): void {
+    // eslint-disable-next-line
+    (this.pricingModelsLocal[this.selectedPricingModelForEditingLocal!] as PerCallPricingModelCommand | PerRowPricingModelCommand).prePaidTiers.splice(i, 1);
   }
 
   async setPricingModel(): Promise<void> {

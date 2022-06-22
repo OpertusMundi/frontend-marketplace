@@ -25,11 +25,6 @@
     <!-- Inject Thymeleaf template variables -->
     <meta name="_csrf" th:content="<%= '${_csrf.token}' %>" />
     <meta name="_csrf_header" th:content="<%= '${_csrf.headerName}' %>" />
-    
-    <th:block 
-      th:if="<%= '${!#strings.isEmpty(@environment.getProperty(\'opertusmundi.googleanalytics.tracker-id\'))}' %>" 
-      th:insert="googleanalytics-tracker.html :: tracking-code" >
-    </th:block>
   </head>
   <body>
     <noscript>

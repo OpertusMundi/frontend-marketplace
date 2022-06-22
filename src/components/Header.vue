@@ -232,7 +232,10 @@
           </nav>
           <div class="header__menu__btn">
             <router-link to="/dashboard" class="btn" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
-            <router-link to="/signin" class="btn" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link>
+            <!-- <router-link to="/signin" class="btn" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link> -->
+            <template v-if="!$store.getters.isAuthenticated">
+              <a class="btn" style="display: inline; cursor: pointer;" @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link style="display: inline" class="btn" to="/register">Register</router-link>
+            </template>
           </div>
         </div>
         <div class="header__right">
@@ -343,9 +346,8 @@
             </div>
           </div>
           <div class="header__login" v-else>
-            <!-- <a :href="getSSOAuthUrl()">SSO Login</a>/ -->
-            <a @click.prevent="loginWithKeycloak">SSO Login</a>/
-            <router-link to="/signin">Login</router-link><span>/</span><router-link to="/register">Register</router-link></div>
+            <a @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link to="/register">Register</router-link>
+          </div>
         </div>
       </div>
       <div class="modal-search" v-bind:class="{ open: showSearchModal }">

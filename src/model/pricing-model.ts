@@ -67,21 +67,14 @@ export enum EnumPricingModel {
    */
   FIXED_FOR_POPULATION = 'FIXED_FOR_POPULATION',
   /**
-   * Pay per call, optional buy prepaid SKUs with reverse block rate
+   * Pay per call, with optional prepaid SKUs and/or reverse block rate
+   * pricing
    */
-  PER_CALL_WITH_PREPAID = 'PER_CALL_WITH_PREPAID',
+  PER_CALL = 'PER_CALL',
   /**
-   * Pay per call, optional define reverse block rate pricing
+   * Pay per row, with optional prepaid SKUs and/or reverse block rate pricing
    */
-  PER_CALL_WITH_BLOCK_RATE = 'PER_CALL_WITH_BLOCK_RATE',
-  /**
-   * Pay per row, optional buy prepaid SKUs with reverse block rate
-   */
-  PER_ROW_WITH_PREPAID = 'PER_ROW_WITH_PREPAID',
-  /**
-   * Pay per row, optional define reverse block rate pricing
-   */
-  PER_ROW_WITH_BLOCK_RATE = 'PER_ROW_WITH_BLOCK_RATE',
+  PER_ROW = 'PER_ROW',
   /**
    * Sentinel Hub open data collections
    */
@@ -189,27 +182,11 @@ export interface FixedPopulationPricingModelCommand extends BasePricingModelComm
   discountRates: DiscountRate[];
 }
 
-export interface CallPrePaidPricingModelCommand extends BasePricingModelCommand {
+export interface PerCallPricingModelCommand extends BasePricingModelCommand {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type: EnumPricingModel.PER_CALL_WITH_PREPAID;
-  /**
-   * The price per call
-   */
-  price: number;
-  /**
-   * Prepaid tiers using service calls as units. Each element (except for the first one)
-   * must have a `count` property with a value greater than the previous one
-   */
-  prePaidTiers: PrePaidTier[];
-}
-
-export interface CallBlockRatePricingModelCommand extends BasePricingModelCommand {
-  /*
-   * Discriminator field used for deserializing the model to the appropriate data type
-   */
-  type: EnumPricingModel.PER_CALL_WITH_BLOCK_RATE;
+  type: EnumPricingModel.PER_CALL;
   /**
    * The price per call
    */
@@ -219,29 +196,18 @@ export interface CallBlockRatePricingModelCommand extends BasePricingModelComman
    * must have a `count` property with a value greater than the previous one"
    */
   discountRates: DiscountRate[];
-}
-
-export interface RowPrePaidPricingModelCommand extends BasePricingModelCommand {
-  /*
-   * Discriminator field used for deserializing the model to the appropriate data type
-   */
-  type: EnumPricingModel.PER_ROW_WITH_PREPAID;
   /**
-   * The price per row
-   */
-  price: number;
-  /**
-   * Prepaid tiers using data rows as units. Each element (except for the first one)
+   * Prepaid tiers using service calls as units. Each element (except for the first one)
    * must have a `count` property with a value greater than the previous one
    */
   prePaidTiers: PrePaidTier[];
 }
 
-export interface RowBlockRatePricingModelCommand extends BasePricingModelCommand {
+export interface PerRowPricingModelCommand extends BasePricingModelCommand {
   /*
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type: EnumPricingModel.PER_ROW_WITH_BLOCK_RATE;
+  type: EnumPricingModel.PER_ROW;
   /**
    * The price per row
    */
@@ -251,6 +217,11 @@ export interface RowBlockRatePricingModelCommand extends BasePricingModelCommand
    * must have a `count` property with a value greater than the previous one
    */
   discountRates: DiscountRate[];
+  /**
+   * Prepaid tiers using data rows as units. Each element (except for the first one)
+   * must have a `count` property with a value greater than the previous one
+   */
+  prePaidTiers: PrePaidTier[];
 }
 
 /**
@@ -333,8 +304,8 @@ export interface FixedPopulationQuotationParameters {
   nuts: string[];
 }
 
-export interface CallPrePaidQuotationParameters {
-  type: EnumPricingModel.PER_CALL_WITH_PREPAID;
+export interface PerCallQuotationParameters {
+  type: EnumPricingModel.PER_CALL;
   /**
    * Selected prepaid tier index if feature is supported. If a tier is selected and the pricing
    * model does not support prepaid tiers, quotation service will return a validation error
@@ -342,8 +313,8 @@ export interface CallPrePaidQuotationParameters {
   prePaidTier: number;
 }
 
-export interface RowPrePaidQuotationParameters {
-  type: EnumPricingModel.PER_ROW_WITH_PREPAID;
+export interface PerRowQuotationParameters {
+  type: EnumPricingModel.PER_ROW;
   /**
    * Selected prepaid tier index if feature is supported. If a tier is selected and the pricing
    * model does not support prepaid tiers, quotation service will return a validation error
@@ -369,13 +340,12 @@ export interface SHImageQuotationParameters {
 
 export type QuotationParameters =
   EmptyQuotationParameters |
-  CallPrePaidQuotationParameters |
   FixedRowQuotationParameters |
   FixedPopulationQuotationParameters |
-  RowPrePaidQuotationParameters |
+  PerCallQuotationParameters |
+  PerRowQuotationParameters |
   SHImageQuotationParameters |
   SHSubscriptionQuotationParameters;
-
 
 export interface QuotationCommand {
   /**
@@ -425,10 +395,8 @@ export type PricingModelCommand =
   FixedPricingModelCommand |
   FixedRowPricingModelCommand |
   FixedPopulationPricingModelCommand |
-  CallPrePaidPricingModelCommand |
-  CallBlockRatePricingModelCommand |
-  RowPrePaidPricingModelCommand |
-  RowBlockRatePricingModelCommand |
+  PerCallPricingModelCommand |
+  PerRowPricingModelCommand |
   SHImagePricingModelCommand |
   SHSubscriptionPricingModelCommand;
 
