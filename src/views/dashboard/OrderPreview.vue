@@ -32,6 +32,8 @@
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod ? $labelize(order.paymentMethod) : '' }}</span>
         <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
+        <span class="info-table__field">Data user</span><span class="info-table__value">{{ `${order.consumer ? order.consumer.name : ''}` }}</span>
+        <span class="info-table__field">Shipping details</span><span class="info-table__value">{{ `${order.deliveryMethod ? $labelize(order.deliveryMethod) : ''}` }}</span>
         <!-- <span class="info-table__field">Contract</span><span class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span> -->
       </div>
 
