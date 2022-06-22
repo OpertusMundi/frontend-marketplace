@@ -53,7 +53,7 @@
           </li>
           <li v-if="activeTab == 5">
             <div class="asset__section__tabs__info_table">
-              <p><strong>Conformity:</strong><span>{{ catalogueItem.conformity }}</span></p>
+              <p><strong>Conformity:</strong><span>{{ catalogueItem.conformity ? $labelize(catalogueItem.conformity) : '' }}</span></p>
               <p><strong>Lineage:</strong><span>{{ catalogueItem.lineage }}</span></p>
             </div>
           </li>

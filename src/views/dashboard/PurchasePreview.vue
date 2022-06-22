@@ -30,7 +30,7 @@
 
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
         <!-- <span class="info-table__field">Provider</span><span class="info-table__value">provider (dummy)</span> -->
-        <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod }}</span>
+        <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod ? $labelize(order.paymentMethod) : '' }}</span>
         <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
         <!-- <span class="info-table__field">Contract</span><span class="info-table__value">download link (dummy)</span> -->
 

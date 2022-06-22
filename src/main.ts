@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import VueToastify from 'vue-toastify';
 import VueScrollactive from 'vue-scrollactive';
+import VueAnalytics from 'vue-analytics';
+import labelize from '@/helper/labels';
 
 /* font awesome */
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -25,6 +27,14 @@ declare module 'vue/types/vue' {
     $vToastify: VueToastify;
   }
 }
+
+Vue.use(VueAnalytics, {
+  id: process.env.VUE_APP_GOOGLE_ANALYTICS_ID,
+  router,
+});
+
+Vue.prototype.$labelize = labelize;
+
 // Vue configuration
 Vue.config.productionTip = false;
 

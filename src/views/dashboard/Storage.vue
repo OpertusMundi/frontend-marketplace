@@ -101,7 +101,7 @@ import moment from 'moment';
 @Component({
   filters: {
     timestampToDate(value: any) {
-      return moment(value).format('d MMMM YYYY - HH:mm');
+      return moment(value).format('DD MMMM YYYY - HH:mm');
     },
     bytesToMb(value: number) {
       return (value / (1024 * 1024)).toFixed(2);
