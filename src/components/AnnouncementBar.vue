@@ -1,6 +1,6 @@
 <template>
   <div class="announcement-bar" id="t-announcement-bar">
-    <div class="announcement-bar__text" v-html="$store.getters.getAnnouncement"></div>
+    <div class="announcement-bar__text" v-html="$store.getters.getAnnouncement.content"></div>
     <div class="announcement-bar__btn-close" @click="closeAnnouncement">
       <svg xmlns="http://www.w3.org/2000/svg" width="17.061" height="17.061" viewBox="0 0 17.061 17.061">
         <g id="Group_7542" data-name="Group 7542" transform="translate(-1738.47 -46.47)">

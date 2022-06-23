@@ -36,6 +36,7 @@ import {
   Configuration, ServerResponse, LogoutResult,
 } from '@/model';
 // import { AxiosError } from 'axios';
+import { Announcement } from '@/model/announcement';
 
 import AnnouncementBar from '@/components/AnnouncementBar.vue';
 import AppHeader from '@/components/Header.vue';
@@ -192,7 +193,7 @@ export default class App extends Vue {
     this.showMenuMobile = status;
   }
 
-  showAnnouncementBar(announcement: string): void {
+  showAnnouncementBar(announcement: Announcement): void {
     store.commit('setAnnouncement', announcement);
     this.$nextTick(() => {
       if (!document.getElementById('t-announcement-bar')) return;
