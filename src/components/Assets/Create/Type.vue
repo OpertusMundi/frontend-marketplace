@@ -29,7 +29,7 @@
           </label>
           <label class="control control-radio" v-if="$store.getters.hasRole(['ROLE_SENTINEL_HUB'])">
             Sentinel Hub
-            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="SENTINEL_HUB" />
+            <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="SENTINEL_HUB_OPEN_DATA" />
             <div class="control_indicator"></div>
           </label>
           <div class="errors" v-if="errors">
@@ -70,6 +70,7 @@ export default class Type extends Vue {
     super();
 
     this.assetMainTypeLocal = this.assetMainType;
+    console.log(this.assetMainTypeLocal, 'b');
   }
 
   @Watch('assetMainType', { immediate: true })

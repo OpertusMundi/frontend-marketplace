@@ -371,6 +371,16 @@
                 </div>
               </div>
 
+              <div class="mt-xs-40 become-vendor-accept-terms">
+                <div>
+                  <div class="form-group-checkbox form-group-checkbox--centered">
+                    <input @change="onAcceptTermsChange" type="checkbox" v-model="vendorData.termsAndConditionsAccepted" id="terms">
+                    <label for="terms">I 've read and accept the <strong><a class="login__helpers" href="https://www.mangopay.com/terms/MANGOPAY_Terms-EN.pdf" target="_blank">MANGOPAY Terms & Conditions</a></strong></label>
+                  </div>
+                </div>
+                <span class="become-vendor-accept-terms__errors" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register</span>
+              </div>
+
             </div>
           </div>
 
@@ -563,6 +573,8 @@ export default class BecomeVendor extends Vue {
 
   selectedBankAccountAddressCountry: { name: string, code: string };
 
+  termsNotAcceptedError: boolean;
+
   // selectedLegalPersonType : { name: string, code: string };
 
   constructor() {
@@ -628,6 +640,7 @@ export default class BecomeVendor extends Vue {
           country: '',
         } as AddressCommand,
       } as BankAccountCommand,
+      termsAndConditionsAccepted: false,
     };
 
     this.selectedHeadquartersCountry = { name: '', code: '' };
@@ -636,6 +649,8 @@ export default class BecomeVendor extends Vue {
     this.selectedRepresentativeAddressCountry = { name: '', code: '' };
     this.selectedBankAccountAddressCountry = { name: '', code: '' };
     // this.selectedLegalPersonType = { name: 'Business', code: 'BUSINESS' };
+
+    this.termsNotAcceptedError = false;
   }
 
   created(): void {
@@ -696,6 +711,11 @@ export default class BecomeVendor extends Vue {
   nextStep():void {
     console.log(this.vendorData);
     if (this.currentStep === this.totalSteps) {
+      if (!this.vendorData.termsAndConditionsAccepted) {
+        this.termsNotAcceptedError = true;
+        return;
+      }
+
       this.submitForm();
       return;
     }
@@ -787,6 +807,10 @@ export default class BecomeVendor extends Vue {
     const partB = Array.isArray(placeholders[country].format) ? `${placeholders[country].format.join(', ')}` : `${placeholders[country].format}`;
 
     return `${partA} (e.g. ${partB})`;
+  }
+
+  onAcceptTermsChange(): void {
+    this.termsNotAcceptedError = false;
   }
 
   formatDate(date: string): string {

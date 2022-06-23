@@ -225,6 +225,7 @@ export interface ConsumerProfessionalCommand extends CustomerCommand {
   name: string;
   phone: string;
   siteUrl: string;
+  termsAndConditionsAccepted: boolean;
 }
 
 /**
