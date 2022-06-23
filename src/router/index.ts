@@ -427,7 +427,7 @@ router.beforeEach((to, from, next) => {
       });
     }
   // end of handle keycloak redirection
-  } else if (to.name === 'ConfirmEmail' && from.name !== 'Register') {
+  } else if (to.name === 'ConfirmEmail' && (from.name !== 'Register' && from.name !== 'RegisterVendor')) {
     next('/error/401');
     // If already a vendor, do not navigate to /become-vendor
   } else if (to.name === 'BecomeVendor' && (store.getters.hasRole([EnumRole.ROLE_PROVIDER]) || store.getters.getProfile.provider.draft)) {
