@@ -63,7 +63,7 @@
           <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
         </ul>
 
-        <ul v-if="assetMainType === 'SENTINEL_HUB'" class="dashboard__form__nav">
+        <ul v-if="assetMainType === 'SENTINEL_HUB_OPEN_DATA'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
         </ul>
@@ -100,7 +100,7 @@
                 <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
               </template>
 
-              <template v-if="assetMainType === 'SENTINEL_HUB'">
+              <template v-if="assetMainType === 'SENTINEL_HUB_OPEN_DATA'">
                 <sentinel-hub-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></sentinel-hub-metadata>
               </template>
 
@@ -115,7 +115,7 @@
         <div class="dashboard__form__navbuttons">
           <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
           <button class="btn btn--std btn--blue" @click.prevent="nextStep()">
-            {{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB' && currentStep === 2) || (assetMainType === 'OPEN' && currentStep === 5) ? 'confirm and submit for review' : 'NEXT' }}
+            {{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB_OPEN_DATA' && currentStep === 2) || (assetMainType === 'OPEN' && currentStep === 5) ? 'confirm and submit for review' : 'NEXT' }}
           </button>
         </div>
       </div>
@@ -242,7 +242,7 @@ export default class CreateAsset extends Vue {
 
   asset: CatalogueItemCommand | SentinelHubItemCommand;
 
-  assetMainType: EnumAssetTypeCategory; // Data File / API / Collection
+  assetMainType: EnumAssetTypeCategory | string; // Data File / API / Collection
 
   serviceType: null | EnumSpatialDataServiceType;
 
@@ -425,7 +425,7 @@ export default class CreateAsset extends Vue {
   }
 
   initAsset(): void {
-    if (this.assetMainType as string !== 'SENTINEL_HUB') {
+    if (this.assetMainType as string !== 'SENTINEL_HUB_OPEN_DATA') {
       this.asset = {
         abstract: '',
         additionalResources: [],
@@ -606,6 +606,8 @@ export default class CreateAsset extends Vue {
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
         this.assetMainType = EnumAssetTypeCategory.API;
         console.log('ΕΔΩ');
+      } else if (this.asset.type as string === 'SENTINEL_HUB_OPEN_DATA') {
+        this.assetMainType = 'SENTINEL_HUB_OPEN_DATA';
       } else {
         // todo
         console.log('other main type');
@@ -631,7 +633,7 @@ export default class CreateAsset extends Vue {
     // console.log('uploadFile?', this.fileToUpload.isFileSelected);
     this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
       if (isValid) {
-        if (this.assetMainType as string === 'SENTINEL_HUB' && this.currentStep === 2) {
+        if (this.assetMainType as string === 'SENTINEL_HUB_OPEN_DATA' && this.currentStep === 2) {
           this.submitSentinelHubForm();
           return;
         }
@@ -691,8 +693,8 @@ export default class CreateAsset extends Vue {
       if (!this.asset.title || !this.asset.type || !this.asset.abstract || !this.asset.version) return false;
     }
 
-    // todo: add 'SENTINEL_HUB' in Enumeration
-    if (this.assetMainType === EnumAssetTypeCategory.COLLECTION || this.assetMainType as string === 'SENTINEL_HUB') return false;
+    // todo: add 'SENTINEL_HUB_OPEN_DATA' in Enumeration
+    if (this.assetMainType === EnumAssetTypeCategory.COLLECTION || this.assetMainType as string === 'SENTINEL_HUB_OPEN_DATA') return false;
 
     return true;
   }
