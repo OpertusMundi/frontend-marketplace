@@ -1,4 +1,5 @@
 import { PricingModelSettings } from '@/model/pricing-model';
+import { Announcement } from './announcement';
 import { EnumAssetType } from './enum';
 
 export enum EnumAuthProvider {
@@ -76,7 +77,7 @@ interface BuildInformation {
 }
 
 export interface Configuration {
-  announcement?: string,
+  announcement?: Announcement,
   asset: AssetConfiguration;
   authProviders: EnumAuthProvider[];
   buildInfo: BuildInformation;

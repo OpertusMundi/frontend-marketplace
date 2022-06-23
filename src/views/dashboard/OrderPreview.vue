@@ -32,9 +32,13 @@
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod ? $labelize(order.paymentMethod) : '' }}</span>
         <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
+
+        <!-- <span class="info-table__field">Contract</span>
+        <span v-if="order.items[0].contractSignedOn" class="info-table__value"><button :disabled="!order" class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
+        <span v-else class="info-table__value">Contract is not ready</span> -->
+
         <span class="info-table__field">Data user</span><span class="info-table__value">{{ `${order.consumer ? order.consumer.name : ''}` }}</span>
         <span class="info-table__field">Shipping details</span><span class="info-table__value">{{ `${order.deliveryMethod ? $labelize(order.deliveryMethod) : ''}` }}</span>
-        <!-- <span class="info-table__field">Contract</span><span class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span> -->
       </div>
 
     </div>
@@ -108,7 +112,7 @@ export default class DashboardPurchases extends Vue {
 
   // TODO: ATTENTION: currently works for only one asset item (index: 1);
   onDownloadContract(): void {
-    console.log('download contract');
+    console.log('download contract - API call is not yet implemented for providers - todo');
     // console.log('d');
     // store.commit('setLoading', true);
     // this.consumerContractsApi.printContract(this.order.key, 1).then((response) => {
