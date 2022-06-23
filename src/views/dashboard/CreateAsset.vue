@@ -519,6 +519,7 @@ export default class CreateAsset extends Vue {
         creationDate: '',
         dateEnd: '',
         dateStart: '',
+        deliveryMethod: EnumDeliveryMethod.DIGITAL_PROVIDER,
         extensions: {
           sentinelHub: {
             type: 'OPEN_DATA',
