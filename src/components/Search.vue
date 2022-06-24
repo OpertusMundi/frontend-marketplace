@@ -54,7 +54,7 @@
         <li class="no_results"><i>No results found for your query</i></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showRecent">
-        <template v-if="!$store.getters.isAuthenticated"><li class="no_results"><i><router-link to="/signin" class="login_link">Login</router-link> to view your recent searches</i></li></template>
+        <template v-if="!$store.getters.isAuthenticated"><li class="no_results"><i><a @click.prevent="loginWithKeycloak" class="login_link" style="cursor: pointer">Login</a> to view your recent searches</i></li></template>
         <template v-else>
           <li
             v-for="recentSearch in getRecentSearches()"
@@ -107,6 +107,7 @@ import AnalyticsApi from '@/service/analytics';
 import CatalogueApi from '@/service/catalogue';
 import ProfileApi from '@/service/profile';
 import { CatalogueQueryResponse, CatalogueQuery, CatalogueItem } from '@/model';
+import { navigateToKeycloakLogin } from '@/helper/login';
 import { AxiosError } from 'axios';
 import { Debounce } from 'vue-debounce-decorator';
 import store from '@/store';
@@ -294,6 +295,10 @@ export default class Search extends Vue {
       if (!response.success) return;
       store.commit('setUserData', response.result);
     });
+  }
+
+  loginWithKeycloak(): void {
+    navigateToKeycloakLogin(this.$route.path);
   }
 }
 </script>
