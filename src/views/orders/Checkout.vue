@@ -343,6 +343,7 @@ import moment from 'moment';
 import Modal from '@/components/Modal.vue';
 import ConsumerPayInApi from '@/service/consumer-payin';
 import ConsumerOrderApi from '@/service/consumer-order';
+import ProviderAssetsApi from '@/service/provider-assets';
 import CartApi from '@/service/cart';
 import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
@@ -378,6 +379,8 @@ export default class Checkout extends Vue {
   consumerContractsApi: ConsumerContractsApi;
 
   consumerOrderApi: ConsumerOrderApi;
+
+  providerAssetsApi: ProviderAssetsApi;
 
   catalogueApi: CatalogueApi;
 
@@ -418,6 +421,7 @@ export default class Checkout extends Vue {
 
     this.consumerPayInApi = new ConsumerPayInApi();
     this.consumerOrderApi = new ConsumerOrderApi();
+    this.providerAssetsApi = new ProviderAssetsApi();
     this.cartApi = new CartApi();
     this.consumerContractsApi = new ConsumerContractsApi();
     this.catalogueApi = new CatalogueApi();
@@ -579,8 +583,25 @@ export default class Checkout extends Vue {
     }
   }
 
-  onDownloadContract(): void {
+  async onDownloadContract(): Promise<void> {
     store.commit('setLoading', true);
+
+    const consumerOrderResponse = await this.consumerOrderApi.getOrder(this.orderKey);
+
+    // if custom contract
+    if (consumerOrderResponse.result && consumerOrderResponse.result.items && consumerOrderResponse.result.items.length && consumerOrderResponse.result.items[0].contractType === 'UPLOADED_CONTRACT') {
+      const { assetId } = consumerOrderResponse.result.items[0];
+      if (!assetId) {
+        console.log('no-asset-id error');
+        store.commit('setLoading', false);
+        return;
+      }
+      await this.providerAssetsApi.downloadContract(assetId);
+      store.commit('setLoading', false);
+      return;
+    }
+
+    // if NOT custom contract
     this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, false, true)
       .catch((err) => {
         console.log('err', err);
@@ -589,12 +610,6 @@ export default class Checkout extends Vue {
       .finally(() => {
         store.commit('setLoading', false);
       });
-
-    // this.consumerContractsApi.printContract(this.orderKey, 1).then((response) => {
-    //   console.log('pdf', response.data);
-    //   const blob = new Blob([(response as any).data], {type: "application/pdf"});
-    //   FileSaver.saveAs(blob, "filename");
-    // });
   }
 
   // TODO: refactoring

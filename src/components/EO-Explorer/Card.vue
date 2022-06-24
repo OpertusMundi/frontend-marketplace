@@ -1,7 +1,8 @@
 <template>
   <div class="eo_card d-flex">
     <div class="eo_card__img">
-      <img :src="feature.assets.thumbnail.href" alt="Thumbnail">
+      <img v-if="feature.assets && feature.assets.thumbnail && feature.assets.thumbnail.href" :src="feature.assets.thumbnail.href" alt="Thumbnail">
+      <img v-else src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZYAAADpCAIAAACImYZhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMUSURBVHhe7dQxDQAwDMCwbvwhFdyekYhkP2GQs7sD0HR/AYIsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoCsmQc7rwQGCUtr1QAAAABJRU5ErkJggg==" alt="missing thumbnail" />
     </div>
     <div class="eo_card__info">
       <div class="d-flex align-items-center">

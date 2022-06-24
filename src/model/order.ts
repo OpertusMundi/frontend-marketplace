@@ -121,6 +121,10 @@ export interface ConsumerOrderItem extends OrderItem {
    * Asset provider
    */
   provider: Provider;
+  /**
+   *
+   */
+  contractType?: string;
 }
 
 export interface ProviderOrderItem extends OrderItem {
