@@ -124,6 +124,10 @@ export default class App extends Vue {
       this.showHeader = true;
       this.showFooter = true;
     }
+
+    if (this.$route.name === 'Home') {
+      this.setAnnouncementBarHeight();
+    }
   }
 
   @Watch('$store.getters.isAuthenticated', { immediate: false })
@@ -195,6 +199,10 @@ export default class App extends Vue {
 
   showAnnouncementBar(announcement: Announcement): void {
     store.commit('setAnnouncement', announcement);
+    this.setAnnouncementBarHeight();
+  }
+
+  setAnnouncementBarHeight(): void {
     this.$nextTick(() => {
       if (!document.getElementById('t-announcement-bar')) return;
       // eslint-disable-next-line
