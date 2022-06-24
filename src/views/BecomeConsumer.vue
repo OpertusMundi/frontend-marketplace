@@ -239,6 +239,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ConsumerAPI from '@/service/consumer';
 import ConfigurationApi from '@/service/config';
+import { navigateToKeycloakLogin } from '@/helper/login';
 import {
   EnumMangopayUserType,
   ConsumerIndividualCommand,
@@ -472,11 +473,16 @@ export default class BecomeConsumer extends Vue {
       console.log(submitResponse);
       if (submitResponse.success) {
         store.commit('logout');
-        this.$router.push('/signin');
+        // this.$router.push('/signin');
+        this.loginWithKeycloak('/');
       }
     }).catch((err) => {
       console.log('error submiting registration', err);
     });
+  }
+
+  loginWithKeycloak(path?: string): void {
+    navigateToKeycloakLogin(path || this.$route.path);
   }
 }
 </script>
