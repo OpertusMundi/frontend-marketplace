@@ -1,7 +1,7 @@
 <template>
   <div class="eo_card d-flex">
     <div class="eo_card__img">
-      <img :src="feature.assets.thumbnail.href" alt="Thumbnail">
+      <img v-if="feature.assets && feature.assets.thumbnail && feature.assets.thumbnail.href" :src="feature.assets.thumbnail.href" alt="Thumbnail">
     </div>
     <div class="eo_card__info">
       <div class="d-flex align-items-center">

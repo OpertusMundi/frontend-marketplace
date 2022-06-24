@@ -89,7 +89,7 @@
               <a href="" @click.prevent="selectedFeatureToShowMetadata = ''" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
               <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
               <hr>
-              <img :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
+              <img v-if="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata) && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
               <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
                 <template v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)">
                   <span class="metadata-property"><strong>{{ key.toUpperCase() }}</strong></span>
