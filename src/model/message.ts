@@ -74,4 +74,15 @@ interface MessagesResponse extends ServerResponse<PageResult<Message>> {
   }[]
 }
 
-export { ClientContact, MessagesResponse, Message };
+interface MessageThreadResponse extends ServerResponse<Message[]> {
+  contacts: {
+    [key: string]: ClientContact;
+  }[]
+}
+
+export {
+  ClientContact,
+  MessagesResponse,
+  MessageThreadResponse,
+  Message,
+};

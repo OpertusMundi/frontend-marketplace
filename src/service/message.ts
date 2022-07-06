@@ -1,7 +1,7 @@
 import Api from '@/service/api';
 import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosResponse } from 'axios';
-import { MessagesResponse } from '@/model/message';
+import { MessagesResponse, MessageThreadResponse } from '@/model/message';
 
 const baseUri = '/action/messages';
 
@@ -31,6 +31,19 @@ export default class MessageApi extends Api {
     return this.get<MessagesResponse>(url)
       .then((response: AxiosResponse<MessagesResponse>) => {
         const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async getThread(threadKey: string): Promise<MessageThreadResponse> {
+    const url = `${baseUri}/thread/${threadKey}`;
+
+    return this.get<MessageThreadResponse>(url)
+      .then((response: AxiosResponse<MessageThreadResponse>) => {
+        const { data } = response;
+
         if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
