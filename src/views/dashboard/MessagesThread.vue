@@ -7,7 +7,7 @@
     </div>
     <div class="thread">
       <div class="thread__main">
-        <div class="thread__row" v-for="message in messages" :key="message.id">
+        <div class="thread__row" :class="{'thread__row--sent-by-user': message.senderId === $store.getters.getUserKey}" v-for="message in messages" :key="message.id">
           <div class="thread__row__date"><span>{{ formatDate(message.createdAt).date }} • {{ formatDate(message.createdAt).time }}</span></div>
           <div class="thread__row__body">
             <div class="thread__row__body__logo">
@@ -65,51 +65,77 @@
         </div> -->
       </div>
 
-      <div class="thread__bottom">
-        <div class="thread__bottom__block">
-          <textarea name="message" id="message" placeholder="Your message"></textarea>
-          <div class="thread__bottom__block__logo">
-            <div class="asset-owner__inner__logo asset-owner__inner__logo--m">
-              <img :src="getSenderProfile($store.getters.getUserKey).logoImage ? 'data:' + getSenderProfile($store.getters.getUserKey).logoImageMimeType + ';base64, ' + getSenderProfile($store.getters.getUserKey).logoImage : defaultLogo()" alt="user image">
-            </div>
-            <p class="form-group__stickyright__text">{{ getSenderProfile($store.getters.getUserKey).name }}</p>
-          </div>
-        </div>
+      <validation-provider ref="vpMessage" rules="required" mode="passive" v-slot="{ errors }">
+        <div class="thread__bottom">
+          <div class="thread__bottom__block">
+            <textarea placeholder="Your message" v-model="messageToSend"></textarea>
 
-        <button type="submit" class="btn--std btn--blue">SEND</button>
-      </div>
+            <div class="thread__bottom__block__logo">
+              <div class="asset-owner__inner__logo asset-owner__inner__logo--m">
+                <img :src="getSenderProfile($store.getters.getUserKey).logoImage ? 'data:' + getSenderProfile($store.getters.getUserKey).logoImageMimeType + ';base64, ' + getSenderProfile($store.getters.getUserKey).logoImage : defaultLogo()" alt="user image">
+              </div>
+              <p class="form-group__stickyright__text">{{ getSenderProfile($store.getters.getUserKey).name }}</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <span v-if="errors[0]" class="errors">A message is required</span>
+          </div>
+
+          <button :disabled="!messages" type="submit" class="btn btn--std btn--blue" @click="sendMessage">SEND</button>
+        </div>
+      </validation-provider>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
+import { required } from 'vee-validate/dist/rules';
 import MessageApi from '@/service/message';
 import { ClientContact, Message } from '@/model/message';
 import getDefaultLogo from '@/helper/logo';
 import store from '@/store';
 import moment from 'moment';
 
-@Component
+extend('required', required);
+
+@Component({
+  components: { ValidationProvider, ValidationObserver },
+})
 export default class DashboardMessagesThread extends Vue {
+  $refs!: {
+    vpMessage: InstanceType<typeof ValidationProvider>,
+  }
+
+  threadId = '';
+
   messageApi = new MessageApi();
 
   contacts: ClientContact[] = [];
 
   messages: Message[] | null = null;
 
+  messageToSend = '';
+
   created(): void {
     store.commit('setLoading', true);
 
-    const threadId = this.$route.params.id;
+    this.threadId = this.$route.params.id;
 
-    this.messageApi.getThread(threadId).then((response) => {
+    this.messageApi.getThread(this.threadId).then((response) => {
       this.contacts = Object.keys(response.contacts).map((x) => response.contacts[x]);
       this.messages = response.result;
       console.log('m', this.messages);
 
       store.commit('setLoading', false);
     });
+  }
+
+  @Watch('messageToSend')
+  onMessageToSendChange(newVal: string, oldVal: string): void {
+    if (newVal && !oldVal) this.$refs.vpMessage.validate();
   }
 
   getSenderProfile(senderId: string): ClientContact {
@@ -134,9 +160,26 @@ export default class DashboardMessagesThread extends Vue {
   defaultLogo(): string {
     return getDefaultLogo();
   }
+
+  async sendMessage(): Promise<void> {
+    const { valid } = await this.$refs.vpMessage.validate();
+    if (!valid) return;
+
+    store.commit('setLoading', true);
+
+    const replyToMessageResponse = await this.messageApi.replyToMessage(this.threadId, this.messageToSend);
+    if (!replyToMessageResponse.success) return;
+
+    if (!this.messages) return;
+    this.messages.push(replyToMessageResponse.result);
+    this.messageToSend = '';
+
+    store.commit('setLoading', false);
+  }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/_message-thread.scss";
   @import "@/assets/styles/_search.scss";
+  @import "@/assets/styles/_forms.scss";
 </style>

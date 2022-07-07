@@ -2,7 +2,7 @@
   max-width: 1000px;
   position: relative;
   &__main{
-    height: calc(100vh - 370px);
+    height: calc(100vh - 380px);
     overflow: auto;
     padding-right: 10px;
   }
@@ -32,13 +32,16 @@
       }
      }
     }
-    &:nth-child(even){
+    &--sent-by-user{
       .thread__row__date{
         text-align: left;
       }
       .thread__row__body__logo{
         order: 2;
       }
+      // .thread__row__body__message{
+      //   text-align: right;
+      // }
     }
   }
 
