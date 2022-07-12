@@ -200,9 +200,9 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider> -->
-          <validation-provider v-slot="{ errors }" name="Reference system">
+          <validation-provider v-slot="{ errors }" name="Reference system" rules="required">
             <div class="form-group" v-show="!isSpatialMetadataHidden">
-              <label for="ajax">Reference system</label>
+              <label for="ajax">Reference system *</label>
               <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
@@ -416,7 +416,10 @@ export default class Metadata extends Vue {
       this.isLoadingEpsg = true;
       this.spatialApi.getEpsgCodes(this.assetLocal.referenceSystem).then((epsgResponse) => {
         const epsg = epsgResponse.result.find((x) => `${x.code}` === this.assetLocal.referenceSystem);
-        if (epsg) this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
+        if (epsg) {
+          this.selectedEpsg = { code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` };
+          this.epsgList = [{ code: `${epsg.code}`, name: `EPSG:${epsg.code} | ${epsg.name}` }];
+        }
         this.isLoadingEpsg = false;
       });
     }

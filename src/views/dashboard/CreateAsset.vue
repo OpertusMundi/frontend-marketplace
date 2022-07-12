@@ -296,7 +296,7 @@ export default class CreateAsset extends Vue {
       fileName: '',
       fileExtension: '',
       crs: '',
-      encoding: '',
+      encoding: 'UTF-8',
     };
 
     this.assetMainType = '' as EnumAssetTypeCategory;
@@ -461,7 +461,7 @@ export default class CreateAsset extends Vue {
         publicationDate: '',
         publisherEmail: '',
         publisherName: '',
-        referenceSystem: '',
+        referenceSystem: '4326',
         resourceLocator: '',
         responsibleParty: this.assetMainType as string === 'OPEN' ? [{
           address: '',
