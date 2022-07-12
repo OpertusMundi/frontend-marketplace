@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 
 import Api from '@/service/api';
 import { showApiErrorModal } from '@/helper/api-errors';
@@ -12,7 +12,7 @@ import {
   ProviderOrder,
   OrderShippingCommand,
 } from '@/model/order';
-import { blobToJson } from '@/helper/file';
+import processResponse from '@/helper/axios-response';
 
 /**
  * Service for querying provider orders.
@@ -137,42 +137,13 @@ export default class ProviderOrderApi extends Api {
     });
   }
 
-  /**
-   * Download provider contract file
-   *
-   * @param orderKey
-   */
-  public async downloadContract(orderKey: string, save = true): Promise<ServerResponse<Blob>> {
-    const url = `/action/provider/orders${orderKey}/contract`;
+  public async downloadContract(key: string, index = 1, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
+    const url = `/action/contract/provider/order/${key}?index=${index}`;
 
-    return this.get<Blob>(url, {
+    const response = this.post<void, Blob>(url, null, {
       responseType: 'blob',
-    }).then((response: AxiosResponse<Blob>) => {
-      if (save) {
-        const contentDisposition = response.headers['content-disposition'];
-        const filename = this.getFilenameFromHeader(contentDisposition);
+    });
 
-        saveAs(response.data, filename);
-      }
-
-      return Promise.resolve({
-        success: true,
-        messages: [],
-        result: response.data,
-      });
-    })
-      .catch((err: AxiosError) => blobToJson(err.response?.data));
-  }
-
-  private getFilenameFromHeader(header: string | null): string {
-    const defaultName = 'download.pdf';
-    if (!header) {
-      return defaultName;
-    }
-    const filenamePart = header.split(';')[1];
-    if (!filenamePart) {
-      return defaultName;
-    }
-    return filenamePart.split('filename')[1].split('=')[1].trim();
+    return processResponse(response, save, downloadFilename);
   }
 }
