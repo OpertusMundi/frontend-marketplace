@@ -117,7 +117,7 @@ export default class DashboardPurchases extends Vue {
   // TODO: ATTENTION: currently works for only one asset item (index: 1);
   onDownloadContract(): void {
     store.commit('setLoading', true);
-    this.consumerContractsApi.downloadContract(this.order.key, 1, true, true)
+    this.consumerContractsApi.downloadContract(this.order.key, 1, true)
       .catch((err) => {
         console.log('err', err);
       }).finally(() => {

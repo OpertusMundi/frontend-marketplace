@@ -602,7 +602,7 @@ export default class Checkout extends Vue {
     }
 
     // if NOT custom contract
-    this.consumerContractsApi.printContract(this.orderKey, this.currentItemToReviewContract + 1, false, true)
+    this.consumerContractsApi.downloadContract(this.orderKey, this.currentItemToReviewContract + 1, true)
       .catch((err) => {
         console.log('err', err);
         store.commit('setLoading', false);

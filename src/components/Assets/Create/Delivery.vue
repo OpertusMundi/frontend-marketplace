@@ -113,10 +113,17 @@
                   </validation-provider>
                 </div>
 
-                <div v-if="fileToUploadLocal.isFileSelected" class="form-group mt-xs-20">
-                  <label for="fileEncoding">Encoding</label>
-                  <input class="form-group__text" id="fileEncoding" type="text" placeholder="(optional)" v-model="fileToUploadLocal.encoding" />
-                </div>
+                <template v-if="fileToUploadLocal.isFileSelected">
+                  <validation-provider v-slot="{ errors }" rules="required">
+                    <div class="form-group mt-xs-20">
+                      <label for="fileEncoding">Encoding</label>
+                      <input class="form-group__text" id="fileEncoding" type="text" placeholder="e.g. UTF-8" v-model="fileToUploadLocal.encoding" />
+                      <div class="errors" v-if="errors.length">
+                        <span class="mt-xs-20">Encoding is required</span>
+                      </div>
+                    </div>
+                  </validation-provider>
+                </template>
               </div>
             </div>
             <div v-else-if="byPlatform === 'LINK_TO_ASSET' && byOwnMeans === 'DIGITAL_PLATFORM'" class="col-md-4">
@@ -320,16 +327,28 @@ export default class Delivery extends Vue {
     console.log('Emit file from storage to CreatAsset component topio drive => ', fileTopioDrive);
   }
 
+  @Watch('fileToUploadLocal', { deep: true })
+  onFileToUploadChange(): void {
+    console.log('file-to-upload change');
+    this.$emit('update:fileToUpload', this.fileToUploadLocal);
+  }
+
   // eslint-disable-next-line
   readFile(e): void {
     console.log(e);
     const [file] = e.srcElement.files;
-    this.fileToUploadLocal.isFileSelected = true;
-    this.fileToUploadLocal.file = file;
-    this.fileToUploadLocal.fileName = file.name;
-    this.fileToUploadLocal.fileExtension = file.name.split('.').pop();
-
-    this.$emit('update:fileToUpload', this.fileToUploadLocal);
+    // this.fileToUploadLocal.isFileSelected = true;
+    // this.fileToUploadLocal.file = file;
+    // this.fileToUploadLocal.fileName = file.name;
+    // this.fileToUploadLocal.fileExtension = file.name.split('.').pop();
+    this.fileToUploadLocal = {
+      ...this.fileToUploadLocal,
+      isFileSelected: true,
+      file,
+      fileName: file.name,
+      fileExtension: file.name.split('.').pop(),
+    };
+    // this.$emit('update:fileToUpload', this.fileToUploadLocal);
   }
 
   removeResource(id: string): void {

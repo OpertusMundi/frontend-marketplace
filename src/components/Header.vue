@@ -482,6 +482,11 @@ export default class Header extends Vue {
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
   }
 
+  @Watch('$store.getters.isAuthenticated')
+  onAuthenticationStateChange(isAuthenticated: boolean): void {
+    if (isAuthenticated) this.pollNotifications();
+  }
+
   @Watch('$store.getters.getCart', { deep: true })
   onCartChange(cartCurrent: Cart, cartPrevious: Cart): void {
     if (cartCurrent && cartPrevious && (cartCurrent.totalItems > cartPrevious.totalItems)) {
