@@ -1,4 +1,5 @@
 import Api from '@/service/api';
+import processResponse from '@/helper/axios-response';
 import { showApiErrorModal } from '@/helper/api-errors';
 import { Sorting } from '@/model/request';
 import {
@@ -242,5 +243,23 @@ export default class ContractApi extends Api {
     return this.get<ServerResponse<BinaryType>>(url, {
       responseType: 'blob',
     });
+  }
+
+  /**
+   * Download Contract
+   *
+   * @param key
+   * @param index
+   * @returns
+   */
+
+  public async downloadContract(key: string, index = 1, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
+    const url = `${this.basePath}/order/${key}?index=${index}`;
+
+    const response = this.get<Blob>(url, {
+      responseType: 'blob',
+    });
+
+    return processResponse(response, save, downloadFilename);
   }
 }
