@@ -25,17 +25,17 @@
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
@@ -191,8 +191,13 @@ export default class SalesLineGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
+    console.log(newVal);
     this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
     this.getAnalytics();
+  }
+
+  filteredAssets(assets: AssetDraft[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
   }
 
   async getAssets(): Promise<any> {
@@ -437,68 +442,54 @@ export default class SalesLineGraphCard extends Vue {
   formatDate(value: any): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
-      date = moment()
-        .set({ year: value.year, month: value.month, date: value.day })
+      date = moment(`${value.year}-${value.month}-${value.day}`)
         .format('MMM D, YY');
-      // console.log('day');
     } else if (Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year') && !Object.prototype.hasOwnProperty.call(value, 'week')) {
-      date = moment()
-        .set({ year: value.year, month: value.month })
+      date = moment(`${value.year}-${value.month}`)
         .format('MMMM YYYY');
-      // console.log('month');
     } else if (Object.prototype.hasOwnProperty.call(value, 'week') && Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year')) {
-      const startWeek = moment()
-        .set('year', value.year)
+      const startWeek = moment(`${value.year}`)
         .add(value.week, 'weeks')
         .startOf('isoWeek')
         .format('MMM D');
-      const endWeek = moment()
-        .set('year', value.year)
+      const endWeek = moment(`${value.year}`)
         .add(value.week, 'weeks')
         .endOf('isoWeek')
         .format('MMM D, YY');
       date = `${startWeek} - ${endWeek}`;
-      // console.log('week');
     } else if (Object.prototype.hasOwnProperty.call(value, 'year')) {
-      date = moment()
-        .set({ year: value.year })
+      date = moment(`${value.year}`)
         .format('YYYY');
-      // console.log('year');
     }
-    // console.log(value);
     return date;
   }
 
   formatTheDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
+    if (this.assetsQuery?.length > 0) {
       this.segmentsNames.forEach((date: any) => {
         if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment()
-            .set({ year: date.year, month: date.month, date: date.day })
+          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
             .format('MMM D, YY');
           formattedDate.push(dayFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment()
-            .set({ year: date.year, month: date.month })
+          const monthFormat = moment(`${date.year}-${date.month}`)
+            // .set({ year: date.year, month: date.month })
             .format('MMMM YYYY');
           formattedDate.push(monthFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment()
-            .set('year', date.year)
+          const startWeek = moment(`${date.year}`)
             .add(date.week, 'weeks')
             .startOf('isoWeek')
             .format('MMM D');
-          const endWeek = moment()
-            .set('year', date.year)
+          const endWeek = moment(`${date.year}`)
             .add(date.week, 'weeks')
             .endOf('isoWeek')
             .format('MMM D, YY');
           const weekFormat = `${startWeek} - ${endWeek}`;
           formattedDate.push(weekFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment()
-            .set({ year: date.year })
+          const yearFormat = moment(`${date.year}`)
             .format('YYYY');
           formattedDate.push(yearFormat);
         }

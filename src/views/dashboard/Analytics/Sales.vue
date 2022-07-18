@@ -1,15 +1,6 @@
 <template>
   <div class="analytics__group">
     <div class="analytics__types">
-      <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'heatmap'" :class="{ active: activeTab == 'heatmap' }">
-        <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="" />
-          <h5>Viewer location</h5>
-        </div>
-        <div class="analytics__types__item__desc">
-          See the countries your assets are most popular at.
-        </div>
-      </a>
       <a href="#" class="analytics__types__item" @click.prevent="activeTab = 'line_transactions'" :class="{ active: activeTab == 'line_transactions' }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="" />

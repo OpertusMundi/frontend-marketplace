@@ -25,17 +25,17 @@
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
@@ -187,6 +187,10 @@ export default class SalesBarGraphCard extends Vue {
   selectedAssetsChanged(newVal: Array<any>): void {
     this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
     this.getAnalytics();
+  }
+
+  filteredAssets(assets: AssetDraft[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
   }
 
   async getAssets(): Promise<any> {
