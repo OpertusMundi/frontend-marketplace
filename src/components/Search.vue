@@ -11,7 +11,11 @@
       <div class="asset_search__upper__controls">
         <div class="asset_search__upper__controls__inner">
           <div class="asset_search__upper__controls__icons">
-            <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading"><img src="@/assets/images/icons/search_new.svg" alt="" /></div>
+            <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#333333" />
+              </svg>
+            </div>
             <div class="asset_search__upper__icon" v-if="query && searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
             <div class="asset_search__upper__icon" v-if="loading"><div class="loader_icon"></div></div>
           </div>
