@@ -137,6 +137,14 @@
               </div>
             </div>
             <div v-else-if="byPlatform === 'TOPIO_DRIVE' && byOwnMeans === 'DIGITAL_PLATFORM'" class="col-md-4">
+              <div class="d-inline-flex mb-xs-20" v-if="resources && resources.length">
+                <div v-for="resource in resources" :key="resource.id" class="resource-label">
+                  {{ resource.fileName }}
+                  <div @click="removeResource(resource.id)" class="resource-label__remove-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="9.061" height="9.061" viewBox="0 0 9.061 9.061"><g data-name="Group 2880" fill="none" stroke="#190aff" stroke-width="1.5"><path data-name="Line 135" d="m0 0 8 8" transform="translate(.53 .53)"/><path data-name="Line 136" d="m0 8 8-8" transform="translate(.53 .53)"/></g></svg>
+                  </div>
+                </div>
+              </div>
               <div class="dashboard__form__step__title">
                 <p>Select an asset from your topio Drive.</p>
               </div>
@@ -237,7 +245,7 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import { EnumDeliveryMethod, DraftApiFromFileCommand } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
-import { FileResource } from '@/model/asset';
+import { EnumResourceSource, EnumResourceType, FileResource } from '@/model/asset';
 
 extend('required', required);
 
@@ -274,7 +282,7 @@ export default class Delivery extends Vue {
 
   byOwnMeans: any | null;
 
-  byPlatform: any | null;
+  byPlatform: 'DIRECT_UPLOAD' | 'LINK_TO_ASSET' | 'TOPIO_DRIVE' | null;
 
   linkToAsset: string | null;
 
@@ -294,6 +302,19 @@ export default class Delivery extends Vue {
     this.linkToAsset = '';
 
     this.fileTopioDrive = {};
+  }
+
+  created(): void {
+    if (this.resources.length && this.resources[0].type === EnumResourceType.FILE) {
+      if (this.resources[0].source && this.resources[0].source === EnumResourceSource.UPLOAD) {
+        this.byOwnMeans = 'DIGITAL_PLATFORM';
+        this.byPlatform = 'DIRECT_UPLOAD';
+      }
+      if (this.resources[0].source && this.resources[0].source === EnumResourceSource.FILE_SYSTEM) {
+        this.byOwnMeans = 'DIGITAL_PLATFORM';
+        this.byPlatform = 'TOPIO_DRIVE';
+      }
+    }
   }
 
   @Watch('deliveryMethodLocal')

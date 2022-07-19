@@ -5,6 +5,13 @@ export enum EnumResourceType {
   SERVICE = 'SERVICE',
 }
 
+export enum EnumResourceSource {
+  NONE = 'NONE',
+  PARENT_DATASOURCE = 'PARENT_DATASOURCE',
+  FILE_SYSTEM = 'FILE_SYSTEM',
+  UPLOAD = 'UPLOAD',
+}
+
 export enum EnumAssetAdditionalResource {
   FILE = 'FILE',
   URI = 'URI'
@@ -78,7 +85,7 @@ export interface FileResource extends Resource {
   /**
    * Discriminator field used for deserializing the model to the appropriate data type
    */
-  type: EnumResourceType.FILE;
+  type: EnumResourceType;
   /**
    * File size in bytes
    */
@@ -107,6 +114,10 @@ export interface FileResource extends Resource {
    * File format
    */
   format: string;
+  /**
+   * Resource source
+   */
+  source?: EnumResourceSource;
 }
 
 interface Attributes {
