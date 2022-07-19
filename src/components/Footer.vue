@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="footer-cta">
+    <div class="footer-cta" v-if="showFooterCta">
       <div class="s_container">
         <div class="footer-cta__inner">
           <div class="footer-cta__item">
@@ -134,7 +134,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Flickity from 'flickity';
 import 'flickity/css/flickity.css';
 
@@ -142,14 +142,25 @@ import 'flickity/css/flickity.css';
 export default class Footer extends Vue {
   promoCarousel: any;
 
+  showFooterCta = true;
+
   promoClasses: Array<string> = ['over', ''];
 
   mounted(): void {
     this.initPromoCarousel();
+    // this.showHideFooterCta();
   }
 
   destroyed(): void {
     if (this.promoCarousel) this.promoCarousel.destroy();
+  }
+
+  @Watch('$route', { immediate: true, deep: true })
+  showHideFooterCta(): void {
+    console.log(this.$route.name);
+    if (this.$route.name === 'Catalogue' || this.$route.name === 'CatalogueSingle' || this.$route.name === 'single-vas' || this.$route.name === 'vas') {
+      this.showFooterCta = false;
+    }
   }
 
   initPromoCarousel = (): void => {
