@@ -9,7 +9,7 @@
           <search></search>
           <!--  -->
           <div class="homepage__hero__content__text">
-            <div class="homepage__hero__content__filter_shortcuts">
+            <!-- <div class="homepage__hero__content__filter_shortcuts">
               <div>
                 <p>Show Only</p>
                 <div class="btn--filter-shortcut" @click="onSelectFilterShortcut('OPEN')">
@@ -53,7 +53,7 @@
                 </div>
               </div>
               <router-link :to="'/catalogue'"><p>ADVANCED SEARCH &#8600;</p></router-link>
-            </div>
+            </div> -->
           </div>
           <!--  -->
         </div>
