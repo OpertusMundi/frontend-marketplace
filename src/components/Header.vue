@@ -494,7 +494,10 @@
               </transition>
             </div>
           </div>
-          <div class="header__login" v-else><a @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link to="/register">Register</router-link></div>
+          <div class="header__login" v-else>
+            <router-link class="header__login__register" to="/register">REGISTER</router-link>
+            <a @click.prevent="loginWithKeycloak">Login</a>
+          </div>
         </div>
       </div>
       <div class="modal-search" v-bind:class="{ open: showSearchModal }">

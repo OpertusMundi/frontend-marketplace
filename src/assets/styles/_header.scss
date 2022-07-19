@@ -528,6 +528,9 @@
 
   &__login {
     cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     a {
       color: inherit;
       font-weight: 500;
@@ -535,6 +538,16 @@
     }
     span {
       padding: 0 5px;
+    }
+    &__register {
+      border-radius: 20px;
+      padding: 8px 20px;
+      border: 2px solid #fff;
+      margin-right: 20px;
+      &:hover {
+        background-color: #fff;
+        color: $secondColor;
+      }
     }
     .header--dashboard & {
       svg {
