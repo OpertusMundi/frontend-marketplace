@@ -117,7 +117,11 @@
                   <validation-provider v-slot="{ errors }" rules="required">
                     <div class="form-group mt-xs-20">
                       <label for="fileEncoding">Encoding</label>
-                      <input class="form-group__text" id="fileEncoding" type="text" placeholder="e.g. UTF-8" v-model="fileToUploadLocal.encoding" />
+                      <!-- <input class="form-group__text" id="fileEncoding" type="text" placeholder="e.g. UTF-8" v-model="fileToUploadLocal.encoding" />
+                      <div class="errors" v-if="errors.length">
+                        <span class="mt-xs-20">Encoding is required</span>
+                      </div> -->
+                      <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileToUploadLocal.encoding" @tag="fileToUploadLocal = { ...fileToUploadLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
                       <div class="errors" v-if="errors.length">
                         <span class="mt-xs-20">Encoding is required</span>
                       </div>
@@ -243,6 +247,7 @@ import {
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
+import Multiselect from 'vue-multiselect';
 import { EnumDeliveryMethod, DraftApiFromFileCommand } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
 import { EnumResourceSource, EnumResourceType, FileResource } from '@/model/asset';
@@ -262,6 +267,7 @@ interface FileToUpload {
   components: {
     ValidationProvider,
     ValidationObserver,
+    Multiselect,
     FileTopioDrive,
   },
 })
@@ -288,6 +294,8 @@ export default class Delivery extends Vue {
 
   fileTopioDrive: any | null;
 
+  popularEncodings: string[];
+
   constructor() {
     super();
 
@@ -302,6 +310,8 @@ export default class Delivery extends Vue {
     this.linkToAsset = '';
 
     this.fileTopioDrive = {};
+
+    this.popularEncodings = ['UTF-8', 'Windows-1251', 'Windows-1252', 'Windows-1253', 'ISO 8859-1', 'ISO 8859-2', 'ISO 8859-3', 'ISO 8859-4', 'ISO 8859-5', 'ISO 8859-7'];
   }
 
   created(): void {
