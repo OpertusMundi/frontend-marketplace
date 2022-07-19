@@ -28,15 +28,18 @@
         <span v-else class="info-table__value info-table__value--large">{{ order.items[0].description }}</span>
 
         <span class="info-table__field">Date Executed</span><span class="info-table__value">{{ formatDate(order.createdOn) }}</span>
+        <span class="info-table__field">Provider</span><span class="info-table__value">{{ order.items[0].provider ? order.items[0].provider.name : '' }}</span> <!-- TODO: we currently have only 1 item -->
         <span class="info-table__field">Payment method</span><span class="info-table__value">{{ order.paymentMethod ? $labelize(order.paymentMethod) : '' }}</span>
+        <span class="info-table__field">Shipping details</span><span class="info-table__value">{{ `${order.deliveryMethod ? $labelize(order.deliveryMethod) : ''}` }}</span>
         <span class="info-table__field">Purchase cost</span><span class="info-table__value">{{ `${order.totalPrice}€` }}</span>
 
         <span class="info-table__field">Contract</span>
         <span v-if="order.items[0].contractSignedOn" class="info-table__value"><button :disabled="!order" class="btn btn--std btn--blue" @click="onDownloadContract">download</button></span>
         <span v-else class="info-table__value">Contract is not ready</span>
-        <!-- <span class="info-table__field">Order confirmation</span><span class="info-table__value">download link (dummy)</span> -->
-        <span class="info-table__field">Shipping details</span><span class="info-table__value">{{ `${order.deliveryMethod ? $labelize(order.deliveryMethod) : ''}` }}</span>
-        <span class="info-table__field">Provider</span><span class="info-table__value">{{ order.items[0].provider ? order.items[0].provider.name : '' }}</span> <!-- TODO: we currently have only 1 item -->
+
+        <span class="info-table__field">Invoice</span>
+        <span v-if="order && order.invoicePrinted" class="info-table__value"><button class="btn btn--std btn--blue" @click="onDownloadInvoice">download</button></span>
+        <span v-else class="info-table__value">Invoice is not ready</span>
       </div>
     </div>
   </div>
@@ -123,6 +126,12 @@ export default class DashboardPurchases extends Vue {
       }).finally(() => {
         store.commit('setLoading', false);
       });
+  }
+
+  onDownloadInvoice(): void {
+    store.commit('setLoading', true);
+    this.consumerOrderApi.downloadInvoice(this.order.key, true)
+      .finally(() => store.commit('setLoading', false));
   }
 
   onOrderDeliveredConfirmation(): void {

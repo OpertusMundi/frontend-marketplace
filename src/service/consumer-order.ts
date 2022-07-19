@@ -1,5 +1,6 @@
 import Api from '@/service/api';
 import { showApiErrorModal } from '@/helper/api-errors';
+import processResponse from '@/helper/axios-response';
 import {
   AxiosPageResponse, AxiosServerResponse, PageResult, ServerResponse,
 } from '@/model/response';
@@ -92,5 +93,15 @@ export default class ConsumerOrderApi extends Api {
 
         return data;
       });
+  }
+
+  public async downloadInvoice(orderKey: string, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
+    const url = `/action/consumer/orders/${orderKey}/invoice`;
+
+    const response = this.post<void, Blob>(url, null, {
+      responseType: 'blob',
+    });
+
+    return processResponse(response, save, downloadFilename);
   }
 }

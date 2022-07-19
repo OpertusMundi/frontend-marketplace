@@ -194,6 +194,10 @@ export interface ConsumerOrder extends Order {
    * Order items. Currently only a single item is allowed per order
    */
   items: ConsumerOrderItem[];
+  /**
+   * True if invoice is printed
+   */
+   invoicePrinted: boolean;
 }
 
 export interface ProviderOrder extends Order {
