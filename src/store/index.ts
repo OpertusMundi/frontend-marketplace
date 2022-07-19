@@ -9,6 +9,7 @@ import Shop from './modules/shop.module';
 import Router from './modules/router.module';
 import CatalogueFilters from './modules/catalogue-filters.module';
 import Notifications from './modules/notifications.module';
+import Messages from './modules/messages.module';
 import GlobalModals from './modules/global-modals.module';
 import ApiErrors from './modules/api-errors.module';
 import Announcement from './modules/announcement';
@@ -26,6 +27,7 @@ const store = new Vuex.Store({
     router: Router,
     catalogueFilters: CatalogueFilters,
     notifications: Notifications,
+    messages: Messages,
     globalModals: GlobalModals,
     apiErrors: ApiErrors,
     announcement: Announcement,

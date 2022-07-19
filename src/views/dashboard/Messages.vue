@@ -27,7 +27,7 @@
     <div class="messages">
       <div class="filters">
         <div class="filters__block">
-          <p class="filters__title">{{ paginationData.itemsTotal }} messages</p>
+          <p class="filters__title">{{ paginationData.itemsTotal }} threads</p>
         </div>
         <div class="filters__block">
           <div class="filters__block__select">
@@ -210,11 +210,9 @@ export default class DashboardMessages extends Vue {
 
     const userIDs = [message.senderId, message.recipientId];
     if (contactsExcludingCurrentUser.some((x) => userIDs.includes(x.id))) {
-      console.log('yeeeah');
       // eslint-disable-next-line
       return contactsExcludingCurrentUser.find((x) => userIDs.includes(x.id))!;
     }
-    console.log('noooope');
     // eslint-disable-next-line
     return { id: '', logoImage: '', logoImageMimeType: '', name: '' };
   }
@@ -245,7 +243,7 @@ export default class DashboardMessages extends Vue {
   findMessages(page = 0): void {
     store.commit('setLoading', true);
 
-    this.messageApi.find(page).then((response) => {
+    this.messageApi.find(page, this.paginationData.itemsPerPage, null, null, 'THREAD_ONLY').then((response) => {
       Vue.set(this.paginationData, 'itemsTotal', response.result.count);
       Vue.set(this.paginationData, 'currentPage', response.result.pageRequest.page);
       Vue.set(this.paginationData, 'itemsPerPage', response.result.pageRequest.size);
