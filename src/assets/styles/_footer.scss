@@ -57,6 +57,9 @@
           display: inline-block;
           margin: 30px 10px;
         }
+        &:hover {
+          color: $mainColor;
+        }
       }
     }
     &__item {
@@ -76,6 +79,9 @@
         color: #fff;
         margin-top: 15px;
         font-weight: 500;
+        &:hover {
+          color: $mainColor;
+        }
       }
     }
   }

@@ -93,18 +93,25 @@
           </div>
           <div class="footer__upper__item">
             <h6>Sell Geodata</h6>
-            <router-link to="/vendor-benefits">Benefits for suppliers</router-link>
-            <a href="#">Get started</a>
+            <router-link to="/vendor-benefits">topio for data supppliers</router-link>
+            <a href="#">Become a supplier</a>
           </div>
           <div class="footer__upper__item">
             <h6>Buy Geodata</h6>
-            <router-link to="/user-benefits">Benefits for users</router-link>
-            <router-link to="/catalogue">Data catalogue</router-link>
+            <router-link to="/user-benefits">topio for data users</router-link>
+            <router-link to="/catalogue">Explore assets</router-link>
           </div>
           <div class="footer__upper__item">
-            <h6>Topio</h6>
-            <router-link to="/about">About</router-link>
-            <a href="#">Contact</a>
+            <h6>Use Geodata</h6>
+            <router-link to="/vas">Services</router-link>
+            <router-link to="/documentation">Documentation</router-link>
+          </div>
+          <div class="footer__upper__item">
+            <h6>About</h6>
+            <router-link to="/about">What is Topio</router-link>
+            <router-link to="/">Blog</router-link>
+            <router-link to="/">Contact</router-link>
+            <router-link to="/faq">FAQ</router-link>
           </div>
           <div class="footer__upper__item">
             <h6>Disclaimers</h6>
