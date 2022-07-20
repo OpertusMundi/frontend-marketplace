@@ -43,7 +43,7 @@
       </div>
 
       <div class="messages__main">
-        <router-link class="messages__main__row" :to="`/dashboard/messages/${message.thread}`" v-for="message in messages" :key="message.id">
+        <router-link class="messages__main__row" :class="{'messages__main__row--read': message.read}" :to="`/dashboard/messages/${message.thread}`" v-for="message in messages" :key="message.id">
           <div class="messages__main__row__view"><span>VIEW MESSAGE</span></div>
           <div class="messages__main__row__inner">
             <div class="messages__main__row__block">
@@ -172,7 +172,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Pagination from '@/components/Pagination.vue';
 import MessageApi from '@/service/message';
 import { ClientContact, Message } from '@/model/message';
@@ -201,6 +201,11 @@ export default class DashboardMessages extends Vue {
   };
 
   created(): void {
+    this.findMessages();
+  }
+
+  @Watch('$store.getters.getUnreadMessagesCount')
+  onUnreadMessagesCountChange(): void {
     this.findMessages();
   }
 

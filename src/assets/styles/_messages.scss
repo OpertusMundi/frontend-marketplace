@@ -25,6 +25,9 @@
           display: none!important;
         }
       }
+      &--read {
+        color: $darkColor;
+      }
 
       &:hover{
         cursor: pointer;

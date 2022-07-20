@@ -64,4 +64,15 @@ export default class MessageApi extends Api {
         return data;
       });
   }
+
+  public async markThreadAsRead(threadKey: string): Promise<MessagesResponse> {
+    const url = `${baseUri}/thread/${threadKey}`;
+
+    return this.put<void, MessagesResponse>(url, null)
+      .then((response) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
 }

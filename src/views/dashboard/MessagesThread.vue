@@ -130,7 +130,18 @@ export default class DashboardMessagesThread extends Vue {
       console.log('m', this.messages);
 
       store.commit('setLoading', false);
+
+      this.$nextTick(() => this.scrollMessagesToBottom());
+
+      this.messageApi.markThreadAsRead(this.threadId)
+        .finally(() => this.messageApi.find(0, 1, null, null, 'UNREAD'))
+        .then((unreadMessagesResponse) => store.commit('setUnreadMessagesCount', unreadMessagesResponse.result.count));
     });
+  }
+
+  scrollMessagesToBottom(): void {
+    const elem = document.querySelector('.thread__main');
+    if (elem) elem.scrollTo({ top: elem.scrollHeight });
   }
 
   @Watch('messageToSend')
