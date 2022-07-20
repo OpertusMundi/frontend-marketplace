@@ -14,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="dashboard__head__helpers">
+      <!-- <div class="dashboard__head__helpers">
         <div class="asset_search asset_search--grey-border">
           <div class="asset_search__upper asset_search__upper--sm">
             <input type="text" name="" id="" placeholder="Search in messages" class="asset_search__upper__input">
@@ -22,7 +22,7 @@
             <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="/assets/images/icons/close_icon.svg" alt=""></div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="messages">
       <div class="filters">
