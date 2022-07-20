@@ -423,7 +423,11 @@
               <transition name="fade" mode="out-in">
                 <div class="user_menu__dropdown user_menu__dropdown--large" v-show="showNotifications">
                   <ul>
-                    <li v-if="!notifications.length"><span class="dropdown-text">No notifications</span></li>
+                    <li v-if="!notifications.length && !$store.getters.getUnreadMessagesCount"><span class="dropdown-text">No notifications</span></li>
+                    <li v-if="$store.getters.getUnreadMessagesCount">
+                      <router-link to="/dashboard/messages"><span class="notification--unread">You have unread messages</span></router-link>
+                      <hr>
+                    </li>
                     <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                       <router-link to="">
                         <div :class="{ 'notification--unread': !notification.read }" v-html="notification.text"></div>
@@ -547,6 +551,7 @@ import {
 import store from '@/store';
 import AccountApi from '@/service/account';
 import NotificationApi from '@/service/notification';
+import MessageApi from '@/service/message';
 import Search from '@/components/Search.vue';
 import {
   ServerResponse, LogoutResult, Cart, CartItem,
@@ -592,6 +597,8 @@ export default class Header extends Vue {
 
   notificationApi: NotificationApi;
 
+  messageApi: MessageApi;
+
   showSubmenuSell = false;
 
   showSubmenuBuy = false;
@@ -613,6 +620,7 @@ export default class Header extends Vue {
 
     this.accountApi = new AccountApi();
     this.notificationApi = new NotificationApi();
+    this.messageApi = new MessageApi();
 
     this.notifications = [];
     this.pollTimeoutRef = null;
@@ -620,7 +628,7 @@ export default class Header extends Vue {
 
   mounted(): void {
     window.addEventListener('scroll', this.handleScroll);
-    this.pollNotifications();
+    this.pollNotificationsAndMessages();
   }
 
   beforeDestroy(): void {
@@ -630,7 +638,7 @@ export default class Header extends Vue {
 
   @Watch('$store.getters.isAuthenticated')
   onAuthenticationStateChange(isAuthenticated: boolean): void {
-    if (isAuthenticated) this.pollNotifications();
+    if (isAuthenticated) this.pollNotificationsAndMessages();
   }
 
   @Watch('$store.getters.getCart', { deep: true })
@@ -658,7 +666,7 @@ export default class Header extends Vue {
     this.$router.push({ name: 'BecomeVendor' });
   }
 
-  pollNotifications(): void {
+  pollNotificationsAndMessages(): void {
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
     if (store.getters.isAuthenticated) {
       this.notificationApi.find(0, 5, null, null, null).then((response) => {
@@ -666,8 +674,12 @@ export default class Header extends Vue {
         console.log(this.notifications);
         store.commit('setNotificationsCount', response.result.count);
         this.pollTimeoutRef = setTimeout(() => {
-          this.pollNotifications();
+          this.pollNotificationsAndMessages();
         }, 30000);
+      });
+
+      this.messageApi.find(0, 1, null, null, 'UNREAD').then((response) => {
+        store.commit('setUnreadMessagesCount', response.result.count);
       });
     } else {
       this.notifications = [];
@@ -679,7 +691,7 @@ export default class Header extends Vue {
     this.notificationApi.readNotification(id).then((response) => {
       if (response.success) {
         console.log('marked notification as read');
-        this.pollNotifications();
+        this.pollNotificationsAndMessages();
       } else {
         console.log('error marking notification as read');
       }
@@ -688,6 +700,7 @@ export default class Header extends Vue {
 
   showNotificationBadge(): boolean {
     if (this.notifications && this.notifications.some((x) => !x.read)) return true;
+    if (store.getters.getUnreadMessagesCount) return true;
     return false;
   }
 

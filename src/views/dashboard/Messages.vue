@@ -14,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="dashboard__head__helpers">
+      <!-- <div class="dashboard__head__helpers">
         <div class="asset_search asset_search--grey-border">
           <div class="asset_search__upper asset_search__upper--sm">
             <input type="text" name="" id="" placeholder="Search in messages" class="asset_search__upper__input">
@@ -22,12 +22,12 @@
             <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="/assets/images/icons/close_icon.svg" alt=""></div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="messages">
       <div class="filters">
         <div class="filters__block">
-          <p class="filters__title">{{ paginationData.itemsTotal }} messages</p>
+          <p class="filters__title">{{ paginationData.itemsTotal }} threads</p>
         </div>
         <div class="filters__block">
           <div class="filters__block__select">
@@ -43,7 +43,7 @@
       </div>
 
       <div class="messages__main">
-        <router-link class="messages__main__row" :to="`/dashboard/messages/${message.thread}`" v-for="message in messages" :key="message.id">
+        <router-link class="messages__main__row" :class="{'messages__main__row--read': message.read}" :to="`/dashboard/messages/${message.thread}`" v-for="message in messages" :key="message.id">
           <div class="messages__main__row__view"><span>VIEW MESSAGE</span></div>
           <div class="messages__main__row__inner">
             <div class="messages__main__row__block">
@@ -172,7 +172,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import Pagination from '@/components/Pagination.vue';
 import MessageApi from '@/service/message';
 import { ClientContact, Message } from '@/model/message';
@@ -204,17 +204,20 @@ export default class DashboardMessages extends Vue {
     this.findMessages();
   }
 
+  @Watch('$store.getters.getUnreadMessagesCount')
+  onUnreadMessagesCountChange(): void {
+    this.findMessages();
+  }
+
   getContactProfile(message: Message): ClientContact {
     const contactsExcludingCurrentUser = this.contacts.filter((x) => x.id !== store.getters.getUserKey);
     console.log(contactsExcludingCurrentUser);
 
     const userIDs = [message.senderId, message.recipientId];
     if (contactsExcludingCurrentUser.some((x) => userIDs.includes(x.id))) {
-      console.log('yeeeah');
       // eslint-disable-next-line
       return contactsExcludingCurrentUser.find((x) => userIDs.includes(x.id))!;
     }
-    console.log('noooope');
     // eslint-disable-next-line
     return { id: '', logoImage: '', logoImageMimeType: '', name: '' };
   }
@@ -245,7 +248,7 @@ export default class DashboardMessages extends Vue {
   findMessages(page = 0): void {
     store.commit('setLoading', true);
 
-    this.messageApi.find(page).then((response) => {
+    this.messageApi.find(page, this.paginationData.itemsPerPage, null, null, 'THREAD_ONLY').then((response) => {
       Vue.set(this.paginationData, 'itemsTotal', response.result.count);
       Vue.set(this.paginationData, 'currentPage', response.result.pageRequest.page);
       Vue.set(this.paginationData, 'itemsPerPage', response.result.pageRequest.size);

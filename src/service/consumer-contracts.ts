@@ -10,7 +10,7 @@ export default class ConsumerContractsApi extends Api {
   public async downloadContract(key: string, index = 1, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
     const url = `/action/contract/consumer/order/${key}?index=${index}`;
 
-    const response = this.post<void, Blob>(url, null, {
+    const response = this.get<Blob>(url, {
       responseType: 'blob',
     });
 

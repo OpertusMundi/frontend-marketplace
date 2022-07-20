@@ -120,17 +120,35 @@ export default class DashboardMessagesThread extends Vue {
   messageToSend = '';
 
   created(): void {
-    store.commit('setLoading', true);
-
     this.threadId = this.$route.params.id;
 
-    this.messageApi.getThread(this.threadId).then((response) => {
-      this.contacts = Object.keys(response.contacts).map((x) => response.contacts[x]);
-      this.messages = response.result;
-      console.log('m', this.messages);
+    this.getMessages();
+  }
 
-      store.commit('setLoading', false);
-    });
+  @Watch('$store.getters.getUnreadMessagesCount')
+  onUnreadMessagesCountChange(newVal: number, oldVal: number): void {
+    if (newVal > oldVal) this.getMessages(false);
+  }
+
+  getMessages(withLoader = true): void {
+    if (withLoader) store.commit('setLoading', true);
+
+    this.messageApi.getThread(this.threadId)
+      .then((response) => {
+        this.contacts = Object.keys(response.contacts).map((x) => response.contacts[x]);
+        this.messages = response.result;
+
+        if (withLoader) store.commit('setLoading', false);
+        this.$nextTick(() => this.scrollMessagesToBottom());
+      })
+      .then(() => this.messageApi.markThreadAsRead(this.threadId))
+      .finally(() => this.messageApi.find(0, 1, null, null, 'UNREAD'))
+      .then((unreadMessagesResponse) => store.commit('setUnreadMessagesCount', unreadMessagesResponse.result.count));
+  }
+
+  scrollMessagesToBottom(): void {
+    const elem = document.querySelector('.thread__main');
+    if (elem) elem.scrollTo({ top: elem.scrollHeight });
   }
 
   @Watch('messageToSend')
@@ -170,11 +188,9 @@ export default class DashboardMessagesThread extends Vue {
     const replyToMessageResponse = await this.messageApi.replyToMessage(this.threadId, this.messageToSend);
     if (!replyToMessageResponse.success) return;
 
-    if (!this.messages) return;
-    this.messages.push(replyToMessageResponse.result);
     this.messageToSend = '';
 
-    store.commit('setLoading', false);
+    this.getMessages();
   }
 }
 </script>

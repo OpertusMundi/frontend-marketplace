@@ -15,17 +15,18 @@ export default class MessageApi extends Api {
     page = 0, size = 10,
     dateFrom: string | null = null,
     dateTo: string | null = null,
-    read: boolean | null = null,
+    status: 'ALL' | 'UNREAD' | 'THREAD_ONLY' | 'THREAD_ONLY_UNREAD' | null = null,
   ): Promise<MessagesResponse> {
     const params = {
       page,
       size,
       'date-from': dateFrom,
       'date-to': dateTo,
-      read,
+      status,
     };
 
-    const keyValues = Object.keys(params).filter((k) => !!params[k] || params[k] === false).map((k) => `${k}=${params[k]}`);
+    const keyValues = Object.keys(params).filter((k) => !!params[k] || params[k] === false || params[k] === 0)
+      .map((k) => `${k}=${params[k]}`);
 
     const url = `${baseUri}?${keyValues.join('&')}`;
 
@@ -59,6 +60,17 @@ export default class MessageApi extends Api {
         const { data } = response;
 
         if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async markThreadAsRead(threadKey: string): Promise<MessagesResponse> {
+    const url = `${baseUri}/thread/${threadKey}`;
+
+    return this.put<void, MessagesResponse>(url, null)
+      .then((response) => {
+        const { data } = response;
 
         return data;
       });

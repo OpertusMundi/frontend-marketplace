@@ -8,7 +8,10 @@
     <div class="notification__card__main">
       <div class="notification__title">{{ formatTitle(notification.eventType) }}</div>
       <div class="notification__text" v-html="notification.text"></div>
-      <div class="notification__moment">{{ getTimeFromNow(notification.createdAt) }}</div>
+      <div class="notification__moment">
+        <template v-if="notification.createdAt">{{ getTimeFromNow(notification.createdAt) }}</template>
+        <template v-else><span style="color: #fff">_</span></template>
+      </div>
     </div>
   </div>
 </template>
