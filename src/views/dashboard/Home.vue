@@ -126,8 +126,6 @@ import ProviderOrderApi from '@/service/provider-order';
 import ConsumerOrderApi from '@/service/consumer-order';
 import ConsumerApi from '@/service/consumer';
 import store from '@/store';
-import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
-import { EnumAssetType } from '@/model/enum';
 import { EnumRole } from '@/model/role';
 import { Sorting } from '@/model/request';
 import { ConsumerOrder, EnumOrderSortField, ProviderOrder } from '@/model/order';
@@ -137,10 +135,12 @@ import { ConsumerAccountSubscription, EnumConsumerSubSortField } from '@/model/a
 import moment from 'moment';
 import AnalyticsApi from '@/service/analytics';
 import {
-  SalesQuery,
-  AssetTotalValueQuery,
+  AssetQuery,
+  EnumAssetQueryMetric,
+  EnumAssetSource,
+  EnumSalesQueryMetric,
   EnumTemporalUnit,
-  EnumSalesQueryMetric, AssetQuery, EnumAssetSource, EnumAssetQueryMetric,
+  SalesQuery,
 } from '@/model/analytics';
 
 const enum EnumFilterDates {
@@ -272,10 +272,7 @@ export default class DashboardHome extends Vue {
   }
 
   get isLoading(): boolean {
-    if (this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions) {
-      return true;
-    }
-    return false;
+    return this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions;
   }
 
   @Watch('isLoading', { immediate: true })
@@ -284,18 +281,18 @@ export default class DashboardHome extends Vue {
   }
 
   @Watch('totalEarningDateSelected')
-  onEarningsDateChange(value) {
+  onEarningsDateChange(value: EnumFilterDates): void {
     const dates = this.setMinMaxDates(value);
     this.getTotalEarnings(dates);
   }
 
   @Watch('totalAssetsDateSelected')
-  onTotalAssetsDateSelected(value) {
+  onTotalAssetsDateSelected(value: EnumFilterDates): void {
     const dates = this.setMinMaxDates(value);
     this.getTotalAssets(dates);
   }
 
-  setMinMaxDates(value): TemporalDimension {
+  setMinMaxDates(value: EnumFilterDates): TemporalDimension {
     switch (value) {
       case EnumFilterDates.ALL_TIME:
         return {
@@ -330,9 +327,9 @@ export default class DashboardHome extends Vue {
     }
   }
 
-  async getTotalEarnings(dates: TemporalDimension) {
+  getTotalEarnings(dates: TemporalDimension): void {
     const query: SalesQuery = {
-      metric: this.salesQueryMetricType,
+      metric: EnumSalesQueryMetric.SUM_SALES,
       time: {
         unit: dates.unit,
         min: dates.min,
@@ -347,7 +344,7 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  getTotalAssets(dates: TemporalDimension) {
+  getTotalAssets(dates: TemporalDimension): void {
     const query: AssetQuery = {
       source: EnumAssetSource.VIEW,
       metric: EnumAssetQueryMetric.COUNT,
@@ -358,10 +355,9 @@ export default class DashboardHome extends Vue {
       },
     };
     this.analyticsApi.executeAssetQuery(query).then((response) => {
-      const assetsSum = response.result.points.reduce( // sum all values of assets
+      this.itemsNum = response.result.points.reduce( // sum all values of assets
         (previousValue, currentValue) => previousValue + currentValue.value, 0,
       );
-      this.itemsNum = assetsSum;
     });
   }
   // block of code that has been replaced

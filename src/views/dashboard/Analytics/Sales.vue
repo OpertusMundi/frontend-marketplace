@@ -49,9 +49,6 @@
     </div>
 
     <div class="analytics__cards">
-      <div class="analytics__cards__item" v-show="activeTab == 'heatmap'">
-        <sales-heat-map-graph-card></sales-heat-map-graph-card>
-      </div>
       <div class="analytics__cards__item" v-show="activeTab == 'line_transactions'">
         <sales-line-graph-card :cardHeading="'Number of Transactions'" :salesQueryMetricType="'COUNT_TRANSACTIONS'" :symbol="''" :symbolTitle="'Number of Transactions'"></sales-line-graph-card>
       </div>

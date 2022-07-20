@@ -77,9 +77,11 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit, DataPoint,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
+import moment from 'moment';
+import DataTransform from '@/helper/analytics';
 
 @Component({
   components: {
@@ -123,6 +125,10 @@ export default class SalesBarGraphCard extends Vue {
 
   seriesData: any;
 
+  chartDate: any;
+
+  datetimeSeries: any;
+
   constructor() {
     super();
 
@@ -149,6 +155,10 @@ export default class SalesBarGraphCard extends Vue {
     this.temporalUnit = EnumTemporalUnit.DAY;
 
     this.seriesData = [];
+
+    this.chartDate = [];
+
+    this.datetimeSeries = [];
   }
 
   async mounted(): Promise<any> {
@@ -171,13 +181,47 @@ export default class SalesBarGraphCard extends Vue {
     };
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
+      console.log('segmentQuery: ', segmentQuery);
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
+        const dumm = {
+          time: {
+            year: 2022,
+            month: 6,
+            week: 12,
+            day: 3,
+          },
+          segment: 'MUNICIPAL',
+          asset: 'topio.another-company.169.VECTOR',
+          value: 120.76,
+        };
+        response.result.points.push(dumm);
+        console.log('SALE BAR GRAPH RESPONSE => ', response);
         // eslint-disable-next-line
         this.analyticsData = response.result!;
+        console.log('analytics data: ', this.analyticsData);
         this.segmentsNames = this.formatSegmentsNames();
+        console.log('segments: ', this.segmentsNames);
+        this.datetimeSeries = this.formatSegmentNamesTime();
+        console.log('datetime siries => ', this.datetimeSeries);
+        this.chartDate = this.formatTheDate();
+        console.log('chart date: ', this.chartDate);
         this.seriesData = this.formatSeries();
+        console.log('searies data: ', this.seriesData);
+
+        const result = Object.entries(response.result.points.reduce((previousValue, currentValue) => {
+          // eslint-disable-next-line no-param-reassign,@typescript-eslint/no-non-null-assertion
+          previousValue[currentValue.segment!] = (previousValue[currentValue.segment!] || 0) + currentValue.value || 1;
+          return previousValue;
+        }, {})).map((data) => data[1]);
+        console.log('result', result);
+        console.log('this. assets query => ', this.assetsQuery);
+        const format = this.assetsQuery.map((asset) => ({
+          name: this.assets.find(({ assetPublished }) => assetPublished === asset)?.title,
+          data: DataTransform.groupBySegmentToBarData(response.result.points.filter((e: DataPoint) => asset === e.asset)),
+        }));
+        console.log(format);
         this.chartOptions = this.getOptions();
       }
     });
@@ -240,6 +284,7 @@ export default class SalesBarGraphCard extends Vue {
       },
       xAxis: {
         categories: this.segmentsNames,
+        // type: 'datetime',
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,
@@ -281,20 +326,37 @@ export default class SalesBarGraphCard extends Vue {
     return names;
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  formatSegmentNamesTime() {
+    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
+  }
+
   formatSeries(): any[] {
     const series: Array<any> = [];
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
-        const data: Array<number> = [];
+        console.log('asset name: ', assetName);
+        // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUPING
+        // const data: Array<number> = [];
+        // this.segmentsNames.forEach((segName) => {
+        //   const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
+        //   console.log('vaue -> ', value);
+        //   if (value.length > 0) {
+        //     data.push(value[0]);
+        //   } else {
+        //     data.push(0);
+        //   }
+        // });
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const data: Array<any> = [];
         this.segmentsNames.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
+          const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
           if (value.length > 0) {
-            data.push(value[0]);
+            data.push(value);
           } else {
             data.push(0);
           }
         });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
@@ -304,8 +366,11 @@ export default class SalesBarGraphCard extends Vue {
       });
     } else {
       this.assetsQuery.forEach((assetName) => {
+        console.log('asset name: ', assetName);
         const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
-        const data = this.analyticsData?.points.map((a) => a.value);
+        // TODO: Confirm if this chart must be grouped by segment or by date index
+        // const data = this.analyticsData?.points.map((a) => a.value);
+        const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
@@ -325,7 +390,42 @@ export default class SalesBarGraphCard extends Vue {
   }
 
   upperCaseTransform(value: string): any {
-    return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
+    return value;
+    // return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
+  }
+
+  formatTheDate(): string[] {
+    const formattedDate: Array<any> = [];
+    if (this.assetsQuery?.length > 0) {
+      this.datetimeSeries.forEach((date: any) => {
+        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+            .format('MMM D, YY');
+          formattedDate.push(dayFormat);
+        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+          const monthFormat = moment(`${date.year}-${date.month}`)
+            // .set({ year: date.year, month: date.month })
+            .format('MMMM YYYY');
+          formattedDate.push(monthFormat);
+        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+          const startWeek = moment(`${date.year}`)
+            .add(date.week, 'weeks')
+            .startOf('isoWeek')
+            .format('MMM D');
+          const endWeek = moment(`${date.year}`)
+            .add(date.week, 'weeks')
+            .endOf('isoWeek')
+            .format('MMM D, YY');
+          const weekFormat = `${startWeek} - ${endWeek}`;
+          formattedDate.push(weekFormat);
+        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+          const yearFormat = moment(`${date.year}`)
+            .format('YYYY');
+          formattedDate.push(yearFormat);
+        }
+      });
+    }
+    return formattedDate;
   }
 }
 </script>

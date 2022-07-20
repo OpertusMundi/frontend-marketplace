@@ -24,13 +24,13 @@
     <table class="data_table" v-if="chartOptions">
       <thead>
         <tr>
-          <th class="data_table__header">Asset</th>
+          <th class="data_table__header">Location</th>
           <th v-for="(name, index) in tableData" class="data_table__header" :key="`segment_name_${index}`">{{ name.country }}</th>
         </tr>
       </thead>
       <tbody>
         <tr class="data_table__row">
-          <td class="data_table__data">Asset Name</td>
+          <td class="data_table__data">Views</td>
           <td class="data_table__data" v-for="value in tableData" :key="value.id">{{ formatValue(value.views) }}</td>
         </tr>
       </tbody>
@@ -39,7 +39,7 @@
 </template>
 <script lang="ts">
 import {
-  Component, Watch, Vue, Prop,
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -51,7 +51,11 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
+  AssetQuery,
+  DataSeries,
+  EnumAssetQueryMetric,
+  EnumAssetSource,
+  EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
@@ -144,7 +148,6 @@ export default class ViewsMapGraphCard extends Vue {
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    // await this.getAnalytics();
   }
 
   getAnalytics(): void {
@@ -180,9 +183,8 @@ export default class ViewsMapGraphCard extends Vue {
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    // this.assetsQuery = newVal.map((a) => a.key); //TODO: get the PID of asset
-    this.assetsQuery = ['topio.the-company.1.VECTOR'];
+  selectedAssetsChanged(newVal: AssetDraft[]): void {
+    this.assetsQuery = newVal.map((a) => a.key);
     this.getAnalytics();
   }
 
@@ -255,14 +257,13 @@ export default class ViewsMapGraphCard extends Vue {
   }
 
   formatSeries(): any {
-    const result: any[] = Object.values(
+    this.seriesData = Object.values(
       this.analyticsData.points.reduce((acc, object: any) => {
         const entry = object.location.code.toLowerCase();
         (acc[entry] || (acc[entry] = [entry, 0]))[1] += object.value;
         return acc;
       }, {}),
     );
-    this.seriesData = result;
   }
 
   tableCountries(): any {
@@ -275,13 +276,6 @@ export default class ViewsMapGraphCard extends Vue {
       tableData.push(tableObject);
     });
     return tableData;
-  }
-
-  setTemporalUnit(value: EnumTemporalUnit): void {
-    this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
   }
 
   formatValue(value: string): any {

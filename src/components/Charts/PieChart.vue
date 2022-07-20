@@ -4,33 +4,125 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import {
+  Component, Vue, Prop, Watch,
+} from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import exportingInit from 'highcharts/modules/exporting';
+import { AssetDraft } from '@/model/draft';
+import DataTransform from '@/helper/analytics';
+import {
+  AssetQuery, DataSeries,
+  EnumAssetQueryMetric,
+  EnumAssetSource,
+  EnumTemporalUnit,
+} from '@/model/analytics';
+import AnalyticsApi from '@/service/analytics';
 
 exportingInit(Highcharts);
+
+interface TemporalDimension {
+  /**
+   * Time interval unit (required)
+   */
+  unit: EnumTemporalUnit;
+  /**
+   * Min date in YYYY-MM-DD ISO format
+   */
+  min?: string;
+  /**
+   * Max date in YYYY-MM-DD ISO format
+   */
+  max?: string;
+}
 
 @Component({
   components: {
     highcharts: Chart,
   },
 })
-export default class SalesBarGraphCard extends Vue {
+export default class PieChart extends Vue {
   @Prop({ default: null }) private pieColor!: string[];
 
-  @Prop({ default: null }) private analyticsData!: any;
+  @Prop({ default: [] })
+  private assetQuery!: AssetDraft[];
+
+  @Prop({ default: null })
+  private index!: number;
+
+  @Prop({
+    default: {
+      unit: EnumTemporalUnit.DAY,
+      min: '',
+      max: '',
+    },
+  })
+  private time!: TemporalDimension
 
   chartOptions: any | null;
+
+  analyticsApi: AnalyticsApi;
+
+  dataSeriesPie: any;
+
+  analyticsData: DataSeries;
 
   constructor() {
     super();
 
     this.chartOptions = null;
+    this.analyticsApi = new AnalyticsApi();
+    this.dataSeriesPie = [];
+    this.analyticsData = {} as DataSeries;
   }
 
-  async mounted(): Promise<any> {
-    this.chartOptions = this.getOptions();
+  @Watch('assetQuery')
+  onAssetChange(asset: AssetDraft[]): void {
+    this.getAnalytics();
+    console.log('asset watcher => ', asset);
+  }
+
+  @Watch('time', { immediate: true, deep: true })
+  onTimeChange(time: TemporalDimension): void {
+    this.getAnalytics();
+    console.log('TIME watcher => ', time);
+  }
+
+  getAnalytics(): void {
+    const assetsViewsQuery: AssetQuery = {
+      segments: {
+        enabled: true,
+      },
+      assets: this.setSingleAsset(this.assetQuery),
+      metric: EnumAssetQueryMetric.COUNT,
+      source: EnumAssetSource.VIEW,
+      time: this.time,
+      areas: {
+        enabled: false,
+        codes: [],
+      },
+    };
+
+    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+      if (response.success) {
+        // eslint-disable-next-line
+        response.result!.points.reverse();
+        // eslint-disable-next-line
+        this.analyticsData = response.result!;
+        // Group by segments and sum values
+        this.dataSeriesPie = DataTransform.groupBySegmentToPie(response.result.points);
+        this.chartOptions = this.getOptions();
+      }
+    });
+  }
+
+  setSingleAsset(query: AssetDraft[]): string[] | null {
+    return query.filter((asset, index) => (index === this.index)).map((asset) => asset.assetPublished);
+  }
+
+  setSingleAssetTitle(query: AssetDraft[]): string {
+    return query.filter((asset, index) => (index === this.index)).map((asset) => asset.title)[0];
   }
 
   getOptions(): any {
@@ -56,7 +148,7 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       subtitle: {
-        text: 'Asset',
+        text: this.setSingleAssetTitle(this.assetQuery),
       },
 
       accessibility: {
@@ -92,43 +184,7 @@ export default class SalesBarGraphCard extends Vue {
               fontSize: 8,
             },
           },
-          data: [
-            {
-              name: 'BIOTA',
-              y: 45.74,
-            },
-            {
-              name: 'ECONOMY',
-              y: 10.57,
-            },
-            {
-              name: 'ELEVATION',
-              y: 7.23,
-            },
-            {
-              name: 'PLANNING_CADASTRE',
-              y: 5.58,
-            },
-            {
-              name: 'STRUCTURE',
-              y: 22.02,
-            },
-            {
-              name: 'TRANSPORTATION',
-              y: 3.92,
-              drilldown: 'Opera',
-            },
-            {
-              name: 'BOUNDARIES',
-              y: 7.62,
-              drilldown: null,
-            },
-            {
-              name: 'CLIMA',
-              y: 2.62,
-              drilldown: null,
-            },
-          ],
+          data: this.dataSeriesPie,
         },
       ],
     };
@@ -138,9 +194,9 @@ export default class SalesBarGraphCard extends Vue {
 <style lang="scss">
 .pie-container {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
   &__chart {
-    flex: 0 1 33%;
+    flex: 0 1 33.333%;
     div {
       width: 100%;
     }

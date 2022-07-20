@@ -176,12 +176,14 @@ export default class SalesLineGraphCard extends Vue {
     };
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
+      console.log('response: ', response);
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
         this.segmentsNames = this.formatSegmentsNames();
+        console.log('segments names', this.segmentsNames);
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
@@ -439,7 +441,7 @@ export default class SalesLineGraphCard extends Vue {
     }
   }
 
-  formatDate(value: any): any {
+  formatDate(value): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
       date = moment(`${value.year}-${value.month}-${value.day}`)
@@ -498,7 +500,7 @@ export default class SalesLineGraphCard extends Vue {
     return formattedDate;
   }
 
-  formatValue(value: any): any {
+  formatValue(value: string): any {
     const regex = value.toString();
     return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }

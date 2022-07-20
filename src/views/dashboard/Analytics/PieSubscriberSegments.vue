@@ -9,53 +9,65 @@
         <div class="graphcard__head__data__right">
           <ul>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+              <a href="#" @click.prevent="setTemporalUnit(temporalUnitEnum.DAY)" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+              <a href="#" @click.prevent="setTemporalUnit(temporalUnitEnum.WEEK)" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+              <a href="#" @click.prevent="setTemporalUnit(temporalUnitEnum.MONTH)" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+              <a href="#" @click.prevent="setTemporalUnit(temporalUnitEnum.YEAR)" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
             </li>
           </ul>
         </div>
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" @triggerchange="onDateTimeChange" @init="setInitialDate" />
         </div>
       </div>
     </div>
     <div class="pie-container">
-      <PieChart :analyticsData="analyticsData" :pieColor="bluePalette" />
-      <PieChart :analyticsData="analyticsData" :pieColor="greenPalette" />
-      <PieChart :analyticsData="analyticsData" :pieColor="magentaPalette" />
+      <PieChart v-if="selectedAssets.length > 0"
+                :index="0"
+                :asset-query="selectedAssets"
+                :time="timeParams"
+                :pieColor="bluePalette" />
+      <PieChart v-if="selectedAssets.length >= 2"
+                :index="1"
+                :asset-query="selectedAssets"
+                :time="timeParams"
+                :pieColor="greenPalette" />
+      <PieChart v-if="selectedAssets.length === 3"
+                :index="2"
+                :asset-query="selectedAssets"
+                :time="timeParams"
+                :pieColor="magentaPalette" />
     </div>
   </div>
 </template>
 <script lang="ts">
 import {
-  Component, Watch, Vue, Prop,
+  Component, Vue, Prop,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -65,17 +77,28 @@ import { Order } from '@/model/request';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
-import AnalyticsApi from '@/service/analytics';
-import {
-  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
-} from '@/model/analytics';
+import { EnumAssetSource, EnumTemporalUnit } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
-import moment from 'moment';
 import Highcharts from 'highcharts';
 import exportingInit from 'highcharts/modules/exporting';
 import PieChart from '@/components/Charts/PieChart.vue';
 
 exportingInit(Highcharts);
+
+interface TemporalDimension {
+  /**
+   * Time interval unit (required)
+   */
+  unit: EnumTemporalUnit;
+  /**
+   * Min date in YYYY-MM-DD ISO format
+   */
+  min?: string;
+  /**
+   * Max date in YYYY-MM-DD ISO format
+   */
+  max?: string;
+}
 
 @Component({
   components: {
@@ -102,31 +125,21 @@ export default class SalesBarGraphCard extends Vue {
 
   selectedAssets: AssetDraft[];
 
-  analyticsApi: AnalyticsApi;
-
-  analyticsData: DataSeries;
-
-  assetsQuery: string[];
-
-  segmentsNames: string[];
-
-  chartOptions: any | null;
-
   temporalUnit: EnumTemporalUnit;
 
   temporalUnitMin: string;
 
   temporalUnitMax: string;
 
-  assetQueryMetricType: EnumAssetQueryMetric;
-
-  countryCode?: string[];
-
   bluePalette: string[];
 
   greenPalette: string[];
 
   magentaPalette: string[];
+
+  timeParams: TemporalDimension | null;
+
+  temporalUnitEnum: typeof EnumTemporalUnit;
 
   constructor() {
     super();
@@ -137,25 +150,19 @@ export default class SalesBarGraphCard extends Vue {
 
     this.selectedAssets = [];
 
-    this.analyticsApi = new AnalyticsApi();
-
-    this.analyticsData = {} as DataSeries;
-
-    this.chartOptions = null;
-
-    this.assetsQuery = [];
-
-    this.segmentsNames = [];
-
     this.temporalUnitMin = '';
 
     this.temporalUnitMax = '';
 
     this.temporalUnit = EnumTemporalUnit.DAY;
 
-    this.countryCode = [];
+    this.temporalUnitEnum = EnumTemporalUnit;
 
-    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
+    this.timeParams = {
+      unit: EnumTemporalUnit.DAY,
+      min: this.temporalUnitMin,
+      max: this.temporalUnitMax,
+    };
 
     this.bluePalette = ['rgb(0,0,146)', 'rgb(0,0,183)', 'rgb(0,0,219)', 'rgb(25,10,255)', 'rgb(61,46,255)', 'rgb(97,82,255)', 'rgb(134,119,255)', 'rgb(170,155,255)', 'rgb(207,192,255)', 'rgb(243,228,255)'];
 
@@ -166,42 +173,10 @@ export default class SalesBarGraphCard extends Vue {
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    // await this.getAnalytics();
   }
 
-  getAnalytics(): void {
-    const assetsViewsQuery: AssetQuery = {
-      segments: {
-        enabled: true,
-      },
-      assets: this.assetsQuery,
-      metric: this.assetQueryMetricType,
-      source: this.assetSourceEnum,
-      time: {
-        unit: this.temporalUnit,
-        min: this.temporalUnitMin,
-        max: this.temporalUnitMax,
-      },
-      areas: {
-        enabled: false,
-        codes: this.countryCode,
-      },
-    };
-
-    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
-      if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
-      }
-    });
-  }
-
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.map((a) => a.assetPublished);
-    this.getAnalytics();
+  filteredAssets(assets: AssetDraft[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
   }
 
   async getAssets(): Promise<any> {
@@ -225,11 +200,29 @@ export default class SalesBarGraphCard extends Vue {
     });
   }
 
-  setTemporalUnit(value: EnumTemporalUnit): void {
+  onDateTimeChange(): void { // cast time on datetime change
+    this.timeParams = {
+      unit: this.temporalUnit,
+      min: this.temporalUnitMin,
+      max: this.temporalUnitMax,
+    };
+  }
+
+  setTemporalUnit(value: EnumTemporalUnit): void { // cast time on temporal unit change
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.timeParams = {
+      unit: this.temporalUnit,
+      min: this.temporalUnitMin,
+      max: this.temporalUnitMax,
+    };
+  }
+
+  setInitialDate(date: { min: string; max: string; }): void { // cast time when datepicker mounts
+    this.timeParams = {
+      unit: this.temporalUnit,
+      min: date.min,
+      max: date.max,
+    };
   }
 }
 </script>
