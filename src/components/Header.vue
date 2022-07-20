@@ -13,10 +13,10 @@
     </modal>
     <!-- END OF MODALS -->
 
-    <header class="header" v-bind:class="[headerClass, scrollClass, { open: showMenuMobile }]" :style="{ transform: `translateY(${ this.$route.name === 'Home' ? $store.getters.getAnnouncementBarHeight : 0}px)` }">
+    <header class="header" v-bind:class="[headerClass, scrollClass, { open: showMenuMobile }]" :style="{ transform: `translateY(${this.$route.name === 'Home' ? $store.getters.getAnnouncementBarHeight : 0}px)` }">
       <div class="header__inner">
         <div class="header__logo">
-          <router-link to="/"><img src="@/assets/images/logo.svg" alt=""/></router-link>
+          <router-link to="/"><img src="@/assets/images/logo_beta.svg" alt=""/></router-link>
         </div>
         <div class="header__mobile">
           <a href="#" class="header__mobile__burger" v-bind:class="{ open: showMenuMobile }" @click.prevent="toggleMobileMenu">
@@ -87,11 +87,11 @@
           <nav>
             <ul>
               <li>
-                <a href="#" @click.prevent="showSubmenu1">Sell</a>
+                <a href="#" @click.prevent="showSubmenu1">Sell <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
                 <div class="header__mobile-submenu" v-if="showSubmenuSell">
                   <ul>
                     <li>
-                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for suppliers</span></router-link>
+                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Topio for data suppliers</span></router-link>
                     </li>
                     <li>
                       <a @click.prevent="navigateToBecomeVendor"><span @click="toggleMobileMenu">BECOME A SUPPLIER</span></a>
@@ -99,10 +99,10 @@
                   </ul>
                 </div>
                 <transition name="fade" mode="out-in">
-                  <div class="arrow-up arrow-up--white" v-if="showSubmenuSell"></div>
+                  <div class="arrow-up arrow-up--white"></div>
                 </transition>
                 <transition name="fade" mode="out-in">
-                  <div class="header__submenu" v-if="showSubmenuSell">
+                  <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
                       <div class="header__submenu__block">
                         <div class="header__submenu__block__img-btn">
@@ -126,7 +126,7 @@
                         </div>
                       </div>
                       <div class="header__submenu__block">
-                        <h4 class="header__submenu__block__title">Benefits for suppliers</h4>
+                        <h4 class="header__submenu__block__title">Topio for data suppliers</h4>
                         <div class="header__submenu__block__text">
                           <ul>
                             <li>Easily upload, promote and trade your data assets</li>
@@ -136,7 +136,7 @@
                         </div>
                         <router-link class="header__submenu__block__link" to="/vendor-benefits">
                           <span @click="showSubmenuSell = !showSubmenuSell"
-                            >LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
+                            >HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
                           ></span>
                         </router-link>
                       </div>
@@ -145,11 +145,11 @@
                 </transition>
               </li>
               <li>
-                <a href="#" @click.prevent="showSubmenu2">Buy</a>
+                <a href="#" @click.prevent="showSubmenu2">Buy <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
                 <div class="header__mobile-submenu" v-if="showSubmenuBuy">
                   <ul>
                     <li>
-                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Benefits for data users</span></router-link>
+                      <router-link to="/vendor-benefits"><span @click="toggleMobileMenu">Topio for data users</span></router-link>
                     </li>
                     <li>
                       <router-link to="/catalogue"><span @click="toggleMobileMenu">Data catalogue</span></router-link>
@@ -157,24 +157,104 @@
                   </ul>
                 </div>
                 <transition name="fade" mode="out-in">
-                  <div class="arrow-up arrow-up--white" v-if="showSubmenuBuy"></div>
+                  <div class="arrow-up arrow-up--white"></div>
                 </transition>
                 <transition name="fade" mode="out-in">
-                  <div class="header__submenu" v-if="showSubmenuBuy">
+                  <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
-                      <div class="header__submenu__block">
-                        <div class="header__submenu__block__menu">
-                          <ul>
-                            <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Vector</router-link></li>
-                            <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Tile</router-link></li>
-                            <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Raster</router-link></li>
-                            <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">APIs</router-link></li>
-                            <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">Bundles</router-link></li>
-                          </ul>
-                        </div>
+                      <div class="header__submenu__items header__submenu__items--small header__submenu__block">
+                        <p>Asset categories</p>
+                        <ul>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24"><path id="Path_9734" data-name="Path 9734" d="M1315.418,163.7h1.49v-4h-4v4h1a8.442,8.442,0,0,1-7.012,7.072V169.7h-4v1.175h-6.148a2,2,0,1,0,0,1.5h2.379a10.7,10.7,0,0,0-4.744,7.325H1292.9v4h4v-4h-1.01a8.4,8.4,0,0,1,7.01-7.072V173.7h4v-1.325h6.035a2,2,0,1,0,.067-1.5h-2.084A10.807,10.807,0,0,0,1315.418,163.7Z" transform="translate(-1292.898 -159.697)" fill="#333" /></svg>Vector</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_9742" data-name="Path 9742" d="M1312.152,531.977h0v-5h-19v19h5v5h19v-19Zm-17.5-3.5h16v3.5h-12.5v12.5h-3.5Zm21,21h-16v-3.5h12.5v-12.5h3.5Z" transform="translate(-1293.152 -526.977)" fill="#333" /></svg>WMS</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <g id="Group_3635" data-name="Group 3635" transform="translate(-1299.314 -397.794)">
+                                  <path id="Path_9740" data-name="Path 9740" d="M1302.314,399.294v-1.5h-1.5v1.5h-1.5v1.5h1.5v21h1.5v-21h21v-1.5Z" fill="#333" />
+                                  <rect id="Rectangle_4840" data-name="Rectangle 4840" width="4" height="4" transform="translate(1305.302 403.801)" fill="#333" />
+                                  <rect id="Rectangle_4841" data-name="Rectangle 4841" width="4" height="4" transform="translate(1312.291 403.801)" fill="#333" />
+                                  <rect id="Rectangle_4842" data-name="Rectangle 4842" width="4" height="4" transform="translate(1319.314 403.801)" fill="#333" />
+                                  <rect id="Rectangle_4843" data-name="Rectangle 4843" width="4" height="4" transform="translate(1305.302 410.808)" fill="#333" />
+                                  <rect id="Rectangle_4844" data-name="Rectangle 4844" width="4" height="4" transform="translate(1312.291 410.808)" fill="#333" />
+                                  <rect id="Rectangle_4845" data-name="Rectangle 4845" width="4" height="4" transform="translate(1319.314 410.808)" fill="#333" />
+                                  <rect id="Rectangle_4846" data-name="Rectangle 4846" width="4" height="4" transform="translate(1305.302 417.794)" fill="#333" />
+                                  <rect id="Rectangle_4847" data-name="Rectangle 4847" width="4" height="4" transform="translate(1312.291 417.794)" fill="#333" />
+                                  <rect id="Rectangle_4848" data-name="Rectangle 4848" width="4" height="4" transform="translate(1319.314 417.794)" fill="#333" />
+                                </g>
+                              </svg>
+                              Tabular</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path id="Path_9760" data-name="Path 9760" d="M1307.983,651.411h11.25l-12-4.8-12,4.8h11.25v4.8h-11.25v4.8h11.25v4.727h-11.25c0,2.692,5.373,4.874,12,4.874s12-2.182,12-4.874h-11.25V661.01h11.25v-4.8h-11.25Zm-.75-3.185,4.211,1.685h-8.422Zm0,20.885c-4.353,0-7.439-.915-9.094-1.874h18.188C1314.672,668.2,1311.586,669.111,1307.233,669.111Zm10.5-9.6h-21v-1.8h21Z" transform="translate(-1295.233 -646.611)" fill="#333" />
+                              </svg>
+                              WFS</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24">
+                                <g id="Group_3633" data-name="Group 3633" transform="translate(-1291.423 -275.129)">
+                                  <rect id="Rectangle_4822" data-name="Rectangle 4822" width="4" height="4" transform="translate(1291.423 275.129)" fill="#333" />
+                                  <rect id="Rectangle_4823" data-name="Rectangle 4823" width="4" height="4" transform="translate(1311.433 295.129)" fill="#333" />
+                                  <rect id="Rectangle_4824" data-name="Rectangle 4824" width="4" height="4" transform="translate(1295.425 295.129)" fill="#333" />
+                                  <rect id="Rectangle_4825" data-name="Rectangle 4825" width="4" height="4" transform="translate(1299.427 275.129)" fill="#333" />
+                                  <rect id="Rectangle_4826" data-name="Rectangle 4826" width="4" height="4" transform="translate(1303.429 295.129)" fill="#333" />
+                                  <rect id="Rectangle_4827" data-name="Rectangle 4827" width="4" height="4" transform="translate(1311.433 287.129)" fill="#333" />
+                                  <rect id="Rectangle_4828" data-name="Rectangle 4828" width="4" height="4" transform="translate(1295.425 287.129)" fill="#333" />
+                                  <rect id="Rectangle_4829" data-name="Rectangle 4829" width="4" height="4" transform="translate(1303.429 287.129)" fill="#333" />
+                                  <rect id="Rectangle_4830" data-name="Rectangle 4830" width="4" height="4" transform="translate(1311.433 279.129)" fill="#333" />
+                                  <rect id="Rectangle_4831" data-name="Rectangle 4831" width="4" height="4" transform="translate(1295.425 279.129)" fill="#333" />
+                                  <rect id="Rectangle_4832" data-name="Rectangle 4832" width="4" height="4" transform="translate(1303.429 279.129)" fill="#333" />
+                                  <rect id="Rectangle_4833" data-name="Rectangle 4833" width="4" height="4" transform="translate(1307.431 275.129)" fill="#333" />
+                                  <rect id="Rectangle_4834" data-name="Rectangle 4834" width="4" height="4" transform="translate(1291.423 291.129)" fill="#333" />
+                                  <rect id="Rectangle_4835" data-name="Rectangle 4835" width="4" height="4" transform="translate(1299.427 291.129)" fill="#333" />
+                                  <rect id="Rectangle_4836" data-name="Rectangle 4836" width="4" height="4" transform="translate(1307.431 291.129)" fill="#333" />
+                                  <rect id="Rectangle_4837" data-name="Rectangle 4837" width="4" height="4" transform="translate(1291.423 283.129)" fill="#333" />
+                                  <rect id="Rectangle_4838" data-name="Rectangle 4838" width="4" height="4" transform="translate(1299.427 283.129)" fill="#333" />
+                                  <rect id="Rectangle_4839" data-name="Rectangle 4839" width="4" height="4" transform="translate(1307.431 283.129)" fill="#333" />
+                                </g>
+                              </svg>
+                              Raster</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="24.007" height="24.004" viewBox="0 0 24.007 24.004">
+                                <g id="Group_3640" data-name="Group 3640" transform="translate(-1293.148 -784.223)">
+                                  <path id="Path_9744" data-name="Path 9744" d="M1308.682,796.823a2.87,2.87,0,1,0,2.869,2.869A2.873,2.873,0,0,0,1308.682,796.823Zm0,4.239a1.37,1.37,0,1,1,1.369-1.37A1.371,1.371,0,0,1,1308.682,801.062Z" fill="#333" />
+                                  <path id="Path_9745" data-name="Path 9745" d="M1314.986,796.222l1.117-1.117-2.9-2.895-1.166,1.166-1.374-.557v-1.661h-4.094v1.7l-1.336.566-1.208-1.209-2.9,2.895,1.193,1.194a13.039,13.039,0,0,0-.571,1.347l-1.674,0v4.089l1.676.013a13.248,13.248,0,0,0,.569,1.34l-1.193,1.193,2.9,2.9,1.207-1.206,1.337.564v1.7h4.094v-1.619a14,14,0,0,0,1.419-.555l1.121,1.121,2.9-2.9-1.115-1.115a13.313,13.313,0,0,0,.615-1.425h1.552v-4.094H1315.6A12.958,12.958,0,0,0,1314.986,796.222Zm.669,4.017h-1.229l-.122.6a10.716,10.716,0,0,1-.893,2.111l-.265.491.835.837-.773.774-.886-.886-.509.333a11.24,11.24,0,0,1-2.11.842l-.535.16v1.225h-1.094v-1.189l-3.182-1.346-.862.861-.774-.774.908-.908-.259-.489a10.631,10.631,0,0,1-.846-2.031l-.122-.6-1.354-.01v-1.1h1.351l.122-.6a10.7,10.7,0,0,1,.848-2.043l.259-.489-.907-.908.774-.774.863.863,3.181-1.349v-1.187h1.094v1.171l3.231,1.311.809-.809.773.774-.837.839.266.493a10.618,10.618,0,0,1,.893,2.106l.122.6h1.23Z" fill="#333" />
+                                  <path id="Path_9746" data-name="Path 9746" d="M1293.148,784.223v24h6.943v-1.5h-5.443v-21h21.007v5.8h1.5v-7.3Z" fill="#333" />
+                                </g>
+                              </svg>
+                              Data API</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link to="/catalogue"
+                              ><svg xmlns="http://www.w3.org/2000/svg" width="23.995" height="23.996" viewBox="0 0 23.995 23.996">
+                                <path id="Path_9747" data-name="Path 9747" d="M1305.944,1028.2l-.884.884-4.4-4.4,3.023-3.023a4,4,0,0,0,5.062-.486l-5.657-5.656a4,4,0,0,0-.468,5.083l-3.021,3.021-4.394-4.394.884-.884-5.657-5.657-.884.884h0l-1.06,1.061h0l-.884.884,5.657,5.657.884-.884,4.394,4.394-4.343,4.342,1.06,1.061,4.343-4.343,4.4,4.4-.884.884,5.657,5.657,2.828-2.829Z" transform="translate(-1287.605 -1012.689)" fill="#333" />
+                              </svg>
+                              Earth Observation</router-link
+                            >
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">BUNDLES</router-link></li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">EXPLORE ALL ASSETS</router-link></li>
+                        </ul>
                       </div>
                       <div class="header__submenu__block">
-                        <h4 class="header__submenu__block__title">Benefits for users</h4>
+                        <h4 class="header__submenu__block__title">Topio for data users</h4>
                         <div class="header__submenu__block__text">
                           <ul>
                             <li>View, discover, compare and purchase geospatial data assets</li>
@@ -192,32 +272,63 @@
                   </div>
                 </transition>
               </li>
-              <li @click="toggleMobileMenu">
-                <a href="#" @click.prevent="showSubmenu3">Use</a>
+              <li>
+                <a href="#" @click.prevent="showSubmenu3">Use <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
+                <div class="header__mobile-submenu" v-if="showSubmenuUse">
+                  <ul>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/drive-3"><span> Drive</span></router-link>
+                    </li>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/maps"> <span>Maps</span></router-link>
+                    </li>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/api"> <span>API</span></router-link>
+                    </li>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/tiles"> <span>TILES</span></router-link>
+                    </li>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/drive-2"> <span>Notebooks</span></router-link>
+                    </li>
+                    <li @click="showSubmenuUse = !showSubmenuUse">
+                      <router-link to="/vas/bundles"> <span>Bundles</span></router-link>
+                    </li>
+                  </ul>
+                </div>
                 <transition name="fade" mode="out-in">
-                  <div class="arrow-up arrow-up--white" v-if="showSubmenuUse"></div>
+                  <div class="arrow-up arrow-up--white"></div>
                 </transition>
                 <transition name="fade" mode="out-in">
-                  <div class="header__submenu header__submenu--small" v-if="showSubmenuUse">
+                  <div class="header__submenu header__submenu--small">
                     <div class="header__submenu__wrapper">
                       <div class="header__submenu__items">
                         <p>topio services</p>
                         <ul>
                           <li @click="showSubmenuUse = !showSubmenuUse">
+                            <router-link to="/vas/drive-3"><img src="@/assets/images/t-icon.svg" alt="" /> Drive</router-link>
+                          </li>
+                          <li @click="showSubmenuUse = !showSubmenuUse">
+                            <router-link to="/vas/maps"><img src="@/assets/images/t-icon.svg" alt="" /> Maps</router-link>
+                          </li>
+                          <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/api"><img src="@/assets/images/t-icon.svg" alt="" /> API</router-link>
+                          </li>
+                          <li @click="showSubmenuUse = !showSubmenuUse">
+                            <router-link to="/vas/tiles"><img src="@/assets/images/t-icon.svg" alt="" /> TILES</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/drive-2"><img src="@/assets/images/t-icon.svg" alt="" /> Notebooks</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
-                            <router-link to="/vas/maps"><img src="@/assets/images/t-icon.svg" alt="" /> Maps</router-link>
+                            <router-link to="/vas/bundles"><img src="@/assets/images/t-icon.svg" alt="" /> Bundles</router-link>
                           </li>
-                          <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">ALL SERVICES</router-link></li>
+                          <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">EXPLORE ALL SERVICES</router-link></li>
                         </ul>
                         <hr />
                         <p @click="showSubmenuUse = !showSubmenuUse">
                           <router-link to="/documentation"
-                            >HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
+                            >VIEW DOCUMENTATION<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
                           ></router-link>
                         </p>
                       </div>
@@ -225,17 +336,52 @@
                   </div>
                 </transition>
               </li>
-              <li @click="toggleMobileMenu"><router-link to="/about">About</router-link></li>
-              <li @click="toggleMobileMenu"><router-link to="/faq">FAQ</router-link></li>
+              <li>
+                <a href="#" @click.prevent="showSubmenu4">About <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
+                <div class="header__mobile-submenu" v-if="showSubmenuAbout">
+                  <ul>
+                    <li @click="showSubmenuAbout = !showSubmenuAbout">
+                      <router-link to="/about"><span> What is Topio</span></router-link>
+                    </li>
+                    <li @click="showSubmenuAbout = !showSubmenuAbout">
+                      <router-link to="/contact"> <span>Contact</span></router-link>
+                    </li>
+                    <li @click="showSubmenuAbout = !showSubmenuAbout">
+                      <router-link to="/faq"> <span>API</span></router-link>
+                    </li>
+                  </ul>
+                </div>
+                <transition name="fade" mode="out-in">
+                  <div class="arrow-up arrow-up--white"></div>
+                </transition>
+                <transition name="fade" mode="out-in">
+                  <div class="header__submenu header__submenu--xsmall">
+                    <div class="header__submenu__wrapper">
+                      <div class="header__submenu__items header__submenu__items--full">
+                        <ul>
+                          <li @click="showSubmenuAbout = !showSubmenuAbout">
+                            <router-link to="/about"><span> What is Topio</span></router-link>
+                          </li>
+                          <li @click="showSubmenuAbout = !showSubmenuAbout">
+                            <router-link to="/contact"> <span>Contact</span></router-link>
+                          </li>
+                          <li @click="showSubmenuAbout = !showSubmenuAbout">
+                            <router-link to="/faq"> <span>API</span></router-link>
+                          </li>
+                          <li></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </transition>
+              </li>
               <li @click="toggleMobileMenu"><router-link to="/catalogue">Explore Assets</router-link></li>
             </ul>
           </nav>
           <div class="header__menu__btn">
             <router-link to="/dashboard" class="btn" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
             <!-- <router-link to="/signin" class="btn" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link> -->
-            <template v-if="!$store.getters.isAuthenticated">
-              <a class="btn" style="display: inline; cursor: pointer;" @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link style="display: inline" class="btn" to="/register">Register</router-link>
-            </template>
+            <template v-if="!$store.getters.isAuthenticated"> <a class="btn" style="display: inline; cursor: pointer;" @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link style="display: inline" class="btn" to="/register">Register</router-link> </template>
           </div>
         </div>
         <div class="header__right">
@@ -284,9 +430,10 @@
                     </li>
                     <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
                       <router-link to="">
-                        <div :class="{'notification--unread': !notification.read}" v-html="notification.text"></div><br>
+                        <div :class="{ 'notification--unread': !notification.read }" v-html="notification.text"></div>
+                        <br />
                         <small>{{ getTimeFromNow(notification.createdAt) }}</small>
-                        <hr>
+                        <hr />
                       </router-link>
                     </li>
                     <li class="user_menu__dropdown__btn_view_all"><router-link to="/dashboard/notifications">VIEW ALL</router-link></li>
@@ -311,7 +458,9 @@
               <transition name="fade" mode="out-in">
                 <div class="user_menu__dropdown user_menu__dropdown--x-large" v-show="showCart">
                   <ul>
-                    <li><span class="dropdown-text">{{ cartItemsNum }} {{ cartItemsNum === 1 ? 'ASSET' : 'ASSETS' }} IN YOUR CART</span></li>
+                    <li>
+                      <span class="dropdown-text">{{ cartItemsNum }} {{ cartItemsNum === 1 ? 'ASSET' : 'ASSETS' }} IN YOUR CART</span>
+                    </li>
                     <li v-for="item in cartItems" :key="item.id">
                       <cart-mini-card :item="item"></cart-mini-card>
                     </li>
@@ -350,7 +499,8 @@
             </div>
           </div>
           <div class="header__login" v-else>
-            <a @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link to="/register">Register</router-link>
+            <router-link class="header__login__register" to="/register">REGISTER</router-link>
+            <a @click.prevent="loginWithKeycloak">Login</a>
           </div>
         </div>
       </div>
@@ -396,10 +546,7 @@
 
 <script lang="ts">
 import {
-  Component,
-  Prop,
-  Vue,
-  Watch,
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 import store from '@/store';
 import AccountApi from '@/service/account';
@@ -407,10 +554,7 @@ import NotificationApi from '@/service/notification';
 import MessageApi from '@/service/message';
 import Search from '@/components/Search.vue';
 import {
-  ServerResponse,
-  LogoutResult,
-  Cart,
-  CartItem,
+  ServerResponse, LogoutResult, Cart, CartItem,
 } from '@/model';
 import { Notification } from '@/model/notification';
 import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
@@ -461,6 +605,8 @@ export default class Header extends Vue {
 
   showSubmenuUse = false;
 
+  showSubmenuAbout = false;
+
   showSearch = false;
 
   showSearchModal = false;
@@ -497,7 +643,7 @@ export default class Header extends Vue {
 
   @Watch('$store.getters.getCart', { deep: true })
   onCartChange(cartCurrent: Cart, cartPrevious: Cart): void {
-    if (cartCurrent && cartPrevious && (cartCurrent.totalItems > cartPrevious.totalItems)) {
+    if (cartCurrent && cartPrevious && cartCurrent.totalItems > cartPrevious.totalItems) {
       this.cartItems = cartCurrent.items;
       this.cartItemsNum = cartCurrent.totalItems;
       this.showCart = true;
@@ -589,18 +735,28 @@ export default class Header extends Vue {
     this.showSubmenuSell = !this.showSubmenuSell;
     this.showSubmenuBuy = false;
     this.showSubmenuUse = false;
+    this.showSubmenuAbout = false;
   }
 
   showSubmenu2(): void {
     this.showSubmenuBuy = !this.showSubmenuBuy;
     this.showSubmenuSell = false;
     this.showSubmenuUse = false;
+    this.showSubmenuAbout = false;
   }
 
   showSubmenu3(): void {
     this.showSubmenuUse = !this.showSubmenuUse;
     this.showSubmenuBuy = false;
     this.showSubmenuSell = false;
+    this.showSubmenuAbout = false;
+  }
+
+  showSubmenu4(): void {
+    this.showSubmenuAbout = !this.showSubmenuAbout;
+    this.showSubmenuBuy = false;
+    this.showSubmenuSell = false;
+    this.showSubmenuUse = false;
   }
 
   bgColor(): void {
@@ -636,6 +792,6 @@ export default class Header extends Vue {
 }
 </script>
 <style lang="scss">
-  @import "@/assets/styles/_notifications.scss";
-  @import "@/assets/styles/abstracts/_spacings.scss";
+@import '@/assets/styles/_notifications.scss';
+@import '@/assets/styles/abstracts/_spacings.scss';
 </style>

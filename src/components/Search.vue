@@ -8,9 +8,29 @@
       <form v-on:submit.prevent="searchAssets">
         <input v-on:keyup.enter="searchByTerm($event.target.value)" type="text" name="query" autocomplete="off" v-model="query" id="" placeholder="Search for Geospatial Assets" class="asset_search__upper__input" @focus="showSearchResults" @input="debouncedInput" />
       </form>
-      <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading"><img src="@/assets/images/icons/search_black.svg" alt="" /></div>
+      <div class="asset_search__upper__controls">
+        <div class="asset_search__upper__controls__inner">
+          <div class="asset_search__upper__controls__icons">
+            <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#333333" />
+              </svg>
+            </div>
+            <div class="asset_search__upper__icon" v-if="query && searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
+            <div class="asset_search__upper__icon" v-if="loading"><div class="loader_icon"></div></div>
+          </div>
+          <ul class="asset_search__upper__controls__links">
+            <li><a href="#" @click.prevent="onSelectFilterShortcut('OPEN')">Open</a></li>
+            <li><a href="#" @click.prevent="onSelectFilterShortcut('VECTOR')">Vector</a></li>
+            <li><a href="#" @click.prevent="onSelectFilterShortcut('RASTER')">Rester</a></li>
+            <li><a href="#" @click.prevent="onSelectFilterShortcut('SERVICE')">APIs</a></li>
+            <li><router-link :to="'/catalogue'">ALL →</router-link></li>
+          </ul>
+        </div>
+      </div>
+      <!-- <div class="asset_search__upper__icon" @click.prevent="searchAssets" v-if="!searchResultsActive && !loading"><img src="@/assets/images/icons/search_new.svg" alt="" /></div>
       <div class="asset_search__upper__icon" v-if="query && searchResultsActive && !loading" @click.prevent="clearInput"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div>
-      <div class="asset_search__upper__icon" v-if="loading"><div class="loader_icon"></div></div>
+      <div class="asset_search__upper__icon" v-if="loading"><div class="loader_icon"></div></div> -->
     </div>
     <div class="asset_search__resultscont" v-if="searchResultsActive">
       <ul class="asset_search__resultscont__filters">
@@ -54,12 +74,13 @@
         <li class="no_results"><i>No results found for your query</i></li>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showRecent">
-        <template v-if="!$store.getters.isAuthenticated"><li class="no_results"><i><a @click.prevent="loginWithKeycloak" class="login_link" style="cursor: pointer">Login</a> to view your recent searches</i></li></template>
+        <template v-if="!$store.getters.isAuthenticated"
+          ><li class="no_results">
+            <i><a @click.prevent="loginWithKeycloak" class="login_link" style="cursor: pointer">Login</a> to view your recent searches</i>
+          </li></template
+        >
         <template v-else>
-          <li
-            v-for="recentSearch in getRecentSearches()"
-            :key="recentSearch"
-          >
+          <li v-for="recentSearch in getRecentSearches()" :key="recentSearch">
             <a href="#" @click.prevent="searchByTerm(recentSearch)">
               <h5>{{ recentSearch }}</h5>
               <!-- <span>Municipalities, Greece, Administrative boundaries, Kallikrates</span></a -->
@@ -68,10 +89,7 @@
         </template>
       </ul>
       <ul class="asset_search__resultscont__results related" v-if="showPopular">
-        <li
-          v-for="popularTerm in popularTerms"
-          :key="popularTerm.term"
-        >
+        <li v-for="popularTerm in popularTerms" :key="popularTerm.term">
           <a href="#" @click.prevent="searchByTerm(popularTerm.term)">
             <h5>{{ popularTerm.term }}</h5>
             <!-- <span>{{ popularTerm.amount }} {{ popularTerm.amount === 1 ? 'search' : 'searches' }}</span> -->
@@ -111,6 +129,7 @@ import { navigateToKeycloakLogin } from '@/helper/login';
 import { AxiosError } from 'axios';
 import { Debounce } from 'vue-debounce-decorator';
 import store from '@/store';
+import { EnumAssetType } from '@/model/enum';
 
 @Component
 export default class Search extends Vue {
@@ -134,7 +153,7 @@ export default class Search extends Vue {
 
   profileApi: ProfileApi;
 
-  popularTerms: { term: string, amount: number }[] = [];
+  popularTerms: { term: string; amount: number }[] = [];
 
   queryResults: CatalogueItem[];
 
@@ -167,7 +186,7 @@ export default class Search extends Vue {
         this.popularTerms = response.result
           .filter((x) => Object.keys(x)[0])
           // eslint-disable-next-line
-          .sort((a, b) => (Object.values(a)[0]! < Object.values(b)[0]!) ? 1 : (Object.values(a)[0]! > Object.values(b)[0]!) ? -1 : 0)
+          .sort((a, b) => (Object.values(a)[0]! < Object.values(b)[0]! ? 1 : Object.values(a)[0]! > Object.values(b)[0]! ? -1 : 0))
           .map((x) => ({
             term: Object.keys(x)[0],
             amount: x[Object.keys(x)[0]],
@@ -287,6 +306,10 @@ export default class Search extends Vue {
         console.log(error);
         this.loading = false;
       });
+  }
+
+  onSelectFilterShortcut(filter: EnumAssetType | string): void {
+    this.$router.push({ name: 'Catalogue', params: { filterShortcut: filter } });
   }
 
   // used to reload recent searches (they are included inside profile)
