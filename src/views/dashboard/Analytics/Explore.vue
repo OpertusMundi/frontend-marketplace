@@ -106,7 +106,7 @@ enum EnumAnalyticsExplore {
     PieSubscriberSegments,
   },
 })
-export default class DashboardAnalyticsExplore extends Vue {
+export default class Explore extends Vue {
   activeTab: string | null;
 
   enumAssetSource: typeof EnumAssetSource;

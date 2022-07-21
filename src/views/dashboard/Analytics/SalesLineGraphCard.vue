@@ -51,7 +51,7 @@
       <thead>
         <tr>
           <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+          <th v-for="(name, index) in timePoints" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
         </tr>
       </thead>
       <tbody>
@@ -65,7 +65,7 @@
 </template>
 <script lang="ts">
 import {
-  Component, Watch, Vue, Prop,
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -77,10 +77,17 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  DataSeries, EnumSalesQueryMetric, EnumTemporalUnit, SalesQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+
+interface TimeResponse {
+  day: number;
+  month: number;
+  week: number;
+  year: number;
+}
 
 @Component({
   components: {
@@ -112,7 +119,7 @@ export default class SalesLineGraphCard extends Vue {
 
   assetsQuery: string[];
 
-  segmentsNames: string[];
+  timePoints: TimeResponse[];
 
   chartOptions: any | null;
 
@@ -143,7 +150,7 @@ export default class SalesLineGraphCard extends Vue {
 
     this.assetsQuery = [];
 
-    this.segmentsNames = [];
+    this.timePoints = [];
 
     this.temporalUnitMin = '';
 
@@ -176,14 +183,12 @@ export default class SalesLineGraphCard extends Vue {
     };
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
-      console.log('response: ', response);
       if (response.success) {
         // eslint-disable-next-line
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
-        this.segmentsNames = this.formatSegmentsNames();
-        console.log('segments names', this.segmentsNames);
+        this.timePoints = this.getTimeResponse();
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
@@ -347,8 +352,10 @@ export default class SalesLineGraphCard extends Vue {
 
       tooltip: {
         shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#190AFF',
         valueSuffix: this.symbol,
         style: {
           color: '#190AFF',
@@ -369,10 +376,9 @@ export default class SalesLineGraphCard extends Vue {
     };
   }
 
-  formatSegmentsNames(): string[] {
-    let names: Array<any> = [];
-    names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
-    return names;
+  getTimeResponse(): Array<any> {
+    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time)
+      .reverse();
   }
 
   formatSeries(): any[] {
@@ -380,7 +386,7 @@ export default class SalesLineGraphCard extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.segmentsNames.forEach((segName) => {
+        this.timePoints.forEach((segName) => {
           const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
@@ -441,7 +447,7 @@ export default class SalesLineGraphCard extends Vue {
     }
   }
 
-  formatDate(value): any {
+  formatDate(value: TimeResponse): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
       date = moment(`${value.year}-${value.month}-${value.day}`)
@@ -469,7 +475,7 @@ export default class SalesLineGraphCard extends Vue {
   formatTheDate(): string[] {
     const formattedDate: Array<any> = [];
     if (this.assetsQuery?.length > 0) {
-      this.segmentsNames.forEach((date: any) => {
+      this.timePoints.forEach((date: any) => {
         if (Object.prototype.hasOwnProperty.call(date, 'day')) {
           const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
             .format('MMM D, YY');

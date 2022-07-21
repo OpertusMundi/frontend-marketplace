@@ -312,7 +312,7 @@ export default class ViewsBarGraphCard extends Vue {
     return names;
   }
 
-  formatSegmentNamesTime() {
+  formatSegmentNamesTime(): Array<any> {
     return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
   }
 
@@ -343,7 +343,6 @@ export default class ViewsBarGraphCard extends Vue {
         console.log('asset name: ', assetName);
         const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
         const data = this.analyticsData?.points.map((a) => a.value);
-        const segment = this.analyticsData?.points.map((e) => e.segment);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,

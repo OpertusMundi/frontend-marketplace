@@ -8,7 +8,8 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+        <!-- Hide select asset from ui -->
+        <div v-if="false" class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
@@ -147,7 +148,9 @@ export default class ViewsMapGraphCard extends Vue {
   }
 
   async mounted(): Promise<any> {
+    // TODO: If asset selection will be removed from production then the below method "getAssets()" should be removed as well from the code
     await this.getAssets();
+    this.getAnalytics();
   }
 
   getAnalytics(): void {
