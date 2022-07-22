@@ -8,8 +8,9 @@ import {
   CoverageQuery,
   AssetTotalValueQuery,
   PopularAsset,
-  PopularTerm,
+  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery,
 } from '@/model/analytics';
+import { AxiosResponse } from 'axios';
 
 export default class AnalyticsApi extends Api {
   constructor() {
@@ -126,6 +127,42 @@ export default class AnalyticsApi extends Api {
 
     return this.get<ServerResponse<PopularTerm[]>>(url)
       .then((response: AxiosServerResponse<PopularTerm[]>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async executeSubscribersQuery(query: SubscribersQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/subscribers';
+
+    return this.post<SubscribersQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response: AxiosResponse<ServerResponse<DataSeries>>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async executeEarningsAssetTypeQuery(query: EarningsAssetTypeQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/earnings-asset-type';
+
+    return this.post<EarningsAssetTypeQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response: AxiosResponse<ServerResponse<DataSeries>>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async executeGoogleAnalyticsQuery(query: GoogleAnalyticsQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/google-analytics';
+
+    return this.post<GoogleAnalyticsQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response:AxiosResponse<ServerResponse<DataSeries>>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 

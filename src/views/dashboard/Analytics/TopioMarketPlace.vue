@@ -137,19 +137,38 @@
     <div class="analytics__cards">
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS">
-        {{ EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS }}
+        <BarPopularAssets
+          :enum-asset-source="EnumAssetSource.VIEW"
+          :symbol="''"
+          :symbol-title="EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS"
+          :card-heading="EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED">
-        {{ EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED }}
+        <BarPopularAssets
+          :enum-asset-source="EnumAssetSource.SEARCH"
+          :symbol="''"
+          :symbol-title="EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED"
+          :card-heading="EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.TOP_SEARCH_TERMS">
-        {{ EnumAnalyticsMarketplace.TOP_SEARCH_TERMS }}
+        <BarPopularTerms
+          :card-heading="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
+          :symbol-title="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
+          :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VISITORS">
-        {{ EnumAnalyticsMarketplace.MARKETPLACE_VISITORS }}
+        <LineGoogleAnalytics
+          :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
+          :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VISITORS"
+          :symbol="''"
+          :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_VISITORS"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VENDORS">
@@ -189,10 +208,15 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { EnumAssetSource, EnumGoogleAnalyticsMetric } from '@/model/analytics';
 import ViewsLineGraphCard from '@/views/dashboard/Analytics/ViewsLineGraphCard.vue';
 import ViewsMapGraphCard from '@/views/dashboard/Analytics/ViewsMapGraphCard.vue';
 import ViewsBarGraphCard from '@/views/dashboard/Analytics/ViewsBarGraphCard.vue';
 import PieSubscriberSegments from '@/views/dashboard/Analytics/PieSubscriberSegments.vue';
+import BarPopularAssets from '@/views/dashboard/Analytics/TopioMarketplace/BarPopularAssets.vue';
+import BarPopularTerms from '@/views/dashboard/Analytics/TopioMarketplace/BarPopularTerms.vue';
+import LineGoogleAnalytics
+  from '@/views/dashboard/Analytics/TopioMarketplace/LineGoogleAnalytics.vue';
 
 enum EnumAnalyticsMarketplace {
   TOP_VIEWED_ASSETS = 'Top viewed assets',
@@ -215,6 +239,9 @@ enum EnumAnalyticsMarketplace {
     ViewsMapGraphCard,
     ViewsBarGraphCard,
     PieSubscriberSegments,
+    BarPopularAssets,
+    BarPopularTerms,
+    LineGoogleAnalytics,
   },
 })
 export default class TopioMarketPlace extends Vue {
@@ -222,11 +249,17 @@ export default class TopioMarketPlace extends Vue {
 
   EnumAnalyticsMarketplace: typeof EnumAnalyticsMarketplace;
 
+  EnumAssetSource: typeof EnumAssetSource;
+
+  EnumGoogleAnalyticsMetric: typeof EnumGoogleAnalyticsMetric;
+
   constructor() {
     super();
 
     this.activeTab = null;
     this.EnumAnalyticsMarketplace = EnumAnalyticsMarketplace;
+    this.EnumAssetSource = EnumAssetSource;
+    this.EnumGoogleAnalyticsMetric = EnumGoogleAnalyticsMetric;
   }
 }
 </script>

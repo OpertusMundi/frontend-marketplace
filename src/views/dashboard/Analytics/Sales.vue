@@ -60,11 +60,12 @@
          @click.prevent="activeTab = EnumAnalyticsSales.NUMBER_API_CALLS"
          :class="{ active: activeTab === EnumAnalyticsSales.NUMBER_API_CALLS }">
         <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="" />
+          COMMING SOON
+<!--          <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="" />-->
           <h5>{{  EnumAnalyticsSales.NUMBER_API_CALLS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          COMING SOON
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -142,26 +143,47 @@
           :symbolTitle="'Transactions'" />
       </div>
       <div class="analytics__cards__item" v-show="activeTab ===  EnumAnalyticsSales.NUMBER_SUBSCRIBERS">
-       <h1>{{  EnumAnalyticsSales.NUMBER_SUBSCRIBERS }}</h1>
+       <LineSubscribersApi
+         :card-heading="EnumAnalyticsSales.NUMBER_SUBSCRIBERS"
+         :symbol-title="EnumAnalyticsSales.NUMBER_SUBSCRIBERS"
+         :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
+         :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item" v-show="activeTab ===  EnumAnalyticsSales.NUMBER_API_CALLS">
-        <h1>{{  EnumAnalyticsSales.NUMBER_API_CALLS }}</h1>
+        <h1>COMING SOON {{  EnumAnalyticsSales.NUMBER_API_CALLS }}</h1>
       </div>
       <div class="analytics__cards__item" v-show="activeTab ===  EnumAnalyticsSales.EARNINGS_API">
-        <h1>{{  EnumAnalyticsSales.EARNINGS_API }}</h1>
+        <LineSubscribersApi
+          :card-heading="EnumAnalyticsSales.EARNINGS_API"
+          :symbol-title="EnumAnalyticsSales.EARNINGS_API"
+          :subscribers-query-metric="EnumSubscribersQueryMetric.EARNINGS"
+          :symbol="'€'"
+          :symbolTitle="'Earnings in €'"
+        />
       </div>
       <div class="analytics__cards__item" v-show="activeTab ===  EnumAnalyticsSales.SUBSCRIBER_LOCATION">
-        <h1>{{  EnumAnalyticsSales.SUBSCRIBER_LOCATION }}</h1>
+        <MapSubscribersApi
+          :card-heading="EnumAnalyticsSales.SUBSCRIBER_LOCATION"
+          :symbol-title="EnumAnalyticsSales.SUBSCRIBER_LOCATION"
+          :asset-source-enum="EnumSubscribersQueryMetric.SUBSCRIBER_LOCATION"
+          :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item" v-show="activeTab === EnumAnalyticsSales.SUBSCRIBER_SEGMENTS">
-        <pie-subscriber-segments
+        <PieSubscribersApi
           :cardHeading="EnumAnalyticsSales.SUBSCRIBER_SEGMENTS"
           :assetSourceEnum="'VIEW'"
           :symbol="''"
           :symbolTitle="'Transactions'" />
       </div>
       <div class="analytics__cards__item" v-show="activeTab ===  EnumAnalyticsSales.ASSET_TYPE_EARNINGS">
-        <h1>{{  EnumAnalyticsSales.ASSET_TYPE_EARNINGS }}</h1>
+        <LineAssetTypeEarnings
+        :enum-asset-type-dimension="EnumAssetTypeDimension.ALL_ASSET_TYPES"
+        :enum-sales-query-metric="EnumSalesQueryMetric.SUM_SALES"
+        :symbol-title="EnumAnalyticsSales.ASSET_TYPE_EARNINGS"
+        :symbol="'€'"
+        />
       </div>
     </div>
   </div>
@@ -170,6 +192,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
+import { EnumSubscribersQueryMetric, EnumAssetTypeDimension, EnumSalesQueryMetric } from '@/model/analytics';
+import LineSubscribersApi from '@/views/dashboard/Analytics/sales/LineSubscribersApi.vue';
+import MapSubscribersApi from '@/views/dashboard/Analytics/sales/MapSubscribersApi.vue';
+import PieSubscribersApi from '@/views/dashboard/Analytics/sales/PieSubscribersApi.vue';
+import LineAssetTypeEarnings from '@/views/dashboard/Analytics/sales/LineAssetTypeEarnings.vue';
 import SalesBarGraphCard from './SalesBarGraphCard.vue';
 import SalesHeatMapGraphCard from './SalesHeatMapGraphCard.vue';
 import SalesLineGraphCard from './SalesLineGraphCard.vue';
@@ -195,6 +222,10 @@ enum EnumAnalyticsSales {
     SalesHeatMapGraphCard,
     SalesLineGraphCard,
     PieSubscriberSegments,
+    LineSubscribersApi,
+    MapSubscribersApi,
+    PieSubscribersApi,
+    LineAssetTypeEarnings,
   },
 })
 export default class Sales extends Vue {
@@ -202,11 +233,21 @@ export default class Sales extends Vue {
 
   EnumAnalyticsSales: typeof EnumAnalyticsSales;
 
+  EnumSubscribersQueryMetric: typeof EnumSubscribersQueryMetric;
+
+  EnumAssetTypeDimension: typeof EnumAssetTypeDimension;
+
+  EnumSalesQueryMetric: typeof EnumSalesQueryMetric;
+
+
   constructor() {
     super();
 
     this.activeTab = null;
     this.EnumAnalyticsSales = EnumAnalyticsSales;
+    this.EnumSubscribersQueryMetric = EnumSubscribersQueryMetric;
+    this.EnumAssetTypeDimension = EnumAssetTypeDimension;
+    this.EnumSalesQueryMetric = EnumSalesQueryMetric;
   }
 }
 </script>

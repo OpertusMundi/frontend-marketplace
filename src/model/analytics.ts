@@ -75,11 +75,55 @@ export enum EnumSalesQueryMetric {
   SUM_SALES = 'SUM_SALES',
 }
 
+export enum EnumSubscribersQueryMetric {
+  COUNT_SUBSCRIBERS = 'COUNT_SUBSCRIBERS',
+  COUNT_CALLS = 'COUNT_CALLS',
+  EARNINGS = 'EARNINGS',
+  SUBSCRIBER_LOCATION = 'SUBSCRIBER_LOCATION',
+  SUBSCRIBER_SEGMENT = 'SUBSCRIBER_SEGMENT',
+}
+
 export interface SalesQuery extends BaseQuery {
   /**
    * Aggregate to compute
    */
   metric: EnumSalesQueryMetric;
+}
+
+export interface SubscribersQuery extends BaseQuery {
+  /**
+   * Dimension to be filtered
+   */
+  metric: EnumSubscribersQueryMetric;
+}
+
+export interface GoogleAnalyticsQuery extends BaseQuery {
+  /**
+   * Aggregate to compute
+   */
+  metric: EnumGoogleAnalyticsMetric;
+}
+
+export enum EnumAssetTypeDimension {
+  /**
+   * Aggregate to compute
+   */
+  FILE_ASSET = 'FILE_ASSET',
+  API = 'API',
+  TOTAL = 'TOTAL',
+  ALL_ASSET_TYPES = 'ALL_ASSET_TYPES',
+}
+
+export enum EnumGoogleAnalyticsMetric {
+  /**
+   * Aggregate to compute
+   */
+  COUNT_USERS = 'COUNT_USERS',
+  COUNT_SESSIONS = 'COUNT_SESSIONS',
+}
+
+export interface EarningsAssetTypeQuery extends SalesQuery {
+  dimension: EnumAssetTypeDimension;
 }
 
 export enum EnumAssetSource {
