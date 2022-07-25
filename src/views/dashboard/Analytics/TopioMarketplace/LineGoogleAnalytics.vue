@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+        <div v-if="false" class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
@@ -187,29 +187,17 @@ export default class LineGoogleAnalytics extends Vue {
     };
 
     this.analyticsApi.executeGoogleAnalyticsQuery(query).then((response) => {
-      console.log('response analytics: ', response);
       if (response.success) {
         response.result.points.reverse();
         this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
-        this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        this.lineChartDate = this.convertPointsToDate();
+        // this.seriesData = this.formatSeries();
+        const dataSeries = this.analyticsData.points.map((point) => (point.value));
+        this.seriesData = [{ name: 'Marketplace visitors', data: dataSeries }];
         this.chartOptions = this.getOptions();
       }
     });
-
-    // this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
-    //   if (response.success) {
-    //     // eslint-disable-next-line
-    //     response.result!.points.reverse();
-    //     // eslint-disable-next-line
-    //     this.analyticsData = response.result!;
-    //     this.timePoints = this.getTimeResponse();
-    //     this.lineChartDate = this.formatTheDate();
-    //     this.seriesData = this.formatSeries();
-    //     this.chartOptions = this.getOptions();
-    //   }
-    // });
   }
 
   @Watch('selectedAssets')
@@ -458,9 +446,8 @@ export default class LineGoogleAnalytics extends Vue {
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.getAnalytics();
+    console.log('here');
   }
 
   formatDate(value: TimeResponse): any {
@@ -488,37 +475,35 @@ export default class LineGoogleAnalytics extends Vue {
     return date;
   }
 
-  formatTheDate(): string[] {
+  convertPointsToDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.timePoints.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
+    this.timePoints.forEach((date: any) => {
+      if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+        const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+          .format('MMM D, YY');
+        formattedDate.push(dayFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+        const monthFormat = moment(`${date.year}-${date.month}`)
+        // .set({ year: date.year, month: date.month })
+          .format('MMMM YYYY');
+        formattedDate.push(monthFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const startWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .startOf('isoWeek')
+          .format('MMM D');
+        const endWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .endOf('isoWeek')
+          .format('MMM D, YY');
+        const weekFormat = `${startWeek} - ${endWeek}`;
+        formattedDate.push(weekFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const yearFormat = moment(`${date.year}`)
+          .format('YYYY');
+        formattedDate.push(yearFormat);
+      }
+    });
     return formattedDate;
   }
 

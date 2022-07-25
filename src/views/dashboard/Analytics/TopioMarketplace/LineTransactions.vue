@@ -28,25 +28,32 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+        <div v-if="false" class="graphcard__head__filters__assets">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
+                           v-on:triggerchange="getAnalytics()"/>
         </div>
       </div>
     </div>
@@ -55,13 +62,17 @@
       <thead>
       <tr>
         <th class="data_table__header">Asset</th>
-        <th v-for="(name, index) in timePoints" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+        <th v-for="(name, index) in timePoints" class="data_table__header"
+            :key="`segment_name_${index}`">{{ formatDate(name) }}
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
+        <td class="data_table__data" v-for="value in data.data" :key="value.id">
+          {{ formatValue(value) }}
+        </td>
       </tr>
       </tbody>
     </table>
@@ -81,7 +92,8 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  DataSeries, EnumSubscribersQueryMetric, EnumTemporalUnit, SubscribersQuery,
+  DataSeries, EnumSalesQueryMetric,
+  EnumTemporalUnit, SalesQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
@@ -102,9 +114,9 @@ interface TimeResponse {
     highcharts: Chart,
   },
 })
-export default class LineSubscribersApi extends Vue {
-  @Prop({ default: EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS })
-  private subscribersQueryMetric!: EnumSubscribersQueryMetric;
+export default class LineTransactions extends Vue {
+  @Prop({ default: EnumSalesQueryMetric.COUNT_TRANSACTIONS })
+  private EnumSalesQueryMetric!: EnumSalesQueryMetric;
 
   @Prop({ default: null }) private symbol!: string;
 
@@ -168,45 +180,49 @@ export default class LineSubscribersApi extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
-    this.EnumTemporalUnit = EnumTemporalUnit;
-  }
 
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    console.log(newVal);
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
-    this.getAnalytics();
+    this.EnumTemporalUnit = EnumTemporalUnit;
   }
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    // await this.getAnalytics();
+    await this.getAnalytics();
   }
 
   getAnalytics(): void {
-    const subscribersQuery: SubscribersQuery = {
+    const query: SalesQuery = {
       segments: {
         enabled: false,
       },
       assets: this.assetsQuery,
-      metric: this.subscribersQueryMetric,
+      metric: this.EnumSalesQueryMetric,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
         max: this.temporalUnitMax,
       },
     };
-    console.log('subscribersQuery: ', subscribersQuery);
-    this.analyticsApi.executeSubscribersQuery(subscribersQuery).then((response) => {
+    this.analyticsApi.executeSalesQuery(query).then((response) => {
       if (response.success) {
-        console.log('response subscribers => ', response);
+        console.log('response TRANSACTIONS: ', response);
+        response.result.points.reverse();
         this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
-        this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        this.lineChartDate = this.convertPointsToDate();
+        // this.seriesData = this.formatSeries();
+        const dataSeries = this.analyticsData.points.map((point) => (point.value));
+        this.seriesData = [{ name: 'Marketplace vendors', data: dataSeries }];
         this.chartOptions = this.getOptions();
       }
     });
+  }
+
+  @Watch('selectedAssets')
+  selectedAssetsChanged(newVal: Array<any>): void {
+    console.log(newVal);
+    this.assetsQuery = newVal.filter((el) => el)
+      .map((a) => a.assetPublished);
+    this.getAnalytics();
   }
 
   filteredAssets(assets: AssetDraft[]): any {
@@ -225,13 +241,14 @@ export default class LineSubscribersApi extends Vue {
       id: EnumSortField.CREATED_ON,
       order: 'ASC' as Order,
     };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    await this.draftAssetApi.find(query, pageRequest, sort)
+      .then((resp) => {
+        if (resp.data.success) {
+          this.assets = resp.data.result.items;
+        } else {
+          console.log('error', resp.data);
+        }
+      });
   }
 
   getOptions(): any {
@@ -393,7 +410,8 @@ export default class LineSubscribersApi extends Vue {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
         this.timePoints.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
+            .map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
           } else {
@@ -448,9 +466,8 @@ export default class LineSubscribersApi extends Vue {
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.getAnalytics();
+    console.log('here', value);
   }
 
   formatDate(value: TimeResponse): any {
@@ -478,49 +495,49 @@ export default class LineSubscribersApi extends Vue {
     return date;
   }
 
-  formatTheDate(): string[] {
+  convertPointsToDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.timePoints.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
+    this.timePoints.forEach((date: any) => {
+      if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+        const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+          .format('MMM D, YY');
+        formattedDate.push(dayFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+        const monthFormat = moment(`${date.year}-${date.month}`)
+          // .set({ year: date.year, month: date.month })
+          .format('MMMM YYYY');
+        formattedDate.push(monthFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const startWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .startOf('isoWeek')
+          .format('MMM D');
+        const endWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .endOf('isoWeek')
+          .format('MMM D, YY');
+        const weekFormat = `${startWeek} - ${endWeek}`;
+        formattedDate.push(weekFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const yearFormat = moment(`${date.year}`)
+          .format('YYYY');
+        formattedDate.push(yearFormat);
+      }
+    });
     return formattedDate;
   }
 
   formatValue(value: string): any {
     const regex = value.toString();
-    return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
+    return regex.replace(/(\.\d{2})\d*/, '$1')
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+
 .multiselect__option--highlight {
   background: none !important;
 }

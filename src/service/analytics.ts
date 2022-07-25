@@ -8,7 +8,7 @@ import {
   CoverageQuery,
   AssetTotalValueQuery,
   PopularAsset,
-  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery,
+  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery, VendorCountQuery,
 } from '@/model/analytics';
 import { AxiosResponse } from 'axios';
 
@@ -162,6 +162,18 @@ export default class AnalyticsApi extends Api {
     const url = '/action/analytics/google-analytics';
 
     return this.post<GoogleAnalyticsQuery, ServerResponse<DataSeries>>(url, query)
+      .then((response:AxiosResponse<ServerResponse<DataSeries>>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
+  }
+
+  public async executeVendorCountQuery(query: VendorCountQuery): Promise<ServerResponse<DataSeries>> {
+    const url = '/action/analytics/vendor-count';
+
+    return this.post<VendorCountQuery, ServerResponse<DataSeries>>(url, query)
       .then((response:AxiosResponse<ServerResponse<DataSeries>>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);

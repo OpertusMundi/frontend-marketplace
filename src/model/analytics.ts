@@ -104,6 +104,10 @@ export interface GoogleAnalyticsQuery extends BaseQuery {
   metric: EnumGoogleAnalyticsMetric;
 }
 
+export interface VendorCountQuery {
+  time: TemporalDimension;
+}
+
 export enum EnumAssetTypeDimension {
   /**
    * Aggregate to compute

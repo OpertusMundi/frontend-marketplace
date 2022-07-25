@@ -116,7 +116,7 @@
          :class="{ active: activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
-          <h5>{{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}</h5>
+          <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
           Some text...
@@ -172,31 +172,57 @@
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VENDORS">
-        {{ EnumAnalyticsMarketplace.MARKETPLACE_VENDORS }}
+        <LineVendorsCount
+          :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
+          :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
+          :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS">
-        {{ EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS }}
+        <LineTransactions
+          :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS"
+          :enum-sales-query-metric="EnumSalesQueryMetric.COUNT_TRANSACTIONS"
+          :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS"
+          :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.SUBSCRIBERS_API">
-        {{ EnumAnalyticsMarketplace.SUBSCRIBERS_API }}
+        <LineSubscribersApiCount
+          :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
+          :card-heading="EnumAnalyticsMarketplace.SUBSCRIBERS_API"
+          :symbol-title="EnumAnalyticsMarketplace.SUBSCRIBERS_API"
+          :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.NUMBER_OF_ASSETS">
-        {{ EnumAnalyticsMarketplace.NUMBER_OF_ASSETS }}
+        <LineAssetsTotal
+          :card-heading="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
+          :symbol-title="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
+          :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.VALUE_FILE_ASSETS">
-        {{ EnumAnalyticsMarketplace.VALUE_FILE_ASSETS }}
+        <LineValueFileAssets
+          :symbol-title="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
+          :card-heading="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
+          :symbol="'€'"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS">
-        {{ EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS }}
+        <MapCoverageFileAssets
+          :card-heading="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
+          :symbol-title="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
+          :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS">
-        {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}
+        <MapViewerLocations
+          :card-heading="'COMING SOON'"
+          :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
+        />
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS">
@@ -208,7 +234,12 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { EnumAssetSource, EnumGoogleAnalyticsMetric } from '@/model/analytics';
+import {
+  EnumAssetSource,
+  EnumGoogleAnalyticsMetric,
+  EnumSalesQueryMetric,
+  EnumSubscribersQueryMetric,
+} from '@/model/analytics';
 import ViewsLineGraphCard from '@/views/dashboard/Analytics/ViewsLineGraphCard.vue';
 import ViewsMapGraphCard from '@/views/dashboard/Analytics/ViewsMapGraphCard.vue';
 import ViewsBarGraphCard from '@/views/dashboard/Analytics/ViewsBarGraphCard.vue';
@@ -217,6 +248,17 @@ import BarPopularAssets from '@/views/dashboard/Analytics/TopioMarketplace/BarPo
 import BarPopularTerms from '@/views/dashboard/Analytics/TopioMarketplace/BarPopularTerms.vue';
 import LineGoogleAnalytics
   from '@/views/dashboard/Analytics/TopioMarketplace/LineGoogleAnalytics.vue';
+import LineVendorsCount from '@/views/dashboard/Analytics/TopioMarketplace/LineVendorsCount.vue';
+import LineTransactions from '@/views/dashboard/Analytics/TopioMarketplace/LineTransactions.vue';
+import LineSubscribersApiCount
+  from '@/views/dashboard/Analytics/TopioMarketplace/LineSubscribersApiCount.vue';
+import LineAssetsTotal from '@/views/dashboard/Analytics/TopioMarketplace/LineAssetsTotal.vue';
+import LineValueFileAssets
+  from '@/views/dashboard/Analytics/TopioMarketplace/LineValueFileAssets.vue';
+import MapCoverageFileAssets
+  from '@/views/dashboard/Analytics/TopioMarketplace/MapCoverageFileAssets.vue';
+import MapViewerLocations
+  from '@/views/dashboard/Analytics/TopioMarketplace/MapViewerLocations.vue';
 
 enum EnumAnalyticsMarketplace {
   TOP_VIEWED_ASSETS = 'Top viewed assets',
@@ -242,6 +284,13 @@ enum EnumAnalyticsMarketplace {
     BarPopularAssets,
     BarPopularTerms,
     LineGoogleAnalytics,
+    LineVendorsCount,
+    LineTransactions,
+    LineSubscribersApiCount,
+    LineAssetsTotal,
+    LineValueFileAssets,
+    MapCoverageFileAssets,
+    MapViewerLocations,
   },
 })
 export default class TopioMarketPlace extends Vue {
@@ -253,6 +302,10 @@ export default class TopioMarketPlace extends Vue {
 
   EnumGoogleAnalyticsMetric: typeof EnumGoogleAnalyticsMetric;
 
+  EnumSalesQueryMetric: typeof EnumSalesQueryMetric;
+
+  EnumSubscribersQueryMetric: typeof EnumSubscribersQueryMetric;
+
   constructor() {
     super();
 
@@ -260,6 +313,8 @@ export default class TopioMarketPlace extends Vue {
     this.EnumAnalyticsMarketplace = EnumAnalyticsMarketplace;
     this.EnumAssetSource = EnumAssetSource;
     this.EnumGoogleAnalyticsMetric = EnumGoogleAnalyticsMetric;
+    this.EnumSalesQueryMetric = EnumSalesQueryMetric;
+    this.EnumSubscribersQueryMetric = EnumSubscribersQueryMetric;
   }
 }
 </script>

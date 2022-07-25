@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+        <div v-if="false" class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
@@ -102,7 +102,7 @@ interface TimeResponse {
     highcharts: Chart,
   },
 })
-export default class LineSubscribersApi extends Vue {
+export default class LineSubscribersApiCount extends Vue {
   @Prop({ default: EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS })
   private subscribersQueryMetric!: EnumSubscribersQueryMetric;
 
@@ -179,8 +179,8 @@ export default class LineSubscribersApi extends Vue {
   }
 
   async mounted(): Promise<any> {
-    await this.getAssets();
-    // await this.getAnalytics();
+    // await this.getAssets();
+    await this.getAnalytics();
   }
 
   getAnalytics(): void {
@@ -203,7 +203,9 @@ export default class LineSubscribersApi extends Vue {
         this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
         this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        // this.seriesData = this.formatSeries();
+        const dataSeries = this.analyticsData.points.map((point) => (point.value));
+        this.seriesData = [{ name: 'Marketplace vendors', data: dataSeries }];
         this.chartOptions = this.getOptions();
       }
     });
@@ -480,35 +482,33 @@ export default class LineSubscribersApi extends Vue {
 
   formatTheDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.timePoints.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
+    this.timePoints.forEach((date: any) => {
+      if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+        const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+          .format('MMM D, YY');
+        formattedDate.push(dayFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+        const monthFormat = moment(`${date.year}-${date.month}`)
+        // .set({ year: date.year, month: date.month })
+          .format('MMMM YYYY');
+        formattedDate.push(monthFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const startWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .startOf('isoWeek')
+          .format('MMM D');
+        const endWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .endOf('isoWeek')
+          .format('MMM D, YY');
+        const weekFormat = `${startWeek} - ${endWeek}`;
+        formattedDate.push(weekFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const yearFormat = moment(`${date.year}`)
+          .format('YYYY');
+        formattedDate.push(yearFormat);
+      }
+    });
     return formattedDate;
   }
 
