@@ -24,16 +24,16 @@
     <highcharts v-if="chartOptions" :constructorType="'mapChart'" class="hc" :options="chartOptions" ref="chart"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
-        <tr>
-          <th class="data_table__header">Location</th>
-          <th v-for="(name, index) in tableData" class="data_table__header" :key="`segment_name_${index}`">{{ name.country }}</th>
-        </tr>
+      <tr>
+        <th class="data_table__header">Location</th>
+        <th v-for="(name, index) in tableData" class="data_table__header" :key="`segment_name_${index}`">{{ name.country }}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row">
-          <td class="data_table__data">Views</td>
-          <td class="data_table__data" v-for="value in tableData" :key="value.id">{{ formatValue(value.views) }}</td>
-        </tr>
+      <tr class="data_table__row">
+        <td class="data_table__data">Views</td>
+        <td class="data_table__data" v-for="value in tableData" :key="value.id">{{ formatValue(value.views) }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -52,11 +52,10 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  AssetQuery,
   DataSeries,
   EnumAssetQueryMetric,
-  EnumAssetSource,
-  EnumTemporalUnit,
+  EnumSubscribersQueryMetric,
+  EnumTemporalUnit, SubscribersQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
@@ -74,8 +73,9 @@ HighchartsMapModule(Highcharts);
     highcharts: Chart,
   },
 })
-export default class ViewsMapGraphCard extends Vue {
-  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
+export default class MapSubscribersApi extends Vue {
+  @Prop({ default: EnumSubscribersQueryMetric.SUBSCRIBER_LOCATION })
+  private subscribersQueryMetric!: EnumSubscribersQueryMetric;
 
   @Prop({ default: '' }) private cardHeading!: string;
 
@@ -154,13 +154,12 @@ export default class ViewsMapGraphCard extends Vue {
   }
 
   getAnalytics(): void {
-    const assetsViewsQuery: AssetQuery = {
+    const subscribersQuery: SubscribersQuery = {
       segments: {
         enabled: false,
       },
       assets: this.assetsQuery,
-      metric: this.assetQueryMetricType,
-      source: this.assetSourceEnum,
+      metric: this.subscribersQueryMetric,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
@@ -172,12 +171,10 @@ export default class ViewsMapGraphCard extends Vue {
       },
     };
 
-    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+    this.analyticsApi.executeSubscribersQuery(subscribersQuery).then((response) => {
       if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
+        response.result.points.reverse();
+        this.analyticsData = response.result;
         this.formatSeries();
         this.tableData = this.tableCountries();
         this.chartOptions = this.getOptions();

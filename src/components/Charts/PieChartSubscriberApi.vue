@@ -13,10 +13,9 @@ import exportingInit from 'highcharts/modules/exporting';
 import { AssetDraft } from '@/model/draft';
 import DataTransform from '@/helper/analytics';
 import {
-  AssetQuery, DataSeries,
-  EnumAssetQueryMetric,
-  EnumAssetSource,
-  EnumTemporalUnit,
+  DataSeries,
+  EnumSubscribersQueryMetric,
+  EnumTemporalUnit, SubscribersQuery,
 } from '@/model/analytics';
 import AnalyticsApi from '@/service/analytics';
 
@@ -42,7 +41,7 @@ interface TemporalDimension {
     highcharts: Chart,
   },
 })
-export default class PieChart extends Vue {
+export default class PieChartSubscriberApi extends Vue {
   @Prop({ default: null }) private pieColor!: string[];
 
   @Prop({ default: [] })
@@ -90,13 +89,12 @@ export default class PieChart extends Vue {
   }
 
   getAnalytics(): void {
-    const assetsViewsQuery: AssetQuery = {
+    const subscribersQuery: SubscribersQuery = {
       segments: {
         enabled: true,
       },
       assets: this.setSingleAsset(this.assetQuery),
-      metric: EnumAssetQueryMetric.COUNT,
-      source: EnumAssetSource.VIEW,
+      metric: EnumSubscribersQueryMetric.SUBSCRIBER_SEGMENT,
       time: this.time,
       areas: {
         enabled: false,
@@ -104,13 +102,11 @@ export default class PieChart extends Vue {
       },
     };
 
-    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+    this.analyticsApi.executeSubscribersQuery(subscribersQuery).then((response) => {
+      console.log('response: ', response);
       if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
-        // Group by segments and sum values
+        response.result.points.reverse();
+        this.analyticsData = response.result;
         this.dataSeriesPie = DataTransform.groupBySegmentToPie(response.result.points);
         this.chartOptions = this.getOptions();
       }

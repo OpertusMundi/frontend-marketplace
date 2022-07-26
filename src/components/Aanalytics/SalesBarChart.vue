@@ -35,6 +35,7 @@ import {
   EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
+import DataTransform from '@/helper/analytics';
 
 @Component({
   components: {
@@ -210,8 +211,10 @@ export default class SalesBarGraphCard extends Vue {
       },
       tooltip: {
         shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#190AFF',
         valueSuffix: this.symbol,
         style: {
           color: '#190AFF',
@@ -257,7 +260,9 @@ export default class SalesBarGraphCard extends Vue {
     } else {
       this.assetsQuery.forEach((assetName) => {
         const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
-        const data = this.analyticsData?.points.map((a) => a.value);
+        // const data = this.analyticsData?.points.map((a) => a.value);
+        // Group by segments
+        const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,

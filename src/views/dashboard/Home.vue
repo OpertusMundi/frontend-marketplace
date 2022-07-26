@@ -52,27 +52,21 @@
               <h3 class="stats-card__title">Total earnings</h3>
               <div class="stats-card__filter">
                 <div class="ds_select">
-                  <select name="version">
-                    <option value="" default selected>ALL TIME</option>
-                    <option value="">LAST 3 MONTHS</option>
-                    <option value="">LAST 6 MONTHS</option>
-                    <option value="">LAST YEAR</option>
+                  <select name="version" v-model="totalEarningDateSelected">
+                    <option v-for="dateOption in ['ALL TIME', 'LAST 3 MONTHS', 'LAST 6 MONTHS', 'LAST YEAR']" :key="dateOption">{{ dateOption }}</option>
                   </select>
                 </div>
               </div>
             </div>
-            <div class="stats-card__value">€0</div>
+            <div class="stats-card__value">{{ totalEarnings }}</div>
           </div>
           <div class="stats-card">
             <div class="stats-card__upper">
               <h3 class="stats-card__title">Total assets</h3>
               <div class="stats-card__filter">
                 <div class="ds_select">
-                  <select name="version">
-                    <option value="" default selected>ALL TIME</option>
-                    <option value="">LAST 3 MONTHS</option>
-                    <option value="">LAST 6 MONTHS</option>
-                    <option value="">LAST YEAR</option>
+                  <select name="version" v-model="totalAssetsDateSelected">
+                    <option v-for="dateOption in ['ALL TIME', 'LAST 3 MONTHS', 'LAST 6 MONTHS', 'LAST YEAR']" :key="dateOption">{{ dateOption }}</option>
                   </select>
                 </div>
               </div>
@@ -132,8 +126,6 @@ import ProviderOrderApi from '@/service/provider-order';
 import ConsumerOrderApi from '@/service/consumer-order';
 import ConsumerApi from '@/service/consumer';
 import store from '@/store';
-import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
-import { EnumAssetType } from '@/model/enum';
 import { EnumRole } from '@/model/role';
 import { Sorting } from '@/model/request';
 import { ConsumerOrder, EnumOrderSortField, ProviderOrder } from '@/model/order';
@@ -141,6 +133,37 @@ import SalesLineChart from '@/components/Aanalytics/SalesLineChart.vue';
 import SalesBarChart from '@/components/Aanalytics/SalesBarChart.vue';
 import { ConsumerAccountSubscription, EnumConsumerSubSortField } from '@/model/account-asset';
 import moment from 'moment';
+import AnalyticsApi from '@/service/analytics';
+import {
+  AssetQuery,
+  EnumAssetQueryMetric,
+  EnumAssetSource,
+  EnumSalesQueryMetric,
+  EnumTemporalUnit,
+  SalesQuery,
+} from '@/model/analytics';
+
+const enum EnumFilterDates {
+  ALL_TIME = 'ALL TIME',
+  LAST_THREE_MONTHS = 'LAST 3 MONTHS',
+  LAST_SIX_MONTHS = 'LAST 6 MONTHS',
+  LAST_YEAR = 'LAST YEAR',
+}
+
+interface TemporalDimension {
+  /**
+   * Time interval unit (required)
+   */
+  unit: EnumTemporalUnit;
+  /**
+   * Min date in YYYY-MM-DD ISO format
+   */
+  min?: string;
+  /**
+   * Max date in YYYY-MM-DD ISO format
+   */
+  max?: string;
+}
 
 @Component({
   components: {
@@ -188,6 +211,16 @@ export default class DashboardHome extends Vue {
 
   isLoadingLatestActiveSubscriptions: boolean;
 
+  analyticsApi: AnalyticsApi;
+
+  totalEarnings: string;
+
+  totalEarningDateSelected: string;
+
+  totalAssetsDateSelected: string;
+
+  salesQueryMetricType: EnumSalesQueryMetric;
+
   constructor() {
     super();
 
@@ -212,6 +245,12 @@ export default class DashboardHome extends Vue {
     this.isLoadingLatestOrders = false;
     this.isLoadingLatestPurchases = false;
     this.isLoadingLatestActiveSubscriptions = false;
+
+    this.analyticsApi = new AnalyticsApi();
+    this.totalEarnings = '';
+    this.totalEarningDateSelected = EnumFilterDates.ALL_TIME;
+    this.totalAssetsDateSelected = EnumFilterDates.ALL_TIME;
+    this.salesQueryMetricType = EnumSalesQueryMetric.SUM_SALES;
   }
 
   created(): void {
@@ -219,7 +258,11 @@ export default class DashboardHome extends Vue {
     this.fullName = `${profile.firstName} ${profile.lastName}`;
 
     if (this.isProvider) {
-      this.setNumberOfItems();
+      const assetDates = this.setMinMaxDates(EnumFilterDates.ALL_TIME);
+      this.getTotalAssets(assetDates);
+      const earningDates = this.setMinMaxDates(EnumFilterDates.ALL_TIME);
+      this.getTotalEarnings(earningDates);
+      // this.setNumberOfItems();
       this.setLatestOrders();
     }
     if (this.isConsumer) {
@@ -229,10 +272,7 @@ export default class DashboardHome extends Vue {
   }
 
   get isLoading(): boolean {
-    if (this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions) {
-      return true;
-    }
-    return false;
+    return this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions;
   }
 
   @Watch('isLoading', { immediate: true })
@@ -240,28 +280,109 @@ export default class DashboardHome extends Vue {
     store.commit('setLoading', this.isLoading);
   }
 
-  setNumberOfItems(): void {
-    this.isLoadingItemsNum = true;
+  @Watch('totalEarningDateSelected')
+  onEarningsDateChange(value: EnumFilterDates): void {
+    const dates = this.setMinMaxDates(value);
+    this.getTotalEarnings(dates);
+  }
 
-    // todo: currently, providerAssetsApi does not work correctly (ignores parameters). Also, I can not ask api for multiple types.
-    const query: ProviderDraftQuery = {
-      q: '',
-      type: EnumAssetType.VECTOR,
-      pageRequest: {
-        page: 0,
-        size: 100000,
-      },
-      sorting: {
-        id: EnumProviderAssetSortField.TITLE,
-        order: 'ASC',
+  @Watch('totalAssetsDateSelected')
+  onTotalAssetsDateSelected(value: EnumFilterDates): void {
+    const dates = this.setMinMaxDates(value);
+    this.getTotalAssets(dates);
+  }
+
+  setMinMaxDates(value: EnumFilterDates): TemporalDimension {
+    switch (value) {
+      case EnumFilterDates.ALL_TIME:
+        return {
+          unit: EnumTemporalUnit.DAY,
+          min: '',
+          max: '',
+        };
+      case EnumFilterDates.LAST_THREE_MONTHS:
+        return {
+          unit: EnumTemporalUnit.DAY,
+          min: moment().subtract(3, 'M').format('YYYY-MM-DD'),
+          max: moment().format('YYYY-MM-DD'),
+        };
+      case EnumFilterDates.LAST_SIX_MONTHS:
+        return {
+          unit: EnumTemporalUnit.DAY,
+          min: moment().subtract(6, 'M').format('YYYY-MM-DD'),
+          max: moment().format('YYYY-MM-DD'),
+        };
+      case EnumFilterDates.LAST_YEAR:
+        return {
+          unit: EnumTemporalUnit.DAY,
+          min: moment().subtract(12, 'M').format('YYYY-MM-DD'),
+          max: moment().format('YYYY-MM-DD'),
+        };
+      default:
+        return {
+          unit: EnumTemporalUnit.DAY,
+          min: '',
+          max: '',
+        };
+    }
+  }
+
+  getTotalEarnings(dates: TemporalDimension): void {
+    const query: SalesQuery = {
+      metric: EnumSalesQueryMetric.SUM_SALES,
+      time: {
+        unit: dates.unit,
+        min: dates.min,
+        max: dates.max,
       },
     };
-
-    this.providerAssetsApi.find(query).then((response) => {
-      this.itemsNum = response.result.count;
-      this.isLoadingItemsNum = false;
+    this.analyticsApi.executeSalesQuery(query).then((response) => {
+      const earningsSum = response.result.points.reduce( // sum all values of sales
+        (previousValue, currentValue) => previousValue + currentValue.value, 0,
+      );
+      this.totalEarnings = `€${earningsSum.toLocaleString()}`;
     });
   }
+
+  getTotalAssets(dates: TemporalDimension): void {
+    const query: AssetQuery = {
+      source: EnumAssetSource.VIEW,
+      metric: EnumAssetQueryMetric.COUNT,
+      time: {
+        unit: dates.unit,
+        min: dates.min,
+        max: dates.max,
+      },
+    };
+    this.analyticsApi.executeAssetQuery(query).then((response) => {
+      this.itemsNum = response.result.points.reduce( // sum all values of assets
+        (previousValue, currentValue) => previousValue + currentValue.value, 0,
+      );
+    });
+  }
+  // block of code that has been replaced
+  // setNumberOfItems(): void {
+  //   this.isLoadingItemsNum = true;
+  //
+  //   // todo: currently, providerAssetsApi does not work correctly (ignores parameters). Also, I can not ask api for multiple types.
+  //   const query: ProviderDraftQuery = {
+  //     q: '',
+  //     type: EnumAssetType.VECTOR,
+  //     pageRequest: {
+  //       page: 0,
+  //       size: 100000,
+  //     },
+  //     sorting: {
+  //       id: EnumProviderAssetSortField.TITLE,
+  //       order: 'ASC',
+  //     },
+  //   };
+  //
+  //   this.providerAssetsApi.find(query).then((response) => {
+  //     this.itemsNum = response.result.count;
+  //     this.isLoadingItemsNum = false;
+  //   });
+  // }
 
   setLatestOrders(): void {
     this.isLoadingLatestOrders = true;
