@@ -192,7 +192,6 @@ export default class LineGoogleAnalytics extends Vue {
         this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
         this.lineChartDate = this.convertPointsToDate();
-        // this.seriesData = this.formatSeries();
         const dataSeries = this.analyticsData.points.map((point) => (point.value));
         this.seriesData = [{ name: 'Marketplace visitors', data: dataSeries }];
         this.chartOptions = this.getOptions();

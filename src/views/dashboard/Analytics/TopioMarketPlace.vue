@@ -127,7 +127,7 @@
          :class="{ active: activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
-          <h5>{{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}</h5>
+          <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
           Some text...
@@ -136,7 +136,7 @@
     </div>
     <div class="analytics__cards">
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS">
+           v-if="activeTab === EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS">
         <BarPopularAssets
           :enum-asset-source="EnumAssetSource.VIEW"
           :symbol="''"
@@ -145,7 +145,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED">
+           v-if="activeTab === EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED">
         <BarPopularAssets
           :enum-asset-source="EnumAssetSource.SEARCH"
           :symbol="''"
@@ -154,7 +154,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.TOP_SEARCH_TERMS">
+           v-if="activeTab === EnumAnalyticsMarketplace.TOP_SEARCH_TERMS">
         <BarPopularTerms
           :card-heading="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
           :symbol-title="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
@@ -162,7 +162,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VISITORS">
+           v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VISITORS">
         <LineGoogleAnalytics
           :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VISITORS"
@@ -171,7 +171,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VENDORS">
+           v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VENDORS">
         <LineVendorsCount
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
           :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
@@ -179,7 +179,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS">
+           v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS">
         <LineTransactions
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS"
           :enum-sales-query-metric="EnumSalesQueryMetric.COUNT_TRANSACTIONS"
@@ -187,7 +187,7 @@
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.SUBSCRIBERS_API">
+           v-if="activeTab === EnumAnalyticsMarketplace.SUBSCRIBERS_API">
         <LineSubscribersApiCount
           :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
           :card-heading="EnumAnalyticsMarketplace.SUBSCRIBERS_API"
@@ -195,14 +195,14 @@
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.NUMBER_OF_ASSETS">
+           v-if="activeTab === EnumAnalyticsMarketplace.NUMBER_OF_ASSETS">
         <LineAssetsTotal
           :card-heading="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
           :symbol-title="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.VALUE_FILE_ASSETS">
+           v-if="activeTab === EnumAnalyticsMarketplace.VALUE_FILE_ASSETS">
         <LineValueFileAssets
           :symbol-title="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
           :card-heading="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
@@ -210,7 +210,7 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS">
+           v-if="activeTab === EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS">
         <MapCoverageFileAssets
           :card-heading="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
           :symbol-title="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
@@ -218,15 +218,15 @@
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS">
+           v-if="activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS">
         <MapViewerLocations
           :card-heading="'COMING SOON'"
           :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
         />
       </div>
       <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS">
-        {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}
+           v-if="activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS">
+        COMING SOON: {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}
       </div>
     </div>
   </div>
