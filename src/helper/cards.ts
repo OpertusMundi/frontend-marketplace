@@ -67,4 +67,11 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
   return res;
 };
 
+export const renderedPriceAsString = (price: { prefix: string, value: string, suffix: string }): string => {
+  const prefix = price.prefix ? `${price.prefix} ` : '';
+  const value = price.value !== 'FREE' ? `${price.value}€` : price.value;
+  const suffix = price.suffix ? price.suffix : '';
+  return `${prefix} ${value} ${suffix}`;
+};
+
 export default getPriceOrMinimumPrice;

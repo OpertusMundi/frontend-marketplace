@@ -6,10 +6,10 @@
          :class="{ active: activeTab === EnumAnalyticsExplore.ASSET_VIEWS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="">
-          <h5>Number of asset views</h5>
+          <h5>{{ EnumAnalyticsExplore.ASSET_VIEWS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsExploreDescription.ASSET_VIEWS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -17,10 +17,10 @@
          :class="{ active: activeTab === EnumAnalyticsExplore.VIEWER_LOCATION }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
-          <h5>Viewer location</h5>
+          <h5>{{ EnumAnalyticsExplore.VIEWER_LOCATION }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          See the countries your assets are most popular at.
+          {{ EnumAnalyticsExploreDescription.VIEWER_LOCATION_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -28,10 +28,10 @@
          :class="{ active: activeTab === EnumAnalyticsExplore.VIEWER_MARKET_SEGMENT }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/lines_chart_icon.svg" alt="">
-          <h5>Viewer market segment</h5>
+          <h5>{{ EnumAnalyticsExplore.VIEWER_MARKET_SEGMENT }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsExploreDescription.VIEWER_MARKET_SEGMENT_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -39,10 +39,10 @@
          :class="{ active: activeTab === EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/pie_chart_icon.svg" alt="">
-          <h5>Subscriber segments</h5>
+          <h5>{{ EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsExploreDescription.SUBSCRIBER_SEGMENTS_DESC }}
         </div>
       </a>
     </div>
@@ -52,32 +52,36 @@
         <views-line-graph-card
           :asset-source-enum="enumAssetSource.VIEW"
           :card-heading="EnumAnalyticsExplore.ASSET_VIEWS"
+          :card-description="EnumAnalyticsExploreDescription.ASSET_VIEWS_DESC"
           :symbol-title="EnumAnalyticsExplore.ASSET_VIEWS"
-          :symbol="''" />
+          :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsExplore.VIEWER_LOCATION">
         <views-map-graph-card
           :asset-source-enum="enumAssetSource.VIEW"
           :card-heading="EnumAnalyticsExplore.VIEWER_LOCATION"
+          :card-description="EnumAnalyticsExploreDescription.VIEWER_LOCATION_DESC"
           :symbol-title="EnumAnalyticsExplore.VIEWER_LOCATION"
-          :symbol="''" />
+          :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-show="activeTab === EnumAnalyticsExplore.VIEWER_MARKET_SEGMENT">
         <views-bar-graph-card
           :card-heading="EnumAnalyticsExplore.VIEWER_MARKET_SEGMENT"
+          :card-description="EnumAnalyticsExploreDescription.VIEWER_MARKET_SEGMENT_DESC"
           :asset-query-metric-type="EnumAssetQueryMetric.COUNT"
           :symbol="''"
-          :symbol-title="'Views'" />
+          :symbol-title="'Views'"/>
       </div>
       <div class="analytics__cards__item"
-            v-show="activeTab === EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS">
-        <pie-subscriber-segments
-        :asset-source-enum="enumAssetSource.VIEW"
-        :card-heading="EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS"
-        :symbol-title="'Views'"
-        :symbol="''"/>
+           v-show="activeTab === EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS">
+        <PieSubscribersApi
+          :card-heading="EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS"
+          :card-description="EnumAnalyticsExploreDescription.SUBSCRIBER_SEGMENTS_DESC"
+          :asset-source-enum="enumAssetSource.VIEW"
+          :symbol="''"
+          :symbolTitle="'Transactions'"/>
       </div>
     </div>
   </div>
@@ -89,13 +93,20 @@ import { EnumAssetSource, EnumAssetQueryMetric } from '@/model/analytics';
 import ViewsLineGraphCard from '@/views/dashboard/Analytics/ViewsLineGraphCard.vue';
 import ViewsMapGraphCard from '@/views/dashboard/Analytics/ViewsMapGraphCard.vue';
 import ViewsBarGraphCard from '@/views/dashboard/Analytics/ViewsBarGraphCard.vue';
-import PieSubscriberSegments from '@/views/dashboard/Analytics/PieSubscriberSegments.vue';
+import PieSubscribersApi from '@/views/dashboard/Analytics/sales/PieSubscribersApi.vue';
 
 enum EnumAnalyticsExplore {
   ASSET_VIEWS = 'Number of asset views',
   VIEWER_LOCATION = 'Viewer location',
   VIEWER_MARKET_SEGMENT = 'Viewer market segment',
-  SUBSCRIBER_SEGMENTS = 'Subscriber Segments',
+  SUBSCRIBER_SEGMENTS = 'Subscriber segments',
+}
+
+enum EnumAnalyticsExploreDescription {
+  ASSET_VIEWS_DESC = 'How many times was the asset viewed by visitors',
+  VIEWER_LOCATION_DESC = 'Where are the clients of the API asset located',
+  VIEWER_MARKET_SEGMENT_DESC = 'What market segment do the viewers of an asset belong to',
+  SUBSCRIBER_SEGMENTS_DESC = 'What market segments do the clients of the API asset belong to',
 }
 
 @Component({
@@ -103,7 +114,7 @@ enum EnumAnalyticsExplore {
     ViewsLineGraphCard,
     ViewsMapGraphCard,
     ViewsBarGraphCard,
-    PieSubscriberSegments,
+    PieSubscribersApi,
   },
 })
 export default class Explore extends Vue {
@@ -113,6 +124,8 @@ export default class Explore extends Vue {
 
   EnumAnalyticsExplore: typeof EnumAnalyticsExplore;
 
+  EnumAnalyticsExploreDescription: typeof EnumAnalyticsExploreDescription;
+
   EnumAssetQueryMetric: typeof EnumAssetQueryMetric;
 
   constructor() {
@@ -120,6 +133,7 @@ export default class Explore extends Vue {
 
     this.activeTab = null;
     this.EnumAnalyticsExplore = EnumAnalyticsExplore;
+    this.EnumAnalyticsExploreDescription = EnumAnalyticsExploreDescription;
     this.enumAssetSource = EnumAssetSource;
     this.EnumAssetQueryMetric = EnumAssetQueryMetric;
   }

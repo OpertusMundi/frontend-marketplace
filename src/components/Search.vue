@@ -130,6 +130,7 @@ import { AxiosError } from 'axios';
 import { Debounce } from 'vue-debounce-decorator';
 import store from '@/store';
 import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
 
 @Component
 export default class Search extends Vue {
@@ -212,18 +213,7 @@ export default class Search extends Vue {
   }
 
   showItemPrice(item: CatalogueItem): string {
-    let lowestPrice: number | string = 999999;
-    let highestPrice = 0;
-    item.pricingModels.forEach((pricingModel) => {
-      if (lowestPrice > pricingModel.quotation?.totalPrice) {
-        lowestPrice = pricingModel.quotation?.totalPrice;
-      }
-      if (highestPrice < pricingModel.quotation?.totalPrice) {
-        highestPrice = pricingModel.quotation?.totalPrice;
-      }
-    });
-    if (lowestPrice === 0) lowestPrice = 'FREE';
-    return `${lowestPrice} - ${highestPrice}€`;
+    return renderedPriceAsString(getPriceOrMinimumPrice(item));
   }
 
   showSearchResults(): void {

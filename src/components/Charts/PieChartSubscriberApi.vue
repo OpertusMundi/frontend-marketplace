@@ -10,7 +10,7 @@ import {
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import exportingInit from 'highcharts/modules/exporting';
-import { AssetDraft } from '@/model/draft';
+import { CatalogueItem } from '@/model/catalogue';
 import DataTransform from '@/helper/analytics';
 import {
   DataSeries,
@@ -45,7 +45,7 @@ export default class PieChartSubscriberApi extends Vue {
   @Prop({ default: null }) private pieColor!: string[];
 
   @Prop({ default: [] })
-  private assetQuery!: AssetDraft[];
+  private assetQuery!: CatalogueItem[];
 
   @Prop({ default: null })
   private index!: number;
@@ -77,7 +77,7 @@ export default class PieChartSubscriberApi extends Vue {
   }
 
   @Watch('assetQuery')
-  onAssetChange(asset: AssetDraft[]): void {
+  onAssetChange(asset: CatalogueItem[]): void {
     this.getAnalytics();
     console.log('asset watcher => ', asset);
   }
@@ -113,11 +113,11 @@ export default class PieChartSubscriberApi extends Vue {
     });
   }
 
-  setSingleAsset(query: AssetDraft[]): string[] | null {
-    return query.filter((asset, index) => (index === this.index)).map((asset) => asset.assetPublished);
+  setSingleAsset(query: CatalogueItem[]): string[] | null {
+    return query.filter((asset, index) => (index === this.index)).map((asset) => asset.id);
   }
 
-  setSingleAssetTitle(query: AssetDraft[]): string {
+  setSingleAssetTitle(query: CatalogueItem[]): string {
     return query.filter((asset, index) => (index === this.index)).map((asset) => asset.title)[0];
   }
 

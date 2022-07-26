@@ -49,6 +49,20 @@ import CatalogueCard from '@/components/Catalogue/Card.vue';
 import ViewsLineGraphCard from './ViewsLineGraphCard.vue';
 import ViewsMapGraphCard from './ViewsMapGraphCard.vue';
 
+enum EnumAnalyticsAssets {
+  ASSET_VIEWS = 'Number of Asset Views',
+  APPEARED_SEARCH_RESULTS = 'Appeared in search results',
+  VIEWER_LOCATION = 'Viewer location',
+  VIEWER_MARKET_SEGMENT = 'Viewer market segment',
+}
+
+enum EnumAnalyticsAssetsDescription {
+  ASSET_VIEWS_DESC = 'How many times was the asset viewed by visitors',
+  APPEARED_SEARCH_RESULTS_DESC = 'How many times did the asset appear in search results',
+  VIEWER_LOCATION_DESC = 'Where are the viewers of an asset located',
+  VIEWER_MARKET_SEGMENT_DESC = 'What market segment do the viewers of an asset belong to',
+}
+
 @Component({
   components: {
     CatalogueCard,
