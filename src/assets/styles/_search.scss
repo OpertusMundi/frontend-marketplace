@@ -163,6 +163,10 @@
         }
       }
     }
+
+    &--no-z-index {
+      z-index: 0;
+    }
   }
 
   &__resultscont {
