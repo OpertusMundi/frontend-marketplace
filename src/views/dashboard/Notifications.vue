@@ -16,7 +16,7 @@
           </div>
 
           <div class="notifications__main">
-            <notification-card @click.native="navigateToMessages" :notification="{id: 'notification_messages', text: 'You have unread messages', createdAt: '', readAt: null, read: false, recipient: '', eventType: 'UNREAD_MESSAGES', data: null}"></notification-card>
+            <notification-card v-if="$store.getters.getUnreadMessagesCount" @click.native="navigateToMessages" :notification="{id: 'notification_messages', text: 'You have unread messages', createdAt: '', readAt: null, read: false, recipient: '', eventType: 'UNREAD_MESSAGES', data: null}"></notification-card>
             <hr>
             <notification-card v-for="notification in notifications" :key="notification.id" :notification="notification" @click.native="onSelectNotification(notification.id)"></notification-card>
             <pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :itemsTotal="itemsTotal" @pageSelection="onPageSelect"></pagination>

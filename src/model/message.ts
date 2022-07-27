@@ -68,13 +68,24 @@ interface Message {
   thread: string;
 }
 
+interface Thread {
+  key: string;
+  owner: string;
+  subject: string;
+  text: string;
+  modifiedAt: string;
+  count: number;
+  unread: number;
+  messages: Message[];
+}
+
 interface MessagesResponse extends ServerResponse<PageResult<Message>> {
   contacts: {
     [key: string]: ClientContact;
   }[]
 }
 
-interface MessageThreadResponse extends ServerResponse<Message[]> {
+interface MessageThreadResponse extends ServerResponse<Thread> {
   contacts: {
     [key: string]: ClientContact;
   }[]

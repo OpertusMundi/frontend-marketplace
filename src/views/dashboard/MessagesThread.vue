@@ -136,13 +136,13 @@ export default class DashboardMessagesThread extends Vue {
     this.messageApi.getThread(this.threadId)
       .then((response) => {
         this.contacts = Object.keys(response.contacts).map((x) => response.contacts[x]);
-        this.messages = response.result;
+        this.messages = response.result.messages;
 
         if (withLoader) store.commit('setLoading', false);
         this.$nextTick(() => this.scrollMessagesToBottom());
       })
-      .then(() => this.messageApi.markThreadAsRead(this.threadId))
-      .finally(() => this.messageApi.find(0, 1, null, null, 'UNREAD'))
+      .then(() => (this.messageApi.markThreadAsRead(this.threadId)))
+      .then(() => (this.messageApi.find(0, 1, null, null, 'UNREAD')))
       .then((unreadMessagesResponse) => store.commit('setUnreadMessagesCount', unreadMessagesResponse.result.count));
   }
 
