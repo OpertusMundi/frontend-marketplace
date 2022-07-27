@@ -150,7 +150,7 @@
                 </div>
               </div>
               <div class="dashboard__form__step__title">
-                <p>Select an asset from your topio Drive. {{ fileTopioDrive }}</p>
+                <p>Select an asset from your topio Drive.</p>
               </div>
               <validation-provider v-slot="{ errors }" rules="required">
                 <div class="form-group mt-xs-20">
