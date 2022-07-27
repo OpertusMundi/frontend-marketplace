@@ -19,6 +19,13 @@
         width: 100%;
         margin: 0 10px 20px 10px;
         min-height:270px;
+        //border: 2px solid transparent;
+        transition: border 0.3s ease;
+        &:hover {
+            .services-carts__item__inner, .services-carts__item__view {
+                border-color: $secondColor;
+            }
+        }
         @media (min-width: 576px) {
             width: calc(50% - 20px);
         }
@@ -44,10 +51,20 @@
             span {
                 @extend .a_carousel__item__main__title;
             }
+            &--m-0 {
+                margin: 0;
+            }
         }
         &__main {
             @extend .a_carousel__item__main;
             &__text {
+                font-size: 14px;
+            }
+            &__hero-title {
+                color: $secondColor;
+                font-weight: 500;
+                font-size: 20px;
+                margin-bottom: 10px;
             }
         }
     }
