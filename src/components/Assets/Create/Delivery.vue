@@ -152,6 +152,15 @@
               <div class="dashboard__form__step__title">
                 <p>Select an asset from your topio Drive.</p>
               </div>
+              <validation-provider v-slot="{ errors }" rules="required">
+                <div class="form-group mt-xs-20">
+                  <label for="fileEncoding">Encoding</label>
+                  <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileTopioDriveEncoding" @tag="fileTopioDriveEncoding = $event" tag-placeholder="Custom encoding"></multiselect>
+                  <div class="errors" v-if="errors.length">
+                    <span class="mt-xs-20">Encoding is required</span>
+                  </div>
+                </div>
+              </validation-provider>
               <div>
                 <file-topio-drive :fileApi.sync="fileTopioDrive"></file-topio-drive>
               </div>
@@ -294,6 +303,8 @@ export default class Delivery extends Vue {
 
   fileTopioDrive: any | null;
 
+  fileTopioDriveEncoding = 'UTF-8';
+
   popularEncodings: string[];
 
   constructor() {
@@ -353,7 +364,7 @@ export default class Delivery extends Vue {
       encoding: '',
     };
 
-    this.$emit('update:selectedPublishedFileForDataFileCreation', fileTopioDrive);
+    this.$emit('update:selectedPublishedFileForDataFileCreation', { ...fileTopioDrive, encoding: this.fileTopioDriveEncoding });
     this.$emit('update:fileToUpload', this.fileToUploadLocal);
     console.log('Emit file from storage to CreatAsset component topio drive => ', fileTopioDrive);
   }

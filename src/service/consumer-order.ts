@@ -98,7 +98,7 @@ export default class ConsumerOrderApi extends Api {
   public async downloadInvoice(orderKey: string, save = false, downloadFilename?: string): Promise<ServerResponse<Blob>> {
     const url = `/action/consumer/orders/${orderKey}/invoice`;
 
-    const response = this.post<void, Blob>(url, null, {
+    const response = this.get<Blob>(url, {
       responseType: 'blob',
     });
 

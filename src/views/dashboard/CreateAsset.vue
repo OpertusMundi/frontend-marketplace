@@ -889,6 +889,7 @@ export default class CreateAsset extends Vue {
     const filetFromTopioDrive: UserFileResourceCommand = {
       path: this.selectedPublishedFileForDataFileCreation?.path as string,
       format: (this.asset as CatalogueItemCommand).format,
+      encoding: this.selectedPublishedFileForDataFileCreation?.encoding as string,
     };
 
     const addResourceFromFileSystemResponse = await this.draftAssetApi.addResourceFromFileSystem(draftKey, filetFromTopioDrive);

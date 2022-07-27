@@ -12,17 +12,18 @@ export default class MessageApi extends Api {
   }
 
   public async find(
-    page = 0, size = 10,
+    page = 0,
+    size = 10,
     dateFrom: string | null = null,
     dateTo: string | null = null,
-    status: 'ALL' | 'UNREAD' | 'THREAD_ONLY' | 'THREAD_ONLY_UNREAD' | null = null,
+    view: 'ALL' | 'UNREAD' | 'THREAD_ONLY' | 'THREAD_ONLY_UNREAD' | null = null,
   ): Promise<MessagesResponse> {
     const params = {
       page,
       size,
       'date-from': dateFrom,
       'date-to': dateTo,
-      status,
+      view,
     };
 
     const keyValues = Object.keys(params).filter((k) => !!params[k] || params[k] === false || params[k] === 0)
@@ -65,10 +66,10 @@ export default class MessageApi extends Api {
       });
   }
 
-  public async markThreadAsRead(threadKey: string): Promise<MessagesResponse> {
+  public async markThreadAsRead(threadKey: string): Promise<MessageThreadResponse> {
     const url = `${baseUri}/thread/${threadKey}`;
 
-    return this.put<void, MessagesResponse>(url, null)
+    return this.put<void, MessageThreadResponse>(url, null)
       .then((response) => {
         const { data } = response;
 
