@@ -562,6 +562,7 @@ import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import Modal from '@/components/Modal.vue';
 import moment from 'moment';
 import { navigateToKeycloakLogin } from '@/helper/login';
+import { EnumRole } from '@/model/role';
 // import { EnumRole } from '@/model/role';
 
 @Component({
@@ -668,7 +669,7 @@ export default class Header extends Vue {
 
   pollNotificationsAndMessages(): void {
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
-    if (store.getters.isAuthenticated) {
+    if (store.getters.isAuthenticated && store.getters.hasRole([EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER])) {
       this.notificationApi.find(0, 5, null, null, null).then((response) => {
         this.notifications = response.result.items;
         console.log(this.notifications);
