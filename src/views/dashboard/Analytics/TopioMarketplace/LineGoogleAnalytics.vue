@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+        <div v-if="false" class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
@@ -49,23 +49,23 @@
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
-        </tr>
+      <tr>
+        <th class="data_table__header">Asset</th>
+        <th v-for="(name, index) in timePoints" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.name">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
-        </tr>
+      <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
+        <td class="data_table__data">{{ data.name }}</td>
+        <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
 </template>
 <script lang="ts">
 import {
-  Component, Watch, Vue, Prop,
+  Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -77,16 +77,20 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
+  DataSeries,
+  EnumGoogleAnalyticsMetric,
+  EnumTemporalUnit,
+  GoogleAnalyticsQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-import Highcharts from 'highcharts';
-import exportData from 'highcharts/modules/export-data';
-import exportingInit from 'highcharts/modules/exporting';
 
-exportingInit(Highcharts);
-exportData(Highcharts);
+interface TimeResponse {
+  day: number;
+  month: number;
+  week: number;
+  year: number;
+}
 
 @Component({
   components: {
@@ -97,14 +101,15 @@ exportData(Highcharts);
     highcharts: Chart,
   },
 })
-export default class ViewsLineGraphCard extends Vue {
-  @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
-
-  @Prop({ default: '' }) private cardHeading!: string;
+export default class LineGoogleAnalytics extends Vue {
+  @Prop({ default: EnumGoogleAnalyticsMetric.COUNT_USERS })
+  private EnumGoogleAnalyticsMetric!: EnumGoogleAnalyticsMetric;
 
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
+
+  @Prop({ default: '' }) private cardHeading!: string;
 
   draftAssetApi: DraftAssetApi;
 
@@ -118,7 +123,7 @@ export default class ViewsLineGraphCard extends Vue {
 
   assetsQuery: string[];
 
-  segmentsNames: string[];
+  timePoints: TimeResponse[];
 
   chartOptions: any | null;
 
@@ -131,8 +136,6 @@ export default class ViewsLineGraphCard extends Vue {
   seriesData: any;
 
   lineChartDate: any;
-
-  assetQueryMetricType: EnumAssetQueryMetric;
 
   constructor() {
     super();
@@ -151,7 +154,7 @@ export default class ViewsLineGraphCard extends Vue {
 
     this.assetsQuery = [];
 
-    this.segmentsNames = [];
+    this.timePoints = [];
 
     this.temporalUnitMin = '';
 
@@ -162,27 +165,20 @@ export default class ViewsLineGraphCard extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
-
-    this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
   }
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    // await this.getAnalytics();
-  }
-
-  filteredAssets(assets: AssetDraft[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
+    await this.getAnalytics();
   }
 
   getAnalytics(): void {
-    const assetsViewsQuery: AssetQuery = {
+    const query: GoogleAnalyticsQuery = {
       segments: {
         enabled: false,
       },
       assets: this.assetsQuery,
-      metric: this.assetQueryMetricType,
-      source: this.assetSourceEnum,
+      metric: this.EnumGoogleAnalyticsMetric,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
@@ -190,15 +186,14 @@ export default class ViewsLineGraphCard extends Vue {
       },
     };
 
-    this.analyticsApi.executeAssetQuery(assetsViewsQuery).then((response) => {
+    this.analyticsApi.executeGoogleAnalyticsQuery(query).then((response) => {
       if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
-        this.segmentsNames = this.formatSegmentsNames();
-        this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        response.result.points.reverse();
+        this.analyticsData = response.result;
+        this.timePoints = this.getTimeResponse();
+        this.lineChartDate = this.convertPointsToDate();
+        const dataSeries = this.analyticsData.points.map((point) => (point.value));
+        this.seriesData = [{ name: 'Marketplace visitors', data: dataSeries }];
         this.chartOptions = this.getOptions();
       }
     });
@@ -206,8 +201,13 @@ export default class ViewsLineGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.map((a) => a.assetPublished);
+    console.log(newVal);
+    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
     this.getAnalytics();
+  }
+
+  filteredAssets(assets: AssetDraft[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
   }
 
   async getAssets(): Promise<any> {
@@ -222,7 +222,7 @@ export default class ViewsLineGraphCard extends Vue {
       id: EnumSortField.CREATED_ON,
       order: 'ASC' as Order,
     };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
+    await this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
       if (resp.data.success) {
         this.assets = resp.data.result.items;
       } else {
@@ -235,13 +235,13 @@ export default class ViewsLineGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
+    // const name = 'Sales per segment';
 
     return {
       chart: {
         type: 'areaspline',
         zoomType: 'x',
       },
-
       credits: {
         enabled: false,
       },
@@ -355,8 +355,10 @@ export default class ViewsLineGraphCard extends Vue {
 
       tooltip: {
         shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#190AFF',
         valueSuffix: this.symbol,
         style: {
           color: '#190AFF',
@@ -373,19 +375,13 @@ export default class ViewsLineGraphCard extends Vue {
               .replace(/(\d)(?=(\d{3})+\b)/g, '$1,')}€ <br>${point.category}`;
         },
       },
-      exporting: {
-        csv: {
-          itemDelimiter: ';',
-        },
-      },
       series: this.seriesData,
     };
   }
 
-  formatSegmentsNames(): string[] {
-    let names: Array<any> = [];
-    names = [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
-    return names;
+  getTimeResponse(): Array<any> {
+    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time)
+      .reverse();
   }
 
   formatSeries(): any[] {
@@ -393,7 +389,7 @@ export default class ViewsLineGraphCard extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.segmentsNames.forEach((segName) => {
+        this.timePoints.forEach((segName) => {
           const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
@@ -421,37 +417,39 @@ export default class ViewsLineGraphCard extends Vue {
         series.push(assetObj);
       });
     } else {
-      const data = this.analyticsData?.points.map((a) => a.value);
-      const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === this.assetsQuery[0]);
-      const assetObj = {
-        name: assetTitle?.title,
-        marker: {
-          enabled: true,
-          symbol: 'circle',
-          lineWidth: 1,
-          radius: 4,
-          states: {
-            hover: {
-              enabled: true,
+      this.assetsQuery.forEach((assetName) => {
+        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const data = this.analyticsData?.points.map((a) => a.value);
+        const assetObj = {
+          name: assetTitle?.title,
+          marker: {
+            enabled: true,
+            symbol: 'circle',
+            lineWidth: 1,
+            radius: 4,
+            states: {
+              hover: {
+                enabled: true,
+              },
             },
           },
-        },
-        showInLegend: true,
-        data,
-      };
-      series.push(assetObj);
+          showInLegend: true,
+          data,
+        };
+        series.push(assetObj);
+      });
     }
+
     return series;
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.getAnalytics();
+    console.log('here');
   }
 
-  formatDate(value): any {
+  formatDate(value: TimeResponse): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
       date = moment(`${value.year}-${value.month}-${value.day}`)
@@ -476,41 +474,39 @@ export default class ViewsLineGraphCard extends Vue {
     return date;
   }
 
-  formatTheDate(): string[] {
+  convertPointsToDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.segmentsNames.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
+    this.timePoints.forEach((date: any) => {
+      if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+        const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+          .format('MMM D, YY');
+        formattedDate.push(dayFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+        const monthFormat = moment(`${date.year}-${date.month}`)
+        // .set({ year: date.year, month: date.month })
+          .format('MMMM YYYY');
+        formattedDate.push(monthFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const startWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .startOf('isoWeek')
+          .format('MMM D');
+        const endWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .endOf('isoWeek')
+          .format('MMM D, YY');
+        const weekFormat = `${startWeek} - ${endWeek}`;
+        formattedDate.push(weekFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const yearFormat = moment(`${date.year}`)
+          .format('YYYY');
+        formattedDate.push(yearFormat);
+      }
+    });
     return formattedDate;
   }
 
-  formatValue(value: any): any {
+  formatValue(value: string): any {
     const regex = value.toString();
     return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }

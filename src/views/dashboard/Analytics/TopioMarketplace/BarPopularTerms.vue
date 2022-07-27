@@ -6,7 +6,7 @@
           <h3>{{ cardHeading }}</h3>
           <p>Keep track of your assets popularity across time and countries.</p>
         </div>
-        <div class="graphcard__head__data__right">
+        <div v-if="false" class="graphcard__head__data__right">
           <ul>
             <li>
               <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
+        <div v-if="false" class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
@@ -49,16 +49,16 @@
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
-        </tr>
+      <tr>
+        <th class="data_table__header">{{ cardHeading }}</th>
+        <th v-for="(name, index) in assetNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
-        </tr>
+      <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
+        <td class="data_table__data">{{ data.name }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -77,11 +77,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  DataSeries, EnumTemporalUnit, EnumAssetSource,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
-import moment from 'moment';
-import DataTransform from '@/helper/analytics';
 
 @Component({
   components: {
@@ -92,8 +90,9 @@ import DataTransform from '@/helper/analytics';
     highcharts: Chart,
   },
 })
-export default class SalesBarGraphCard extends Vue {
-  @Prop({ default: null }) private salesQueryMetricType!: EnumSalesQueryMetric;
+export default class BarPopularTerms extends Vue {
+  @Prop({ default: EnumAssetSource.VIEW })
+  private EnumAssetSource!: EnumAssetSource;
 
   @Prop({ default: null }) private symbol!: string;
 
@@ -127,7 +126,9 @@ export default class SalesBarGraphCard extends Vue {
 
   chartDate: any;
 
-  datetimeSeries: any;
+  datetimeSeries: any
+
+  assetNames: string[]
 
   constructor() {
     super();
@@ -159,37 +160,24 @@ export default class SalesBarGraphCard extends Vue {
     this.chartDate = [];
 
     this.datetimeSeries = [];
+
+    this.assetNames = [];
   }
 
   async mounted(): Promise<any> {
     await this.getAssets();
-    // await this.getAnalytics();
+    await this.getAnalytics();
   }
 
   getAnalytics(): void {
-    const segmentQuery: SalesQuery = {
-      segments: {
-        enabled: true,
-      },
-      assets: this.assetsQuery,
-      metric: this.salesQueryMetricType,
-      time: {
-        unit: this.temporalUnit,
-        min: this.temporalUnitMin,
-        max: this.temporalUnitMax,
-      },
-    };
-
-    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
-      console.log('segmentQuery: ', segmentQuery);
+    this.analyticsApi.getMostPopularTerms().then((response) => {
+      console.log('response: ', response);
       if (response.success) {
-        // eslint-disable-next-line
-        response.result.points.reverse();
-        this.analyticsData = response.result;
-        this.segmentsNames = this.formatSegmentsNames();
-        this.datetimeSeries = this.formatSegmentNamesTime();
-        this.chartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
+        this.seriesData = [{
+          name: 'Value counts',
+          data: response.result.map((serie) => Object.values(serie)),
+        }];
+        this.assetNames = response.result.map((serie) => Object.keys(serie)[0]);
         this.chartOptions = this.getOptions();
       }
     });
@@ -217,7 +205,7 @@ export default class SalesBarGraphCard extends Vue {
       id: EnumSortField.CREATED_ON,
       order: 'ASC' as Order,
     };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
+    await this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
       if (resp.data.success) {
         this.assets = resp.data.result.items;
       } else {
@@ -251,14 +239,14 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       xAxis: {
-        categories: this.segmentsNames,
-        // type: 'datetime',
+        categories: this.assetNames,
         labels: {
-          allowOverlap: true,
-          autoRotationLimit: 0,
+          allowOverlap: false,
+          autoRotationLimit: -90,
+          rotation: -45,
           style: {
             fontFamily: 'Roboto',
-            fontSize: '10px',
+            fontSize: '8px',
           },
         },
       },
@@ -283,73 +271,11 @@ export default class SalesBarGraphCard extends Vue {
         },
         formatter: (a) => {
           const point = a.chart.hoverPoint;
-          return this.symbol === '' ? `${point.y} <br>${point.category}` : `${point.y}€ <br>${point.category}`;
+          return this.symbol === '' ? `${point.y} views <br>${point.category}` : `${point.y}€ <br>${point.category}`;
         },
       },
       series: this.seriesData,
     };
-  }
-
-  formatSegmentsNames(): string[] {
-    let names: Array<any> = [];
-    names = [...new Map(this.analyticsData.points.map((item) => [item.segment, item])).values()].map((a) => a.segment);
-    return names;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  formatSegmentNamesTime() {
-    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
-  }
-
-  formatSeries(): any[] {
-    const series: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
-      this.assetsQuery.forEach((assetName) => {
-        console.log('asset name: ', assetName);
-        // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUPING
-        // const data: Array<number> = [];
-        // this.segmentsNames.forEach((segName) => {
-        //   const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
-        //   console.log('vaue -> ', value);
-        //   if (value.length > 0) {
-        //     data.push(value[0]);
-        //   } else {
-        //     data.push(0);
-        //   }
-        // });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
-        const data: Array<any> = [];
-        this.segmentsNames.forEach((segName) => { // group by segment method from helper/analytics.ts
-          const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
-          if (value.length > 0) {
-            data.push(value);
-          } else {
-            data.push(0);
-          }
-        });
-        const assetObj = {
-          name: assetTitle?.title,
-          showInLegend: true,
-          data,
-        };
-        series.push(assetObj);
-      });
-    } else {
-      this.assetsQuery.forEach((assetName) => {
-        console.log('asset name: ', assetName);
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
-        // TODO: Confirm if this chart must be grouped by segment or by date index
-        // const data = this.analyticsData?.points.map((a) => a.value);
-        const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
-        const assetObj = {
-          name: assetTitle?.title,
-          showInLegend: true,
-          data,
-        };
-        series.push(assetObj);
-      });
-    }
-    return series;
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
@@ -362,40 +288,6 @@ export default class SalesBarGraphCard extends Vue {
   upperCaseTransform(value: string): any {
     return value;
     // return value.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => $1.toUpperCase().replace('_', ' '));
-  }
-
-  formatTheDate(): string[] {
-    const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.datetimeSeries.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
-    return formattedDate;
   }
 }
 </script>

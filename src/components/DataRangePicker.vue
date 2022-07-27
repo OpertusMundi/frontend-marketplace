@@ -66,6 +66,7 @@ export default class DataRangePicker extends Vue {
 
   mounted(): void {
     this.initDatePicker();
+    this.$emit('init', { min: this.dataMin, max: this.dataMax });
   }
 
   initDatePicker() {

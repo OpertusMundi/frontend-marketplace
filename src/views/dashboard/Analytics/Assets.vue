@@ -56,7 +56,7 @@ import ViewsMapGraphCard from './ViewsMapGraphCard.vue';
     ViewsMapGraphCard,
   },
 })
-export default class DashboardAnalyticsExplore extends Vue {
+export default class Assets extends Vue {
   activeTab: string | null;
 
   constructor() {

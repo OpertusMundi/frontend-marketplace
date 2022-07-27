@@ -8,16 +8,16 @@
     <div class="analytics">
       <tabs>
         <tab title="Sales">
-          <sales></sales>
+          <Sales />
         </tab>
         <tab title="Explore">
-          <explore></explore>
+          <Explore />
         </tab>
         <tab title="Assets">
-          <assets></assets>
+          <Assets />
         </tab>
-        <tab title="topio Marketplace">
-          TOPIO
+        <tab title="Topio Marketplace">
+          <TopioMarketPlace />
         </tab>
       </tabs>
     </div>
@@ -28,9 +28,11 @@
 import { Component, Vue } from 'vue-property-decorator';
 import Tab from '@/components/Tab.vue';
 import Tabs from '@/components/Tabs.vue';
-import Explore from './Explore.vue';
-import Sales from './Sales.vue';
-import Assets from './Assets.vue';
+import TopioMarketPlace from '@/views/dashboard/Analytics/TopioMarketPlace.vue';
+import Explore from '@/views/dashboard/Analytics/Explore.vue';
+import Sales from '@/views/dashboard/Analytics/Sales.vue';
+import Assets from '@/views/dashboard/Analytics/Assets.vue';
+
 
 @Component({
   components: {
@@ -39,6 +41,7 @@ import Assets from './Assets.vue';
     Explore,
     Sales,
     Assets,
+    TopioMarketPlace,
   },
 })
 export default class DashboardAnalytics extends Vue {}

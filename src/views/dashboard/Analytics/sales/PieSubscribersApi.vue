@@ -47,17 +47,17 @@
       </div>
     </div>
     <div class="pie-container">
-      <PieChart v-if="selectedAssets.length > 0"
+      <PieChartSubscriberApi v-if="selectedAssets.length > 0"
                 :index="0"
                 :asset-query="selectedAssets"
                 :time="timeParams"
                 :pieColor="bluePalette" />
-      <PieChart v-if="selectedAssets.length >= 2"
+      <PieChartSubscriberApi v-if="selectedAssets.length >= 2"
                 :index="1"
                 :asset-query="selectedAssets"
                 :time="timeParams"
                 :pieColor="greenPalette" />
-      <PieChart v-if="selectedAssets.length === 3"
+      <PieChartSubscriberApi v-if="selectedAssets.length === 3"
                 :index="2"
                 :asset-query="selectedAssets"
                 :time="timeParams"
@@ -81,7 +81,7 @@ import { EnumAssetSource, EnumTemporalUnit } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import exportingInit from 'highcharts/modules/exporting';
-import PieChart from '@/components/Charts/PieChart.vue';
+import PieChartSubscriberApi from '@/components/Charts/PieChartSubscriberApi.vue';
 
 exportingInit(Highcharts);
 
@@ -106,11 +106,11 @@ interface TemporalDimension {
     Multiselect,
     AssetMiniCard,
     DataRangePicker,
-    PieChart,
+    PieChartSubscriberApi,
     highcharts: Chart,
   },
 })
-export default class SalesBarGraphCard extends Vue {
+export default class PieSubscribersApi extends Vue {
   @Prop({ default: null }) private assetSourceEnum!: EnumAssetSource;
 
   @Prop({ default: null }) private symbol!: string;
