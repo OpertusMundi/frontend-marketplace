@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
       </div>
       <div class="graphcard__head__filters">
@@ -83,6 +83,8 @@ export default class MapSubscribersApi extends Vue {
 
   @Prop({ default: null }) private symbolTitle!: string;
 
+  @Prop({ default: '' }) private cardDescription!: string;
+
   draftAssetApi: DraftAssetApi;
 
   assets: AssetDraft[];
@@ -149,7 +151,7 @@ export default class MapSubscribersApi extends Vue {
 
   async mounted(): Promise<any> {
     // TODO: If asset selection will be removed from production then the below method "getAssets()" should be removed as well from the code
-    await this.getAssets();
+    // await this.getAssets();
     this.getAnalytics();
   }
 

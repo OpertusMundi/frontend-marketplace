@@ -4,21 +4,25 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div class="graphcard__head__data__right">
           <ul>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.DAY)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.DAY }">DAY</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.WEEK)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.WEEK }">WEEK</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.MONTH)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.MONTH }">MONTH</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.YEAR)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.YEAR }">YEAR</a>
             </li>
           </ul>
         </div>
@@ -27,17 +31,17 @@
         <div class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
@@ -69,12 +73,9 @@ import {
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
-import DraftAssetApi from '@/service/draft';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
-import { Order } from '@/model/request';
+import ProviderAssetsApi from '@/service/provider-assets';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
@@ -82,12 +83,17 @@ import {
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
 import DataTransform from '@/helper/analytics';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import { EnumAssetType } from '@/model/enum';
+import { CatalogueItem, CatalogueQueryResponse } from '@/model';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
 
 @Component({
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
+    AssetMiniCardProvider,
     DataRangePicker,
     highcharts: Chart,
   },
@@ -101,11 +107,13 @@ export default class SalesBarGraphCard extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
-  draftAssetApi: DraftAssetApi;
+  @Prop({ default: '' }) private cardDescription!: string;
 
-  assets: AssetDraft[];
+  ProviderAssetsApi: ProviderAssetsApi;
 
-  selectedAssets: AssetDraft[];
+  assets: CatalogueItem[];
+
+  selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
@@ -119,6 +127,8 @@ export default class SalesBarGraphCard extends Vue {
 
   temporalUnit: EnumTemporalUnit;
 
+  EnumTemporalUnit: typeof EnumTemporalUnit;
+
   temporalUnitMin: string;
 
   temporalUnitMax: string;
@@ -131,34 +141,21 @@ export default class SalesBarGraphCard extends Vue {
 
   constructor() {
     super();
-
-    this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
-
     this.selectedAssets = [];
-
     this.analyticsApi = new AnalyticsApi();
-
     this.analyticsData = {} as DataSeries;
-
     this.chartOptions = null;
-
     this.assetsQuery = [];
-
     this.segmentsNames = [];
-
     this.temporalUnitMin = '';
-
     this.temporalUnitMax = '';
-
     this.temporalUnit = EnumTemporalUnit.DAY;
-
+    this.EnumTemporalUnit = EnumTemporalUnit;
     this.seriesData = [];
-
     this.chartDate = [];
-
     this.datetimeSeries = [];
+    this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
   async mounted(): Promise<any> {
@@ -181,9 +178,8 @@ export default class SalesBarGraphCard extends Vue {
     };
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
-      console.log('segmentQuery: ', segmentQuery);
       if (response.success) {
-        // eslint-disable-next-line
+        console.log('response: ', response);
         response.result.points.reverse();
         this.analyticsData = response.result;
         this.segmentsNames = this.formatSegmentsNames();
@@ -196,41 +192,44 @@ export default class SalesBarGraphCard extends Vue {
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+  selectedAssetsChanged(newVal: CatalogueItem[]): void {
+    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
     this.getAnalytics();
   }
 
-  filteredAssets(assets: AssetDraft[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
+  filteredAssets(assets: CatalogueItem[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
   }
 
-  async getAssets(): Promise<any> {
-    const query = {
-      status: [EnumDraftStatus.PUBLISHED],
+  getAssets(): void {
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TYPE,
+        order: 'ASC',
+      },
     };
-    const pageRequest = {
-      page: 0,
-      size: 100,
-    };
-    const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
-    };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    this.ProviderAssetsApi.find(query)
+      .then((response: CatalogueQueryResponse) => {
+        if (response.success) {
+          this.assets = response.result.items.map((item) => ({
+            ...item,
+            price: getPriceOrMinimumPrice(item),
+            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
+          }));
+        }
+      });
   }
 
   getOptions(): any {
     if (!this.analyticsData) {
       return null;
     }
-    // const name = 'Sales per segment';
     return {
       credits: {
         enabled: false,
@@ -305,8 +304,7 @@ export default class SalesBarGraphCard extends Vue {
     const series: Array<any> = [];
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
-        console.log('asset name: ', assetName);
-        // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUPING
+        // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUP BY SEGMENT NAME
         // const data: Array<number> = [];
         // this.segmentsNames.forEach((segName) => {
         //   const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
@@ -317,7 +315,7 @@ export default class SalesBarGraphCard extends Vue {
         //     data.push(0);
         //   }
         // });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const data: Array<any> = [];
         this.segmentsNames.forEach((segName) => { // group by segment method from helper/analytics.ts
           const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
@@ -337,7 +335,7 @@ export default class SalesBarGraphCard extends Vue {
     } else {
       this.assetsQuery.forEach((assetName) => {
         console.log('asset name: ', assetName);
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         // TODO: Confirm if this chart must be grouped by segment or by date index
         // const data = this.analyticsData?.points.map((a) => a.value);
         const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);

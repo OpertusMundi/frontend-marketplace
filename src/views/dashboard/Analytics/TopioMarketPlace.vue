@@ -9,7 +9,7 @@
           <h5>{{ EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.TOP_VIEWED_ASSETS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -20,7 +20,7 @@
           <h5>{{ EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          See the countries your assets are most popular at.
+          {{ EnumAnalyticsMarketplaceDescription.TOP_ASSETS_APPEARED_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -31,7 +31,7 @@
           <h5>{{ EnumAnalyticsMarketplace.TOP_SEARCH_TERMS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.TOP_SEARCH_TERMS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -42,7 +42,7 @@
           <h5>{{ EnumAnalyticsMarketplace.MARKETPLACE_VISITORS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.MARKETPLACE_VISITORS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -53,7 +53,7 @@
           <h5>{{ EnumAnalyticsMarketplace.MARKETPLACE_VENDORS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.MARKETPLACE_VENDORS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -64,7 +64,7 @@
           <h5>{{ EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.MARKETPLACE_TRANSACTIONS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -75,7 +75,7 @@
           <h5>{{ EnumAnalyticsMarketplace.SUBSCRIBERS_API }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.SUBSCRIBERS_API_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -86,7 +86,7 @@
           <h5>{{ EnumAnalyticsMarketplace.NUMBER_OF_ASSETS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.NUMBER_OF_ASSETS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -97,7 +97,7 @@
           <h5>{{ EnumAnalyticsMarketplace.VALUE_FILE_ASSETS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.VALUE_FILE_ASSETS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -108,7 +108,7 @@
           <h5>{{ EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.COVERAGE_FILE_ASSETS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -119,7 +119,7 @@
           <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.VIEWER_LOCATIONS_DESC }}
         </div>
       </a>
       <a href="#" class="analytics__types__item"
@@ -130,7 +130,7 @@
           <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
-          Some text...
+          {{ EnumAnalyticsMarketplaceDescription.PURCHASES_LOCATIONS_DESC }}
         </div>
       </a>
     </div>
@@ -138,25 +138,29 @@
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS">
         <BarPopularAssets
+          :card-heading="EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS"
+          :card-description="EnumAnalyticsMarketplaceDescription.TOP_VIEWED_ASSETS_DESC"
           :enum-asset-source="EnumAssetSource.VIEW"
           :symbol="''"
           :symbol-title="EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS"
-          :card-heading="EnumAnalyticsMarketplace.TOP_VIEWED_ASSETS"
         />
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED">
         <BarPopularAssets
+          :card-heading="EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED"
+          :card-description="EnumAnalyticsMarketplaceDescription.TOP_ASSETS_APPEARED_DESC"
           :enum-asset-source="EnumAssetSource.SEARCH"
           :symbol="''"
           :symbol-title="EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED"
-          :card-heading="EnumAnalyticsMarketplace.TOP_ASSETS_APPEARED"
         />
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.TOP_SEARCH_TERMS">
         <BarPopularTerms
           :card-heading="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
+          :card-description="EnumAnalyticsMarketplaceDescription.TOP_SEARCH_TERMS_DESC"
+          :enum-asset-source="EnumAssetSource.VIEW"
           :symbol-title="EnumAnalyticsMarketplace.TOP_SEARCH_TERMS"
           :symbol="''"
         />
@@ -164,8 +168,9 @@
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VISITORS">
         <LineGoogleAnalytics
-          :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VISITORS"
+          :card-description="EnumAnalyticsMarketplaceDescription.MARKETPLACE_VISITORS_DESC"
+          :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
           :symbol="''"
           :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_VISITORS"
         />
@@ -174,6 +179,7 @@
            v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_VENDORS">
         <LineVendorsCount
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
+          :card-description="EnumAnalyticsMarketplaceDescription.MARKETPLACE_VENDORS_DESC"
           :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_VENDORS"
           :symbol="''"
         />
@@ -182,30 +188,36 @@
            v-if="activeTab === EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS">
         <LineTransactions
           :card-heading="EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS"
+          :card-description="EnumAnalyticsMarketplaceDescription.MARKETPLACE_TRANSACTIONS_DESC"
           :enum-sales-query-metric="EnumSalesQueryMetric.COUNT_TRANSACTIONS"
           :symbol-title="EnumAnalyticsMarketplace.MARKETPLACE_TRANSACTIONS"
+          :legend="'Transactions'"
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.SUBSCRIBERS_API">
         <LineSubscribersApiCount
-          :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
           :card-heading="EnumAnalyticsMarketplace.SUBSCRIBERS_API"
+          :card-description="EnumAnalyticsMarketplaceDescription.SUBSCRIBERS_API_DESC"
+          :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
           :symbol-title="EnumAnalyticsMarketplace.SUBSCRIBERS_API"
+          :legend="'API Subscribers'"
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.NUMBER_OF_ASSETS">
         <LineAssetsTotal
           :card-heading="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
+          :card-description="EnumAnalyticsMarketplaceDescription.NUMBER_OF_ASSETS_DESC"
           :symbol-title="EnumAnalyticsMarketplace.NUMBER_OF_ASSETS"
           :symbol="''"/>
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.VALUE_FILE_ASSETS">
         <LineValueFileAssets
-          :symbol-title="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
           :card-heading="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
+          :card-description="EnumAnalyticsMarketplaceDescription.VALUE_FILE_ASSETS_DESC"
+          :symbol-title="EnumAnalyticsMarketplace.VALUE_FILE_ASSETS"
           :symbol="'€'"
         />
       </div>
@@ -213,16 +225,14 @@
            v-if="activeTab === EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS">
         <MapCoverageFileAssets
           :card-heading="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
+          :card-description="EnumAnalyticsMarketplaceDescription.COVERAGE_FILE_ASSETS_DESC"
           :symbol-title="EnumAnalyticsMarketplace.COVERAGE_FILE_ASSETS"
           :symbol="''"
         />
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS">
-        <MapViewerLocations
-          :card-heading="'COMING SOON'"
-          :enum-google-analytics-metric="EnumGoogleAnalyticsMetric.COUNT_USERS"
-        />
+        COMING SOON: {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS">
@@ -275,6 +285,21 @@ enum EnumAnalyticsMarketplace {
   PURCHASES_LOCATIONS = 'Purchases locations'
 }
 
+enum EnumAnalyticsMarketplaceDescription {
+  TOP_VIEWED_ASSETS_DESC = 'The top viewed assets in Topio market',
+  TOP_ASSETS_APPEARED_DESC = 'The top assets in search results across Topio',
+  TOP_SEARCH_TERMS_DESC = 'The top search terms of Topio visitors',
+  MARKETPLACE_VISITORS_DESC = 'Number of Topio visitors',
+  MARKETPLACE_VENDORS_DESC = 'Number of Topio suppliers',
+  MARKETPLACE_TRANSACTIONS_DESC = 'Number of sales in Topio for all assets',
+  SUBSCRIBERS_API_DESC = 'Number of subsribers to APIs offered via Topio',
+  NUMBER_OF_ASSETS_DESC = 'Total number of assets',
+  VALUE_FILE_ASSETS_DESC = 'Total value of assets offered via Topio',
+  COVERAGE_FILE_ASSETS_DESC = 'Geographic coverage of assets availalble in Topio',
+  VIEWER_LOCATIONS_DESC = 'What are the locations of Topio viewers',
+  PURCHASES_LOCATIONS_DESC = 'What are the locations of users purchasing assets?'
+}
+
 @Component({
   components: {
     ViewsLineGraphCard,
@@ -298,6 +323,8 @@ export default class TopioMarketPlace extends Vue {
 
   EnumAnalyticsMarketplace: typeof EnumAnalyticsMarketplace;
 
+  EnumAnalyticsMarketplaceDescription: typeof EnumAnalyticsMarketplaceDescription;
+
   EnumAssetSource: typeof EnumAssetSource;
 
   EnumGoogleAnalyticsMetric: typeof EnumGoogleAnalyticsMetric;
@@ -311,6 +338,7 @@ export default class TopioMarketPlace extends Vue {
 
     this.activeTab = null;
     this.EnumAnalyticsMarketplace = EnumAnalyticsMarketplace;
+    this.EnumAnalyticsMarketplaceDescription = EnumAnalyticsMarketplaceDescription;
     this.EnumAssetSource = EnumAssetSource;
     this.EnumGoogleAnalyticsMetric = EnumGoogleAnalyticsMetric;
     this.EnumSalesQueryMetric = EnumSalesQueryMetric;

@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div class="graphcard__head__data__right">
           <ul>
@@ -27,17 +27,17 @@
         <div class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
@@ -69,24 +69,26 @@ import {
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
-import DraftAssetApi from '@/service/draft';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
-import { Order } from '@/model/request';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   EnumAssetQueryMetric, DataSeries, EnumTemporalUnit, AssetQuery, EnumAssetSource,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import { CatalogueItem, CatalogueQueryResponse } from '@/model';
+import ProviderAssetsApi from '@/service/provider-assets';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
 
 @Component({
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
+    AssetMiniCardProvider,
     DataRangePicker,
     highcharts: Chart,
   },
@@ -100,11 +102,13 @@ export default class ViewsBarGraphCard extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
-  draftAssetApi: DraftAssetApi;
+  @Prop({ default: '' }) private cardDescription!: string;
 
-  assets: AssetDraft[];
+  ProviderAssetsApi: ProviderAssetsApi;
 
-  selectedAssets: AssetDraft[];
+  assets: CatalogueItem[];
+
+  selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
@@ -131,8 +135,6 @@ export default class ViewsBarGraphCard extends Vue {
   constructor() {
     super();
 
-    this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
 
     this.selectedAssets = [];
@@ -158,6 +160,8 @@ export default class ViewsBarGraphCard extends Vue {
     this.chartDate = [];
 
     this.datetimeSeries = [];
+
+    this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
   async mounted(): Promise<any> {
@@ -183,31 +187,12 @@ export default class ViewsBarGraphCard extends Vue {
     this.analyticsApi.executeAssetQuery(query).then((response) => {
       console.log('segmentQuery: ', query);
       if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        const dumm = {
-          time: {
-            year: 2022,
-            month: 6,
-            week: 12,
-            day: 3,
-          },
-          segment: 'MUNICIPAL',
-          value: 120.76,
-        };
-        response.result.points.push(dumm);
-        console.log('SALE BAR GRAPH RESPONSE => ', response);
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
-        console.log('analytics data: ', this.analyticsData);
+        response.result.points.reverse();
+        this.analyticsData = response.result;
         this.segmentsNames = this.formatSegmentsNames();
-        console.log('segments: ', this.segmentsNames);
         this.datetimeSeries = this.formatSegmentNamesTime();
-        console.log('datetime siries => ', this.datetimeSeries);
         this.chartDate = this.formatTheDate();
-        console.log('chart date: ', this.chartDate);
         this.seriesData = this.formatSeries();
-        console.log('searies data: ', this.seriesData);
         this.chartOptions = this.getOptions();
       }
     });
@@ -215,33 +200,37 @@ export default class ViewsBarGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+    this.assetsQuery = newVal.map((a) => a.id);
     this.getAnalytics();
   }
 
-  filteredAssets(assets: AssetDraft[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
+  filteredAssets(assets: CatalogueItem[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
   }
 
-  async getAssets(): Promise<any> {
-    const query = {
-      status: [EnumDraftStatus.PUBLISHED],
+  getAssets(): void {
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TYPE,
+        order: 'ASC',
+      },
     };
-    const pageRequest = {
-      page: 0,
-      size: 100,
-    };
-    const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
-    };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    this.ProviderAssetsApi.find(query)
+      .then((response: CatalogueQueryResponse) => {
+        if (response.success) {
+          this.assets = response.result.items.map((item) => ({
+            ...item,
+            price: getPriceOrMinimumPrice(item),
+            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
+          }));
+        }
+      });
   }
 
   getOptions(): any {
@@ -330,7 +319,7 @@ export default class ViewsBarGraphCard extends Vue {
             data.push(0);
           }
         });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
@@ -341,7 +330,7 @@ export default class ViewsBarGraphCard extends Vue {
     } else {
       this.assetsQuery.forEach((assetName) => {
         console.log('asset name: ', assetName);
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const data = this.analyticsData?.points.map((a) => a.value);
         const assetObj = {
           name: assetTitle?.title,

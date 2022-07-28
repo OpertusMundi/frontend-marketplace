@@ -4,21 +4,25 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div class="graphcard__head__data__right">
           <ul>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.DAY)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.DAY }">DAY</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.WEEK)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.WEEK }">WEEK</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.MONTH)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.MONTH }">MONTH</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.YEAR)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.YEAR }">YEAR</a>
             </li>
           </ul>
         </div>
@@ -27,17 +31,17 @@
         <div class="graphcard__head__filters__assets">
           <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
@@ -69,12 +73,10 @@ import {
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
-import DraftAssetApi from '@/service/draft';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
-import { Order } from '@/model/request';
+import ProviderAssetsApi from '@/service/provider-assets';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   EnumAssetQueryMetric, AssetQuery, EnumAssetSource, DataSeries, EnumTemporalUnit,
@@ -84,15 +86,26 @@ import moment from 'moment';
 import Highcharts from 'highcharts';
 import exportData from 'highcharts/modules/export-data';
 import exportingInit from 'highcharts/modules/exporting';
+import { CatalogueItem, CatalogueQueryResponse } from '@/model';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
 
 exportingInit(Highcharts);
 exportData(Highcharts);
+
+interface TimeResponse {
+  day: number;
+  month: number;
+  week: number;
+  year: number;
+}
 
 @Component({
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
+    AssetMiniCardProvider,
     DataRangePicker,
     highcharts: Chart,
   },
@@ -102,15 +115,17 @@ export default class ViewsLineGraphCard extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
+  @Prop({ default: '' }) private cardDescription!: string;
+
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
 
-  draftAssetApi: DraftAssetApi;
+  ProviderAssetsApi: ProviderAssetsApi;
 
-  assets: AssetDraft[];
+  assets: CatalogueItem[];
 
-  selectedAssets: AssetDraft[];
+  selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
@@ -134,36 +149,25 @@ export default class ViewsLineGraphCard extends Vue {
 
   assetQueryMetricType: EnumAssetQueryMetric;
 
+  EnumTemporalUnit: typeof EnumTemporalUnit;
+
   constructor() {
     super();
-
-    this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
-
     this.selectedAssets = [];
-
     this.analyticsApi = new AnalyticsApi();
-
     this.analyticsData = {} as DataSeries;
-
     this.chartOptions = null;
-
     this.assetsQuery = [];
-
     this.segmentsNames = [];
-
     this.temporalUnitMin = '';
-
     this.temporalUnitMax = '';
-
     this.temporalUnit = EnumTemporalUnit.DAY;
-
     this.seriesData = [];
-
     this.lineChartDate = [];
-
+    this.EnumTemporalUnit = EnumTemporalUnit;
     this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
+    this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
   async mounted(): Promise<any> {
@@ -171,8 +175,8 @@ export default class ViewsLineGraphCard extends Vue {
     // await this.getAnalytics();
   }
 
-  filteredAssets(assets: AssetDraft[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
+  filteredAssets(assets: CatalogueItem[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
   }
 
   getAnalytics(): void {
@@ -206,29 +210,33 @@ export default class ViewsLineGraphCard extends Vue {
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.map((a) => a.assetPublished);
+    this.assetsQuery = newVal.map((a) => a.id);
     this.getAnalytics();
   }
 
-  async getAssets(): Promise<any> {
-    const query = {
-      status: [EnumDraftStatus.PUBLISHED],
+  getAssets(): void {
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TYPE,
+        order: 'ASC',
+      },
     };
-    const pageRequest = {
-      page: 0,
-      size: 100,
-    };
-    const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
-    };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    this.ProviderAssetsApi.find(query)
+      .then((response: CatalogueQueryResponse) => {
+        if (response.success) {
+          this.assets = response.result.items.map((item) => ({
+            ...item,
+            price: getPriceOrMinimumPrice(item),
+            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
+          }));
+        }
+      });
   }
 
   getOptions(): any {
@@ -355,8 +363,10 @@ export default class ViewsLineGraphCard extends Vue {
 
       tooltip: {
         shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#190AFF',
         valueSuffix: this.symbol,
         style: {
           color: '#190AFF',
@@ -401,7 +411,7 @@ export default class ViewsLineGraphCard extends Vue {
             data.push(0);
           }
         });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const assetObj = {
           marker: {
             enabled: true,
@@ -422,7 +432,7 @@ export default class ViewsLineGraphCard extends Vue {
       });
     } else {
       const data = this.analyticsData?.points.map((a) => a.value);
-      const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === this.assetsQuery[0]);
+      const assetTitle = this.assets.find(({ id }) => id === this.assetsQuery[0]);
       const assetObj = {
         name: assetTitle?.title,
         marker: {
@@ -451,7 +461,7 @@ export default class ViewsLineGraphCard extends Vue {
     }
   }
 
-  formatDate(value): any {
+  formatDate(value: TimeResponse): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
       date = moment(`${value.year}-${value.month}-${value.day}`)
@@ -510,7 +520,7 @@ export default class ViewsLineGraphCard extends Vue {
     return formattedDate;
   }
 
-  formatValue(value: any): any {
+  formatValue(value: string): string {
     const regex = value.toString();
     return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }

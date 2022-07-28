@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div class="graphcard__head__data__right">
           <ul>
@@ -29,24 +29,31 @@
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
+                           v-on:triggerchange="getAnalytics()"/>
         </div>
       </div>
     </div>
@@ -55,13 +62,17 @@
       <thead>
       <tr>
         <th class="data_table__header">Asset</th>
-        <th v-for="(name, index) in timePoints" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+        <th v-for="(name, index) in timePoints" class="data_table__header"
+            :key="`segment_name_${index}`">{{ formatDate(name) }}
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
+        <td class="data_table__data" v-for="value in data.data" :key="value.id">
+          {{ formatValue(value) }}
+        </td>
       </tr>
       </tbody>
     </table>
@@ -73,18 +84,20 @@ import {
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
-import DraftAssetApi from '@/service/draft';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
-import { Order } from '@/model/request';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   DataSeries, EnumSubscribersQueryMetric, EnumTemporalUnit, SubscribersQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import { CatalogueItem, CatalogueQueryResponse } from '@/model/catalogue';
+import { EnumAssetType } from '@/model/enum';
+import ProviderAssetsApi from '@/service/provider-assets';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
 
 interface TimeResponse {
   day: number;
@@ -97,9 +110,9 @@ interface TimeResponse {
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
     DataRangePicker,
     highcharts: Chart,
+    AssetMiniCardProvider,
   },
 })
 export default class LineSubscribersApi extends Vue {
@@ -112,11 +125,13 @@ export default class LineSubscribersApi extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
-  draftAssetApi: DraftAssetApi;
+  @Prop({ default: '' }) private cardDescription!: string;
 
-  assets: AssetDraft[];
+  ProviderAssetsApi: ProviderAssetsApi;
 
-  selectedAssets: AssetDraft[];
+  assets: CatalogueItem[];
+
+  selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
@@ -142,39 +157,25 @@ export default class LineSubscribersApi extends Vue {
 
   constructor() {
     super();
-
-    this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
-
     this.selectedAssets = [];
-
     this.analyticsApi = new AnalyticsApi();
-
     this.analyticsData = {} as DataSeries;
-
     this.chartOptions = null;
-
     this.assetsQuery = [];
-
     this.timePoints = [];
-
     this.temporalUnitMin = '';
-
     this.temporalUnitMax = '';
-
     this.temporalUnit = EnumTemporalUnit.DAY;
-
     this.seriesData = [];
-
     this.lineChartDate = [];
     this.EnumTemporalUnit = EnumTemporalUnit;
+    this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    console.log(newVal);
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+  selectedAssetsChanged(newVal: CatalogueItem[]): void {
+    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
     this.getAnalytics();
   }
 
@@ -196,42 +197,46 @@ export default class LineSubscribersApi extends Vue {
         max: this.temporalUnitMax,
       },
     };
-    console.log('subscribersQuery: ', subscribersQuery);
-    this.analyticsApi.executeSubscribersQuery(subscribersQuery).then((response) => {
-      if (response.success) {
-        console.log('response subscribers => ', response);
-        this.analyticsData = response.result;
-        this.timePoints = this.getTimeResponse();
-        this.lineChartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
-        this.chartOptions = this.getOptions();
-      }
-    });
+    this.analyticsApi.executeSubscribersQuery(subscribersQuery)
+      .then((response) => {
+        if (response.success) {
+          console.log('executeSubscribersQuery => response: ', response);
+          this.analyticsData = response.result;
+          this.timePoints = this.getTimeResponse();
+          this.lineChartDate = this.formatTheDate();
+          this.seriesData = this.formatSeries();
+          this.chartOptions = this.getOptions();
+        }
+      });
   }
 
-  filteredAssets(assets: AssetDraft[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
+  filteredAssets(assets: CatalogueItem[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
   }
 
-  async getAssets(): Promise<any> {
-    const query = {
-      status: [EnumDraftStatus.PUBLISHED],
+  getAssets(): void {
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TYPE,
+        order: 'ASC',
+      },
     };
-    const pageRequest = {
-      page: 0,
-      size: 100,
-    };
-    const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
-    };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    this.ProviderAssetsApi.find(query)
+      .then((response: CatalogueQueryResponse) => {
+        if (response.success) {
+          this.assets = response.result.items.map((item) => ({
+            ...item,
+            price: getPriceOrMinimumPrice(item),
+            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
+          }));
+        }
+      });
   }
 
   getOptions(): any {
@@ -393,14 +398,15 @@ export default class LineSubscribersApi extends Vue {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
         this.timePoints.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
+            .map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
           } else {
             data.push(0);
           }
         });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const assetObj = {
           marker: {
             enabled: true,
@@ -421,7 +427,7 @@ export default class LineSubscribersApi extends Vue {
       });
     } else {
       this.assetsQuery.forEach((assetName) => {
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const data = this.analyticsData?.points.map((a) => a.value);
         const assetObj = {
           name: assetTitle?.title,
@@ -514,13 +520,15 @@ export default class LineSubscribersApi extends Vue {
 
   formatValue(value: string): any {
     const regex = value.toString();
-    return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
+    return regex.replace(/(\.\d{2})\d*/, '$1')
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+
 .multiselect__option--highlight {
   background: none !important;
 }

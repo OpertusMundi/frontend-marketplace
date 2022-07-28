@@ -3,9 +3,9 @@
     <div class="line_chart__head">
       <div class="line_chart__head__filters">
         <div class="line_chart__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="assets" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
@@ -24,24 +24,33 @@ import {
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
-import DraftAssetApi from '@/service/draft';
-import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
-import { Order } from '@/model/request';
+import ProviderAssetsApi from '@/service/provider-assets';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import { CatalogueItem, CatalogueQueryResponse } from '@/model';
+import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
+import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
+
+interface TimeResponse {
+  day: number;
+  month: number;
+  week: number;
+  year: number;
+}
 
 @Component({
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
+    AssetMiniCardProvider,
     DataRangePicker,
     highcharts: Chart,
   },
@@ -57,11 +66,11 @@ export default class SalesLineGraphCard extends Vue {
 
   datesSelect: any;
 
-  draftAssetApi: DraftAssetApi;
+  ProviderAssetsApi: ProviderAssetsApi;
 
-  assets: AssetDraft[];
+  assets: CatalogueItem[];
 
-  selectedAssets: AssetDraft[];
+  selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
@@ -69,7 +78,7 @@ export default class SalesLineGraphCard extends Vue {
 
   assetsQuery: string[];
 
-  segmentsNames: string[];
+  timePoints: string[];
 
   chartOptions: any | null;
 
@@ -88,8 +97,6 @@ export default class SalesLineGraphCard extends Vue {
 
     this.datesSelect = [{ date: 'today' }, { date: 'last week' }, { date: 'last month' }, { date: 'last 3 months' }, { date: 'last 6 months' }, { date: 'last year' }];
 
-    this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
 
     this.selectedAssets = [];
@@ -102,7 +109,7 @@ export default class SalesLineGraphCard extends Vue {
 
     this.assetsQuery = [];
 
-    this.segmentsNames = [];
+    this.timePoints = [];
 
     this.temporalUnitMin = '';
 
@@ -113,6 +120,8 @@ export default class SalesLineGraphCard extends Vue {
     this.seriesData = [];
 
     this.lineChartDate = [];
+
+    this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
   async mounted(): Promise<any> {
@@ -140,7 +149,7 @@ export default class SalesLineGraphCard extends Vue {
         response.result!.points.reverse();
         // eslint-disable-next-line
         this.analyticsData = response.result!;
-        this.segmentsNames = this.formatSegmentsNames();
+        this.timePoints = this.formatSegmentsNames();
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
         this.chartOptions = this.getOptions();
@@ -149,30 +158,38 @@ export default class SalesLineGraphCard extends Vue {
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+  selectedAssetsChanged(newVal: CatalogueItem[]): void {
+    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
     this.getAnalytics();
   }
 
-  async getAssets(): Promise<any> {
-    const query = {
-      status: [EnumDraftStatus.PUBLISHED],
+  filteredAssets(assets: CatalogueItem[]): any {
+    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
+  }
+
+  getAssets(): void {
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: EnumAssetType.VECTOR,
+      pageRequest: {
+        page: 0,
+        size: 100,
+      },
+      sorting: {
+        id: EnumProviderAssetSortField.TYPE,
+        order: 'ASC',
+      },
     };
-    const pageRequest = {
-      page: 0,
-      size: 100,
-    };
-    const sort = {
-      id: EnumSortField.CREATED_ON,
-      order: 'ASC' as Order,
-    };
-    this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    this.ProviderAssetsApi.find(query)
+      .then((response: CatalogueQueryResponse) => {
+        if (response.success) {
+          this.assets = response.result.items.map((item) => ({
+            ...item,
+            price: getPriceOrMinimumPrice(item),
+            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
+          }));
+        }
+      });
   }
 
   getOptions(): any {
@@ -300,8 +317,10 @@ export default class SalesLineGraphCard extends Vue {
 
       tooltip: {
         shadow: false,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#190AFF',
         valueSuffix: this.symbol,
         style: {
           color: '#190AFF',
@@ -333,7 +352,7 @@ export default class SalesLineGraphCard extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.segmentsNames.forEach((segName) => {
+        this.timePoints.forEach((segName) => {
           const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
@@ -341,7 +360,7 @@ export default class SalesLineGraphCard extends Vue {
             data.push(0);
           }
         });
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const assetObj = {
           marker: {
             enabled: true,
@@ -362,7 +381,7 @@ export default class SalesLineGraphCard extends Vue {
       });
     } else {
       this.assetsQuery.forEach((assetName) => {
-        const assetTitle = this.assets.find(({ assetPublished }) => assetPublished === assetName);
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
         const data = this.analyticsData?.points.map((a) => a.value);
         const assetObj = {
           name: assetTitle?.title,
@@ -394,71 +413,57 @@ export default class SalesLineGraphCard extends Vue {
     }
   }
 
-  formatDate(value: any): any {
+  formatDate(value: TimeResponse): any {
     let date: any;
     if (Object.prototype.hasOwnProperty.call(value, 'day')) {
-      date = moment()
-        .set({ year: value.year, month: value.month, date: value.day })
+      date = moment(`${value.year}-${value.month}-${value.day}`)
         .format('MMM D, YY');
-      // console.log('day');
     } else if (Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year') && !Object.prototype.hasOwnProperty.call(value, 'week')) {
-      date = moment()
-        .set({ year: value.year, month: value.month })
+      date = moment(`${value.year}-${value.month}`)
         .format('MMMM YYYY');
-      // console.log('month');
     } else if (Object.prototype.hasOwnProperty.call(value, 'week') && Object.prototype.hasOwnProperty.call(value, 'month') && Object.prototype.hasOwnProperty.call(value, 'year')) {
-      const startWeek = moment()
-        .set('year', value.year)
+      const startWeek = moment(`${value.year}`)
         .add(value.week, 'weeks')
         .startOf('isoWeek')
         .format('MMM D');
-      const endWeek = moment()
-        .set('year', value.year)
+      const endWeek = moment(`${value.year}`)
         .add(value.week, 'weeks')
         .endOf('isoWeek')
         .format('MMM D, YY');
       date = `${startWeek} - ${endWeek}`;
-      // console.log('week');
     } else if (Object.prototype.hasOwnProperty.call(value, 'year')) {
-      date = moment()
-        .set({ year: value.year })
+      date = moment(`${value.year}`)
         .format('YYYY');
-      // console.log('year');
     }
-    // console.log(value);
     return date;
   }
 
   formatTheDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
-      this.segmentsNames.forEach((date: any) => {
+    if (this.assetsQuery?.length > 0) {
+      this.timePoints.forEach((date: any) => {
         if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment()
-            .set({ year: date.year, month: date.month, date: date.day })
+          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
             .format('MMM D, YY');
           formattedDate.push(dayFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment()
-            .set({ year: date.year, month: date.month })
+          const monthFormat = moment(`${date.year}-${date.month}`)
+            // .set({ year: date.year, month: date.month })
             .format('MMMM YYYY');
           formattedDate.push(monthFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment()
-            .set('year', date.year)
+          const startWeek = moment(`${date.year}`)
             .add(date.week, 'weeks')
             .startOf('isoWeek')
             .format('MMM D');
-          const endWeek = moment()
-            .set('year', date.year)
+          const endWeek = moment(`${date.year}`)
             .add(date.week, 'weeks')
             .endOf('isoWeek')
             .format('MMM D, YY');
           const weekFormat = `${startWeek} - ${endWeek}`;
           formattedDate.push(weekFormat);
         } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment()
-            .set({ year: date.year })
+          const yearFormat = moment(`${date.year}`)
             .format('YYYY');
           formattedDate.push(yearFormat);
         }
@@ -467,7 +472,7 @@ export default class SalesLineGraphCard extends Vue {
     return formattedDate;
   }
 
-  formatValue(value: any): any {
+  formatValue(value: string): any {
     const regex = value.toString();
     return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }

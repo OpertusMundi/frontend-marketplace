@@ -51,13 +51,13 @@
         border-color: $secondColor;
         #{$item}__upper {
           img {
-            height: calc(100% - 65px);
+            height: calc(100% - 75px);
             filter: grayscale(0);
             opacity: 1;
           }
         }
         #{$item}__desc {
-          transform: translateY(-20px);
+          transform: translateY(-30px);
         }
       }
 
