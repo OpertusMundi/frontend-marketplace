@@ -174,9 +174,8 @@ export default class LineSubscribersApi extends Vue {
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    console.log(newVal);
-    this.assetsQuery = newVal.map((a) => a.id);
+  selectedAssetsChanged(newVal: CatalogueItem[]): void {
+    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
     this.getAnalytics();
   }
 
@@ -198,11 +197,10 @@ export default class LineSubscribersApi extends Vue {
         max: this.temporalUnitMax,
       },
     };
-    console.log('subscribersQuery: ', subscribersQuery);
     this.analyticsApi.executeSubscribersQuery(subscribersQuery)
       .then((response) => {
         if (response.success) {
-          console.log('response subscribers => ', response);
+          console.log('executeSubscribersQuery => response: ', response);
           this.analyticsData = response.result;
           this.timePoints = this.getTimeResponse();
           this.lineChartDate = this.formatTheDate();

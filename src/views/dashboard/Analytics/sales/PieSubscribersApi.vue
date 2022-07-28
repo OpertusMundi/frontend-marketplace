@@ -47,17 +47,17 @@
       </div>
     </div>
     <div class="pie-container">
-      <PieChartSubscriberApi v-if="selectedAssets.length > 0"
+      <PieChartSubscriberApi v-if="selectedAssets[0]"
                 :index="0"
                 :asset-query="selectedAssets"
                 :time="timeParams"
                 :pieColor="bluePalette" />
-      <PieChartSubscriberApi v-if="selectedAssets.length >= 2"
+      <PieChartSubscriberApi v-if="selectedAssets[1]"
                 :index="1"
                 :asset-query="selectedAssets"
                 :time="timeParams"
                 :pieColor="greenPalette" />
-      <PieChartSubscriberApi v-if="selectedAssets.length === 3"
+      <PieChartSubscriberApi v-if="selectedAssets[2]"
                 :index="2"
                 :asset-query="selectedAssets"
                 :time="timeParams"

@@ -193,13 +193,10 @@ export default class SalesLineGraphCard extends Vue {
         max: this.temporalUnitMax,
       },
     };
-    console.log('query', query);
     this.analyticsApi.executeSalesQuery(query).then((response) => {
       if (response.success) {
-        // eslint-disable-next-line
-        response.result!.points.reverse();
-        // eslint-disable-next-line
-        this.analyticsData = response.result!;
+        response.result.points.reverse();
+        this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
         this.lineChartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
@@ -209,8 +206,8 @@ export default class SalesLineGraphCard extends Vue {
   }
 
   @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.map((a) => a.id);
+  selectedAssetsChanged(newVal: CatalogueItem[]): void {
+    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
     this.getAnalytics();
   }
 
@@ -247,8 +244,6 @@ export default class SalesLineGraphCard extends Vue {
     if (!this.analyticsData) {
       return null;
     }
-    // const name = 'Sales per segment';
-
     return {
       chart: {
         type: 'areaspline',

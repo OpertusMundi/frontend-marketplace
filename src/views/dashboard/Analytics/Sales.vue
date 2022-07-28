@@ -60,9 +60,8 @@
          @click.prevent="activeTab = EnumAnalyticsSales.NUMBER_API_CALLS"
          :class="{ active: activeTab === EnumAnalyticsSales.NUMBER_API_CALLS }">
         <div class="analytics__types__item__upper">
-          COMING SOON
-          <!--          <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt="" />-->
-          <h5>{{ EnumAnalyticsSales.NUMBER_API_CALLS }}</h5>
+          <img src="@/assets/images/icons/dashboard/line_chart_icon.svg" alt=""/>
+          <h5>COMING SOON: {{ EnumAnalyticsSales.NUMBER_API_CALLS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
           {{ EnumAnalyticsSalesDescription.NUMBER_API_CALLS_DESC }}

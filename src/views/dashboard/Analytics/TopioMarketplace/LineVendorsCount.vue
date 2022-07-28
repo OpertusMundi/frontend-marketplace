@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div class="graphcard__head__data__right">
           <ul>
@@ -33,21 +33,21 @@
                        :searchable="true" :close-on-select="true" :show-labels="false" label="title"
                        placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
                        :searchable="true" :close-on-select="true" :show-labels="false" label="title"
                        placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
           <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
                        :searchable="true" :close-on-select="true" :show-labels="false" label="title"
                        placeholder="Select asset">
             <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
+              <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
@@ -89,7 +89,6 @@ import { AssetDraft, EnumDraftStatus, EnumSortField } from '@/model/draft';
 import { Order } from '@/model/request';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
   DataSeries,
@@ -97,6 +96,7 @@ import {
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import AssetMiniCardProvider from '@/components/Assets/AssetMiniCardProvider.vue';
 
 interface TimeResponse {
   day: number;
@@ -109,7 +109,7 @@ interface TimeResponse {
   components: {
     AssetSelector,
     Multiselect,
-    AssetMiniCard,
+    AssetMiniCardProvider,
     DataRangePicker,
     highcharts: Chart,
   },
@@ -120,6 +120,8 @@ export default class LineVendorsCount extends Vue {
   @Prop({ default: null }) private symbolTitle!: string;
 
   @Prop({ default: '' }) private cardHeading!: string;
+
+  @Prop({ default: '' }) private cardDescription!: string;
 
   draftAssetApi: DraftAssetApi;
 

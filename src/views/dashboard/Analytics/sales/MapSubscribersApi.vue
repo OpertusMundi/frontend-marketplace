@@ -151,7 +151,7 @@ export default class MapSubscribersApi extends Vue {
 
   async mounted(): Promise<any> {
     // TODO: If asset selection will be removed from production then the below method "getAssets()" should be removed as well from the code
-    await this.getAssets();
+    // await this.getAssets();
     this.getAnalytics();
   }
 

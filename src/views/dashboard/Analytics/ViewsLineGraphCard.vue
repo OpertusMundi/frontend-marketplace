@@ -9,16 +9,20 @@
         <div class="graphcard__head__data__right">
           <ul>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.DAY)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.DAY }">DAY</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.WEEK)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.WEEK }">WEEK</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.MONTH)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.MONTH }">MONTH</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.YEAR)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.YEAR }">YEAR</a>
             </li>
           </ul>
         </div>
@@ -145,33 +149,23 @@ export default class ViewsLineGraphCard extends Vue {
 
   assetQueryMetricType: EnumAssetQueryMetric;
 
+  EnumTemporalUnit: typeof EnumTemporalUnit;
+
   constructor() {
     super();
-
     this.assets = [];
-
     this.selectedAssets = [];
-
     this.analyticsApi = new AnalyticsApi();
-
     this.analyticsData = {} as DataSeries;
-
     this.chartOptions = null;
-
     this.assetsQuery = [];
-
     this.segmentsNames = [];
-
     this.temporalUnitMin = '';
-
     this.temporalUnitMax = '';
-
     this.temporalUnit = EnumTemporalUnit.DAY;
-
     this.seriesData = [];
-
     this.lineChartDate = [];
-
+    this.EnumTemporalUnit = EnumTemporalUnit;
     this.assetQueryMetricType = EnumAssetQueryMetric.COUNT;
     this.ProviderAssetsApi = new ProviderAssetsApi();
   }

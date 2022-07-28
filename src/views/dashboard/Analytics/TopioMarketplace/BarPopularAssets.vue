@@ -4,21 +4,25 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
         <div v-if="false" class="graphcard__head__data__right">
           <ul>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('DAY')" :class="{ active: temporalUnit === 'DAY' }">DAY</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.DAY)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.DAY }">DAY</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('WEEK')" :class="{ active: temporalUnit === 'WEEK' }">WEEK</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.WEEK)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.WEEK }">WEEK</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('MONTH')" :class="{ active: temporalUnit === 'MONTH' }">MONTH</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.MONTH)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.MONTH }">MONTH</a>
             </li>
             <li>
-              <a href="#" @click.prevent="setTemporalUnit('YEAR')" :class="{ active: temporalUnit === 'YEAR' }">YEAR</a>
+              <a href="#" @click.prevent="setTemporalUnit(EnumTemporalUnit.YEAR)"
+                 :class="{ active: temporalUnit === EnumTemporalUnit.YEAR }">YEAR</a>
             </li>
           </ul>
         </div>
@@ -102,6 +106,8 @@ export default class BarPopularAssets extends Vue {
 
   @Prop({ default: '' }) private cardHeading!: string;
 
+  @Prop({ default: '' }) private cardDescription!: string;
+
   draftAssetApi: DraftAssetApi;
 
   assets: AssetDraft[];
@@ -132,38 +138,26 @@ export default class BarPopularAssets extends Vue {
 
   assetNames: string[]
 
+  EnumTemporalUnit: typeof EnumTemporalUnit;
+
   constructor() {
     super();
-
     this.draftAssetApi = new DraftAssetApi();
-
     this.assets = [];
-
     this.selectedAssets = [];
-
     this.analyticsApi = new AnalyticsApi();
-
     this.analyticsData = {} as DataSeries;
-
     this.chartOptions = null;
-
     this.assetsQuery = [];
-
     this.segmentsNames = [];
-
     this.temporalUnitMin = '';
-
     this.temporalUnitMax = '';
-
     this.temporalUnit = EnumTemporalUnit.DAY;
-
     this.seriesData = [];
-
     this.chartDate = [];
-
     this.datetimeSeries = [];
-
     this.assetNames = [];
+    this.EnumTemporalUnit = EnumTemporalUnit;
   }
 
   async mounted(): Promise<any> {

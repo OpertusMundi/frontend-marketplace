@@ -4,7 +4,7 @@
       <div class="graphcard__head__data">
         <div class="graphcard__head__data__left">
           <h3>{{ cardHeading }}</h3>
-          <p>Keep track of your assets popularity across time and countries.</p>
+          <p>{{ cardDescription }}</p>
         </div>
       </div>
       <div class="graphcard__head__filters">
@@ -90,6 +90,8 @@ export default class MapCoverageFileAssets extends Vue {
   @Prop({ default: null }) private symbol!: string;
 
   @Prop({ default: null }) private symbolTitle!: string;
+
+  @Prop({ default: '' }) private cardDescription!: string;
 
   draftAssetApi: DraftAssetApi;
 
