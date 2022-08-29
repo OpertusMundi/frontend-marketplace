@@ -22,7 +22,7 @@
           <ul class="asset_search__upper__controls__links">
             <li><a href="#" @click.prevent="onSelectFilterShortcut('OPEN')">Open</a></li>
             <li><a href="#" @click.prevent="onSelectFilterShortcut('VECTOR')">Vector</a></li>
-            <li><a href="#" @click.prevent="onSelectFilterShortcut('RASTER')">Rester</a></li>
+            <li><a href="#" @click.prevent="onSelectFilterShortcut('RASTER')">Raster</a></li>
             <li><a href="#" @click.prevent="onSelectFilterShortcut('SERVICE')">APIs</a></li>
             <li><router-link :to="'/catalogue'">ALL →</router-link></li>
           </ul>
