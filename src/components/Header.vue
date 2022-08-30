@@ -286,7 +286,7 @@
                       <router-link to="/vas/api"> <span>API</span></router-link>
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
-                      <router-link to="/vas/tiles"> <span>TILES</span></router-link>
+                      <router-link to="/vas/tiles"> <span>Tiles</span></router-link>
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
                       <router-link to="/vas/drive-2"> <span>Notebooks</span></router-link>
@@ -315,7 +315,7 @@
                             <router-link to="/vas/api"><img src="@/assets/images/t-icon.svg" alt="" /> API</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
-                            <router-link to="/vas/tiles"><img src="@/assets/images/t-icon.svg" alt="" /> TILES</router-link>
+                            <router-link to="/vas/tiles"><img src="@/assets/images/t-icon.svg" alt="" /> Tiles</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/drive-2"><img src="@/assets/images/t-icon.svg" alt="" /> Notebooks</router-link>
@@ -360,13 +360,13 @@
                       <div class="header__submenu__items header__submenu__items--full">
                         <ul>
                           <li @click="showSubmenuAbout = !showSubmenuAbout">
-                            <router-link to="/about"><span> What is Topio</span></router-link>
+                            <p><router-link to="/about" class="item--sm">What is Topio</router-link></p>
                           </li>
                           <li @click="showSubmenuAbout = !showSubmenuAbout">
-                            <router-link to="/contact"> <span>Contact</span></router-link>
+                            <p><router-link to="/contact" class="item--sm">Contact</router-link></p>
                           </li>
                           <li @click="showSubmenuAbout = !showSubmenuAbout">
-                            <router-link to="/faq"> <span>API</span></router-link>
+                            <p><router-link to="/faq" class="item--sm">FAQ</router-link></p>
                           </li>
                           <li></li>
                         </ul>
