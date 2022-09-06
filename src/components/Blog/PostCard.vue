@@ -1,8 +1,10 @@
 <template>
   <div class="post-card">
-    <img :src="image" alt="blog post image">
+    <div class="img-container">
+      <img :src="image" alt="blog post image">
+    </div>
 
-    <div class="category">{{ categoryName }}</div>
+    <div class="category" @click="selectCategory">{{ categoryName }}</div>
 
     <h3 class="title">{{ title }}</h3>
 
@@ -43,6 +45,10 @@ export default class PostCard extends Vue {
   formatDate(date: string): string {
     return moment(date).format('D MMM YYYY');
   }
+
+  selectCategory(): void {
+    this.$emit('selectCategory', this.categoryID);
+  }
 }
 </script>
 <style lang="scss">
@@ -52,8 +58,9 @@ export default class PostCard extends Vue {
 
   img {
     display: block;
-    width: 100%;
-    height: 50%;
+    max-width: 100%;
+    height: 200px;
+    object-fit: contain;
     border-radius: 5px;
   }
 
@@ -68,11 +75,17 @@ export default class PostCard extends Vue {
     -webkit-box-orient: vertical;
   }
 
+  .img-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .category, .bottom {
     color: $secondColor;
   }
 
-  .category, .title, .author {
+  .category, .title {
     &:hover {
       text-decoration: underline;
       cursor: pointer;

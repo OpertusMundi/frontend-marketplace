@@ -29,6 +29,7 @@
                 :image="post.acf && post.acf.image ? post.acf.image.url : null"
                 :categoryID="post.categories && post.categories.length ? post.categories[0] : null"
                 :categoryName="post.categories && post.categories.length ? categories.find(x => x.id === post.categories[0]).name : null"
+                @selectCategory="selectedCategoryID = $event"
               ></post-card>
             </div>
           </div>
@@ -112,6 +113,16 @@ export default class BlogList extends Vue {
     Vue.set(this.pagination, 'currentPage', page);
 
     if (withLoading) store.commit('setLoading', false);
+
+    this.$nextTick(() => {
+      // for some reason, nextTick is not enough for firefox
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }, 0);
+    });
   }
 
   onPageSelect(e: number): void {
