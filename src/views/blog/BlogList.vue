@@ -2,7 +2,20 @@
   <div class="blog assets">
     <div class="s_container">
       <div class="assets__head">
-        <h1>topio Blog</h1>
+        <div class="d-flex space-between">
+          <h1>topio Blog</h1>
+
+          <div class="d-flex align-items-center">
+            <div class="header__search open">
+              <input type="text" name="search" id="" placeholder="Search" @keyup.enter="searchPosts" v-model="searchText" />
+              <a href="#" @click.prevent="searchPosts">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         <div class="category__container">
@@ -66,11 +79,15 @@ export default class BlogList extends Vue {
 
   postsUrl = '';
 
+  searchUrl = '';
+
   pagination = {
     currentPage: 0,
     itemsPerPage: 12,
     itemsTotal: 0,
   };
+
+  searchText = '';
 
   @Watch('$store.getters.getConfig', { immediate: true })
   onConfigChange(): void {
@@ -83,6 +100,7 @@ export default class BlogList extends Vue {
   getData(): void {
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
     this.postsUrl = `${wordressEndpoint}/wp-json/wp/v2/blog`;
+    this.searchUrl = `${wordressEndpoint}/wp-json/wp/v2/search`;
 
     store.commit('setLoading', true);
 
@@ -135,6 +153,14 @@ export default class BlogList extends Vue {
     });
   }
 
+  async searchPosts(): Promise<void> {
+    const text = this.searchText;
+    this.searchText = '';
+
+    const url = `${this.searchUrl}?_embed&subtype=blog&search=${text}`;
+    console.log(url, 'todo');
+  }
+
   onPageSelect(e: number): void {
     this.getPosts(e);
   }
@@ -142,5 +168,7 @@ export default class BlogList extends Vue {
 </script>
 <style lang="scss">
   @import "~flexboxgrid/css/flexboxgrid.min.css";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/_blog.scss";
+  @import "@/assets/styles/_header.scss";
 </style>

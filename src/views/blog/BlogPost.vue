@@ -55,10 +55,12 @@ export default class BlogPost extends Vue {
   }
 
   mounted(): void {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 0);
   }
 
   async getPost(): Promise<void> {
