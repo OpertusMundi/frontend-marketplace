@@ -1,5 +1,5 @@
 <template>
-  <div class="blog-list assets">
+  <div class="blog assets">
     <div class="s_container">
       <div class="assets__head">
         <h1>topio Blog</h1>
@@ -14,13 +14,14 @@
             :key="category.id"
             @click="selectedCategoryID = category.id"
           >
-              {{ category.name }}
+            {{ category.name }}
           </span>
         </div>
         <template v-if="categories.length">
           <div class="row" v-for="(postsRow, i) in postsChunked" :key="i">
             <div class="col-sm-4" v-for="post in postsRow" :key="post.id">
               <post-card
+                :postID="post.id"
                 :title="post.title.rendered"
                 :body="post.content.rendered"
                 :authorID="post._embedded.author[0].id"
@@ -71,7 +72,15 @@ export default class BlogList extends Vue {
     itemsTotal: 0,
   };
 
-  created(): void {
+  @Watch('$store.getters.getConfig', { immediate: true })
+  onConfigChange(): void {
+    const { categoryID } = this.$route.params;
+    this.selectedCategoryID = parseInt(categoryID, 10) || null;
+
+    if (store.getters.getConfig && !this.categories.length) this.getData();
+  }
+
+  getData(): void {
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
     this.postsUrl = `${wordressEndpoint}/wp-json/wp/v2/blog`;
 
@@ -87,6 +96,7 @@ export default class BlogList extends Vue {
 
   @Watch('selectedCategoryID')
   onSelectedCategoryChange(): void {
+    if (!this.categories.length) return;
     this.getPosts();
   }
 
@@ -132,25 +142,5 @@ export default class BlogList extends Vue {
 </script>
 <style lang="scss">
   @import "~flexboxgrid/css/flexboxgrid.min.css";
-
-  .blog-list {
-    .category {
-      &__container {
-        display: inline-flex;
-        gap: 20px;
-      }
-
-      &__item {
-        font-size: 13px;
-        text-transform: uppercase;
-        font-weight: 700;
-        margin: 0 0 2rem 0;
-        cursor: pointer;
-
-        &__active {
-          color: $secondColor;
-        }
-      }
-    }
-  }
+  @import "@/assets/styles/_blog.scss";
 </style>
