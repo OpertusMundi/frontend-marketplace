@@ -36,6 +36,10 @@
             <svg class="mr-xs-3" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 36 36"><path data-name="Rectangle 5652" fill="#190AFF" d="M11.7 13.8h13.05v3.15H11.7z"/><path data-name="Rectangle 5653" fill="#190AFF" d="M11.7 19.5h13.05v3.15H11.7z"/><path data-name="Path 14340" d="M30.75 5.25A17.311 17.311 0 0 0 18 0 17.925 17.925 0 0 0 0 18a18.183 18.183 0 0 0 18 18 17.933 17.933 0 0 0 12.9-5.4A16.621 16.621 0 0 0 36 18a17.311 17.311 0 0 0-5.25-12.75m-2.25 23.1A14.756 14.756 0 0 1 18 32.7a14.415 14.415 0 0 1-10.35-4.35A14.7 14.7 0 0 1 18 3.3a13.611 13.611 0 0 1 10.35 4.35A13.926 13.926 0 0 1 32.7 18a13.572 13.572 0 0 1-4.2 10.35" fill="#190AFF"/></svg>
             CC BY-NC-ND
           </template>
+          <template v-if="catalogueItem.license === 'ODBL V1.0'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="0" height="36" viewBox="0 0 36 36"><path data-name="Path 14352" d="" fill="#333"/></svg>
+            ODbL v1.0
+          </template>
         </div>
       </div>
 

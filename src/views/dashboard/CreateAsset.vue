@@ -176,6 +176,7 @@ import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricin
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
 import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
+import { EnumPricingModel } from '@/model/pricing-model';
 
 Vue.use(VueCardFormat);
 
@@ -585,6 +586,20 @@ export default class CreateAsset extends Vue {
       this.asset = { ...this.asset, ...assetResponse.result.command };
       console.log(this.assetMainType, 'ASSET MAIN TYPE');
 
+      /* open dataset fix */
+      if (this.asset.openDataset) {
+        (this.asset as CatalogueItemCommand).pricingModels = [{
+          type: EnumPricingModel.FREE,
+          domainRestrictions: [],
+          coverageRestrictionContinents: [],
+          coverageRestrictionCountries: [],
+          consumerRestrictionContinents: [],
+          consumerRestrictionCountries: [],
+        }];
+        this.asset.contractTemplateType = EnumContractType.OPEN_DATASET;
+      }
+      /* */
+
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
 
       if (this.asset.type === EnumAssetType.SERVICE) {
@@ -910,7 +925,7 @@ export default class CreateAsset extends Vue {
     // TODO: IMPORTANT, contract key is hardcoded
     const asset = {
       ...this.asset,
-      contractTemplateKey: '877a5a19-2768-49dd-b7a6-59a9f0474d67',
+      contractTemplateKey: '2b0fec49-eac4-4cd3-a92b-204cdfc0bbaf',
     } as SentinelHubItemCommand;
 
     console.log('SH ASSET', asset);

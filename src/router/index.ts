@@ -95,6 +95,16 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "documentationsingle" */ '../views/documentation/SingleDocumentation.vue'),
   },
   {
+    path: '/blog',
+    name: 'Blog',
+    component: (): Promise<any> => import(/* webpackChunkName: "bloglist" */ '@/views/blog/BlogList.vue'),
+  },
+  {
+    path: '/blog/post/:id',
+    name: 'BlogPost',
+    component: (): Promise<any> => import(/* webpackChunkName: "blogpost" */ '@/views/blog/BlogPost.vue'),
+  },
+  {
     path: '/dashboard',
     component: (): Promise<any> => import(/* webpackChunkName: "dashboardmain" */ '../views/dashboard/Main.vue'),
     meta: { requiresRole: [EnumRole.ROLE_USER, EnumRole.ROLE_VENDOR_USER], layout: 'dashboard' },

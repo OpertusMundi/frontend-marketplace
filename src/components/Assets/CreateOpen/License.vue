@@ -62,6 +62,14 @@
             <input type="radio" name="license_type" v-model="licenseLocal" value="CC BY-NC-ND" />
             <div class="control_indicator"></div>
           </label>
+          <label class="control control-radio" v-if="$store.getters.hasRole(['ROLE_SENTINEL_HUB'])">
+            <div class="svg-label-container">
+              <svg xmlns="http://www.w3.org/2000/svg" width="0" height="36" viewBox="0 0 36 36"><path data-name="Path 14352" d="" fill="#333"/></svg>
+              Open Data Commons Open Database License (ODbL) v1.0
+            </div>
+            <input type="radio" name="license_type" v-model="licenseLocal" value="ODBL V1.0" />
+            <div class="control_indicator"></div>
+          </label>
           <div class="errors" v-if="errors">
             <span v-for="error in errors" v-bind:key="error">{{ error }}</span>
           </div>
