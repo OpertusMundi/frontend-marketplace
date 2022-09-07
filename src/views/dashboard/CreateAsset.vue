@@ -176,6 +176,7 @@ import ApiPricing from '@/components/Assets/CreateServiceFromPublished/ApiPricin
 import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetadata.vue';
 import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
+import { EnumPricingModel } from '@/model/pricing-model';
 
 Vue.use(VueCardFormat);
 
@@ -584,6 +585,20 @@ export default class CreateAsset extends Vue {
       console.log('asset resp', assetResponse);
       this.asset = { ...this.asset, ...assetResponse.result.command };
       console.log(this.assetMainType, 'ASSET MAIN TYPE');
+
+      /* open dataset fix */
+      if (this.asset.openDataset) {
+        (this.asset as CatalogueItemCommand).pricingModels = [{
+          type: EnumPricingModel.FREE,
+          domainRestrictions: [],
+          coverageRestrictionContinents: [],
+          coverageRestrictionCountries: [],
+          consumerRestrictionContinents: [],
+          consumerRestrictionCountries: [],
+        }];
+        this.asset.contractTemplateType = EnumContractType.OPEN_DATASET;
+      }
+      /* */
 
       this.serviceType = assetResponse.result.serviceType ? assetResponse.result.serviceType : null;
 
