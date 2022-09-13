@@ -57,7 +57,11 @@
 }
 
 .become-vendor-accept-terms {
-  text-align: center;
+  text-align: end;
+  .form-group-checkbox {
+    justify-content: end;
+    margin: 0 15px;
+  }
   label {
     font-size: inherit !important;
   }
