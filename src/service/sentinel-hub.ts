@@ -93,8 +93,8 @@ export default class SentinelHubApi extends Api {
       });
   }
 
-  getAvailableWMSLayersByInstanceID(instanceID: string): Promise<WMSLayer[]> {
-    const endpoint = `https://services.sentinel-hub.com/ogc/wms/${instanceID}`;
+  getAvailableWMSLayersByInstanceID(instanceID: string, baseURL: string): Promise<WMSLayer[]> {
+    const endpoint = `${baseURL}/ogc/wms/${instanceID}`;
 
     return this.get<string>(`${endpoint}?request=GetCapabilities`)
       .then((response: AxiosResponse<string>) => {

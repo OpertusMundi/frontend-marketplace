@@ -156,6 +156,7 @@ export interface SHCollection {
   id: string,
   name: string,
   instanceId: string,
+  endpoint: string,
 }
 
 export interface WMSLayer {

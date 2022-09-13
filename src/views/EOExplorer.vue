@@ -209,6 +209,8 @@ export default class EOExplorer extends Vue {
 
   collectionId = '';
 
+  baseURL = '';
+
   instanceId = '';
 
   fromPrice: number | null = null;
@@ -273,7 +275,10 @@ export default class EOExplorer extends Vue {
     this.collectionId = collectionId as string;
 
     const { result: collections } = await this.sentinelHubApi.getOpenDataCollections();
-    this.instanceId = collections.find((x) => x.id === this.collectionId)?.instanceId || '';
+    const collection = collections.find((x) => x.id === this.collectionId);
+
+    this.instanceId = collection ? collection.instanceId : '';
+    this.baseURL = collection ? collection.endpoint : '';
 
     this.sentinelHubApi.getSubscriptionPlans().then((response) => {
       if (!response.success) return;
@@ -670,7 +675,7 @@ export default class EOExplorer extends Vue {
 
     this.menuState = EnumMenuState.SHOW_VISUALISE_LAYERS;
 
-    this.sentinelHubApi.getAvailableWMSLayersByInstanceID(this.instanceId).then((response) => {
+    this.sentinelHubApi.getAvailableWMSLayersByInstanceID(this.instanceId, this.baseURL).then((response) => {
       this.visualiseLayers = this.applyFilterRulesToVisualiseLayers(response);
       store.commit('setLoading', false);
     });
