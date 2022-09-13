@@ -455,7 +455,7 @@ export default class ApiPricing extends Vue {
       },
     ];
 
-    this.menusData.countries = store.getters.getConfig.configuration.europeCountries;
+    this.menusData.countries = store.getters.getConfig.configuration.countries;
 
     this.pricingModelsLocal = [];
 
