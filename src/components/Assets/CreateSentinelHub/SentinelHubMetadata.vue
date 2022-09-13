@@ -133,37 +133,37 @@
           <validation-provider name="Date start">
             <div class="form-group">
               <label for="">Date start (of resource temporal extent)</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.dateStart" @input="assetLocal.dateStart = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.dateStart" @input="assetLocal.dateStart = formatDate($event)" :clear-button="true" @cleared="assetLocal.dateStart=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider name="Date end">
             <div class="form-group">
               <label for="">Date end (of resource temporal extent)</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.dateEnd" @input="assetLocal.dateEnd = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.dateEnd" @input="assetLocal.dateEnd = formatDate($event)" :clear-button="true" @cleared="assetLocal.dateEnd=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider name="Creation date">
             <div class="form-group">
               <label for="">Creation date</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.creationDate" @input="assetLocal.creationDate = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.creationDate" @input="assetLocal.creationDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.creationDate=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider name="Publication date">
             <div class="form-group">
               <label for="">Publication date</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.publicationDate" @input="assetLocal.publicationDate = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.publicationDate" @input="assetLocal.publicationDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.publicationDate=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider name="Revision date">
             <div class="form-group">
               <label for="">Revision date</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.revisionDate" @input="assetLocal.revisionDate = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.revisionDate" @input="assetLocal.revisionDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.revisionDate=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider name="Metadata date">
             <div class="form-group">
               <label for="">Metadata date</label>
-              <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)"></datepicker>
+              <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.metadataDate=''"></datepicker>
             </div>
           </validation-provider>
           <validation-provider v-slot="{ errors }" name="Topic">
