@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <button class="btn btn--std btn--blue" style="width: 100%">download</button>
+      <button class="btn btn--std btn--blue" style="width: 100%" @click="downloadAsset">download</button>
       <hr>
       <ul class="asset__shopcard__open-asset-delivery-info">
         <li><strong>Delivered from: </strong> <span>topio</span></li>
@@ -58,11 +58,31 @@ import {
   Component,
   Prop,
 } from 'vue-property-decorator';
-import { CatalogueItem } from '@/model';
+import { CatalogueItemDetails } from '@/model/catalogue';
+import ConsumerAssetsApi from '@/service/consumer-assets';
+import store from '@/store';
 
 @Component
 export default class ShopCardOpen extends Vue {
-  @Prop({ required: true }) catalogueItem!: CatalogueItem;
+  @Prop({ required: true }) catalogueItem!: CatalogueItemDetails;
+
+  consumerAssetsApi = new ConsumerAssetsApi();
+
+  downloadAsset(): void {
+    store.commit('setLoading', true);
+
+    const { id } = this.catalogueItem;
+    const resourceKey = this.catalogueItem.resources && this.catalogueItem.resources.length ? this.catalogueItem.resources[0].id : '';
+
+    if (!id || !resourceKey) {
+      console.log('error');
+      return;
+    }
+
+    this.consumerAssetsApi.downloadResource(id, resourceKey).finally(() => {
+      store.commit('setLoading', false);
+    });
+  }
 }
 </script>
 <style lang="scss">
