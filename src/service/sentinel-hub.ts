@@ -1,7 +1,15 @@
 import Api from '@/service/api';
+import { AxiosResponse } from 'axios';
+import convert from 'xml-js';
 import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosServerResponse, ServerResponse } from '@/model/response';
-import { ClientCatalogueQuery, SentinelHubCatalogueResponse, SubscriptionPlan } from '@/model/sentinel-hub';
+import {
+  ClientCatalogueQuery,
+  SentinelHubCatalogueResponse,
+  SHCollection,
+  SubscriptionPlan,
+  WMSLayer,
+} from '@/model/sentinel-hub';
 
 const baseUri = '/action/integration/sentinel-hub';
 
@@ -15,10 +23,10 @@ export default class SentinelHubApi extends Api {
    *
    * @returns
    */
-  public async getOpenDataCollections(): Promise<ServerResponse<{ id: string, name: string }[]>> {
+  public async getOpenDataCollections(): Promise<ServerResponse<SHCollection[]>> {
     const url = `${baseUri}/open-data/collections`;
 
-    return this.get<ServerResponse<{ id: string, name: string }[]>>(url)
+    return this.get<ServerResponse<SHCollection[]>>(url)
       .then((response) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
@@ -82,6 +90,30 @@ export default class SentinelHubApi extends Api {
         if (data.success === false) showApiErrorModal(data.messages);
 
         return data;
+      });
+  }
+
+  getAvailableWMSLayersByInstanceID(instanceID: string, baseURL: string): Promise<WMSLayer[]> {
+    const endpoint = `${baseURL}/ogc/wms/${instanceID}`;
+
+    return this.get<string>(`${endpoint}?request=GetCapabilities`)
+      .then((response: AxiosResponse<string>) => {
+        const { data: dataXML } = response;
+
+        const dataJSON = JSON.parse(convert.xml2json(dataXML));
+
+        const layers: WMSLayer[] = dataJSON.elements[0].elements
+          .find((x) => x.name === 'Capability').elements
+          .find((x) => x.name === 'Layer').elements
+          .filter((x) => x.name === 'Layer')
+          .map((x) => ({
+            name: x.elements.find((o) => o.name === 'Name').elements[0].text,
+            title: x.elements.find((o) => o.name === 'Title').elements[0].text,
+            abstract: x.elements.find((o) => o.name === 'Abstract').elements[0].text,
+            endpoint,
+          }));
+
+        return layers;
       });
   }
 }

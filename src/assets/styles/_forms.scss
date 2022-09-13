@@ -649,6 +649,18 @@
       }
     }
   }
+
+  .vdp-datepicker__clear-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    i {
+      span {
+        font-style: normal;
+        cursor: pointer;
+      }
+    }
+  }
 }
 .form-group-double {
   display: flex;

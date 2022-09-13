@@ -151,3 +151,17 @@ export interface SentinelHubCatalogueResponse {
   links: Link[];
   context: Context;
 }
+
+export interface SHCollection {
+  id: string,
+  name: string,
+  instanceId: string,
+  endpoint: string,
+}
+
+export interface WMSLayer {
+  name: string,
+  title: string,
+  abstract: string,
+  endpoint: string,
+}

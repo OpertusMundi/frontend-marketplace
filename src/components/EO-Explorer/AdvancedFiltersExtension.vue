@@ -118,7 +118,7 @@ export default class AdvancedFiltersExtension extends Vue {
       { label: 'Cloud top height', value: 'CLOUD_TOP_HEIGHT' },
       { label: 'Cloud optical thickness', value: 'CLOUD_OPTICAL_THICKNESS' },
       { label: 'Effective radiometric cloud fraction', value: 'CLOUD_FRACTION' },
-      { label: 'The mask of data/no data pixels', value: 'dataMask' },
+      // { label: 'The mask of data/no data pixels', value: 'dataMask' },
     ],
   }
 

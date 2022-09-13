@@ -22,7 +22,7 @@
 
       <div class="mt-xs-20">
         <button @click="$emit('viewAllMetadata', feature.id)">View all metadata</button>
-        <button disabled class="ml-xs-10">
+        <button @click="$emit('visualise', feature.id)" class="ml-xs-10">
           <svg xmlns="http://www.w3.org/2000/svg" width="16.776" height="10" viewBox="0 0 16.776 10"><g data-name="Group 5863"><path data-name="Path 13426" d="M8.388 0C5.183 0 2.276 1.754.131 4.6a.664.664 0 0 0 0 .793c2.145 2.852 5.051 4.605 8.257 4.605s6.112-1.754 8.257-4.6a.664.664 0 0 0 0-.793C14.5 1.754 11.593 0 8.388 0Zm.23 8.521a3.528 3.528 0 1 1 3.291-3.291 3.531 3.531 0 0 1-3.291 3.291Zm-.106-1.627a1.9 1.9 0 1 1 1.774-1.774 1.9 1.9 0 0 1-1.775 1.774Z" fill="#190aff"/></g></svg>
           Visualise
         </button>

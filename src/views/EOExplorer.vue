@@ -18,7 +18,8 @@
           <div class="col-md-4">
             <h4 class="mt-xs-20">Data source: <span class="collection_name">{{ collectionId }}</span></h4>
 
-            <template v-if="!searchResults">
+            <!-- <template v-if="!searchResults"> -->
+            <template v-if="menuState === 'SEARCH'">
               <h4 class="mt-xs-20 mb-xs-10">Date Selection</h4>
               <div class="d-flex space-between">
                 <div>
@@ -74,8 +75,9 @@
                 <button class="btn btn--std btn--blue" @click="searchCollection()">SEARCH</button>
               </div>
             </template>
-            <template v-if="searchResults && !selectedFeatureToShowMetadata">
-              <a href="" @click.prevent="resetResults" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+            <!-- <template v-if="searchResults && !selectedFeatureToShowMetadata && !visualiseLayers.length"> -->
+            <template v-if="menuState === 'SHOW_FEATURES' && searchResults">
+              <a href="" @click.prevent="goBack" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
               <div>
                 <div class="pill pill--blue" v-for="filter in getSelectedFilters()" :key="filter.id">
                   {{ filter.label }}
@@ -83,10 +85,16 @@
                 </div>
               </div>
               <hr>
-              <eo-explorer-card v-for="feature in searchResults.features" :key="feature.id" :feature="feature" @viewAllMetadata="selectedFeatureToShowMetadata = $event"></eo-explorer-card>
+              <eo-explorer-card
+                v-for="feature in searchResults.features"
+                :key="feature.id"
+                :feature="feature"
+                @viewAllMetadata="onViewAllMetadata"
+                @visualise="onVisualise"
+              ></eo-explorer-card>
             </template>
-            <template v-if="selectedFeatureToShowMetadata">
-              <a href="" @click.prevent="selectedFeatureToShowMetadata = ''" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+            <template v-if="menuState === 'SHOW_FEATURE_METADATA'">
+              <a href="" @click.prevent="goBack" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
               <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
               <hr>
               <img v-if="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata) && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
@@ -99,6 +107,19 @@
                 <span v-else class="metadata-property"><strong>{{ formatMetadataProperty(key) }}:</strong> {{ Array.isArray(value) ? value.join(', ') : value }}</span>
               </div>
             </template>
+            <template v-if="menuState === 'SHOW_VISUALISE_LAYERS' && visualiseLayers.length">
+              <a href="" @click.prevent="goBack" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
+              <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
+              <hr>
+              <datepicker
+                input-class="form-group__text"
+                :disabled-dates="{from: new Date()}"
+                :value="visualizeCurrentLayerDate"
+                @input="visualizeCurrentLayerDate = formatDateForDatePicker($event)"
+                class="mb-xs-40"
+              ></datepicker>
+              <eo-explorer-layer-card v-for="layer in visualiseLayers" :key="layer.name" :layer="layer" @click.native="visualiseLayerSelection(layer)" :isActive="visualizeCurrentLayerId === layer.name"></eo-explorer-layer-card>
+            </template>
           </div>
           <div class="col-md-8 p-relative">
             <div class="eo-map-container">
@@ -108,7 +129,13 @@
                   <h3>{{ clickedResultFeatures.length }} {{ clickedResultFeatures.length === 1 ? 'RESULT' : 'RESULTS' }}</h3>
                   <div class="clicked-features-list__btn-close" @click="clickedResultFeatures = []"><svg xmlns="http://www.w3.org/2000/svg" width="11.414" height="11.414" viewBox="0 0 11.414 11.414"><g data-name="Group 4926" fill="none" stroke="#190aff" stroke-width="2"><path data-name="Path 815" d="m.707.707 10 10"/><path data-name="Path 2030" d="m.707 10.707 10-10"/></g></svg></div>
                 </div>
-                <eo-explorer-card v-for="feature in clickedResultFeatures" :key="feature.id" :feature="feature" @viewAllMetadata="selectedFeatureToShowMetadata = $event; clickedResultFeatures = []"></eo-explorer-card>
+                <eo-explorer-card
+                  v-for="feature in clickedResultFeatures"
+                  :key="feature.id"
+                  :feature="feature"
+                  @viewAllMetadata="onViewAllMetadata"
+                  @visualise="onVisualise"
+                ></eo-explorer-card>
               </div>
             </div>
           </div>
@@ -133,12 +160,25 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import moment from 'moment';
 import EOExplorerCard from '@/components/EO-Explorer/Card.vue';
+import EOExplorerLayerCard from '@/components/EO-Explorer/LayerCard.vue';
 import AdvancedFiltersExtension from '@/components/EO-Explorer/AdvancedFiltersExtension.vue';
 import MetadataTable from '@/components/EO-Explorer/MetadataTable.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
-import { ClientCatalogueQuery, SentinelHubCatalogueResponse, Feature } from '@/model/sentinel-hub';
+import {
+  ClientCatalogueQuery,
+  SentinelHubCatalogueResponse,
+  Feature,
+  WMSLayer,
+} from '@/model/sentinel-hub';
 import store from '@/store';
+
+enum EnumMenuState {
+  SEARCH = 'SEARCH',
+  SHOW_FEATURES = 'SHOW_FEATURES',
+  SHOW_FEATURE_METADATA = 'SHOW_FEATURE_METADATA',
+  SHOW_VISUALISE_LAYERS = 'SHOW_VISUALISE_LAYERS',
+}
 
 interface ExtendedMapOptions extends L.MapOptions {
   editable: boolean,
@@ -154,6 +194,7 @@ interface RectangleEditable extends L.Rectangle {
     Datepicker,
     Multiselect,
     'eo-explorer-card': EOExplorerCard,
+    'eo-explorer-layer-card': EOExplorerLayerCard,
     AdvancedFiltersExtension,
     MetadataTable,
     SelectSentinelHubPlan,
@@ -168,7 +209,13 @@ export default class EOExplorer extends Vue {
 
   collectionId = '';
 
+  baseURL = '';
+
+  instanceId = '';
+
   fromPrice: number | null = null;
+
+  menuState: EnumMenuState = EnumMenuState.SEARCH;
 
   isAdvancedFiltersShown = false;
 
@@ -181,6 +228,8 @@ export default class EOExplorer extends Vue {
   bboxSelectionRect: L.Rectangle | null = null;
 
   featureGroup: L.FeatureGroup = {} as L.FeatureGroup;
+
+  refFeatures: {[key: string]: L.GeoJSON} = {};
 
   date = {
     from: new Date().toISOString(),
@@ -198,6 +247,14 @@ export default class EOExplorer extends Vue {
 
   clickedResultFeatures: Feature[] = [];
 
+  visualiseLayers: WMSLayer[] = [];
+
+  visualizeCurrentLayer: L.TileLayer | null = null;
+
+  visualizeCurrentLayerId = '';
+
+  visualizeCurrentLayerDate = new Date().toISOString();
+
   mapShades: any | null = null;
 
   fieldsToInclude: string[] = [];
@@ -210,12 +267,18 @@ export default class EOExplorer extends Vue {
 
   lastQueryData: ClientCatalogueQuery | null = null;
 
-  created(): void {
+  async created(): Promise<void> {
     const { assetId, assetTitle, collectionId } = this.$route.query;
 
     this.assetId = assetId as string;
     this.assetTitle = assetTitle as string;
     this.collectionId = collectionId as string;
+
+    const { result: collections } = await this.sentinelHubApi.getOpenDataCollections();
+    const collection = collections.find((x) => x.id === this.collectionId);
+
+    this.instanceId = collection ? collection.instanceId : '';
+    this.baseURL = collection ? collection.endpoint : '';
 
     this.sentinelHubApi.getSubscriptionPlans().then((response) => {
       if (!response.success) return;
@@ -256,6 +319,14 @@ export default class EOExplorer extends Vue {
     this.productIDs = [];
   }
 
+  @Watch('visualiseLayers', { deep: true })
+  onVisualiseLayersChange(layers: WMSLayer[], layersPrev: WMSLayer[]): void {
+    if (layersPrev.length && !layers.length && this.visualizeCurrentLayer) {
+      this.visualizeCurrentLayer.removeFrom(this.map);
+      this.visualizeCurrentLayerId = '';
+    }
+  }
+
   get bboxString(): string {
     return `${this.bbox.minLon},${this.bbox.minLat},${this.bbox.maxLon},${this.bbox.maxLat}`;
   }
@@ -267,8 +338,17 @@ export default class EOExplorer extends Vue {
 
   @Watch('bboxString')
   onBBoxStringChange(): void {
-    console.log('changed!');
     this.drawRectangle();
+  }
+
+  @Watch('visualizeCurrentLayerDate')
+  onVisualizeCurrentLayerDateChange(): void {
+    if (!this.visualizeCurrentLayerId) return;
+
+    const selectedLayer = this.visualiseLayers.find((x) => x.name === this.visualizeCurrentLayerId);
+    if (!selectedLayer) return;
+
+    this.visualiseLayerSelection(selectedLayer);
   }
 
   drawRectangle(): void {
@@ -486,6 +566,8 @@ export default class EOExplorer extends Vue {
   searchCollection(data: ClientCatalogueQuery | null = null): void {
     store.commit('setLoading', true);
 
+    this.menuState = EnumMenuState.SHOW_FEATURES;
+
     this.resetResults(false);
 
     const fromDateTime = this.date.from.split('T')[0].concat('T00:00:00.000Z');
@@ -511,11 +593,11 @@ export default class EOExplorer extends Vue {
     this.sentinelHubApi.search(queryData).then((response) => {
       if (response.success) {
         this.lastQueryData = queryData;
-        console.log(response.result);
+        console.log('o', response.result);
         this.searchResults = response.result;
 
         this.searchResults.features.forEach((x) => {
-          L.geoJSON(x.geometry).addTo(this.featureGroup);
+          this.refFeatures[x.id] = L.geoJSON(x.geometry).addTo(this.featureGroup);
         });
 
         (this.bboxSelectionRect as RectangleEditable).disableEdit();
@@ -526,9 +608,98 @@ export default class EOExplorer extends Vue {
     });
   }
 
+  zoomToFeature(id: string): void {
+    const featureGeoJSON = this.refFeatures[id];
+    if (!featureGeoJSON) return;
+    this.map.fitBounds(featureGeoJSON.getBounds());
+  }
+
+  onViewAllMetadata(id: string): void {
+    this.zoomToFeature(id);
+    this.selectedFeatureToShowMetadata = id;
+    this.menuState = EnumMenuState.SHOW_FEATURE_METADATA;
+  }
+
+  applyFilterRulesToVisualiseLayers(layers: WMSLayer[]): WMSLayer[] {
+    const extension = this.queryExtension;
+
+    switch (this.collectionId) {
+      case 'sentinel-1-grd': {
+        const type: string | null = extension.polarization && extension.polarization.eq ? extension.polarization.eq : null;
+
+        switch (type) {
+          case null: {
+            return layers;
+          }
+          /* to be checked!! todo */
+          case 'SH':
+          case 'DH':
+            return layers.filter((x) => !x.name.includes('VV'));
+          case 'SV':
+          case 'DV':
+            return layers.filter((x) => !x.name.includes('HH'));
+          /* */
+          default: {
+            return layers;
+          }
+        }
+      }
+      case 'sentinel-5p-l2': {
+        const type: string | null = extension.type && extension.type.eq ? extension.type.eq : null;
+
+        switch (type) {
+          case null: {
+            return layers;
+          }
+          case 'AER_AI_340_380': {
+            return layers.filter((x) => ['AER-AI-340-AND-380', 'AER_AI_340_380'].includes(x.name));
+          }
+          case 'AER_AI_354_388': {
+            return layers.filter((x) => ['AER-AI-354-AND-388', 'AER_AI_354_388'].includes(x.name));
+          }
+          default: {
+            return layers.filter((x) => x.name === type);
+          }
+        }
+      }
+      default:
+    }
+    return layers;
+  }
+
+  onVisualise(id: string): void {
+    store.commit('setLoading', true);
+
+    this.zoomToFeature(id);
+    this.selectedFeatureToShowMetadata = id;
+
+    this.menuState = EnumMenuState.SHOW_VISUALISE_LAYERS;
+
+    this.sentinelHubApi.getAvailableWMSLayersByInstanceID(this.instanceId, this.baseURL).then((response) => {
+      this.visualiseLayers = this.applyFilterRulesToVisualiseLayers(response);
+      store.commit('setLoading', false);
+    });
+  }
+
+  visualiseLayerSelection(layer: WMSLayer): void {
+    this.visualizeCurrentLayerId = layer.name;
+
+    if (this.visualizeCurrentLayer) this.visualizeCurrentLayer.removeFrom(this.map);
+
+    const time = this.visualizeCurrentLayerDate.split('T')[0];
+
+    this.visualizeCurrentLayer = L.tileLayer.wms(layer.endpoint, {
+      tileSize: 512,
+      layers: layer.name,
+      time: `${time}/${time}`,
+    } as L.WMSOptions & { time: string });
+    this.visualizeCurrentLayer.addTo(this.map);
+  }
+
   resetResults(totalReset = true): void {
     this.searchResults = totalReset ? null : {} as SentinelHubCatalogueResponse;
     this.featureGroup.clearLayers();
+    this.refFeatures = {};
     (this.bboxSelectionRect as RectangleEditable).enableEdit();
   }
 
@@ -536,6 +707,28 @@ export default class EOExplorer extends Vue {
     if (property === 'datetime') return 'DATE & TIME';
 
     return property.split('_').join(' ').toUpperCase();
+  }
+
+  goBack(): void {
+    switch (this.menuState) {
+      case EnumMenuState.SHOW_FEATURES: {
+        this.resetResults();
+        this.menuState = EnumMenuState.SEARCH;
+        break;
+      }
+      case EnumMenuState.SHOW_FEATURE_METADATA: {
+        this.selectedFeatureToShowMetadata = '';
+        this.menuState = EnumMenuState.SHOW_FEATURES;
+        break;
+      }
+      case EnumMenuState.SHOW_VISUALISE_LAYERS: {
+        this.selectedFeatureToShowMetadata = '';
+        this.visualiseLayers = [];
+        this.menuState = EnumMenuState.SHOW_FEATURES;
+        break;
+      }
+      default:
+    }
   }
 }
 </script>

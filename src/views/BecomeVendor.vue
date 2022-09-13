@@ -371,7 +371,7 @@
                 </div>
               </div>
 
-              <div class="mt-xs-40 become-vendor-accept-terms">
+              <!-- <div class="mt-xs-40 become-vendor-accept-terms">
                 <div>
                   <div class="form-group-checkbox form-group-checkbox--centered">
                     <input @change="onAcceptTermsChange" type="checkbox" v-model="vendorData.termsAndConditionsAccepted" id="terms">
@@ -379,15 +379,26 @@
                   </div>
                 </div>
                 <span class="become-vendor-accept-terms__errors" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register</span>
-              </div>
+              </div> -->
 
             </div>
           </div>
 
           </div>
-          <div class="dashboard__form__navbuttons">
-            <button class="btn--std btn--blue" @click.prevent="previousStep()" v-if="currentStep > 1">PREVIOUS</button>
-            <button class="btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and create account' : 'NEXT' }}</button>
+          <div>
+            <div class="mt-xs-40 become-vendor-accept-terms" v-show="currentStep == 4">
+              <div>
+                <div class="form-group-checkbox form-group-checkbox--centered">
+                  <input @change="onAcceptTermsChange" type="checkbox" v-model="vendorData.termsAndConditionsAccepted" id="terms">
+                  <label for="terms">I 've read and accept the <strong><a class="login__helpers" href="https://www.mangopay.com/terms/MANGOPAY_Terms-EN.pdf" target="_blank">MANGOPAY Terms & Conditions</a></strong></label>
+                </div>
+              </div>
+              <span class="become-vendor-accept-terms__errors mr-xs-15" v-if="termsNotAcceptedError">You must accept Terms & Conditions to Register</span>
+            </div>
+            <div class="dashboard__form__navbuttons">
+              <button class="btn--std btn--blue" @click.prevent="previousStep()" v-if="currentStep > 1">PREVIOUS</button>
+              <button class="btn--std btn--blue" @click.prevent="nextStep()">{{ currentStep === totalSteps ? 'confirm and create account' : 'NEXT' }}</button>
+            </div>
           </div>
         </div>
 
