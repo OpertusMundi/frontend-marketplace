@@ -13,6 +13,8 @@ interface Post {
       url: string,
       [otherProperties: string]: unknown,
     },
+    cta_button_label: string,
+    cta_button_url: string,
     category: number[],
     [otherProperties: string]: unknown,
   }

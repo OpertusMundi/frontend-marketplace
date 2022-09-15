@@ -26,10 +26,10 @@
         <img v-if="post.acf && post.acf.image" :src="post.acf.image.url" alt="post image" class="mt-xs-60">
 
         <div class="blog-inner-container">
-          <button class="blog-post__btn-registration-info" v-if="!$store.getters.isAuthenticated">
-            Registration information
+          <a class="blog-post__btn-registration-info" :href="post.acf.cta_button_url" target="_blank" v-if="post.acf && post.acf.cta_button_label && post.acf.cta_button_url">
+            {{ post.acf.cta_button_label }}
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33"><text data-name="➝" transform="translate(0 27)" fill="#fff" font-size="25" font-family="SegoeUISymbol, Segoe UI Symbol" letter-spacing=".03em"><tspan x="0" y="0">➝</tspan></text></svg>
-          </button>
+          </a>
 
           <div v-if="post.content" v-html="post.content.rendered" class="blog-inner-container__content mt-xs-50 terms__main__text"></div>
         </div>
@@ -81,9 +81,9 @@ export default class BlogPost extends Vue {
     const { data } = response;
     this.post = data;
 
-    store.commit('setLoading', false);
-
     this.makeIFramesFullWidth();
+
+    store.commit('setLoading', false);
   }
 
   formatDate(date: string): string {
@@ -96,6 +96,8 @@ export default class BlogPost extends Vue {
       const targetWidth = (document.querySelector('.blog-inner-container') as HTMLElement).clientWidth;
 
       iframeElements.forEach((elem) => {
+        if (elem.width === '100%') return;
+
         const height = parseFloat(elem.height);
         const width = parseFloat(elem.width);
         console.log('w', 'h', width, height);
