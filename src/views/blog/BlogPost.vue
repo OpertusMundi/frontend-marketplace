@@ -82,10 +82,35 @@ export default class BlogPost extends Vue {
     this.post = data;
 
     store.commit('setLoading', false);
+
+    this.makeIFramesFullWidth();
   }
 
   formatDate(date: string): string {
     return moment(date).format('D MMM YYYY');
+  }
+
+  makeIFramesFullWidth(): void {
+    this.$nextTick(() => {
+      const iframeElements = document.querySelectorAll('iframe');
+      const targetWidth = (document.querySelector('.blog-inner-container') as HTMLElement).clientWidth;
+
+      iframeElements.forEach((elem) => {
+        const height = parseFloat(elem.height);
+        const width = parseFloat(elem.width);
+        console.log('w', 'h', width, height);
+
+        const aspectRatio = width / height;
+
+        const targetHeight = targetWidth / aspectRatio;
+        console.log('target width', targetWidth);
+        console.log('target height', targetHeight);
+        /* eslint-disable no-param-reassign */
+        elem.width = '100%';
+        elem.height = `${targetHeight}px`;
+        /* eslint-enable no-param-reassign */
+      });
+    });
   }
 }
 </script>
