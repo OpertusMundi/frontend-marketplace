@@ -12,12 +12,13 @@
           </template>
           <h1 v-if="post.title" v-html="post.title.rendered" class="mt-xs-30"></h1>
           <div class="date-author-info mt-xs-30">
-            <small>
-              {{ formatDate(post.date) }}
-              •
+            <small class="blog-inner-container__upper-info">
+              <span>{{ formatDate(post.date) }}</span>
+              <span>•</span>
               <span class="author" v-if="post._embedded && post._embedded.author && post._embedded.author[0]">
                 {{ post._embedded.author[0].name }}
               </span>
+              <svg data-name="Group 7420" xmlns="http://www.w3.org/2000/svg" width="13.333" height="16" viewBox="0 0 13.333 16"><defs><clipPath id="a"><path data-name="Rectangle 5647" fill="#333" d="M0 0h13.333v16H0z"/></clipPath></defs><g data-name="Group 7419" clip-path="url(#a)"><path data-name="Path 14318" d="M11.167 11.667a2.156 2.156 0 0 0-1.493.6L4.2 8.723a2.022 2.022 0 0 0 0-1.441L9.674 3.73A2.162 2.162 0 1 0 9 2.167a2.128 2.128 0 0 0 .133.722L3.663 6.44a2.167 2.167 0 1 0 0 3.123l5.474 3.548a2.128 2.128 0 0 0-.137.722 2.167 2.167 0 1 0 2.167-2.167" fill="#333"/></g></svg>
             </small>
           </div>
         </div>
@@ -25,7 +26,7 @@
         <img v-if="post.acf && post.acf.image" :src="post.acf.image.url" alt="post image" class="mt-xs-60">
 
         <div class="blog-inner-container">
-          <button class="blog-post__btn-registration-info">
+          <button class="blog-post__btn-registration-info" v-if="!$store.getters.isAuthenticated">
             Registration information
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33"><text data-name="➝" transform="translate(0 27)" fill="#fff" font-size="25" font-family="SegoeUISymbol, Segoe UI Symbol" letter-spacing=".03em"><tspan x="0" y="0">➝</tspan></text></svg>
           </button>
