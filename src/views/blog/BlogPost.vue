@@ -25,7 +25,12 @@
         <img v-if="post.acf && post.acf.image" :src="post.acf.image.url" alt="post image" class="mt-xs-60">
 
         <div class="blog-inner-container">
-          <div v-if="post.content" v-html="post.content.rendered" class="mt-xs-50 terms__main__text"></div>
+          <button class="blog-post__btn-registration-info">
+            Registration information
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="33" viewBox="0 0 25 33"><text data-name="➝" transform="translate(0 27)" fill="#fff" font-size="25" font-family="SegoeUISymbol, Segoe UI Symbol" letter-spacing=".03em"><tspan x="0" y="0">➝</tspan></text></svg>
+          </button>
+
+          <div v-if="post.content" v-html="post.content.rendered" class="blog-inner-container__content mt-xs-50 terms__main__text"></div>
         </div>
 
       </template>

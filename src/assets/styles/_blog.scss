@@ -77,6 +77,34 @@
         @media (max-width: 576px) {
             width: 100%;
         }
+
+        &__content {
+            h4 {
+                margin-top: 2.5em;
+                font-size: em(30);
+                font-weight: 700;
+            }
+            p {
+                margin: 1.3em 0;
+            }
+
+            ul {
+                list-style-type: none;
+                margin-left: 4em;
+
+                li {
+                    margin: 1.3em 0;
+
+                    &::before {
+                        content: "\2022";  /* Add content: \2022 is the CSS Code/unicode for a bullet */
+                        color: $darkColor; /* Change the color */
+                        font-weight: bold; /* If you want it to be bold */
+                        display: inline-block; /* Needed to add space between the bullet and the text */
+                        width: .7em; /* Also needed for space (tweak if needed) */
+                    }
+                }
+            }
+        }
     }
 
     .blog-post {
@@ -91,6 +119,24 @@
 
         >img {
             border-radius: 7px;
+        }
+
+        &__btn-registration-info {
+            margin-top: 2.5em;
+            background: $secondColor;
+            color: #fff;
+            border: none;
+            outline: none;
+            border-radius: 9px;
+            font-size: em(25);
+            letter-spacing: .05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1em 1.4em;
+            svg {
+                margin-left: 1em;
+            }
         }
     }
 }
