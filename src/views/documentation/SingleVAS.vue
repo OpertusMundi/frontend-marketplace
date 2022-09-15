@@ -11,9 +11,10 @@
           </h1>
         </div>
         <div class="single-vas__hero__content__right">
-          <div class="single-vas__hero__content__hero-title">{{ page[0].acf.hero_title }}</div>
-          <div class="single-vas__hero__content__text" v-if="page[0].excerpt.rendered"
-               v-html="page[0].excerpt.rendered"></div>
+          <div class="single-vas__hero__content__hero-title" v-html="page[0].excerpt.rendered" />
+          <div class="single-vas__hero__content__text" v-if="page[0].acf.hero_long_description">
+            <p v-html="page[0].acf.hero_long_description"/>
+          </div>
           <div class="single-vars__hero__btn">
             <div v-if="page[0].acf.coming_soon" class="btn btn--std btn--coming-soon">
               COMING SOON
