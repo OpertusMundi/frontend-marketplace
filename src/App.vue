@@ -7,7 +7,7 @@
       <app-header v-if="showHeader" :headerClass="headerClass" :showMenuMobile="showMenuMobile" @toggleMobileMenu="toggleMobileMenu"></app-header>
     </transition>
     <transition name="fade" mode="out-in">
-      <router-view :showMenuMobile="showMenuMobile" @showHideMobileMenu="toggleMobileMenu" />
+      <router-view :showMenuMobile="showMenuMobile" @showHideMobileMenu="toggleMobileMenu" :key="$route.path"/>
     </transition>
     <transition name="fade" mode="out-in">
       <app-footer v-if="!$store.getters.isLoading && showFooter"></app-footer>

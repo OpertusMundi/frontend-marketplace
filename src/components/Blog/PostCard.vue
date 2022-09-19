@@ -6,7 +6,8 @@
 
     <div class="category" @click="selectCategory">{{ categoryName }}</div>
 
-    <router-link :to="`blog/post/${postID}`" style="text-decoration: none; color: inherit">
+    <!-- <router-link :to="`blog/post/${postID}`" style="text-decoration: none; color: inherit"> -->
+    <router-link :to="{ name: 'BlogPost', params: { id: postID, postDate: date } }" style="text-decoration: none; color: inherit">
       <h3 class="title">{{ title }}</h3>
     </router-link>
 

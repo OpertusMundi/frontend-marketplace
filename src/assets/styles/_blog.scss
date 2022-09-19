@@ -12,8 +12,11 @@
             margin: 0 0 2rem 0;
             cursor: pointer;
 
-            &__active {
+            &--active {
                 color: $secondColor;
+            }
+            &--small-margins {
+                margin: .8em 0;
             }
         }
     }
@@ -168,6 +171,33 @@
             svg {
                 margin-left: 1em;
             }
+        }
+    }
+
+    .previous-next-posts__container{
+        display: flex;
+        justify-content: space-between;
+
+        .previous-next-label {
+            color: $labelColor;
+            font-size: .8em;
+            letter-spacing: .01em;
+            display: flex;
+            align-items: center;
+            gap: .3em;
+
+            &--next {
+                justify-content: end;
+            }
+        }
+
+        .post-title {
+            color: $darkColor;
+            font-weight: 800;
+        }
+
+        .next-post {
+            text-align: end;
         }
     }
 }

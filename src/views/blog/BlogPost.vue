@@ -5,7 +5,7 @@
         <div class="blog-inner-container">
           <template v-if="post._embedded && post._embedded['wp:term'] && post._embedded['wp:term'][0] && post._embedded['wp:term'][0][0]">
             <router-link :to="{ name: 'Blog', params: { categoryID: post._embedded['wp:term'][0][0].id } }">
-              <div class="category__item category__item__active">
+              <div class="category__item category__item--active">
                 {{ post._embedded['wp:term'][0][0].name }}
               </div>
             </router-link>
@@ -34,6 +34,41 @@
           <div v-if="post.content" v-html="post.content.rendered" class="blog-inner-container__content mt-xs-50 terms__main__text"></div>
         </div>
 
+        <div class="blog-inner-container previous-next-posts__container" v-if="isPreviousNextPostsLoaded && categories">
+          <div>
+            <template v-if="previousPost && previousPost.title">
+              <div class="previous-next-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16"><text data-name="➝" transform="matrix(-1 0 0 1 12 13)" fill="#333" font-size="12" font-family="SegoeUISymbol, Segoe UI Symbol" letter-spacing=".02em"><tspan x="0" y="0">➝</tspan></text></svg>
+                Previous post
+              </div>
+              <div class="d-flex justify-content-start">
+                <router-link :to="{ name: 'Blog', params: { categoryID: previousPost && previousPost.categories ? previousPost.categories[0] || null : null } }">
+                  <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => previousPost.categories.includes(x.id)).name }}</div>
+                </router-link>
+              </div>
+              <router-link :to="{ name: 'BlogPost', params: { id: previousPost.id, postDate: previousPost.date } }">
+                <span class="post-title">{{ previousPost.title.rendered }}</span>
+              </router-link>
+            </template>
+          </div>
+          <div class="next-post">
+            <template v-if="nextPost && nextPost.title">
+              <div class="previous-next-label previous-next-label--next">
+                Next post
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16"><text data-name="➝" transform="translate(0 13)" fill="#333" font-size="12" font-family="SegoeUISymbol, Segoe UI Symbol" letter-spacing=".02em"><tspan x="0" y="0">➝</tspan></text></svg>
+              </div>
+              <div class="d-flex justify-content-end">
+                <router-link :to="{ name: 'Blog', params: { categoryID: nextPost && nextPost.categories ? nextPost.categories[0] || null : null } }">
+                  <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => nextPost.categories.includes(x.id)).name }}</div>
+                </router-link>
+              </div>
+              <router-link :to="{ name: 'BlogPost', params: { id: nextPost.id, postDate: nextPost.date } }">
+                <span class="post-title">{{ nextPost.title.rendered }}</span>
+              </router-link>
+            </template>
+          </div>
+        </div>
+
       </template>
     </div>
   </div>
@@ -55,9 +90,20 @@ export default class BlogPost extends Vue {
 
   post = null as Post | null;
 
+  previousPost = null as Post | null;
+
+  nextPost = null as Post | null;
+
+  isPreviousNextPostsLoaded = false;
+
+  categories: Category[] | null = null;
+
   @Watch('$store.getters.getConfig', { immediate: true })
   onConfigChange(): void {
-    if (store.getters.getConfig && !this.post) this.getPost();
+    if (store.getters.getConfig && !this.post && !this.$store.getters.isLoading) {
+      this.getPost();
+      if (this.$route.params.postDate) this.getPreviousAndNextPost(this.$route.params.postDate);
+    }
   }
 
   mounted(): void {
@@ -75,15 +121,54 @@ export default class BlogPost extends Vue {
     const { id: postID } = this.$route.params;
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
 
-    const url = `${wordressEndpoint}/wp-json/wp/v2/blog/${postID}?_embed`;
+    const urlPost = `${wordressEndpoint}/wp-json/wp/v2/blog/${postID}?_embed`;
+    const urlCategories = `${wordressEndpoint}/wp-json/wp/v2/categories`;
 
-    const response = await axios.get(url);
-    const { data } = response;
-    this.post = data;
+    const promises = Promise.all([
+      axios.get(urlPost),
+      axios.get(urlCategories),
+    ]);
+
+    const responses = await promises;
+    const [postResponse, categoriesResponse] = responses;
+
+    const { data: post } = postResponse;
+    this.post = post;
+
+    const { data: categories } = categoriesResponse;
+    this.categories = categories;
 
     this.makeIFramesFullWidth();
+    if (!this.$route.params.postDate && this.post) this.getPreviousAndNextPost(this.post.date);
 
     store.commit('setLoading', false);
+  }
+
+  async getPreviousAndNextPost(postDate: string): Promise<void> {
+    console.log('getpreviousandnextpost!!!!!!');
+    const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
+
+    const urlPreviousPosts = `${wordressEndpoint}/wp-json/wp/v2/blog?per_page=1&before=${postDate}&orderBy=date&order=desc`;
+    const urlNextPosts = `${wordressEndpoint}/wp-json/wp/v2/blog?per_page=1&after=${postDate}&orderBy=date&order=asc`;
+
+    const promises = Promise.all([
+      axios.get(urlPreviousPosts),
+      axios.get(urlNextPosts),
+    ]);
+
+    const responses = await promises;
+    const [previousPostsResponse, nextPostsResponse] = responses;
+
+    const { data: previousPosts } = previousPostsResponse;
+    const { data: nextPosts } = nextPostsResponse;
+
+    /* eslint-disable prefer-destructuring */
+    if (previousPosts.length) this.previousPost = previousPosts[0];
+    /* eslint-disable prefer-destructuring */
+    if (nextPosts.length) this.nextPost = nextPosts[0];
+
+    console.log('HEY', this.previousPost, this.nextPost);
+    this.isPreviousNextPostsLoaded = true;
   }
 
   formatDate(date: string): string {
@@ -100,13 +185,10 @@ export default class BlogPost extends Vue {
 
         const height = parseFloat(elem.height);
         const width = parseFloat(elem.width);
-        console.log('w', 'h', width, height);
 
         const aspectRatio = width / height;
 
         const targetHeight = targetWidth / aspectRatio;
-        console.log('target width', targetWidth);
-        console.log('target height', targetHeight);
         /* eslint-disable no-param-reassign */
         elem.width = '100%';
         elem.height = `${targetHeight}px`;
