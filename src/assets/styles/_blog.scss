@@ -1,4 +1,6 @@
 .blog {
+    background-color: #fff;
+
     .category {
         &__container {
             display: inline-flex;
@@ -174,9 +176,26 @@
         }
     }
 
+    .banner {
+        padding: 3em 7em;
+        background: $lightBgColor;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 2em;
+
+        .blue-text {
+            font-weight: 700;
+            color: $secondColor;
+        }
+    }
+
     .previous-next-posts__container{
         display: flex;
         justify-content: space-between;
+        margin-top: 4em;
 
         .previous-next-label {
             color: $labelColor;

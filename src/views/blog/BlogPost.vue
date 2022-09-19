@@ -34,6 +34,13 @@
           <div v-if="post.content" v-html="post.content.rendered" class="blog-inner-container__content mt-xs-50 terms__main__text"></div>
         </div>
 
+        <div class="banner" v-if="!$store.getters.isAuthenticated">
+          <h1>Explore. Trade. Use. <span class="blue-text">Geodata.</span></h1>
+          <router-link to="/register" style="height: min-content">
+            <button class="btn btn--std btn--blue">register now</button>
+          </router-link>
+        </div>
+
         <div class="blog-inner-container previous-next-posts__container" v-if="isPreviousNextPostsLoaded && categories">
           <div>
             <template v-if="previousPost && previousPost.title">
