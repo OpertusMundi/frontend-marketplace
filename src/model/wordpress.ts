@@ -8,6 +8,7 @@ interface Post {
     rendered: string,
     [otherProperties: string]: unknown,
   },
+  categories: number[],
   acf: {
     image: {
       url: string,

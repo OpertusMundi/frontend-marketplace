@@ -76,6 +76,30 @@
           </div>
         </div>
 
+        <div class="related-posts__wrapper">
+          <div class="s_container">
+            <h3>Related posts</h3>
+          </div>
+
+          <div class="related-posts__container" v-if="isRelatedPostsLoaded">
+            <post-card
+              v-for="post in relatedPosts"
+              :carouselElement="true"
+              :key="post.id"
+              :postID="post.id"
+              :title="post.title.rendered"
+              :body="post.content.rendered"
+              :authorID="post._embedded.author[0].id"
+              :authorName="post._embedded.author[0].name"
+              :date="post.date"
+              :image="post.acf && post.acf.image ? post.acf.image.url : null"
+              :categoryID="post.categories && post.categories.length ? post.categories[0] : null"
+              :categoryName="post.categories && post.categories.length ? categories.find(x => x.id === post.categories[0]).name : null"
+              @selectCategory="selectedCategoryID = $event"
+            ></post-card>
+          </div>
+        </div>
+
       </template>
     </div>
   </div>
@@ -85,11 +109,14 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 import moment from 'moment';
+import PostCard from '@/components/Blog/PostCard.vue';
 import ConfigApi from '@/service/config';
 import { Post, Category } from '@/model/wordpress';
 import store from '@/store';
 
-@Component
+@Component({
+  components: { PostCard },
+})
 export default class BlogPost extends Vue {
   configApi = new ConfigApi();
 
@@ -101,7 +128,11 @@ export default class BlogPost extends Vue {
 
   nextPost = null as Post | null;
 
+  relatedPosts = null as Post[] | null;
+
   isPreviousNextPostsLoaded = false;
+
+  isRelatedPostsLoaded = false;
 
   categories: Category[] | null = null;
 
@@ -110,6 +141,7 @@ export default class BlogPost extends Vue {
     if (store.getters.getConfig && !this.post && !this.$store.getters.isLoading) {
       this.getPost();
       if (this.$route.params.postDate) this.getPreviousAndNextPost(this.$route.params.postDate);
+      if (this.$route.params.categoryID) this.getRelatedPosts(parseInt(this.$route.params.categoryID, 10));
     }
   }
 
@@ -147,6 +179,7 @@ export default class BlogPost extends Vue {
 
     this.makeIFramesFullWidth();
     if (!this.$route.params.postDate && this.post) this.getPreviousAndNextPost(this.post.date);
+    if (!this.$route.params.categoryID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0]);
 
     store.commit('setLoading', false);
   }
@@ -176,6 +209,17 @@ export default class BlogPost extends Vue {
 
     console.log('HEY', this.previousPost, this.nextPost);
     this.isPreviousNextPostsLoaded = true;
+  }
+
+  async getRelatedPosts(categoryID: number): Promise<void> {
+    const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
+    const url = `${wordressEndpoint}/wp-json/wp/v2/blog?page=1&per_page=5&_embed&categories=${categoryID}`;
+
+    const relatedPostsResponse = await axios.get(url);
+    const { data: relatedPosts } = relatedPostsResponse;
+
+    this.relatedPosts = relatedPosts;
+    this.isRelatedPostsLoaded = true;
   }
 
   formatDate(date: string): string {

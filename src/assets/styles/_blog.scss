@@ -1,5 +1,6 @@
 .blog {
     background-color: #fff;
+    overflow-x: hidden;
 
     .category {
         &__container {
@@ -26,6 +27,11 @@
     .post-card {
         width: 100%;
         margin-bottom: 2em;
+
+        &--carousel {
+            width: 30vw !important;
+            flex-shrink: 0;
+        }
       
         img {
             display: block;
@@ -192,10 +198,10 @@
         }
     }
 
-    .previous-next-posts__container{
+    .previous-next-posts__container {
         display: flex;
         justify-content: space-between;
-        margin-top: 4em;
+        margin: 4em 0;
 
         .previous-next-label {
             color: $labelColor;
@@ -217,6 +223,30 @@
 
         .next-post {
             text-align: end;
+        }
+    }
+
+    .related-posts {
+        &__wrapper {
+            width: 100vw;
+            background: $lightBgColor;
+            margin: 0;
+            padding: 3em 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            h3 {
+                margin-bottom: 1.3em;
+            }
+        }
+        &__container {
+            max-width: 90%;
+            display: inline-flex;
+            flex-wrap: nowrap;
+            gap: 1.5em;
+            overflow-x: scroll;
+            box-sizing: border-box;
         }
     }
 }
