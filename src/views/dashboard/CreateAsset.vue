@@ -994,6 +994,7 @@ export default class CreateAsset extends Vue {
 
       this.asset = {
         ...this.asset,
+        deliveryMethod: EnumDeliveryMethod.DIGITAL_PLATFORM,
         type: draftAsset.command.type,
         resources: draftAsset.command.resources,
         additionalResources: draftAsset.command.additionalResources,
