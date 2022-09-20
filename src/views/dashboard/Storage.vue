@@ -7,8 +7,8 @@
     </div>
     <div class="storage">
       <div class="storage__status">
-        <div class="storage__status__label"><span>45% out of 20GB used</span><a href="">Upgrade</a></div>
-        <div class="storage__status__bar"><span style="width: 45%"></span></div>
+        <div class="storage__status__label"><span>{{ quotaPercentage }}% out of {{ quotaTotalText }} used</span><a href="">Upgrade</a></div>
+        <div class="storage__status__bar"><span :style="`width: ${ quotaPercentage }%`"></span></div>
       </div>
     </div>
     <div class="dashboard__head">
@@ -92,6 +92,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
+import ProfileApi from '@/service/profile';
 import { ServerResponse } from '@/model';
 import { SimpleResponse } from '@/model/response';
 import { DirectoryInfo, FileUploadCommand } from '@/model/file';
@@ -119,6 +120,8 @@ export default class DashboardStorage extends Vue {
 
   fileSystemApi: FileSystemApi;
 
+  profileApi: ProfileApi;
+
   fileSystem: DirectoryInfo;
 
   newFolderPath: string;
@@ -141,10 +144,16 @@ export default class DashboardStorage extends Vue {
 
   searchString: string;
 
+  quotaTotal: number | null;
+
+  quotaUsed: number | null;
+
   constructor() {
     super();
 
     this.fileSystemApi = new FileSystemApi();
+    this.profileApi = new ProfileApi();
+
     this.fileSystem = {
       name: '',
       path: '',
@@ -178,10 +187,34 @@ export default class DashboardStorage extends Vue {
     };
     this.uploadTokenSource = axios.CancelToken.source();
     this.searchString = '';
+
+    this.quotaTotal = null;
+    this.quotaUsed = null;
   }
 
   mounted():void {
+    this.getQuota();
     this.getFileSystem();
+  }
+
+  getQuota(): void {
+    this.profileApi.getProfile().then((response) => {
+      if (response.success && response.result.profile.quota) {
+        this.quotaTotal = response.result.profile.quota.total;
+        this.quotaUsed = response.result.profile.quota.used;
+      }
+    });
+  }
+
+  get quotaPercentage(): number {
+    if (this.quotaUsed === null || !this.quotaTotal) return 0;
+    return Math.round((this.quotaUsed / this.quotaTotal) * 100);
+  }
+
+  get quotaTotalText(): string {
+    if (!this.quotaTotal) return '';
+    if (this.quotaTotal < 134217728) return `${(this.quotaTotal / 1024) / 1024}MB`;
+    return `${((this.quotaTotal / 1024) / 1024) / 1024}GB`;
   }
 
   getFileSystem():void {
@@ -240,6 +273,7 @@ export default class DashboardStorage extends Vue {
         this.newFolder.show = false;
         this.newFolder.name = '';
         this.goToPath(this.activeFolder.name);
+        this.getQuota();
       }
     }).catch((error: AxiosError) => {
       if (error.response) {
@@ -315,6 +349,7 @@ export default class DashboardStorage extends Vue {
         this.fileSystem = response.result;
         this.$vToastify.success(`File uploaded successfully!`);
         this.goToPath(this.activeFolder.name);
+        this.getQuota();
       }
     }).catch((error: AxiosError) => {
       if (axios.isCancel(error)) {

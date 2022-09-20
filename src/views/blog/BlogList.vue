@@ -6,10 +6,10 @@
       </div>
       <div>
         <div class="category__container">
-          <span class="category__item" :class="{'category__item__active': selectedCategoryID === null}" @click="selectedCategoryID = null">ALL</span>
+          <span class="category__item" :class="{'category__item--active': selectedCategoryID === null}" @click="selectedCategoryID = null">ALL</span>
           <span
             class="category__item"
-            :class="{'category__item__active': category.id === selectedCategoryID}"
+            :class="{'category__item--active': category.id === selectedCategoryID}"
             v-for="category in categories"
             :key="category.id"
             @click="selectedCategoryID = category.id"

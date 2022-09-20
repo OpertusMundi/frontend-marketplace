@@ -616,7 +616,7 @@ export default class CreateAsset extends Vue {
       }
 
       // todo (Enums may have to be fixed to include NetCDF)
-      if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
+      if (['VECTOR', 'RASTER', 'NETCDF', 'TABULAR'].includes(this.asset.type?.toUpperCase() as string)) {
         // todo: add 'OPEN' to enum
         this.assetMainType = this.asset.openDataset ? 'OPEN' as any : EnumAssetTypeCategory.DATA_FILE;
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
@@ -992,7 +992,13 @@ export default class CreateAsset extends Vue {
       // bug (todo: important)
       if (this.customContractToUpload) this.asset = await this.uploadCustomContract(draftAsset.key, this.uploadConfig);
 
-      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: (this.asset as CatalogueItemCommand).pricingModels } };
+      this.asset = {
+        ...this.asset,
+        deliveryMethod: EnumDeliveryMethod.DIGITAL_PLATFORM,
+        type: draftAsset.command.type,
+        resources: draftAsset.command.resources,
+        additionalResources: draftAsset.command.additionalResources,
+      };
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);

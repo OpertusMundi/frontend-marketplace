@@ -521,16 +521,18 @@ export default class DataProfilingAndSamples extends Vue {
   mounted(): void {
     this.selectedAttribute = this.metadata.attributes;
     console.log('heatmap link', this.metadata.heatmap);
-    this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
-      this.heatmapGeoJson = heatmapResponse;
-    });
-    this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
-      console.log('samples!', samplesResponse);
-      this.samples = samplesResponse;
-      this.tempSamples = cloneDeep(samplesResponse);
-    });
-    console.log('keyyy', this.assetKey);
-    console.log('k', this.metadata.key);
+    if (this.metadata.heatmap) {
+      this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
+        this.heatmapGeoJson = heatmapResponse;
+      });
+    }
+    if (this.metadata.samples) {
+      this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
+        console.log('samples!', samplesResponse);
+        this.samples = samplesResponse;
+        this.tempSamples = cloneDeep(samplesResponse);
+      });
+    }
   }
 
   @Watch('activeTab')
@@ -542,6 +544,7 @@ export default class DataProfilingAndSamples extends Vue {
   }
 
   @Watch('selectedAttribute')
+  // eslint-disable-next-line
   onAttributeChange(v: any): void {
     console.log(v);
   }

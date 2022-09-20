@@ -552,6 +552,8 @@ export default class SentinelHubMetadata extends Vue {
   }
 
   onAddScale(scale: string): void {
+    if (Number.isNaN(parseFloat(scale))) return;
+
     const description = `1:${scale}`;
     this.assetLocal.scales.push({ scale: Number(scale), description });
     this.scalesForDisplay.push(description);

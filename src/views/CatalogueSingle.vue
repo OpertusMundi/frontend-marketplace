@@ -55,7 +55,7 @@
       </div>
 
     </div>
-    <related-assets :catalogueItem="catalogueItem"></related-assets>
+    <related-assets :catalogueItem="catalogueItem" v-if="isItemLoaded"></related-assets>
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>

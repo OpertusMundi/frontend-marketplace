@@ -1,4 +1,7 @@
 .blog {
+    background-color: #fff;
+    overflow-x: hidden;
+
     .category {
         &__container {
             display: inline-flex;
@@ -12,8 +15,11 @@
             margin: 0 0 2rem 0;
             cursor: pointer;
 
-            &__active {
+            &--active {
                 color: $secondColor;
+            }
+            &--small-margins {
+                margin: .8em 0;
             }
         }
     }
@@ -21,6 +27,11 @@
     .post-card {
         width: 100%;
         margin-bottom: 2em;
+
+        &--carousel {
+            width: 30vw !important;
+            flex-shrink: 0;
+        }
       
         img {
             display: block;
@@ -77,6 +88,64 @@
         @media (max-width: 576px) {
             width: 100%;
         }
+
+        &__upper-info {
+            display: flex;
+            align-items: center;
+            gap: .25em;
+
+            svg {
+                margin-left: 1.4em;
+                cursor: pointer;
+            }
+        }
+
+        &__content {
+            h4 {
+                margin-top: 2.5em;
+                font-size: em(30);
+                font-weight: 700;
+            }
+            p {
+                margin: 1.3em 0;
+            }
+            a {
+                text-decoration: none;
+                color: $secondColor;
+            }
+            img {
+                width: 100%;
+                height: auto;
+            }
+            ul {
+                list-style-type: none;
+                margin-left: 4em;
+
+                li {
+                    margin: 1.3em 0;
+
+                    &::before {
+                        content: "\2022";  /* Add content: \2022 is the CSS Code/unicode for a bullet */
+                        color: $darkColor; /* Change the color */
+                        font-weight: bold; /* If you want it to be bold */
+                        display: inline-block; /* Needed to add space between the bullet and the text */
+                        width: .7em; /* Also needed for space (tweak if needed) */
+                    }
+                }
+            }
+            blockquote {
+                display: flex;
+                margin: 2.5em 0;
+                line-height: 1.7em;
+                &::before {
+                    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42.14' height='33.46' viewBox='0 0 42.14 33.46'%3E%3Cpath data-name='Path 14319' d='M19.04 23.94a8.979 8.979 0 0 0-9.38-9.1H7.98v-1.4C7.98 9.1 9.8 7 14.42 7h2.94V0h-2.8C4.9 0 0 5.46 0 14.84v8.96c0 5.74 3.92 9.66 9.52 9.66a9.114 9.114 0 0 0 9.52-9.52Zm23.1 0a9.061 9.061 0 0 0-9.38-9.1h-1.82v-1.4C30.94 9.1 32.9 7 37.38 7h3.08V0h-2.8C28 0 22.96 5.46 22.96 14.84v8.96a9.227 9.227 0 0 0 9.52 9.66c5.6 0 9.66-3.92 9.66-9.52Z' fill='%23333'/%3E%3C/svg%3E");
+                }
+                p {
+                    font-size: 1.5em;
+                    margin: .25em 0 0 1em;
+                }
+            }
+        }
     }
 
     .blog-post {
@@ -91,6 +160,93 @@
 
         >img {
             border-radius: 7px;
+        }
+
+        &__btn-registration-info {
+            margin-top: 2.5em;
+            background: $secondColor;
+            color: #fff;
+            border: none;
+            outline: none;
+            border-radius: 9px;
+            font-size: em(25);
+            letter-spacing: .05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1em 1.4em;
+            width: fit-content;
+            svg {
+                margin-left: 1em;
+            }
+        }
+    }
+
+    .banner {
+        padding: 3em 7em;
+        background: $lightBgColor;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 2em;
+
+        .blue-text {
+            font-weight: 700;
+            color: $secondColor;
+        }
+    }
+
+    .previous-next-posts__container {
+        display: flex;
+        justify-content: space-between;
+        margin: 4em 0;
+
+        .previous-next-label {
+            color: $labelColor;
+            font-size: .8em;
+            letter-spacing: .01em;
+            display: flex;
+            align-items: center;
+            gap: .3em;
+
+            &--next {
+                justify-content: end;
+            }
+        }
+
+        .post-title {
+            color: $darkColor;
+            font-weight: 800;
+        }
+
+        .next-post {
+            text-align: end;
+        }
+    }
+
+    .related-posts {
+        &__wrapper {
+            width: 100vw;
+            background: $lightBgColor;
+            margin: 0;
+            padding: 3em 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            h3 {
+                margin-bottom: 1.3em;
+            }
+        }
+        &__container {
+            max-width: 90%;
+            display: inline-flex;
+            flex-wrap: nowrap;
+            gap: 1.5em;
+            overflow-x: scroll;
+            box-sizing: border-box;
         }
     }
 }
