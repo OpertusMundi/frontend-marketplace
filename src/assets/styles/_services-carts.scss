@@ -35,10 +35,6 @@
             width: calc(33.333% - 20px);
         }
 
-        @media (min-width:1200px) {
-            width: calc(25% - 20px);
-        }
-
         &__view {
             @extend .a_carousel__item__view;
         }

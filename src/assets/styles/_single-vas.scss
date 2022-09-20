@@ -68,17 +68,21 @@
                     font-weight: 700;
                 }
             }
-            &__hero-title {
-                font-size: 45px;
-                font-weight: bold;
-                color: white;
+            &__hero-title  {
+                margin-bottom: 20px;
+                p {
+                    font-size: 45px;
+                    font-weight: bold;
+                    color: white;
+                    line-height: 1em;
+                }
             }
             &__text {
                 max-width: 400px;
                 p {
                     color: #fff;
                     font-weight: 400;
-                    line-height: 1.4em;
+                    line-height: 1.2em;
                     margin-top: 00px;
                 }
             }
