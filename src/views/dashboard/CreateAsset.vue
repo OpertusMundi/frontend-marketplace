@@ -616,7 +616,7 @@ export default class CreateAsset extends Vue {
       }
 
       // todo (Enums may have to be fixed to include NetCDF)
-      if (['VECTOR', 'RASTER', 'NETCDF'].includes(this.asset.type?.toUpperCase() as string)) {
+      if (['VECTOR', 'RASTER', 'NETCDF', 'TABULAR'].includes(this.asset.type?.toUpperCase() as string)) {
         // todo: add 'OPEN' to enum
         this.assetMainType = this.asset.openDataset ? 'OPEN' as any : EnumAssetTypeCategory.DATA_FILE;
       } else if ((this.asset.type as string) === EnumAssetType.SERVICE) {
