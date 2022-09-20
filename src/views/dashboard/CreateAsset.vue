@@ -992,7 +992,12 @@ export default class CreateAsset extends Vue {
       // bug (todo: important)
       if (this.customContractToUpload) this.asset = await this.uploadCustomContract(draftAsset.key, this.uploadConfig);
 
-      this.asset = { ...draftAsset.command, ...{ contractTemplateKey: this.asset.contractTemplateKey, pricingModels: (this.asset as CatalogueItemCommand).pricingModels } };
+      this.asset = {
+        ...this.asset,
+        type: draftAsset.command.type,
+        resources: draftAsset.command.resources,
+        additionalResources: draftAsset.command.additionalResources,
+      };
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);
