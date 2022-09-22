@@ -86,9 +86,10 @@ export interface AssetDraft {
    */
   helpdeskRejectionReason: string;
   /**
-   * True if the file should be imported into PostGIS database and published using WMS/WFS endpoints
+   * `true` if the data profiling task should be executed during the asset
+   * publish workflow. Default: `true`
    */
-  ingested: boolean;
+   dataProfilingEnabled: boolean;
   /**
    * Draft unique identifier. Also the key for the catalogue draft record.
    * If the draft is submitted and a workflow instance is initialized, it

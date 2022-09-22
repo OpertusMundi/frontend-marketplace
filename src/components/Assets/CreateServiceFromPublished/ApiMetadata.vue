@@ -212,10 +212,6 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <div class="d-flex align-items-center form-group" v-if="asset.type === 'VECTOR'">
-            <input disabled type="checkbox" id="ingested" :value="asset.ingested" class="mr-xs-10 mb-xs-10">
-            <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
-          </div>
         </div>
         <div class="col-md-5">
           <!-- <div class="dashboard__form__step__title">

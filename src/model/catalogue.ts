@@ -1052,10 +1052,10 @@ interface BaseCatalogueItemCommand extends BaseCatalogueItem {
    */
   contractTemplateType: EnumContractType;
   /**
-   * True if the resource files should be imported into PostGIS database and published using WMS/WFS
-   * endpoints. Ingest operation is only supported for formats of category VECTOR
+   * `true` if the data profiling task should be executed during the asset
+   * publish workflow. Default: `true`
    */
-  ingested: boolean;
+  dataProfilingEnabled: boolean;
   /**
    * Ingestion information. Only visible to the owners (publishers) of the asset.
    * This value will be overwritten by the publish asset workflow
