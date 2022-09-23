@@ -7,7 +7,11 @@
     </div>
     <div class="storage">
       <div class="storage__status">
-        <div class="storage__status__label"><span>{{ quotaPercentage }}% out of {{ quotaTotalText }} used</span><a href="">Upgrade</a></div>
+        <div class="storage__status__label">
+          <span v-if="quotaTotal">{{ 1 > quotaPercentage ? '&#60;1' : quotaPercentage }}% out of {{ quotaTotalText }} used</span><span v-else>%</span>
+          <!-- todo: should not be hardcoded -->
+          <router-link to="/vas/drive-3">Upgrade</router-link>
+        </div>
         <div class="storage__status__bar"><span :style="`width: ${ quotaPercentage }%`"></span></div>
       </div>
     </div>
@@ -213,8 +217,16 @@ export default class DashboardStorage extends Vue {
 
   get quotaTotalText(): string {
     if (!this.quotaTotal) return '';
-    if (this.quotaTotal < 134217728) return `${(this.quotaTotal / 1024) / 1024}MB`;
-    return `${((this.quotaTotal / 1024) / 1024) / 1024}GB`;
+
+    if (this.quotaTotal < 134217728) {
+      const sizeMB = (this.quotaTotal / 1024) / 1024;
+      const sizeMBRounded = Math.round(sizeMB * 10) / 10;
+      return `${sizeMBRounded}MB`;
+    }
+
+    const sizeGB = ((this.quotaTotal / 1024) / 1024) / 1024;
+    const sizeGBRounded = Math.round(sizeGB * 10) / 10;
+    return `${sizeGBRounded}GB`;
   }
 
   getFileSystem():void {
