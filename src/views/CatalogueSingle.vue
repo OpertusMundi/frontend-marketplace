@@ -43,7 +43,7 @@
               @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
             ></shop-card>
           </template>
-          <template v-if="isItemLoaded && mode === 'review'">
+          <template v-if="isItemLoaded && mode && ['review', 'helpdesk-review'].includes(mode)">
             <shop-card-provider-review-open v-if="catalogueItem.openDataset" :catalogueItem="catalogueItem"></shop-card-provider-review-open>
             <shop-card-provider-review v-else :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
           </template>
@@ -55,7 +55,7 @@
       </div>
 
     </div>
-    <related-assets :catalogueItem="catalogueItem" v-if="isItemLoaded"></related-assets>
+    <related-assets :catalogueItem="catalogueItem" v-if="isItemLoaded && mode && !['review', 'helpdesk-review'].includes(mode)"></related-assets>
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>
@@ -91,6 +91,7 @@ import { CatalogueItemCommand, CatalogueItemDetails } from '@/model/catalogue';
 import { FixedPopulationPricingModelCommand, FixedRowPricingModelCommand } from '@/model/pricing-model';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
+import HelpdeskDraftApi from '@/service/draft-helpdesk';
 
 import store from '@/store';
 
@@ -145,6 +146,8 @@ export default class CatalogueSingle extends Vue {
 
   draftAssetApi: DraftAssetApi;
 
+  helpdeskDraftApi: HelpdeskDraftApi;
+
   catalogueItem: CatalogueItem | CatalogueItemCommand;
 
   mode: string; // catalog or review
@@ -166,6 +169,7 @@ export default class CatalogueSingle extends Vue {
 
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
+    this.helpdeskDraftApi = new HelpdeskDraftApi();
 
     // todo: enum
     this.mode = '';
@@ -221,6 +225,13 @@ export default class CatalogueSingle extends Vue {
         console.log('catalog item', this.catalogueItem);
         this.isItemLoaded = true;
         store.commit('setLoading', false);
+      });
+    } else if (mode === 'helpdesk-review') {
+      console.log('helpdesk-review mode!');
+      const { key } = this.$route.params;
+      this.helpdeskDraftApi.findOne(key).then((response) => {
+        this.catalogueItem = response.result;
+        this.isItemLoaded = true;
       });
     } else {
       console.log('wrong mode');

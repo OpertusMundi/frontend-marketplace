@@ -184,7 +184,8 @@ import {
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import CartApi from '@/service/cart';
 import { CatalogueItemCommand } from '@/model';
-import { BasePricingModelCommand } from '@/model/pricing-model';
+import { CatalogueItemDetails } from '@/model/catalogue';
+import { BasePricingModelCommand, EffectivePricingModel, PricingModelCommand } from '@/model/pricing-model';
 import store from '@/store';
 
 @Component({
@@ -194,11 +195,11 @@ import store from '@/store';
   },
 })
 export default class ShopCardProviderReview extends Vue {
-  @Prop({ required: true }) catalogueItem!: CatalogueItemCommand;
+  @Prop({ required: true }) catalogueItem!: CatalogueItemCommand | CatalogueItemDetails;
 
   cartApi: CartApi;
 
-  selectedPricingModel: BasePricingModelCommand | null;
+  selectedPricingModel: BasePricingModelCommand | PricingModelCommand | null;
 
   cartErrors: string;
 
@@ -212,7 +213,10 @@ export default class ShopCardProviderReview extends Vue {
     this.selectedPricingModel = null;
     this.cartErrors = '';
     const [selectedPricingModel] = this.catalogueItem.pricingModels;
-    this.selectedPricingModel = selectedPricingModel;
+    // this.selectedPricingModel = selectedPricingModel;
+    this.selectedPricingModel = 'model' in selectedPricingModel
+      ? (selectedPricingModel as EffectivePricingModel).model
+      : selectedPricingModel as BasePricingModelCommand;
   }
 
   // @Watch('selectedPricingModel')

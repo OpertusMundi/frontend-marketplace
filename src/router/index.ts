@@ -7,6 +7,7 @@ import ProfileApi from '@/service/profile';
 
 import Home from '@/views/Home.vue';
 import { EnumRole } from '@/model/role';
+import { navigateToKeycloakLogin } from '@/helper/login';
 
 Vue.use(VueRouter);
 
@@ -412,6 +413,12 @@ router.beforeEach((to, from, next) => {
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {
     next({ name: 'User' });
+  }
+
+  if (to.name === 'HelpdeskReview' && !store.getters.hasRole([EnumRole.ROLE_HELPDESK])) {
+    console.log('go to keycloak!');
+    navigateToKeycloakLogin(to.path);
+    return;
   }
 
   const routeToNavigateAfterLogin = sessionStorage.getItem('routeToNavigateAfterLogin');
