@@ -273,14 +273,6 @@
               <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.metadataDate=''"></datepicker>
             </div>
           </validation-provider>
-
-          <template v-if="assetLocal.type === 'VECTOR'">
-            <hr>
-            <div class="d-flex align-items-center form-group">
-              <input type="checkbox" id="ingested" v-model="assetLocal.ingested" class="mr-xs-10 mb-xs-10">
-              <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
-            </div>
-          </template>
         </div>
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
