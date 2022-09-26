@@ -273,6 +273,14 @@
               <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.metadataDate=''"></datepicker>
             </div>
           </validation-provider>
+
+          <template v-if="assetLocal.type === 'TABULAR'">
+            <hr>
+            <div class="d-flex align-items-center form-group">
+              <input type="checkbox" id="data_profiling" v-model="assetLocal.dataProfilingEnabled" class="mr-xs-10 mb-xs-10">
+              <label for="data_profiling">Compute automated metadata</label>
+            </div>
+          </template>
         </div>
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
@@ -582,6 +590,11 @@ export default class OpenAssetMetadata extends Vue {
       this.assetLocal.referenceSystem = '';
       return;
     }
+
+    if (type as EnumAssetType !== EnumAssetType.TABULAR) {
+      this.assetLocal.dataProfilingEnabled = true;
+    }
+
     this.isSpatialMetadataHidden = false;
   }
 
