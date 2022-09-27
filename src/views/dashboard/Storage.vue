@@ -19,6 +19,7 @@
       <div class="dashboard__head__btns">
         <a href="#" class="btn--std btn--blue" @click.prevent="newFolder.show = true;">create folder</a>
         <a href="#" class="btn btn--outlineblue" @click.prevent="$refs.file.click();">Upload</a>
+        <a href="#" class="btn btn--outlineblue" @click.prevent="createPrivateOGCService">Create private service</a>
         <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display:none"/>
       </div>
       <div class="dashboard__head__helpers">
@@ -74,7 +75,7 @@
             </td>
           </tr>
           <tr class="storage-files__item" v-for="(file, n) in filteredFiles" v-bind:key="`${n}_file`">
-            <td><input type="checkbox" name="" id=""></td>
+            <td><input type="checkbox" name="" id="" v-model="selectedFiles[file.path]"></td>
             <td><img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}</td>
             <td>{{file.size | bytesToMb}} MB</td>
             <td> {{ file.modified | timestampToDate }}</td>
@@ -94,12 +95,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
 import ProfileApi from '@/service/profile';
 import { ServerResponse } from '@/model';
 import { SimpleResponse } from '@/model/response';
-import { DirectoryInfo, FileUploadCommand } from '@/model/file';
+import { DirectoryInfo, FileInfo, FileUploadCommand } from '@/model/file';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 
@@ -128,9 +129,13 @@ export default class DashboardStorage extends Vue {
 
   fileSystem: DirectoryInfo;
 
+  filesFlattened: FileInfo[];
+
   newFolderPath: string;
 
   activeFolder: DirectoryInfo;
+
+  selectedFiles: { [key: string]: boolean } = {};
 
   errors: any;
 
@@ -176,6 +181,7 @@ export default class DashboardStorage extends Vue {
       size: 0,
       modifiedOn: '',
     };
+    this.filesFlattened = [];
     this.newFolderPath = '';
     this.errors = [];
     this.newFolder = {
@@ -227,6 +233,11 @@ export default class DashboardStorage extends Vue {
     const sizeGB = ((this.quotaTotal / 1024) / 1024) / 1024;
     const sizeGBRounded = Math.round(sizeGB * 10) / 10;
     return `${sizeGBRounded}GB`;
+  }
+
+  @Watch('selectedFiles', { deep: true })
+  onSelectedFilesChange(): void {
+    console.log('s', this.selectedFiles);
   }
 
   getFileSystem():void {
@@ -392,6 +403,41 @@ export default class DashboardStorage extends Vue {
         this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
       }
     });
+  }
+
+  addFilesToFilesArrayRecursively(directory: DirectoryInfo): void {
+    if (directory.files && directory.files.length) this.filesFlattened.push(...directory.files);
+    if (directory.folders && directory.folders.length) {
+      directory.folders.forEach((x) => {
+        this.addFilesToFilesArrayRecursively(x);
+      });
+    }
+  }
+
+  createPrivateOGCService(): void {
+    const pathsOfSelectedFiles = Object.entries(this.selectedFiles)
+      .filter(([path, isSelected]) => isSelected)
+      .map(([path, isSelected]) => (path));
+
+    if (pathsOfSelectedFiles.length === 0) {
+      alert('select a file');
+      return;
+    }
+    if (pathsOfSelectedFiles.length > 1) {
+      alert('select only one file');
+      return;
+    }
+
+    this.addFilesToFilesArrayRecursively(this.fileSystem);
+
+    const [pathOfSelectedFile] = pathsOfSelectedFiles;
+    const nameOfSelectedFile = this.filesFlattened.find((x) => x.path === pathOfSelectedFile)?.name;
+
+    this.$router.push(`/dashboard/create-private-ogc-service/${encodeURIComponent(pathOfSelectedFile)}?originName=${nameOfSelectedFile}`);
+    // this.$router.push({
+    //   name: 'CreatePrivateOGCService',
+    //   params: { fileStoragePath: encodeURIComponent(pathsOfSelectedFiles[0]) },
+    // });
   }
 }
 </script>
