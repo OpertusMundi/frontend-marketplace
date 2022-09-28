@@ -5,127 +5,182 @@
         <h1>Create private service</h1>
         <div class="dashboard__form">
           <ul class="dashboard__form__nav">
-            <li v-for="(step, i) in steps" :key="step">
-              <a href="#" :class="[currentStep === i + 1 ? 'active' : '', currentStep < i + 1 ? 'inactive' : '']" @click="goToStep(i + 1)">{{ step }}</a>
-            </li>
+            <li v-if="isPrivateOGCServiceCreated"><a class="completed" href="#">Well done!</a></li>
+            <template v-else>
+              <li v-for="(step, i) in steps" :key="step">
+                <a href="#" :class="[currentStep === i + 1 ? 'active' : '', currentStep < i + 1 ? 'inactive' : '']" @click="goToStep(i + 1)">{{ step }}</a>
+              </li>
+            </template>
           </ul>
           <div class="dashboard__form__steps">
             <div class="dashboard__form__steps__inner" v-if="privateOGCService.path">
-
-              <!-- STEP 1 -->
-              <validation-observer ref="step1">
-                <div class="dashboard__form__step step1" v-if="currentStep == 1">
+              <template v-if="isPrivateOGCServiceCreated">
+                <div class="dashboard__form__step is-created">
                   <div class="dashboard__form__step__title">
-                    <h3>Select service type</h3>
-                    <p>Select what type of private service you want to create</p>
+                    <h2>Your service has been created</h2>
+                    <p>Visit your topio OGC page to start using it</p>
+                  </div>
+                  <router-link to="/dashboard/private-ogc-services" class="btn btn--std btn--blue">go to topio OGC</router-link>
+                </div>
+              </template>
+              <template v-else>
+                <!-- STEP 1 -->
+                <validation-observer ref="step1">
+                  <div class="dashboard__form__step step1" v-if="currentStep == 1">
+                    <div class="dashboard__form__step__title">
+                      <h3>Select service type</h3>
+                      <p>Select what type of private service you want to create</p>
 
-                    <div class="service-options">
-                      <div class="service-options__card" :class="{'service-options__card--active': privateOGCService.serviceType === 'WMS'}" @click="selectServiceType('WMS')">
-                        <h2>WMS</h2>
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Molestiae quasi neque reprehenderit placeat, et sit tempore commodi consequatur, magni quas quae saepe autem ab ut unde quidem! Esse, fugit dolorem.</p>
+                      <div class="service-options">
+                        <div class="service-options__card" :class="{'service-options__card--active': privateOGCService.serviceType === 'WMS'}" @click="selectServiceType('WMS')">
+                          <h2>WMS</h2>
+                          <p>Create a Web Map Service</p>
+                        </div>
+                        <div class="service-options__card" :class="{'service-options__card--active': privateOGCService.serviceType === 'WFS'}" @click="selectServiceType('WFS')">
+                          <h2>WFS</h2>
+                          <p>Create a Web Feature Service</p>
+                        </div>
                       </div>
-                      <div class="service-options__card" :class="{'service-options__card--active': privateOGCService.serviceType === 'WFS'}" @click="selectServiceType('WFS')">
-                        <h2>WFS</h2>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nulla, vero a. Nobis architecto, perspiciatis voluptatum iusto incidunt facilis omnis quasi debitis fugiat nemo in, provident nostrum voluptas cupiditate laborum alias!</p>
-                      </div>
+                      <validation-provider v-slot="{ errors }" rules="required">
+                        <div class="form-group">
+                          <input hidden type="text" v-model="privateOGCService.serviceType">
+                          <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">Select a service type</span></div>
+                        </div>
+                      </validation-provider>
                     </div>
-                    <validation-provider v-slot="{ errors }" rules="required">
+                  </div>
+                </validation-observer>
+
+                <!-- STEP 2 -->
+                <validation-observer ref="step2">
+                  <div class="dashboard__form__step step2" v-if="currentStep == 2">
+                    <div class="dashboard__form__step__title">
+                      <h3>Metadata</h3>
+                      <p>Fill in your service metadata</p>
+                    </div>
+
+                    <validation-provider v-slot="{ errors }" name="Title" rules="required">
                       <div class="form-group">
-                        <input hidden type="text" v-model="privateOGCService.serviceType">
-                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">Select a service type</span></div>
+                        <label for="metadata_title">Title *</label>
+                        <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" placeholder="Title" v-model="privateOGCService.title">
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                       </div>
                     </validation-provider>
-                  </div>
-                </div>
-              </validation-observer>
-
-              <!-- STEP 2 -->
-              <validation-observer ref="step2">
-                <div class="dashboard__form__step step2" v-if="currentStep == 2">
-                  <div class="dashboard__form__step__title">
-                    <h3>Metadata</h3>
-                    <p>Fill in your service metadata</p>
-                  </div>
-
-                  <validation-provider v-slot="{ errors }" name="Title" rules="required">
-                    <div class="form-group">
-                      <label for="metadata_title">Title *</label>
-                      <input type="text" class="form-group__text" name="metadata_title" id="metadata_title" placeholder="Title" v-model="privateOGCService.title">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider>
-                  <validation-provider v-slot="{ errors }" name="Version" rules="required">
-                    <div class="form-group">
-                      <label for="metadata_version">Version *</label>
-                      <input type="text" class="form-group__text" id="" name="metadata_version" placeholder="Version" v-model="privateOGCService.version">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider>
-                  <validation-provider v-slot="{ errors }" name="Format" rules="required">
-                    <div class="form-group">
-                      <label for="multiselect_type">Format *</label>
-                      <multiselect id="multiselect_format" v-model="privateOGCService.format" :options="availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select format"></multiselect>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-                    </div>
-                  </validation-provider>
-                  <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
-                    <div class="form-group">
-                      <label for="metadata_abstract">Abstract *</label>
-                      <textarea v-model="privateOGCService.abstract" name="metadata_abstract" placeholder="Short description"></textarea>
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                    </div>
-                  </validation-provider>
-                  <div class="form-group">
-                    <label for="metadata_crs">Reference system *</label>
-                    <multiselect id="metadata_crs" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
-                    <validation-provider v-slot="{ errors }" name="CRS" rules="required">
-                      <input hidden type="text" v-model="privateOGCService.crs">
-                      <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                    <validation-provider v-slot="{ errors }" name="Version" rules="required">
+                      <div class="form-group">
+                        <label for="metadata_version">Version *</label>
+                        <input type="text" class="form-group__text" id="" name="metadata_version" placeholder="Version" v-model="privateOGCService.version">
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      </div>
                     </validation-provider>
+                    <validation-provider v-slot="{ errors }" name="Format" rules="required">
+                      <div class="form-group">
+                        <label for="multiselect_type">Format *</label>
+                        <multiselect id="multiselect_format" v-model="privateOGCService.format" :options="availableFormats" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select format"></multiselect>
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+                      </div>
+                    </validation-provider>
+                    <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
+                      <div class="form-group">
+                        <label for="metadata_abstract">Abstract *</label>
+                        <textarea v-model="privateOGCService.abstract" name="metadata_abstract" placeholder="Short description"></textarea>
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      </div>
+                    </validation-provider>
+                    <div class="form-group">
+                      <label for="metadata_crs">Reference system *</label>
+                      <multiselect id="metadata_crs" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
+                      <validation-provider v-slot="{ errors }" name="CRS" rules="required">
+                        <input hidden type="text" v-model="privateOGCService.crs">
+                        <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                      </validation-provider>
+                    </div>
+                    <div class="form-group">
+                      <label for="metadata_encoding">Encoding</label>
+                      <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="privateOGCService.encoding" @tag="privateOGCService = { ...privateOGCService, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label for="metadata_encoding">Encoding</label>
-                    <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="privateOGCService.encoding" @tag="privateOGCService = { ...privateOGCService, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
-                  </div>
-                </div>
-              </validation-observer>
+                </validation-observer>
 
-              <!-- STEP 3 -->
-              <validation-observer ref="step3">
-                <div class="dashboard__form__step step3" v-if="currentStep == 3">
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="dashboard__form__step__title">
-                        <h3>Payment amount</h3>
-                        <p>The cost of using topio OGC is fixed</p>
-                        <div class="cost"><span>32</span><span>€/month</span></div>
-                        <p>Billed every 1st working day of the month</p>
+                <!-- STEP 3 -->
+                <validation-observer ref="step3">
+                  <div class="dashboard__form__step step3" v-if="currentStep == 3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="dashboard__form__step__title">
+                          <h3>Payment amount</h3>
+                          <p>The cost of using topio OGC is fixed</p>
+                          <div class="cost"><span>32</span><span>€/month</span></div>
+                          <p>Billed every 1st working day of the month</p>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <!-- <h3>Select payment method</h3> -->
+                      </div>
+                      <div class="col-md-4"></div>
+                    </div>
+                  </div>
+                </validation-observer>
+
+                <!-- STEP 4 -->
+                <validation-observer ref="step4">
+                  <div class="dashboard__form__step step4" v-if="currentStep == 4">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="dashboard__form__step__title">
+                          <h3>Service details</h3>
+                          <hr>
+                          <div class="service-details__table">
+                            <span>From asset:</span><span>{{ $route.query.originName }}</span>
+                            <span>Type of service:</span><span>{{ privateOGCService.serviceType }}</span>
+                          </div>
+                        </div>
+                        <div class="dashboard__form__step__title">
+                          <h3>Metadata</h3>
+                          <hr>
+                          <div class="service-details__table">
+                            <span>Title:</span><span>{{ privateOGCService.title }}</span>
+                            <span>Abstract:</span><span>{{ privateOGCService.abstract }}</span>
+                            <span>Version:</span><span>{{ privateOGCService.version }}</span>
+                            <span>Format:</span><span>{{ privateOGCService.format }}</span>
+                            <span>CRS:</span><span>{{ selectedEpsg.name }}</span>
+                            <span v-if="privateOGCService.encoding">Encoding:</span><span>{{ privateOGCService.encoding }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="dashboard__form__step__title">
+                          <h3>Payment information</h3>
+                          <hr>
+                          <div class="service-details__table">
+                            <span>Amount:</span><span>32 €/month</span>
+                            <!-- <span>Method:</span><span></span> -->
+                          </div>
+                        </div>
+                        <div class="dashboard__form__step__title">
+                          <h3>Terms & Conditions</h3>
+                          <hr>
+                          <p>Check the box in order to proceed</p>
+                          <div class="form-group">
+                            <validation-provider v-slot="{ errors }" rules="isBooleanTrue">
+                              <div class="form-group-checkbox">
+                                <input type="checkbox" id="terms" v-model="isTermsAndConditionsAccepted">
+                                <label for="terms">I 've read and accept the
+                                  <strong><a href="/terms" target="_blank">Terms & Conditions</a></strong>
+                                </label>
+                                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">Check the box to proceed</span></div>
+                              </div>
+                            </validation-provider>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-md-4">
-                      <!-- <h3>Select payment method</h3> -->
-                    </div>
-                    <div class="col-md-4"></div>
                   </div>
-                </div>
-              </validation-observer>
-
-              <!-- STEP 4 -->
-              <validation-observer ref="step4">
-                <div class="dashboard__form__step step4" v-if="currentStep == 4">
-                  <div class="dashboard__form__step__title">
-                    <h3>Service details</h3>
-                    <hr>
-                    <div class="service-details__table">
-                      <span>From asset:</span><span>{{ $route.query.originName }}</span>
-                      <span>Type of service:</span><span>{{ privateOGCService.serviceType }}</span>
-                    </div>
-                  </div>
-                </div>
-              </validation-observer>
+                </validation-observer>
+              </template>
             </div>
           </div>
-          <div class="dashboard__form__navbuttons">
+          <div class="dashboard__form__navbuttons" v-if="!isPrivateOGCServiceCreated">
             <button class="btn--std btn--blue" @click.prevent="goToPreviousStep()" v-if="currentStep > 1">PREVIOUS</button>
             <button class="btn--std btn--blue" @click.prevent="goToNextStep()">{{ currentStep === steps.length ? 'confirm and pay' : 'next' }}</button>
           </div>
@@ -151,7 +206,14 @@ import { EnumServiceType, PrivateOGCServiceCommand } from '@/model/private-ogc-s
 import store from '@/store';
 import { Configuration } from '@/model';
 
+const booleanValidator = {
+  validate(value) {
+    return !!value;
+  },
+};
+
 extendValidationRules('required', required);
+extendValidationRules('isBooleanTrue', booleanValidator);
 
 @Component({
   components: {
@@ -195,6 +257,10 @@ export default class CreatePrivateOGCService extends Vue {
 
   popularEncodings = ['UTF-8', 'Windows-1251', 'Windows-1252', 'Windows-1253', 'ISO 8859-1', 'ISO 8859-2', 'ISO 8859-3', 'ISO 8859-4', 'ISO 8859-5', 'ISO 8859-7'];
 
+  isTermsAndConditionsAccepted = false;
+
+  isPrivateOGCServiceCreated = false;
+
   // hook that runs immediately and ensures that config is fetched
   @Watch('$store.getters.getConfig', { immediate: true })
   onConfigChange(config: null | { configuration: Configuration }): void {
@@ -221,21 +287,37 @@ export default class CreatePrivateOGCService extends Vue {
     };
   }
 
-  goToNextStep(): void {
-    (this.$refs[`step${this.currentStep}`] as InstanceType<typeof ValidationObserver>).validate().then((success) => {
-      if (success) this.currentStep += 1;
-      console.log(this.privateOGCService);
-    });
+  async goToNextStep(): Promise<void> {
+    const isFormValid = await (this.$refs[`step${this.currentStep}`] as InstanceType<typeof ValidationObserver>).validate();
 
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
+
+    if (!isFormValid) return;
+
+    if (this.currentStep === this.steps.length) {
+      this.submit();
+      return;
+    }
+
+    this.currentStep += 1;
   }
 
   goToPreviousStep(): void {
     if (this.currentStep <= 1) return;
     this.currentStep -= 1;
+  }
+
+  submit(): void {
+    store.commit('setLoading', true);
+    this.privateOGCServicesApi.create(this.privateOGCService).then((response) => {
+      if (response.success) {
+        this.isPrivateOGCServiceCreated = true;
+        store.commit('setLoading', false);
+      }
+    });
   }
 
   selectServiceType(serviceType: EnumServiceType): void {
