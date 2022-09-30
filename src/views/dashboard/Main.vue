@@ -55,6 +55,12 @@
                 <span>t&#176;Drive</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('PrivateOGCServices')">
+              <router-link to="/dashboard/private-ogc-services" data-name="PrivateOGCServices">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path data-name="Rectangle 5697" fill="#333" d="M0 0h24v24H0z"/></svg>
+                <span>t&#176;OGC</span>
+              </router-link>
+            </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Notebooks')">
               <router-link to="/dashboard/notebooks" data-name="Notebooks">
                 <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-509.43 -974.84)" fill="#333" data-name="Group 3652"><path d="M531.338,974.841H514.511a2.047,2.047,0,0,0-2.092,2v2.674a1,1,0,1,0,1.993,0l-.009-2.638a.142.142,0,0,1,.108-.037h16.827c.06,0,.094.025.1.006l.009,19.967a.138.138,0,0,1-.106.037H514.511c-.062,0-.095-.022-.1-.008v-2.811a1,1,0,1,0-1.993,0v2.818a2.047,2.047,0,0,0,2.092,2h16.828a2.047,2.047,0,0,0,2.09-1.995V976.837A2.047,2.047,0,0,0,531.338,974.841Z" data-name="Path 9748"/><path d="m510.48 984.15h4.211a1 1 0 0 0 0-1.995h-4.211a1 1 0 0 0 0 1.995z" data-name="Path 9749"/><path d="m510.48 987.72h4.211a1 1 0 0 0 0-1.994h-4.211a1 1 0 0 0 0 1.994z" data-name="Path 9750"/><path d="m515.68 990.57a1 1 0 0 0-1-1h-4.262a1 1 0 0 0 0 2h4.262a1 1 0 0 0 1-1z" data-name="Path 9751"/><path d="m527.56 985.8a2 2 0 0 0 2-2v-2.952a2 2 0 0 0-2-2h-7.555a2 2 0 0 0-2 2v2.952a2 2 0 0 0 2 2zm-7.555-4.953h7.559v2.955h-7.56z" data-name="Path 9752"/></g></svg>

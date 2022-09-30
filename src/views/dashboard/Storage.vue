@@ -19,7 +19,7 @@
       <div class="dashboard__head__btns">
         <a href="#" class="btn--std btn--blue" @click.prevent="newFolder.show = true;">create folder</a>
         <a href="#" class="btn btn--outlineblue" @click.prevent="$refs.file.click();">Upload</a>
-        <a href="#" class="btn btn--outlineblue" @click.prevent="createPrivateOGCService">Create private service</a>
+        <a href="#" class="btn btn--outlineblue" v-if="this.pathsOfSelectedFiles.length === 1" @click.prevent="createPrivateOGCService">Create private service</a>
         <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display:none"/>
       </div>
       <div class="dashboard__head__helpers">
@@ -214,6 +214,14 @@ export default class DashboardStorage extends Vue {
         this.quotaUsed = response.result.profile.quota.used;
       }
     });
+  }
+
+  get pathsOfSelectedFiles(): string[] {
+    return Object.entries(this.selectedFiles)
+      /* eslint-disable */
+      .filter(([path, isSelected]) => isSelected)
+      .map(([path, isSelected]) => (path));
+      /* eslint-enable */
   }
 
   get quotaPercentage(): number {
@@ -415,29 +423,21 @@ export default class DashboardStorage extends Vue {
   }
 
   createPrivateOGCService(): void {
-    const pathsOfSelectedFiles = Object.entries(this.selectedFiles)
-      .filter(([path, isSelected]) => isSelected)
-      .map(([path, isSelected]) => (path));
-
-    if (pathsOfSelectedFiles.length === 0) {
+    if (this.pathsOfSelectedFiles.length === 0) {
       alert('select a file');
       return;
     }
-    if (pathsOfSelectedFiles.length > 1) {
+    if (this.pathsOfSelectedFiles.length > 1) {
       alert('select only one file');
       return;
     }
 
     this.addFilesToFilesArrayRecursively(this.fileSystem);
 
-    const [pathOfSelectedFile] = pathsOfSelectedFiles;
+    const [pathOfSelectedFile] = this.pathsOfSelectedFiles;
     const nameOfSelectedFile = this.filesFlattened.find((x) => x.path === pathOfSelectedFile)?.name;
 
     this.$router.push(`/dashboard/create-private-ogc-service/${encodeURIComponent(pathOfSelectedFile)}?originName=${nameOfSelectedFile}`);
-    // this.$router.push({
-    //   name: 'CreatePrivateOGCService',
-    //   params: { fileStoragePath: encodeURIComponent(pathsOfSelectedFiles[0]) },
-    // });
   }
 }
 </script>

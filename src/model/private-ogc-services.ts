@@ -156,6 +156,7 @@ interface PrivateOGCService {
 }
 
 export {
+  EnumStatus,
   EnumServiceType,
   PrivateOGCServiceCommand,
   PrivateOGCService,
