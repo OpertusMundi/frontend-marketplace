@@ -83,6 +83,7 @@
               <div class="storage-files__item__actions">
                 <a href="#" @click.prevent="download(file.path)"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
                 <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
+                <a href="#" @click.prevent="createPrivateOGCService(file.path, file.name)"><img src="@/assets/images/icons/dashboard/layers.svg" alt=""></a>
                 <a href="#" @click.prevent="deleteRequest(file.path, 'File')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
               </div>
             </td>
@@ -422,22 +423,33 @@ export default class DashboardStorage extends Vue {
     }
   }
 
-  createPrivateOGCService(): void {
-    if (this.pathsOfSelectedFiles.length === 0) {
-      alert('select a file');
-      return;
+  createPrivateOGCService(filePath?: string, fileName?: string): void {
+    let fPath = '';
+    let fName = '';
+
+    if (filePath && fileName) { // selected from item side-buttons
+      fPath = filePath;
+      fName = fileName;
+    } else { // selected from top-page action buttons
+      if (this.pathsOfSelectedFiles.length === 0) {
+        alert('select a file');
+        return;
+      }
+      if (this.pathsOfSelectedFiles.length > 1) {
+        alert('select only one file');
+        return;
+      }
+
+      this.addFilesToFilesArrayRecursively(this.fileSystem);
+
+      const [pathOfSelectedFile] = this.pathsOfSelectedFiles;
+      const nameOfSelectedFile = this.filesFlattened.find((x) => x.path === pathOfSelectedFile)?.name || '';
+
+      fPath = pathOfSelectedFile;
+      fName = nameOfSelectedFile;
     }
-    if (this.pathsOfSelectedFiles.length > 1) {
-      alert('select only one file');
-      return;
-    }
 
-    this.addFilesToFilesArrayRecursively(this.fileSystem);
-
-    const [pathOfSelectedFile] = this.pathsOfSelectedFiles;
-    const nameOfSelectedFile = this.filesFlattened.find((x) => x.path === pathOfSelectedFile)?.name;
-
-    this.$router.push(`/dashboard/create-private-ogc-service/${encodeURIComponent(pathOfSelectedFile)}?originName=${nameOfSelectedFile}`);
+    this.$router.push(`/dashboard/create-private-ogc-service/${encodeURIComponent(fPath)}?originName=${fName}`);
   }
 }
 </script>
