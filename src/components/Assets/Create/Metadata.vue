@@ -207,10 +207,13 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <div class="d-flex align-items-center form-group" v-if="assetLocal.type === 'VECTOR'">
-            <input type="checkbox" id="ingested" v-model="assetLocal.ingested" class="mr-xs-10 mb-xs-10">
-            <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
-          </div>
+          <template v-if="assetLocal.type === 'TABULAR'">
+            <hr>
+            <div class="d-flex align-items-center form-group">
+              <input type="checkbox" id="data_profiling" v-model="assetLocal.dataProfilingEnabled" class="mr-xs-10 mb-xs-10">
+              <label for="data_profiling">Compute automated metadata</label>
+            </div>
+          </template>
         </div>
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
@@ -476,6 +479,11 @@ export default class Metadata extends Vue {
       this.assetLocal.referenceSystem = '';
       return;
     }
+
+    if (type as EnumAssetType !== EnumAssetType.TABULAR) {
+      this.assetLocal.dataProfilingEnabled = true;
+    }
+
     this.isSpatialMetadataHidden = false;
   }
 

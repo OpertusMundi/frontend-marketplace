@@ -7,6 +7,7 @@ import ProfileApi from '@/service/profile';
 
 import Home from '@/views/Home.vue';
 import { EnumRole } from '@/model/role';
+import { navigateToKeycloakLogin } from '@/helper/login';
 
 Vue.use(VueRouter);
 
@@ -157,6 +158,18 @@ const routes: RouteConfig[] = [
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
+        path: 'private-ogc-services',
+        name: 'PrivateOGCServices',
+        component: (): Promise<any> => import(/* webpackChunkName: "privateogcservices" */ '../views/dashboard/PrivateOGCServices.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
+        path: 'create-private-ogc-service/:fileStoragePath',
+        name: 'CreatePrivateOGCService',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateprivateogcservice" */ '../views/dashboard/CreatePrivateOGCService.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER], layout: 'dashboard' },
       },
       {
         path: 'notebooks',
@@ -412,6 +425,12 @@ router.beforeEach((to, from, next) => {
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {
     next({ name: 'User' });
+  }
+
+  if (to.name === 'HelpdeskReview' && !store.getters.hasRole([EnumRole.ROLE_HELPDESK])) {
+    console.log('go to keycloak!');
+    navigateToKeycloakLogin(to.path);
+    return;
   }
 
   const routeToNavigateAfterLogin = sessionStorage.getItem('routeToNavigateAfterLogin');

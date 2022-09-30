@@ -274,11 +274,11 @@
             </div>
           </validation-provider>
 
-          <template v-if="assetLocal.type === 'VECTOR'">
+          <template v-if="assetLocal.type === 'TABULAR'">
             <hr>
             <div class="d-flex align-items-center form-group">
-              <input type="checkbox" id="ingested" v-model="assetLocal.ingested" class="mr-xs-10 mb-xs-10">
-              <label for="ingested">Ingested <small>Import into PostGIS Database to publish using WMS/WFS</small></label>
+              <input type="checkbox" id="data_profiling" v-model="assetLocal.dataProfilingEnabled" class="mr-xs-10 mb-xs-10">
+              <label for="data_profiling">Compute automated metadata</label>
             </div>
           </template>
         </div>
@@ -590,6 +590,11 @@ export default class OpenAssetMetadata extends Vue {
       this.assetLocal.referenceSystem = '';
       return;
     }
+
+    if (type as EnumAssetType !== EnumAssetType.TABULAR) {
+      this.assetLocal.dataProfilingEnabled = true;
+    }
+
     this.isSpatialMetadataHidden = false;
   }
 

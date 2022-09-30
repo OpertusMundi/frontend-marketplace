@@ -7,7 +7,11 @@
     </div>
     <div class="storage">
       <div class="storage__status">
-        <div class="storage__status__label"><span>{{ quotaPercentage }}% out of {{ quotaTotalText }} used</span><a href="">Upgrade</a></div>
+        <div class="storage__status__label">
+          <span v-if="quotaTotal">{{ 1 > quotaPercentage ? '&#60;1' : quotaPercentage }}% out of {{ quotaTotalText }} used</span><span v-else>%</span>
+          <!-- todo: should not be hardcoded -->
+          <router-link to="/vas/drive-3">Upgrade</router-link>
+        </div>
         <div class="storage__status__bar"><span :style="`width: ${ quotaPercentage }%`"></span></div>
       </div>
     </div>
@@ -15,6 +19,7 @@
       <div class="dashboard__head__btns">
         <a href="#" class="btn--std btn--blue" @click.prevent="newFolder.show = true;">create folder</a>
         <a href="#" class="btn btn--outlineblue" @click.prevent="$refs.file.click();">Upload</a>
+        <a href="#" class="btn btn--outlineblue" v-if="this.pathsOfSelectedFiles.length === 1" @click.prevent="createPrivateOGCService">Create private service</a>
         <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" style="display:none"/>
       </div>
       <div class="dashboard__head__helpers">
@@ -70,7 +75,7 @@
             </td>
           </tr>
           <tr class="storage-files__item" v-for="(file, n) in filteredFiles" v-bind:key="`${n}_file`">
-            <td><input type="checkbox" name="" id=""></td>
+            <td><input type="checkbox" name="" id="" v-model="selectedFiles[file.path]"></td>
             <td><img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}</td>
             <td>{{file.size | bytesToMb}} MB</td>
             <td> {{ file.modified | timestampToDate }}</td>
@@ -78,6 +83,7 @@
               <div class="storage-files__item__actions">
                 <a href="#" @click.prevent="download(file.path)"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
                 <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
+                <a href="#" @click.prevent="createPrivateOGCService(file.path, file.name)"><img src="@/assets/images/icons/dashboard/layers.svg" alt=""></a>
                 <a href="#" @click.prevent="deleteRequest(file.path, 'File')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
               </div>
             </td>
@@ -90,12 +96,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
 import ProfileApi from '@/service/profile';
 import { ServerResponse } from '@/model';
 import { SimpleResponse } from '@/model/response';
-import { DirectoryInfo, FileUploadCommand } from '@/model/file';
+import { DirectoryInfo, FileInfo, FileUploadCommand } from '@/model/file';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 
@@ -124,9 +130,13 @@ export default class DashboardStorage extends Vue {
 
   fileSystem: DirectoryInfo;
 
+  filesFlattened: FileInfo[];
+
   newFolderPath: string;
 
   activeFolder: DirectoryInfo;
+
+  selectedFiles: { [key: string]: boolean } = {};
 
   errors: any;
 
@@ -172,6 +182,7 @@ export default class DashboardStorage extends Vue {
       size: 0,
       modifiedOn: '',
     };
+    this.filesFlattened = [];
     this.newFolderPath = '';
     this.errors = [];
     this.newFolder = {
@@ -206,6 +217,14 @@ export default class DashboardStorage extends Vue {
     });
   }
 
+  get pathsOfSelectedFiles(): string[] {
+    return Object.entries(this.selectedFiles)
+      /* eslint-disable */
+      .filter(([path, isSelected]) => isSelected)
+      .map(([path, isSelected]) => (path));
+      /* eslint-enable */
+  }
+
   get quotaPercentage(): number {
     if (this.quotaUsed === null || !this.quotaTotal) return 0;
     return Math.round((this.quotaUsed / this.quotaTotal) * 100);
@@ -213,8 +232,21 @@ export default class DashboardStorage extends Vue {
 
   get quotaTotalText(): string {
     if (!this.quotaTotal) return '';
-    if (this.quotaTotal < 134217728) return `${(this.quotaTotal / 1024) / 1024}MB`;
-    return `${((this.quotaTotal / 1024) / 1024) / 1024}GB`;
+
+    if (this.quotaTotal < 134217728) {
+      const sizeMB = (this.quotaTotal / 1024) / 1024;
+      const sizeMBRounded = Math.round(sizeMB * 10) / 10;
+      return `${sizeMBRounded}MB`;
+    }
+
+    const sizeGB = ((this.quotaTotal / 1024) / 1024) / 1024;
+    const sizeGBRounded = Math.round(sizeGB * 10) / 10;
+    return `${sizeGBRounded}GB`;
+  }
+
+  @Watch('selectedFiles', { deep: true })
+  onSelectedFilesChange(): void {
+    console.log('s', this.selectedFiles);
   }
 
   getFileSystem():void {
@@ -380,6 +412,44 @@ export default class DashboardStorage extends Vue {
         this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
       }
     });
+  }
+
+  addFilesToFilesArrayRecursively(directory: DirectoryInfo): void {
+    if (directory.files && directory.files.length) this.filesFlattened.push(...directory.files);
+    if (directory.folders && directory.folders.length) {
+      directory.folders.forEach((x) => {
+        this.addFilesToFilesArrayRecursively(x);
+      });
+    }
+  }
+
+  createPrivateOGCService(filePath?: string, fileName?: string): void {
+    let fPath = '';
+    let fName = '';
+
+    if (filePath && fileName) { // selected from item side-buttons
+      fPath = filePath;
+      fName = fileName;
+    } else { // selected from top-page action buttons
+      if (this.pathsOfSelectedFiles.length === 0) {
+        alert('select a file');
+        return;
+      }
+      if (this.pathsOfSelectedFiles.length > 1) {
+        alert('select only one file');
+        return;
+      }
+
+      this.addFilesToFilesArrayRecursively(this.fileSystem);
+
+      const [pathOfSelectedFile] = this.pathsOfSelectedFiles;
+      const nameOfSelectedFile = this.filesFlattened.find((x) => x.path === pathOfSelectedFile)?.name || '';
+
+      fPath = pathOfSelectedFile;
+      fName = nameOfSelectedFile;
+    }
+
+    this.$router.push(`/dashboard/create-private-ogc-service/${encodeURIComponent(fPath)}?originName=${fName}`);
   }
 }
 </script>
