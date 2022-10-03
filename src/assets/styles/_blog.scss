@@ -26,11 +26,11 @@
 
     .post-card {
         width: 100%;
-        margin-bottom: 2em;
 
         &--carousel {
             width: 30vw !important;
             flex-shrink: 0;
+            margin-bottom: 0;
         }
       
         img {
@@ -245,7 +245,7 @@
             display: inline-flex;
             flex-wrap: nowrap;
             gap: 1.5em;
-            overflow-x: scroll;
+            overflow: hidden;
             box-sizing: border-box;
         }
     }

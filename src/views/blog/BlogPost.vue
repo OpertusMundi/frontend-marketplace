@@ -81,7 +81,7 @@
             <h3>Related posts</h3>
           </div>
 
-          <div class="related-posts__container" v-if="isRelatedPostsLoaded">
+          <div class="related-posts__container" v-if="isRelatedPostsLoaded" v-dragscroll>
             <post-card
               v-for="post in relatedPosts"
               :carouselElement="true"
@@ -109,6 +109,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 import moment from 'moment';
+import { dragscroll } from 'vue-dragscroll';
 import PostCard from '@/components/Blog/PostCard.vue';
 import ConfigApi from '@/service/config';
 import { Post, Category } from '@/model/wordpress';
@@ -116,6 +117,7 @@ import store from '@/store';
 
 @Component({
   components: { PostCard },
+  directives: { dragscroll },
 })
 export default class BlogPost extends Vue {
   configApi = new ConfigApi();
