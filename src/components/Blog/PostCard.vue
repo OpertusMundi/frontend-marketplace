@@ -7,7 +7,7 @@
     <div class="category" @click="selectCategory">{{ categoryName }}</div>
 
     <!-- <router-link :to="`blog/post/${postID}`" style="text-decoration: none; color: inherit"> -->
-    <router-link :to="{ name: 'BlogPost', params: { slug: postSlug, postDate: date, categoryID: categoryID || categoryID === 0 ? categoryID : '' } }" style="text-decoration: none; color: inherit">
+    <router-link :to="{ name: 'BlogPost', params: { slug: postSlug, postID, postDate: date, categoryID: categoryID || categoryID === 0 ? categoryID : '' } }" style="text-decoration: none; color: inherit">
       <h3 class="title">{{ title }}</h3>
     </router-link>
 
@@ -29,6 +29,8 @@ import moment from 'moment';
 
 @Component
 export default class PostCard extends Vue {
+  @Prop({ required: true }) readonly postID!: number;
+
   @Prop({ required: true }) readonly postSlug!: string;
 
   @Prop({ required: true }) readonly title!: string;

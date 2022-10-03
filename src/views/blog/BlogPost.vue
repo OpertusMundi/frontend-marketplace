@@ -86,6 +86,7 @@
               v-for="(post, i) in relatedPosts"
               :carouselElement="true"
               :key="post.id"
+              :postID="post.id"
               :postSlug="post.slug"
               :title="post.title.rendered"
               :body="post.content.rendered"
@@ -147,7 +148,7 @@ export default class BlogPost extends Vue {
     if (store.getters.getConfig && !this.post && !this.$store.getters.isLoading) {
       this.getPost();
       if (this.$route.params.postDate) this.getPreviousAndNextPost(this.$route.params.postDate);
-      if (this.$route.params.categoryID) this.getRelatedPosts(parseInt(this.$route.params.categoryID, 10));
+      if (this.$route.params.categoryID && this.$route.params.postID) this.getRelatedPosts(parseInt(this.$route.params.categoryID, 10), parseInt(this.$route.params.postID, 10));
     }
   }
 
@@ -193,7 +194,7 @@ export default class BlogPost extends Vue {
 
     this.makeIFramesFullWidth();
     if (!this.$route.params.postDate && this.post) this.getPreviousAndNextPost(this.post.date);
-    if (!this.$route.params.categoryID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0]);
+    if (!this.$route.params.categoryID && !this.$route.params.postID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0], this.post.id);
 
     store.commit('setLoading', false);
   }
@@ -225,9 +226,9 @@ export default class BlogPost extends Vue {
     this.isPreviousNextPostsLoaded = true;
   }
 
-  async getRelatedPosts(categoryID: number): Promise<void> {
+  async getRelatedPosts(categoryID: number, postID: number): Promise<void> {
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
-    const url = `${wordressEndpoint}/wp-json/wp/v2/blog?page=1&per_page=5&_embed&categories=${categoryID}`;
+    const url = `${wordressEndpoint}/wp-json/wp/v2/blog?page=1&per_page=5&_embed&categories=${categoryID}&exclude=${postID}`;
 
     const relatedPostsResponse = await axios.get(url);
     const { data: relatedPosts } = relatedPostsResponse;
