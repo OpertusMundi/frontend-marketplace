@@ -78,12 +78,12 @@
 
         <div class="related-posts__wrapper">
           <div class="s_container">
-            <h3>Related posts</h3>
+            <h3 class="related-posts__heading">Related posts</h3>
           </div>
 
           <div class="related-posts__container" v-if="isRelatedPostsLoaded" v-dragscroll>
             <post-card
-              v-for="post in relatedPosts"
+              v-for="(post, i) in relatedPosts"
               :carouselElement="true"
               :key="post.id"
               :postSlug="post.slug"
@@ -95,11 +95,15 @@
               :image="post.acf && post.acf.image ? post.acf.image.url : null"
               :categoryID="post.categories && post.categories.length ? post.categories[0] : null"
               :categoryName="post.categories && post.categories.length ? categories.find(x => x.id === post.categories[0]).name : null"
+              :style="{
+                'margin-left': i === 0 ? `${relatedCardMarginLeft}px` : 0,
+                'margin-right': i === relatedPosts.length - 1 ? '2em' : 0,
+                'width': `calc((${windowInnerWidth}px - ${relatedCardMarginLeft}px - (1.5em * 3)) / 3.5)`
+              }"
               @selectCategory="selectedCategoryID = $event"
             ></post-card>
           </div>
         </div>
-
       </template>
     </div>
   </div>
@@ -154,6 +158,14 @@ export default class BlogPost extends Vue {
         behavior: 'smooth',
       });
     }, 0);
+  }
+
+  get windowInnerWidth(): number {
+    return window.innerWidth;
+  }
+
+  get relatedCardMarginLeft(): number | null {
+    return (document.querySelector('.related-posts__heading') as HTMLElement).getBoundingClientRect().x || null;
   }
 
   async getPost(): Promise<void> {
