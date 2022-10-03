@@ -101,7 +101,7 @@
                 'margin-right': i === relatedPosts.length - 1 ? '2em' : 0,
                 'width': `calc((${windowInnerWidth}px - ${relatedCardMarginLeft}px - (1.5em * 3)) / 3.5)`
               }"
-              @selectCategory="selectedCategoryID = $event"
+              @selectCategory="$router.push({ name: 'Blog', params: { categoryID: $event } })"
             ></post-card>
           </div>
         </div>
