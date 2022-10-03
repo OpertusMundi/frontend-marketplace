@@ -101,7 +101,7 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "bloglist" */ '@/views/blog/BlogList.vue'),
   },
   {
-    path: '/blog/post/:id',
+    path: '/blog/post/:slug',
     name: 'BlogPost',
     component: (): Promise<any> => import(/* webpackChunkName: "blogpost" */ '@/views/blog/BlogPost.vue'),
   },

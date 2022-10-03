@@ -53,7 +53,7 @@
                   <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => previousPost.categories.includes(x.id)).name }}</div>
                 </router-link>
               </div>
-              <router-link :to="{ name: 'BlogPost', params: { id: previousPost.id, postDate: previousPost.date } }">
+              <router-link :to="{ name: 'BlogPost', params: { slug: previousPost.slug, postDate: previousPost.date } }">
                 <span class="post-title">{{ previousPost.title.rendered }}</span>
               </router-link>
             </template>
@@ -69,7 +69,7 @@
                   <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => nextPost.categories.includes(x.id)).name }}</div>
                 </router-link>
               </div>
-              <router-link :to="{ name: 'BlogPost', params: { id: nextPost.id, postDate: nextPost.date } }">
+              <router-link :to="{ name: 'BlogPost', params: { slug: nextPost.slug, postDate: nextPost.date } }">
                 <span class="post-title">{{ nextPost.title.rendered }}</span>
               </router-link>
             </template>
@@ -86,7 +86,7 @@
               v-for="post in relatedPosts"
               :carouselElement="true"
               :key="post.id"
-              :postID="post.id"
+              :postSlug="post.slug"
               :title="post.title.rendered"
               :body="post.content.rendered"
               :authorID="post._embedded.author[0].id"
@@ -157,10 +157,10 @@ export default class BlogPost extends Vue {
   async getPost(): Promise<void> {
     store.commit('setLoading', true);
 
-    const { id: postID } = this.$route.params;
+    const { slug } = this.$route.params;
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
 
-    const urlPost = `${wordressEndpoint}/wp-json/wp/v2/blog/${postID}?_embed`;
+    const urlPost = `${wordressEndpoint}/wp-json/wp/v2/blog?slug=${slug}&_embed`;
     const urlCategories = `${wordressEndpoint}/wp-json/wp/v2/categories`;
 
     const promises = Promise.all([
@@ -172,7 +172,7 @@ export default class BlogPost extends Vue {
     const [postResponse, categoriesResponse] = responses;
 
     const { data: post } = postResponse;
-    this.post = post;
+    [this.post] = post;
 
     const { data: categories } = categoriesResponse;
     this.categories = categories;
