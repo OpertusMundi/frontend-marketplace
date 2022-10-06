@@ -646,6 +646,11 @@ export default class Header extends Vue {
     if (isAuthenticated) this.pollNotificationsAndMessages();
   }
 
+  @Watch('$store.getters.getTriggerReloadNotificationsTimestamp')
+  onTriggerReloadTimestampChange(): void {
+    this.pollNotificationsAndMessages();
+  }
+
   @Watch('$store.getters.getCart', { deep: true })
   onCartChange(cartCurrent: Cart, cartPrevious: Cart): void {
     if (cartCurrent && cartPrevious && cartCurrent.totalItems > cartPrevious.totalItems) {

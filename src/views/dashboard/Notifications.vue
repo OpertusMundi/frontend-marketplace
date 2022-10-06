@@ -11,7 +11,7 @@
               <p class="filters__title">{{ unreadNotifications || '' }} NEW NOTIFICATIONS</p>
             </div>
             <div class="filters__block">
-              <p class="filters__title notification__btn_mark_all_as_read">Mark all as read</p>
+              <p class="filters__title notification__btn_mark_all_as_read" @click="markAllAsRead">Mark all as read</p>
             </div>
           </div>
 
@@ -128,6 +128,17 @@ export default class DashboardNotifications extends Vue {
         store.commit('setLoading', false);
       }
     });
+  }
+
+  markAllAsRead(): void {
+    store.commit('setLoading', true);
+
+    this.notificationApi
+      .readAllNotifications()
+      .then(() => {
+        this.loadNotifications(0);
+        store.commit('setTriggerReloadNotificationsTimestamp', Date.now());
+      });
   }
 }
 </script>
