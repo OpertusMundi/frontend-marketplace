@@ -2,7 +2,7 @@
   <div class="asset__head">
     <a href="" @click.prevent="$router.go(-1)" class="asset__head__breadcrumps"><img src="@/assets/images/icons/back_icon.svg" alt="">BACK</a>
     <div class="d-inline-flex">
-      <topic-category-icon class="mr-xs-30" v-for="category in catalogueItem.topicCategory" v-bind:key="`${category}_cat_icon`" :category="category"/>
+      <topic-category-icon class="mr-xs-30" :type="catalogueItem.type === 'SERVICE' ? catalogueItem.spatialDataServiceType : catalogueItem.type"/>
     </div>
     <div class="asset__head__title">
       <h1>{{ catalogueItem.title }}</h1>
