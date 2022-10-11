@@ -1,9 +1,15 @@
 <template>
   <div>
-    <div class="a_carousel draggable">
-      <a href="" class="a_carousel__item a_carousel__item--green" v-for="asset in assets" :key="asset.id">
-        <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-        <div class="a_carousel__item__inner">
+    <div class="a_carousel draggable" v-dragscroll>
+      <router-link
+        v-for="(asset, i) in assets"
+        :key="asset.id"
+        :to="`/catalogue/${asset.id}`"
+        class="a_carousel__item"
+        :style="{'margin-left': i=== 0 ? `${relatedCardMarginLeft}px` : '10px', '--color': getColor(asset)}"
+      >
+        <div class="a_carousel__item__view" :style="{'--color': getColor(asset)}"><span>VIEW ASSET</span></div>
+        <div class="a_carousel__item__inner" :style="{'--color': getColor(asset)}">
           <div class="a_carousel__item__top">
             <!-- <img src="@/assets/images/icons/vector_icon.svg" alt="" /> -->
             <img height="25" src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.type === 'VECTOR'">
@@ -34,19 +40,38 @@
             </div>
           </div>
         </div>
-      </a>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { dragscroll } from 'vue-dragscroll';
 import { CatalogueItem } from '@/model';
 import getPriceOrMinimumPrice from '@/helper/cards';
 
-@Component
+@Component({
+  directives: { dragscroll },
+})
 export default class AssetsCarousel extends Vue {
   @Prop({ required: true }) assets!: CatalogueItem[];
+
+  get relatedCardMarginLeft(): number | null {
+    return document.getElementById('asset__related__heading')?.getBoundingClientRect().x || null;
+  }
+
+  getColor(asset: CatalogueItem): string {
+    let color = '#358F8B';
+    if (asset.type === 'VECTOR') {
+      color = '#358F8B';
+    } else if (asset.type === 'SERVICE') {
+      color = '#6F43B5';
+    } else if (asset.type === 'RASTER') {
+      color = '#197196';
+    }
+    return color;
+  }
 
   price(asset: CatalogueItem): {prefix: string, value: string, suffix: string} {
     return getPriceOrMinimumPrice(asset);
