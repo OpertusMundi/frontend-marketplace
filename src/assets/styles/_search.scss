@@ -148,6 +148,7 @@
     }
 
     &--sm {
+      display: flex;
       width: 360px;
       border: 0px;
       .asset_search__upper {
@@ -160,7 +161,14 @@
           img {
             height: 15px;
           }
+          background: transparent;
         }
+      }
+    }
+
+    &--no-functional-search-button {
+      .asset_search__upper__icon {
+        cursor: default;
       }
     }
 

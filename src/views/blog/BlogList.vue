@@ -22,6 +22,7 @@
             <div class="col-sm-4" v-for="post in postsRow" :key="post.id">
               <post-card
                 :postID="post.id"
+                :postSlug="post.slug"
                 :title="post.title.rendered"
                 :body="post.content.rendered"
                 :authorID="post._embedded.author[0].id"

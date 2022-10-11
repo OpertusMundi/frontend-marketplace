@@ -101,7 +101,7 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "bloglist" */ '@/views/blog/BlogList.vue'),
   },
   {
-    path: '/blog/post/:id',
+    path: '/blog/post/:slug',
     name: 'BlogPost',
     component: (): Promise<any> => import(/* webpackChunkName: "blogpost" */ '@/views/blog/BlogPost.vue'),
   },
@@ -411,6 +411,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.meta.requiresRole && store.getters.isAuthenticated && !store.getters.isAccountActivated) {
+    next({ name: 'Home' });
+    return;
+  }
+
   // Set loading to TRUE before visiting these routes. Loading must be set to FALSE from inside the component, after content loaded
   const routesWithInitialLoading = ['Home', 'Catalogue', 'CatalogueSingle', 'Assets', 'Settings', 'Orders', 'OrderPreview', 'Purchases', 'PurchasePreview'];
   if (to.name && routesWithInitialLoading.includes(to.name)) {

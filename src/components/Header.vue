@@ -379,7 +379,8 @@
             </ul>
           </nav>
           <div class="header__menu__btn">
-            <router-link to="/dashboard" class="btn" v-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
+            <template v-if="$store.getters.isAuthenticated && !$store.getters.isAccountActivated"><span @click="toggleMobileMenu">Pending account activation</span></template>
+            <router-link to="/dashboard" class="btn" v-else-if="$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Dashboard</span></router-link>
             <!-- <router-link to="/signin" class="btn" v-if="!$store.getters.isAuthenticated"><span @click="toggleMobileMenu">Login</span><span>/</span><span @click="toggleMobileMenu">Register</span></router-link> -->
             <template v-if="!$store.getters.isAuthenticated"> <a class="btn" style="display: inline; cursor: pointer;" @click.prevent="loginWithKeycloak">Login</a><span>/</span><router-link style="display: inline" class="btn" to="/register">Register</router-link> </template>
           </div>
@@ -470,7 +471,10 @@
               </transition>
             </div>
           </div>
-          <div class="header__login" v-if="$store.getters.isAuthenticated" @mouseover="showUserMenu = true" @mouseleave="showUserMenu = false">
+          <div class="header__login" v-if="$store.getters.isAuthenticated && !$store.getters.isAccountActivated">
+            <a class="btn btn--std" disabled @click.prevent="" style="cursor: default">Pending account activation</a>
+          </div>
+          <div class="header__login" v-else-if="$store.getters.isAuthenticated" @mouseover="showUserMenu = true" @mouseleave="showUserMenu = false">
             <div class="user_menu">
               <svg xmlns="http://www.w3.org/2000/svg" width="20.454" height="24" viewBox="0 0 20.454 24">
                 <g id="Group_1976" data-name="Group 1976" transform="translate(-663.803 -610.487)">
@@ -640,6 +644,11 @@ export default class Header extends Vue {
   @Watch('$store.getters.isAuthenticated')
   onAuthenticationStateChange(isAuthenticated: boolean): void {
     if (isAuthenticated) this.pollNotificationsAndMessages();
+  }
+
+  @Watch('$store.getters.getTriggerReloadNotificationsTimestamp')
+  onTriggerReloadTimestampChange(): void {
+    this.pollNotificationsAndMessages();
   }
 
   @Watch('$store.getters.getCart', { deep: true })

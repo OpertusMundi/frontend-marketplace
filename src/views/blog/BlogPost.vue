@@ -53,7 +53,7 @@
                   <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => previousPost.categories.includes(x.id)).name }}</div>
                 </router-link>
               </div>
-              <router-link :to="{ name: 'BlogPost', params: { id: previousPost.id, postDate: previousPost.date } }">
+              <router-link :to="{ name: 'BlogPost', params: { slug: previousPost.slug, postDate: previousPost.date } }">
                 <span class="post-title">{{ previousPost.title.rendered }}</span>
               </router-link>
             </template>
@@ -69,7 +69,7 @@
                   <div class="category__item category__item--active category__item--small-margins">{{ categories.find(x => nextPost.categories.includes(x.id)).name }}</div>
                 </router-link>
               </div>
-              <router-link :to="{ name: 'BlogPost', params: { id: nextPost.id, postDate: nextPost.date } }">
+              <router-link :to="{ name: 'BlogPost', params: { slug: nextPost.slug, postDate: nextPost.date } }">
                 <span class="post-title">{{ nextPost.title.rendered }}</span>
               </router-link>
             </template>
@@ -78,15 +78,16 @@
 
         <div class="related-posts__wrapper">
           <div class="s_container">
-            <h3>Related posts</h3>
+            <h3 class="related-posts__heading">Related posts</h3>
           </div>
 
-          <div class="related-posts__container" v-if="isRelatedPostsLoaded">
+          <div class="related-posts__container" v-if="isRelatedPostsLoaded" v-dragscroll>
             <post-card
-              v-for="post in relatedPosts"
+              v-for="(post, i) in relatedPosts"
               :carouselElement="true"
               :key="post.id"
               :postID="post.id"
+              :postSlug="post.slug"
               :title="post.title.rendered"
               :body="post.content.rendered"
               :authorID="post._embedded.author[0].id"
@@ -95,11 +96,15 @@
               :image="post.acf && post.acf.image ? post.acf.image.url : null"
               :categoryID="post.categories && post.categories.length ? post.categories[0] : null"
               :categoryName="post.categories && post.categories.length ? categories.find(x => x.id === post.categories[0]).name : null"
-              @selectCategory="selectedCategoryID = $event"
+              :style="{
+                'margin-left': i === 0 ? `${relatedCardMarginLeft}px` : 0,
+                'margin-right': i === relatedPosts.length - 1 ? '2em' : 0,
+                'width': `calc((${windowInnerWidth}px - ${relatedCardMarginLeft}px - (1.5em * 3)) / 3.5)`
+              }"
+              @selectCategory="$router.push({ name: 'Blog', params: { categoryID: $event } })"
             ></post-card>
           </div>
         </div>
-
       </template>
     </div>
   </div>
@@ -109,6 +114,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 import moment from 'moment';
+import { dragscroll } from 'vue-dragscroll';
 import PostCard from '@/components/Blog/PostCard.vue';
 import ConfigApi from '@/service/config';
 import { Post, Category } from '@/model/wordpress';
@@ -116,6 +122,7 @@ import store from '@/store';
 
 @Component({
   components: { PostCard },
+  directives: { dragscroll },
 })
 export default class BlogPost extends Vue {
   configApi = new ConfigApi();
@@ -141,7 +148,7 @@ export default class BlogPost extends Vue {
     if (store.getters.getConfig && !this.post && !this.$store.getters.isLoading) {
       this.getPost();
       if (this.$route.params.postDate) this.getPreviousAndNextPost(this.$route.params.postDate);
-      if (this.$route.params.categoryID) this.getRelatedPosts(parseInt(this.$route.params.categoryID, 10));
+      if (this.$route.params.categoryID && this.$route.params.postID) this.getRelatedPosts(parseInt(this.$route.params.categoryID, 10), parseInt(this.$route.params.postID, 10));
     }
   }
 
@@ -154,13 +161,21 @@ export default class BlogPost extends Vue {
     }, 0);
   }
 
+  get windowInnerWidth(): number {
+    return window.innerWidth;
+  }
+
+  get relatedCardMarginLeft(): number | null {
+    return (document.querySelector('.related-posts__heading') as HTMLElement).getBoundingClientRect().x || null;
+  }
+
   async getPost(): Promise<void> {
     store.commit('setLoading', true);
 
-    const { id: postID } = this.$route.params;
+    const { slug } = this.$route.params;
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
 
-    const urlPost = `${wordressEndpoint}/wp-json/wp/v2/blog/${postID}?_embed`;
+    const urlPost = `${wordressEndpoint}/wp-json/wp/v2/blog?slug=${slug}&_embed`;
     const urlCategories = `${wordressEndpoint}/wp-json/wp/v2/categories`;
 
     const promises = Promise.all([
@@ -172,14 +187,14 @@ export default class BlogPost extends Vue {
     const [postResponse, categoriesResponse] = responses;
 
     const { data: post } = postResponse;
-    this.post = post;
+    [this.post] = post;
 
     const { data: categories } = categoriesResponse;
     this.categories = categories;
 
     this.makeIFramesFullWidth();
     if (!this.$route.params.postDate && this.post) this.getPreviousAndNextPost(this.post.date);
-    if (!this.$route.params.categoryID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0]);
+    if (!this.$route.params.categoryID && !this.$route.params.postID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0], this.post.id);
 
     store.commit('setLoading', false);
   }
@@ -211,9 +226,9 @@ export default class BlogPost extends Vue {
     this.isPreviousNextPostsLoaded = true;
   }
 
-  async getRelatedPosts(categoryID: number): Promise<void> {
+  async getRelatedPosts(categoryID: number, postID: number): Promise<void> {
     const { endpoint: wordressEndpoint } = store.getters.getConfig.configuration.wordPress;
-    const url = `${wordressEndpoint}/wp-json/wp/v2/blog?page=1&per_page=5&_embed&categories=${categoryID}`;
+    const url = `${wordressEndpoint}/wp-json/wp/v2/blog?page=1&per_page=5&_embed&categories=${categoryID}&exclude=${postID}`;
 
     const relatedPostsResponse = await axios.get(url);
     const { data: relatedPosts } = relatedPostsResponse;
