@@ -98,6 +98,7 @@ import store from '@/store';
 import Modal from '@/components/Modal.vue';
 
 import { navigateToKeycloakLogin } from '@/helper/login';
+import { fetchUserProfileAndCart } from '@/helper/user';
 
 import AssetHead from '../components/CatalogueSingle/AssetHead.vue';
 import AssetHeadMap from '../components/CatalogueSingle/AssetHeadMap.vue';
@@ -197,7 +198,11 @@ export default class CatalogueSingle extends Vue {
     this.loadAsset(this.mode);
   }
 
-  loadAsset(mode: string): void {
+  async loadAsset(mode: string): Promise<void> {
+    if (!store.getters.isAuthenticated) {
+      await fetchUserProfileAndCart();
+    }
+
     console.log('mode', mode);
     if (mode === 'catalogue') {
       const catalogueItemID = this.$route.params.id;
@@ -232,6 +237,7 @@ export default class CatalogueSingle extends Vue {
       this.helpdeskDraftApi.findOne(key).then((response) => {
         this.catalogueItem = response.result;
         this.isItemLoaded = true;
+        store.commit('setLoading', false);
       });
     } else {
       console.log('wrong mode');
