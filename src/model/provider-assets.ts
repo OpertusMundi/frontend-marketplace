@@ -2,10 +2,11 @@ import { PageRequest, Sorting } from '@/model/request';
 import { EnumAssetType } from './enum';
 
 export enum EnumProviderAssetSortField {
-    PROVIDER = 'PROVIDER',
+    DATE_PUBLISHED = 'DATE_PUBLISHED',
+    // PROVIDER = 'PROVIDER',
     TITLE = 'TITLE',
     TYPE = 'TYPE',
-    VERSION = 'VERSION',
+    // VERSION = 'VERSION',
 }
 
 export interface ProviderDraftQuery {

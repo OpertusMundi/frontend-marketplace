@@ -32,7 +32,7 @@
           <div class="asset_card__bottom__left">
             <div class="asset_card__bottom__left__info">
               <span><strong>Version: </strong>{{ asset.version }}</span
-              ><span v-if="asset.command && asset.command.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.command.revisionDate) }}</span>
+              ><span v-if="asset.modifiedOn || asset.createdOn"><strong>Last updated: </strong>{{ formatDate(asset.modifiedOn || asset.createdOn) }}</span>
             </div>
           </div>
         </div>

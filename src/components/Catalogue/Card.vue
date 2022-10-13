@@ -32,7 +32,7 @@
             <i>{{ asset.statistics.rating }}/5</i>
           </div>
           <div class="asset_card__bottom__left__info">
-            <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.revisionDate) }}</span>
+            <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.publicationDate"><strong>Last updated: </strong>{{ formatDate(asset.publicationDate) }}</span>
           </div>
         </div>
         <div class="asset_card__bottom__right" v-if="asset.statistics">

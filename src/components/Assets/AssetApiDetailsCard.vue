@@ -12,7 +12,7 @@
       {{ asset.title }}
     </div>
     <div class="asset_card_api_details__bottom">
-      <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.revisionDate"><strong>Last updated: </strong>{{ formatDate(asset.revisionDate) }}</span>
+      <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.publicationDate"><strong>Last updated: </strong>{{ formatDate(asset.publicationDate) }}</span>
     </div>
   </div>
 </template>

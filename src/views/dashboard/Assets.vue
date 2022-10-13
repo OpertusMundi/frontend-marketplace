@@ -106,7 +106,7 @@
         <div class="filters__block__select">
           <label for="filter">&uarr;&darr;</label>
           <select v-model="selectedOrderOptionPublished" name="filter" id="filter">
-            <option v-for="orderOption in ['TITLE ASCENDING', 'TITLE DESCENDING', 'TYPE ASCENDING', 'TYPE DESCENDING', 'VERSION ASCENDING', 'VERSION DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+            <option v-for="orderOption in ['TITLE ASCENDING', 'TITLE DESCENDING', 'DATE PUBLISHED ASCENDING', 'DATE PUBLISHED DESCENDING', 'TYPE ASCENDING', 'TYPE DESCENDING']" :key="orderOption">{{ orderOption }}</option>
           </select>
         </div>
       </div>
@@ -142,7 +142,7 @@ import { EnumAssetType } from '@/model/enum';
 import Modal from '@/components/Modal.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { CatalogueItem } from '@/model';
-import { chunk as lodashChunk } from 'lodash';
+// import { chunk as lodashChunk } from 'lodash';
 
 @Component({
   components: {
@@ -309,115 +309,60 @@ export default class DashboardHome extends Vue {
     });
   }
 
-  searchPublishedAssets(page: number, scrollBehavior = false): void {
-    this.isLoadingPublished = true;
-
-    const query: ProviderDraftQuery = {
-      q: '',
-      type: EnumAssetType.VECTOR,
-      pageRequest: {
-        page: 0,
-        size: 100000,
-      },
-      sorting: {
-        id: EnumProviderAssetSortField.TITLE,
-        order: 'ASC',
-      },
-    };
-
-    this.providerAssetsApi.find(query).then((resp) => {
-      let assets = resp.result.items;
-      console.log('hey there, assets', assets);
-
-      if (this.selectedTab === 'DATA_FILES') {
-        assets = assets.filter((x) => x.type === EnumAssetType.VECTOR || x.type === EnumAssetType.RASTER);
-      } else if (this.selectedTab === 'YOUR_APIS') {
-        assets = [];
-      } else if (this.selectedTab === 'TOPIO_APIS') {
-        assets = assets.filter((x) => x.type === EnumAssetType.SERVICE);
-      }
-
-      const orderOptions = [
-        { option: 'TITLE ASCENDING', orderBy: 'title', order: 'ASC' },
-        { option: 'TITLE DESCENDING', orderBy: 'title', order: 'DESC' },
-        { option: 'TYPE ASCENDING', orderBy: 'type', order: 'ASC' },
-        { option: 'TYPE DESCENDING', orderBy: 'type', order: 'DESC' },
-        { option: 'VERSION ASCENDING', orderBy: 'version', order: 'ASC' },
-        { option: 'VERSION DESCENDING', orderBy: 'version', order: 'DESC' },
-      ];
-      // eslint-disable-next-line
-      const field = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy;
-      // eslint-disable-next-line
-      const order = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order;
-
-      if (order === 'ASC') {
-        assets.sort((a, b) => (a[field] > b[field] ? 1 : -1));
-      } else if (order === 'DESC') {
-        assets.sort((a, b) => (a[field] < b[field] ? 1 : -1));
-      }
-
-      this.publishedItemsTotal = assets.length;
-
-      const pages = lodashChunk(assets, this.publishedItemsPerPage);
-      this.publishedAssets = pages[page];
-      this.publishedCurrentPage = page;
-      this.isLoadingPublished = false;
-
-      this.$nextTick(() => {
-        if (scrollBehavior) {
-          window.scrollTo({
-            top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
-            behavior: 'smooth',
-          });
-        }
-      });
-    });
-  }
-
-  // TODO: The following function is the correct one. However, API doesnt work (ignores parameters), therefore, a dummy one is used (which makes pagination in the front-end etc)
-
   // searchPublishedAssets(page: number, scrollBehavior = false): void {
   //   this.isLoadingPublished = true;
 
-  //   // TODO: api should support arrays so that DATA_FILES is [EnumAssetType.VECTOR, EnumAssetType.RASTER]. Currently RASTER is not supported.
-  //   // TODO: just a dummy value for YOUR_APIS as it should currently return no value
-  //   const assetTypes = {
-  //     DATA_FILES: EnumAssetType.VECTOR,
-  //     YOUR_APIS: EnumAssetType.RASTER,
-  //     TOPIO_APIS: EnumAssetType.SERVICE,
-  //   };
-
-  //   const orderOptions = [
-  //     { option: 'TITLE ASCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'ASC' },
-  //     { option: 'TITLE DESCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'DESC' },
-  //     { option: 'TYPE ASCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'ASC' },
-  //     { option: 'TYPE DESCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'DESC' },
-  //     { option: 'VERSION ASCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'ASC' },
-  //     { option: 'VERSION DESCENDING', orderBy: EnumProviderAssetSortField.VERSION, order: 'DESC' },
-  //   ];
-
   //   const query: ProviderDraftQuery = {
   //     q: '',
-  //     type: this.selectedTab === 'ALL_ASSETS' ? '' : assetTypes[this.selectedTab],
+  //     type: EnumAssetType.VECTOR,
   //     pageRequest: {
-  //       page,
-  //       size: this.publishedItemsPerPage,
+  //       page: 0,
+  //       size: 100000,
   //     },
   //     sorting: {
-  //       // eslint-disable-next-line
-  //       id: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy,
-  //       // eslint-disable-next-line
-  //       order: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order,
+  //       id: EnumProviderAssetSortField.TITLE,
+  //       order: 'ASC',
   //     },
   //   };
 
   //   this.providerAssetsApi.find(query).then((resp) => {
-  //     console.log('published', resp.result);
-  //     this.publishedAssets = resp.result.items;
-  //     this.publishedItemsTotal = resp.result.count;
-  //     this.publishedCurrentPage = resp.result.pageRequest.page;
+  //     let assets = resp.result.items;
+  //     console.log('hey there, assets', assets);
+
+  //     if (this.selectedTab === 'DATA_FILES') {
+  //       assets = assets.filter((x) => x.type === EnumAssetType.VECTOR || x.type === EnumAssetType.RASTER);
+  //     } else if (this.selectedTab === 'YOUR_APIS') {
+  //       assets = [];
+  //     } else if (this.selectedTab === 'TOPIO_APIS') {
+  //       assets = assets.filter((x) => x.type === EnumAssetType.SERVICE);
+  //     }
+
+  //     const orderOptions = [
+  //       { option: 'TITLE ASCENDING', orderBy: 'title', order: 'ASC' },
+  //       { option: 'TITLE DESCENDING', orderBy: 'title', order: 'DESC' },
+  //       { option: 'TYPE ASCENDING', orderBy: 'type', order: 'ASC' },
+  //       { option: 'TYPE DESCENDING', orderBy: 'type', order: 'DESC' },
+  //       { option: 'VERSION ASCENDING', orderBy: 'version', order: 'ASC' },
+  //       { option: 'VERSION DESCENDING', orderBy: 'version', order: 'DESC' },
+  //     ];
+  //     // eslint-disable-next-line
+  //     const field = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy;
+  //     // eslint-disable-next-line
+  //     const order = orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order;
+
+  //     if (order === 'ASC') {
+  //       assets.sort((a, b) => (a[field] > b[field] ? 1 : -1));
+  //     } else if (order === 'DESC') {
+  //       assets.sort((a, b) => (a[field] < b[field] ? 1 : -1));
+  //     }
+
+  //     this.publishedItemsTotal = assets.length;
+
+  //     const pages = lodashChunk(assets, this.publishedItemsPerPage);
+  //     this.publishedAssets = pages[page];
+  //     this.publishedCurrentPage = page;
   //     this.isLoadingPublished = false;
-  //     console.log('scroll', scrollBehavior);
+
   //     this.$nextTick(() => {
   //       if (scrollBehavior) {
   //         window.scrollTo({
@@ -428,6 +373,61 @@ export default class DashboardHome extends Vue {
   //     });
   //   });
   // }
+
+  // TODO: The following function is the correct one. However, API doesnt work (ignores parameters), therefore, a dummy one is used (which makes pagination in the front-end etc)
+
+  searchPublishedAssets(page: number, scrollBehavior = false): void {
+    this.isLoadingPublished = true;
+
+    // TODO: api should support arrays so that DATA_FILES is [EnumAssetType.VECTOR, EnumAssetType.RASTER]. Currently RASTER is not supported.
+    // TODO: just a dummy value for YOUR_APIS as it should currently return no value
+    const assetTypes = {
+      DATA_FILES: EnumAssetType.VECTOR,
+      YOUR_APIS: EnumAssetType.RASTER, // TODO: this is just DUMMY to return empty array
+      TOPIO_APIS: EnumAssetType.SERVICE,
+    };
+
+    const orderOptions = [
+      { option: 'TITLE ASCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'ASC' },
+      { option: 'TITLE DESCENDING', orderBy: EnumProviderAssetSortField.TITLE, order: 'DESC' },
+      { option: 'DATE PUBLISHED ASCENDING', orderBy: EnumProviderAssetSortField.DATE_PUBLISHED, order: 'ASC' },
+      { option: 'DATE PUBLISHED DESCENDING', orderBy: EnumProviderAssetSortField.DATE_PUBLISHED, order: 'DESC' },
+      { option: 'TYPE ASCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'ASC' },
+      { option: 'TYPE DESCENDING', orderBy: EnumProviderAssetSortField.TYPE, order: 'DESC' },
+    ];
+
+    const query: ProviderDraftQuery = {
+      q: '',
+      type: this.selectedTab === 'ALL_ASSETS' ? '' : assetTypes[this.selectedTab],
+      pageRequest: {
+        page,
+        size: this.publishedItemsPerPage,
+      },
+      sorting: {
+        // eslint-disable-next-line
+        id: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.orderBy,
+        // eslint-disable-next-line
+        order: orderOptions.find((x) => x.option === this.selectedOrderOptionPublished)!.order as Order,
+      },
+    };
+
+    this.providerAssetsApi.find(query).then((resp) => {
+      console.log('published', resp.result);
+      this.publishedAssets = resp.result.items;
+      this.publishedItemsTotal = resp.result.count;
+      this.publishedCurrentPage = resp.result.pageRequest.page;
+      this.isLoadingPublished = false;
+      console.log('scroll', scrollBehavior);
+      this.$nextTick(() => {
+        if (scrollBehavior) {
+          window.scrollTo({
+            top: (document.querySelector('.seperator-published-unpublished') as HTMLElement).offsetTop - (document.querySelector('.header') as HTMLElement).clientHeight,
+            behavior: 'smooth',
+          });
+        }
+      });
+    });
+  }
 
   onPageSelect(published: boolean, page: number): void {
     // this.searchAssets(published, page, true);
