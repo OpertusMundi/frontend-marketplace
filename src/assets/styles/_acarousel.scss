@@ -213,5 +213,50 @@
                 }
             }
         }
+
+        // todo: the following modifiers should be removed in the future
+        // they are used only for temp, dummy items of the home page
+        &--green {
+            &:after {
+                background: #358F8B !important;
+            }
+            #{$item}__view {
+                background: #358F8B !important;
+                border-color: #358F8B;
+            }
+            &:hover {
+                #{$item}__inner {
+                    border-color: #358F8B;
+                }
+            }
+        }
+        &--purple {
+            &:after {
+                background: #6F43B5 !important;
+            }
+            #{$item}__view {
+                background: #6F43B5 !important;
+                border-color: #6F43B5;
+            }
+            &:hover {
+                #{$item}__inner {
+                    border-color: #6F43B5;
+                }
+            }
+        }
+        &--blue {
+            &:after {
+                background: #197196 !important;
+            }
+            #{$item}__view {
+                background: #197196 !important;
+                border-color: #197196;
+            }
+            &:hover {
+                #{$item}__inner {
+                    border-color: #197196;
+                }
+            }
+        }
     }
 }
