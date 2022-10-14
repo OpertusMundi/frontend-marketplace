@@ -299,11 +299,23 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/signin',
+    name: 'LoginError',
+    component: (): Promise<any> => import(/* webpackChunkName: "loginerror" */ '../views/LoginError.vue'),
+    meta: {
+      hideForAuth: true,
+    },
+  },
+  {
+    path: '/signin-localauth',
     name: 'Login',
     component: (): Promise<any> => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
     meta: {
       hideForAuth: true,
     },
+  },
+  {
+    path: '/login/oauth2/code/:authProvider',
+    redirect: '/',
   },
   {
     path: '/register',
@@ -429,7 +441,7 @@ router.beforeEach((to, from, next) => {
   const role = to.meta?.requiresRole;
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {
-    next({ name: 'User' });
+    next({ name: 'DashboardHome' });
   }
 
   if (to.name === 'HelpdeskReview' && !store.getters.hasRole([EnumRole.ROLE_HELPDESK])) {

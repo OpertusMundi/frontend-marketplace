@@ -6,9 +6,10 @@
         <div class="confirm-email__hero__content">
           <h1 class="confirm-email__hero__content__title">Error...</h1>
           <div class="confirm-email__hero__content__text">
-            <p>We could not verify your email</p>
-            <!-- todo: let user do something for this issue -->
-            <!-- <p class="mt-xs-50"><router-link to="/dashboard" class="btn btn--std btn--teal">GO TO DASHBOARD</router-link></p> -->
+            <p v-if="!errorCode || [1, 2].includes(errorCode)">There was a problem with authentication. Please, try again later!</p>
+            <p v-if="errorCode === 3">The email is used with another authentication method.</p>
+
+            <p class="mt-xs-50"><router-link to="/" class="btn btn--std btn--teal">Back</router-link></p>
           </div>
       </div>
       </div>
@@ -22,9 +23,13 @@ import Shape from '@/components/Shape.vue';
 @Component({
   components: { Shape },
 })
-export default class RegistrationFailure extends Vue {
-  mounted(): void {
-    console.log('confirm email mounted');
+export default class LoginError extends Vue {
+  errorCode: number | null = null;
+
+  created(): void {
+    const errorCode = Number.parseInt(this.$route.query.error as string, 10);
+
+    this.errorCode = errorCode;
   }
 }
 </script>
