@@ -36,7 +36,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { CatalogueItem } from '@/model';
 import FavoriteApi from '@/service/favorite';
 import store from '@/store';
-import { EnumFavoriteType, FavoriteProviderCommand } from '@/model/favorite';
+import { EnumFavoriteAction, EnumFavoriteType, FavoriteProviderCommand } from '@/model/favorite';
 import getDefaultLogo from '@/helper/logo';
 import moment from 'moment';
 
@@ -65,6 +65,7 @@ export default class VendorInformation extends Vue {
 
     const providerData: FavoriteProviderCommand = {
       publisherKey,
+      action: EnumFavoriteAction.FAVORITE,
       type: EnumFavoriteType.PROVIDER,
     };
 

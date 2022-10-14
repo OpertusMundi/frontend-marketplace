@@ -70,8 +70,8 @@ import { CatalogueItem } from '@/model';
 import TopicCategoryIcon from '@/components/Catalogue/TopicCategoryIcon.vue';
 import Modal from '@/components/Modal.vue';
 import { CatalogueItemDetails } from '@/model/catalogue';
+import { EnumFavoriteAction, EnumFavoriteType, FavoriteAssetCommand } from '@/model/favorite';
 import store from '@/store';
-import { EnumFavoriteType, FavoriteAssetCommand } from '@/model/favorite';
 
 @Component({
   components: {
@@ -152,6 +152,7 @@ export default class AssetHead extends Vue {
 
     const assetData: FavoriteAssetCommand = {
       pid,
+      action: EnumFavoriteAction.FAVORITE,
       type: EnumFavoriteType.ASSET,
     };
 

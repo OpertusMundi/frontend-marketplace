@@ -6,6 +6,11 @@ export enum EnumFavoriteSortField {
   TITLE = 'TITLE',
 }
 
+export enum EnumFavoriteAction {
+  FAVORITE = 'FAVORITE',
+  PURCHASE = 'PURCHASE',
+}
+
 export enum EnumFavoriteType {
   ASSET = 'ASSET',
   PROVIDER = 'PROVIDER',
@@ -13,6 +18,7 @@ export enum EnumFavoriteType {
 
 interface FavoriteCommand {
   type: EnumFavoriteType;
+  action: EnumFavoriteAction;
 }
 
 export interface FavoriteAssetCommand extends FavoriteCommand {
