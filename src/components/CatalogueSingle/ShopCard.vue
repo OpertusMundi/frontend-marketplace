@@ -250,8 +250,8 @@ export default class ShopCard extends Vue {
       action: EnumFavoriteAction.PURCHASE,
       type: EnumFavoriteType.ASSET,
     }).then(() => {
+      store.commit('setLoading', false);
       this.$router.push('/dashboard/favorites');
-      store.commit('setLoading', true);
     });
   }
 
