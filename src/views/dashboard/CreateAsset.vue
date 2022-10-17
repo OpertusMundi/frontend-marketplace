@@ -112,11 +112,22 @@
             </div>
           </transition>
         </div>
-        <div class="dashboard__form__navbuttons">
-          <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
-          <button class="btn btn--std btn--blue" @click.prevent="nextStep()">
-            {{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB_OPEN_DATA' && currentStep === 2) || (assetMainType === 'OPEN' && currentStep === 5) ? 'confirm and submit for review' : 'NEXT' }}
-          </button>
+        <div>
+          <div
+            class="mt-xs-40 mr-xs-20 d-flex justify-content-end"
+            v-if="asset.type === 'TABULAR' && currentStep === 2"
+          >
+            <div class="form-group-checkbox">
+              <input type="checkbox" id="terms" v-model="asset.dataProfilingEnabled">
+              <label for="terms">Compute automated metadata</label>
+            </div>
+          </div>
+          <div class="dashboard__form__navbuttons">
+            <button class="btn btn--std btn--blue" v-if="this.currentStep !== 1" @click.prevent="previousStep()">PREVIOUS</button>
+            <button class="btn btn--std btn--blue" @click.prevent="nextStep()">
+              {{ currentStep === totalSteps || (assetMainType === 'SENTINEL_HUB_OPEN_DATA' && currentStep === 2) || (assetMainType === 'OPEN' && currentStep === 5) ? 'confirm and submit for review' : 'NEXT' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1084,6 +1095,7 @@ export default class CreateAsset extends Vue {
 <style lang="scss">
 @import '@/assets/styles/_forms.scss';
 @import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/abstracts/_flexbox-utilities.scss';
 @import '~flexboxgrid/css/flexboxgrid.min.css';
 
 .card {

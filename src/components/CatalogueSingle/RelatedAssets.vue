@@ -13,12 +13,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { CatalogueItem } from '@/model';
 import AssetsCarousel from '@/components/AssetsCarousel.vue';
 import CatalogueApi from '@/service/catalogue';
-import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
 import moment from 'moment/moment';
-
-interface CatalogueItemWithPrice extends CatalogueItem {
-  priceRendered: string;
-}
 
 @Component({
   components: { AssetsCarousel },
@@ -26,39 +21,39 @@ interface CatalogueItemWithPrice extends CatalogueItem {
 export default class RelatedAssets extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
-  relatedAssets: CatalogueItemWithPrice[];
+  relatedAssets: CatalogueItem[];
 
-  CatalogueApi: CatalogueApi;
+  catalogueApi: CatalogueApi;
 
   constructor() {
     super();
     this.relatedAssets = [];
-    this.CatalogueApi = new CatalogueApi();
+    this.catalogueApi = new CatalogueApi();
   }
 
-  mounted(): void {
-    console.log('catalogue item => ', this.catalogueItem);
-    this.CatalogueApi.findRelated(this.catalogueItem.id)
-      .then((response) => {
-        if (response.success) {
-          this.relatedAssets = response.result.items.map((item) => ({
-            ...item,
-            price: getPriceOrMinimumPrice(item),
-            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
-          }));
-        }
-        // this.dummyCall();
-      });
-  }
+  async mounted(): Promise<void> {
+    console.log('catalogue item => ', this.catalogueItem.topicCategory);
 
-  // dummyCall(): void {
-  //   fetch('http://localhost:4200/action/catalogue?page=0&size=5&orderBy=REVISION_DATE&order=DESC&text=&type=SERVICE')
-  //     .then((response) => response.json())
-  //     .then((response) => {
-  //       console.log('aaa', response);
-  //       this.relatedAssets = response.result.items;
-  //     });
-  // }
+    const relatedAssetsAmmount = 8;
+
+    let relatedAssets: CatalogueItem[] = [];
+
+    const relatedAssetsByTopicCategoryResponse = await this.catalogueApi.find({ topic: this.catalogueItem.topicCategory, size: relatedAssetsAmmount });
+    if (relatedAssetsByTopicCategoryResponse.success) {
+      relatedAssets = [...relatedAssets, ...relatedAssetsByTopicCategoryResponse.result.items];
+
+      if (relatedAssets.length >= relatedAssetsAmmount) {
+        this.relatedAssets = relatedAssets;
+        return;
+      }
+    }
+
+    const otherAssetsResponse = await this.catalogueApi.find({ size: (relatedAssetsAmmount - relatedAssets.length) });
+    if (otherAssetsResponse.success) {
+      relatedAssets = [...relatedAssets, ...otherAssetsResponse.result.items];
+      this.relatedAssets = relatedAssets;
+    }
+  }
 
   formatDate(date: string): string {
     return moment(date)

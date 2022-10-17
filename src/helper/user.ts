@@ -35,7 +35,7 @@ const fetchUserProfileAndCart = async (): Promise<{ success: boolean }> => {
     if (!profileResponse.success) return { success: false };
     store.commit('setUserData', profileResponse.result);
 
-    if (profileResponse.result.roles.some((x) => [EnumRole.ROLE_CONSUMER].includes(x))) {
+    if (profileResponse.result.roles.some((x) => [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER].includes(x))) {
       const cartResponse = await cartApi.getCart();
       if (!cartResponse.success) return { success: false };
       store.commit('setCartItems', cartResponse.result);

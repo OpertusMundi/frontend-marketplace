@@ -137,7 +137,8 @@
       </div>
     </div>
 
-    <div v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SUBSCRIBE</a></div>
+    <div v-if="!catalogueItem.availableToPurchase" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToWishlist() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO WISHLIST</a></div>
+    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SUBSCRIBE</a></div>
     <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
@@ -186,6 +187,7 @@ import {
 } from 'vue-property-decorator';
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
 import CartApi from '@/service/cart';
+import FavoriteApi from '@/service/favorite';
 import { CatalogueItem } from '@/model';
 import {
   BasePricingModelCommand,
@@ -194,6 +196,7 @@ import {
   PerRowQuotationParameters,
 } from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
+import { EnumFavoriteAction, EnumFavoriteType } from '@/model/favorite';
 import store from '@/store';
 
 @Component({
@@ -207,6 +210,8 @@ export default class ShopCard extends Vue {
 
   cartApi: CartApi;
 
+  favoriteApi: FavoriteApi;
+
   selectedPricingModel: BasePricingModelCommand | null;
 
   selectedPrepaidTierIndex: number;
@@ -219,6 +224,7 @@ export default class ShopCard extends Vue {
     super();
 
     this.cartApi = new CartApi();
+    this.favoriteApi = new FavoriteApi();
 
     console.log('shopcard item', this.catalogueItem);
 
@@ -234,6 +240,19 @@ export default class ShopCard extends Vue {
     if (newVal !== '') {
       this.cartErrors = '';
     }
+  }
+
+  addToWishlist(): void {
+    store.commit('setLoading', true);
+
+    this.favoriteApi.add({
+      pid: this.catalogueItem.id,
+      action: EnumFavoriteAction.PURCHASE,
+      type: EnumFavoriteType.ASSET,
+    }).then(() => {
+      store.commit('setLoading', false);
+      this.$router.push('/dashboard/favorites');
+    });
   }
 
   addToCart():void {
