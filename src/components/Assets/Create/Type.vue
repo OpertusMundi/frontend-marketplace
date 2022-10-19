@@ -12,7 +12,7 @@
             <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="DATA_FILE" />
             <div class="control_indicator"></div>
           </label>
-          <label class="control control-radio">
+          <label class="control control-radio" v-if="$store.getters.hasRole(['ROLE_PROVIDER_OPEN_DATASET'])">
             Open Asset
             <input :disabled="disabled" type="radio" name="asset_type" v-model="assetMainTypeLocal" value="OPEN" />
             <div class="control_indicator"></div>

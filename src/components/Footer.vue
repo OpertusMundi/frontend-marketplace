@@ -119,8 +119,8 @@
             <router-link to="/privacy">Privacy Policy</router-link>
           </div>
           <div class="footer__upper__social">
-            <a href="#" target="_blank"><img src="@/assets/images/icons/linkedin_icon.svg" alt=""/></a>
-            <a href="#" target="_blank"><img src="@/assets/images/icons/github_icon.svg" alt=""/></a>
+            <a href="https://www.linkedin.com/company/topio-market" target="_blank"><img src="@/assets/images/icons/linkedin_icon.svg" alt=""/></a>
+            <a href="https://github.com/OpertusMundi" target="_blank"><img src="@/assets/images/icons/github_icon.svg" alt=""/></a>
           </div>
         </div>
         <div class="footer__lower">
