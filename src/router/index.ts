@@ -203,6 +203,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'clients',
+        name: 'Clients',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardclients" */ '../views/dashboard/Clients.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
         path: 'orders',
         name: 'Orders',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardorders" */ '../views/dashboard/Orders.vue'),

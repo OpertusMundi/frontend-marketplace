@@ -73,6 +73,12 @@
                 <span>t&#176;Maps</span>
               </router-link>
             </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Clients')">
+              <router-link to="/dashboard/clients" data-name="Clients">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23.995" height="24" viewBox="0 0 23.995 24"><g data-name="Group 7919" transform="translate(-1510.049 -1082.444)" fill="#333"><path data-name="Path 14539" d="M1531.728 1084.765a7.911 7.911 0 0 0-13.261 7.568l-7.87 7.87a1 1 0 0 0-.291.651l-.255 4.534a1 1 0 0 0 1 1.056h.063l3.992-.251a1 1 0 0 0 .644-.291l1.436-1.436a1 1 0 0 0 .288-.8l-.118-1.2 1.358.037a.959.959 0 0 0 .733-.291 1 1 0 0 0 .294-.733l-.04-1.685 1.445.177a1 1 0 0 0 .242-1.986l-2.593-.317a1 1 0 0 0-1.121 1.017l.042 1.79-1.439-.039a.957.957 0 0 0-.759.317 1 1 0 0 0-.264.78l.183 1.861-.833.833-2.491.157.17-3.027 8.01-8.011a.962.962 0 0 0 .1-.153 1.043 1.043 0 0 0 .093-.14.988.988 0 0 0 .065-.244 1.028 1.028 0 0 0 .024-.123.978.978 0 0 0-.04-.3c-.006-.024 0-.049-.009-.074a5.923 5.923 0 1 1 3.326 3.535 1 1 0 1 0-.765 1.848 7.925 7.925 0 0 0 8.641-12.923Z"/><circle data-name="Ellipse 735" cx="2.004" cy="2.004" r="2.004" transform="translate(1526.03 1086.53)"/></g></svg>
+                <span>Clients</span>
+              </router-link>
+            </li>
             <hr v-if="isShownDueToUserRole('Purchases') || isShownDueToUserRole('Subscriptions')">
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Purchases')">
               <router-link to="/dashboard/purchases" data-name="Purchases">
