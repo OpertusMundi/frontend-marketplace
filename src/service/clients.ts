@@ -11,8 +11,8 @@ export default class ClientsApi extends Api {
 
   baseURL = '/action/account/clients';
 
-  public async getClients(): Promise<ServerResponse<PageResult<Client>>> {
-    const url = this.baseURL;
+  public async getClients(page = 0, size = 10): Promise<ServerResponse<PageResult<Client>>> {
+    const url = `${this.baseURL}?page=${page}&size=${size}`;
 
     return this.get<ServerResponse<PageResult<Client>>>(url)
       .then((response: AxiosResponse<ServerResponse<PageResult<Client>>>) => {

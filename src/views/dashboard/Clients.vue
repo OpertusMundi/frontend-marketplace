@@ -60,11 +60,21 @@
           <template v-if="client.revokedOn">{{ formatDate('DATE', client.revokedOn) }}, {{ formatDate('TIME', client.revokedOn) }}</template>
         </span>
         <div class="dashboard-clients__table__row__actions">
-          <button @click="revokeClient(client.clientId)">revoke</button>
-          <button>copy</button>
+          <template v-if="!client.revokedOn">
+            <button @click="revokeClient(client.clientId)">revoke</button>
+            <button @click="copyClientIdToClipboard(client.clientId)" v-if="clientIdCopiedToClipboard !== client.clientId">copy</button>
+            <button class="dashboard-clients__table__row__actions__label-copied" v-else>copied &#10003;</button>
+          </template>
         </div>
       </div>
     </div>
+
+    <pagination
+      :currentPage="paginationData.currentPage"
+      :itemsPerPage="paginationData.itemsPerPage"
+      :itemsTotal="paginationData.itemsTotal"
+      @pageSelection="onPageSelect"
+    ></pagination>
   </div>
 </template>
 
@@ -73,9 +83,12 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import moment from 'moment';
 import ClientsApi from '@/service/clients';
 import { Client } from '@/model/client';
+import Pagination from '@/components/Pagination.vue';
 import store from '@/store';
 
-@Component
+@Component({
+  components: { Pagination },
+})
 export default class DashboardClients extends Vue {
   clientsApi = new ClientsApi();
 
@@ -87,6 +100,8 @@ export default class DashboardClients extends Vue {
 
   isShowAliasError = false;
 
+  clientIdCopiedToClipboard: string | null = null;
+
   statusFilterOptions = [
     'ALL',
     'ACTIVE',
@@ -94,6 +109,16 @@ export default class DashboardClients extends Vue {
   ];
 
   selectedStatus = 'ALL';
+
+  paginationData: {
+    currentPage: number | null,
+    itemsPerPage: number,
+    itemsTotal: number | null,
+  } = {
+    currentPage: null,
+    itemsPerPage: 10,
+    itemsTotal: null,
+  };
 
   @Watch('selectedStatus')
   onSelectedStatusChange(): void {
@@ -109,15 +134,26 @@ export default class DashboardClients extends Vue {
     this.loadClients();
   }
 
-  loadClients(): void {
+  loadClients(page = 0): void {
     store.commit('setLoading', true);
 
-    this.clientsApi.getClients().then((response) => {
+    this.clientsApi.getClients(page, this.paginationData.itemsPerPage).then((response) => {
       if (response.success) {
         this.clients = response.result.items;
+
+        this.paginationData = {
+          ...this.paginationData,
+          currentPage: response.result.pageRequest.page,
+          itemsTotal: response.result.count,
+        };
+
         store.commit('setLoading', false);
       }
     });
+  }
+
+  onPageSelect(page: number): void {
+    this.loadClients(page);
   }
 
   createClient(): void {
@@ -147,6 +183,11 @@ export default class DashboardClients extends Vue {
         this.loadClients();
       }
     });
+  }
+
+  copyClientIdToClipboard(clientId: string): void {
+    navigator.clipboard.writeText(clientId);
+    this.clientIdCopiedToClipboard = clientId;
   }
 
   formatDate(type: 'DATE' | 'TIME', dateString: string): string {
