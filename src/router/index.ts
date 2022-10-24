@@ -166,6 +166,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'private-ogc-services/:key',
+        name: 'PrivateOGCServiceSingle',
+        component: (): Promise<any> => import(/* webpackChunkName: "privateogcservicesingle" */ '../views/dashboard/PrivateOGCServiceSingle.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
         path: 'create-private-ogc-service/:fileStoragePath',
         name: 'CreatePrivateOGCService',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateprivateogcservice" */ '../views/dashboard/CreatePrivateOGCService.vue'),

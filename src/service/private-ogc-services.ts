@@ -42,6 +42,17 @@ export default class PrivateOGCServicesApi extends Api {
       });
   }
 
+  public findOne(key: string): Promise<ServerResponse<PrivateOGCService>> {
+    const url = `${baseUri}/${key}`;
+
+    return this.get<ServerResponse<PrivateOGCService>>(url)
+      .then((response: AxiosServerResponse<PrivateOGCService>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
   public async create(command: PrivateOGCServiceCommand): Promise<ServerResponse<PrivateOGCService>> {
     const url = baseUri;
 

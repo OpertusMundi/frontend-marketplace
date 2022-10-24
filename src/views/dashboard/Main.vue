@@ -57,7 +57,8 @@
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('PrivateOGCServices')">
               <router-link to="/dashboard/private-ogc-services" data-name="PrivateOGCServices">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path data-name="Rectangle 5697" fill="#333" d="M0 0h24v24H0z"/></svg>
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="21.273" height="24" viewBox="0 0 21.273 24"><g data-name="Group 7920" fill="#333"><path data-name="Path 14540" d="M9.664 17.299v6.7L0 18.419V7.253l9.665 5.58v2.233l-1.929-1.113-.967-.558-4.835-2.792v6.7l5.8 3.35V18.42l-2.9-1.675v-2.233Z"/><path data-name="Path 14541" d="M10.632 0 .962 5.583l9.67 5.583 9.67-5.583Zm0 8.932-5.8-3.35 5.8-3.35 5.8 3.35-.967.558Z"/><path data-name="Path 14542" d="m15.476 12.806 1.934-1.117 1.934-1.117v2.233l1.929-1.114V7.25l-9.665 5.58v11.141h-.005v.031l9.669-5.583v-4.492l-1.929 1.114v2.233l-5.8 3.35v-6.7Z"/></g></svg> -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g data-name="Group 7920" fill="#333"><path data-name="Path 14540" d="M9.664 17.299v6.7L0 18.419V7.253l9.665 5.58v2.233l-1.929-1.113-.967-.558-4.835-2.792v6.7l5.8 3.35V18.42l-2.9-1.675v-2.233Z"/><path data-name="Path 14541" d="M10.632 0 .962 5.583l9.67 5.583 9.67-5.583Zm0 8.932-5.8-3.35 5.8-3.35 5.8 3.35-.967.558Z"/><path data-name="Path 14542" d="m15.476 12.806 1.934-1.117 1.934-1.117v2.233l1.929-1.114V7.25l-9.665 5.58v11.141h-.005v.031l9.669-5.583v-4.492l-1.929 1.114v2.233l-5.8 3.35v-6.7Z"/></g></svg>
                 <span>t&#176;OGC</span>
               </router-link>
             </li>
