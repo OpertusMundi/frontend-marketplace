@@ -19,6 +19,8 @@ export default class CookieBox extends Vue {
   acceptCookies(): void {
     localStorage.setItem('is_user_accepted_cookies', 'yes');
     this.$emit('close');
+    this.$ga.enable();
+    this.$ga.page(this.$router);
   }
 }
 </script>
