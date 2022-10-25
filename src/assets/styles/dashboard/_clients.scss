@@ -1,0 +1,102 @@
+.dashboard-clients {
+  .dashboard__head__helpers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    h1 {
+      font-size: 1.5em;
+    }
+    p {
+      max-width: 768px;
+      font-size: .85em;
+      color: $labelColor;
+      margin-top: .7em;
+    }
+  }
+
+  .filters {
+    margin-top: 1.6em;
+  }
+
+  &__table {
+    width: 100%;
+    display: grid;
+    grid-template-columns: min-content min-content min-content min-content auto;
+    column-gap: 1em;
+    font-size: .9em;
+    margin-bottom: 2em;
+
+    &__row {
+      display: contents;
+      color: $labelColor;
+
+      &__input-container {
+        input {
+          width: 100%;
+        }
+
+        small {
+          color: red;
+        }
+      }
+
+      span:nth-child(3),
+      span:nth-child(4),
+      span:nth-child(5) {
+        white-space: nowrap;
+      }
+
+      &--header {
+        span {
+          font-weight: 700;
+
+          @media(min-width: 768px) {
+            min-width: 150px;
+          }
+        }
+      }
+
+      &--revoked {
+        color: $greyColor
+      }
+
+      &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .5em;
+
+        &__label-copied {
+          color: $secondColor;
+          pointer-events: none;
+        }
+      }
+
+      input {
+        border: none;
+        border-radius: 5px;
+        outline: none;
+        box-shadow: none;
+        padding: 0 5px;
+      }
+    }
+
+    hr {
+      grid-column: 1/6;
+      margin: .7em 0;
+    }
+
+    button {
+      text-transform: uppercase;
+      border: none;
+      background: transparent;
+      letter-spacing: 0.03em;
+
+      &:hover {
+        color: $secondColor;
+        transition: all ease-in-out .25s;
+      }
+    }
+  }
+}

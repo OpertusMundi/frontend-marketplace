@@ -166,6 +166,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {
+        path: 'private-ogc-services/:key',
+        name: 'PrivateOGCServiceSingle',
+        component: (): Promise<any> => import(/* webpackChunkName: "privateogcservicesingle" */ '../views/dashboard/PrivateOGCServiceSingle.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
         path: 'create-private-ogc-service/:fileStoragePath',
         name: 'CreatePrivateOGCService',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateprivateogcservice" */ '../views/dashboard/CreatePrivateOGCService.vue'),
@@ -200,6 +206,12 @@ const routes: RouteConfig[] = [
         path: 'topiomaps',
         name: 'TopioMaps',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardtopiomaps" */ '../views/dashboard/TopioMaps.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+      },
+      {
+        path: 'clients',
+        name: 'Clients',
+        component: (): Promise<any> => import(/* webpackChunkName: "dashboardclients" */ '../views/dashboard/Clients.vue'),
         meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
       },
       {

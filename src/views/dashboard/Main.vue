@@ -57,7 +57,8 @@
             </li>
             <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('PrivateOGCServices')">
               <router-link to="/dashboard/private-ogc-services" data-name="PrivateOGCServices">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path data-name="Rectangle 5697" fill="#333" d="M0 0h24v24H0z"/></svg>
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="21.273" height="24" viewBox="0 0 21.273 24"><g data-name="Group 7920" fill="#333"><path data-name="Path 14540" d="M9.664 17.299v6.7L0 18.419V7.253l9.665 5.58v2.233l-1.929-1.113-.967-.558-4.835-2.792v6.7l5.8 3.35V18.42l-2.9-1.675v-2.233Z"/><path data-name="Path 14541" d="M10.632 0 .962 5.583l9.67 5.583 9.67-5.583Zm0 8.932-5.8-3.35 5.8-3.35 5.8 3.35-.967.558Z"/><path data-name="Path 14542" d="m15.476 12.806 1.934-1.117 1.934-1.117v2.233l1.929-1.114V7.25l-9.665 5.58v11.141h-.005v.031l9.669-5.583v-4.492l-1.929 1.114v2.233l-5.8 3.35v-6.7Z"/></g></svg> -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g data-name="Group 7920" fill="#333"><path data-name="Path 14540" d="M9.664 17.299v6.7L0 18.419V7.253l9.665 5.58v2.233l-1.929-1.113-.967-.558-4.835-2.792v6.7l5.8 3.35V18.42l-2.9-1.675v-2.233Z"/><path data-name="Path 14541" d="M10.632 0 .962 5.583l9.67 5.583 9.67-5.583Zm0 8.932-5.8-3.35 5.8-3.35 5.8 3.35-.967.558Z"/><path data-name="Path 14542" d="m15.476 12.806 1.934-1.117 1.934-1.117v2.233l1.929-1.114V7.25l-9.665 5.58v11.141h-.005v.031l9.669-5.583v-4.492l-1.929 1.114v2.233l-5.8 3.35v-6.7Z"/></g></svg>
                 <span>t&#176;OGC</span>
               </router-link>
             </li>
@@ -71,6 +72,12 @@
               <router-link to="/dashboard/topiomaps" data-name="TopioMaps">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23.892" height="24"><g data-name="Group 6109" fill="#333"><path data-name="Path 13503" d="m23.312 22.101-6.978-3.2a.99.99 0 0 0-.786-.018l-7.563 3.042-5.995-2.757V4.889a.995.995 0 0 0-1.99 0v14.917a1 1 0 0 0 .579.9l6.964 3.2a.992.992 0 0 0 .787.019l7.563-3.043 6.589 3.025a1 1 0 0 0 .83-1.809z"/><path data-name="Path 13504" d="M23.25 2.709 16.271.065a1 1 0 0 0-.666-.014L7.974 2.586 1.335.169a.995.995 0 0 0-.681 1.869l6.965 2.536a.991.991 0 0 0 .654.01l7.624-2.533 6.005 2.276v14.566a.995.995 0 0 0 1.99 0V3.64a1 1 0 0 0-.642-.931z"/><path data-name="Path 13505" d="M8.954 18.604V8.09a.995.995 0 1 0-1.99 0v10.514a.995.995 0 0 0 1.99 0z"/><path data-name="Path 13506" d="M16.914 15.824V5.503a1 1 0 0 0-1.99 0v10.321a1 1 0 0 0 1.99 0z"/></g></svg>
                 <span>t&#176;Maps</span>
+              </router-link>
+            </li>
+            <li @click="toggleMobileMenu" v-if="isShownDueToUserRole('Clients')">
+              <router-link to="/dashboard/clients" data-name="Clients">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23.995" height="24" viewBox="0 0 23.995 24"><g data-name="Group 7919" transform="translate(-1510.049 -1082.444)" fill="#333"><path data-name="Path 14539" d="M1531.728 1084.765a7.911 7.911 0 0 0-13.261 7.568l-7.87 7.87a1 1 0 0 0-.291.651l-.255 4.534a1 1 0 0 0 1 1.056h.063l3.992-.251a1 1 0 0 0 .644-.291l1.436-1.436a1 1 0 0 0 .288-.8l-.118-1.2 1.358.037a.959.959 0 0 0 .733-.291 1 1 0 0 0 .294-.733l-.04-1.685 1.445.177a1 1 0 0 0 .242-1.986l-2.593-.317a1 1 0 0 0-1.121 1.017l.042 1.79-1.439-.039a.957.957 0 0 0-.759.317 1 1 0 0 0-.264.78l.183 1.861-.833.833-2.491.157.17-3.027 8.01-8.011a.962.962 0 0 0 .1-.153 1.043 1.043 0 0 0 .093-.14.988.988 0 0 0 .065-.244 1.028 1.028 0 0 0 .024-.123.978.978 0 0 0-.04-.3c-.006-.024 0-.049-.009-.074a5.923 5.923 0 1 1 3.326 3.535 1 1 0 1 0-.765 1.848 7.925 7.925 0 0 0 8.641-12.923Z"/><circle data-name="Ellipse 735" cx="2.004" cy="2.004" r="2.004" transform="translate(1526.03 1086.53)"/></g></svg>
+                <span>Clients</span>
               </router-link>
             </li>
             <hr v-if="isShownDueToUserRole('Purchases') || isShownDueToUserRole('Subscriptions')">

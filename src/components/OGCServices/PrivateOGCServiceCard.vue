@@ -1,6 +1,6 @@
 <template>
-  <!-- <router-link :to="`/private-ogc-service/${ogcService.key}`" class="asset_card"> -->
-  <router-link to="#" class="asset_card">
+  <!-- <router-link :to="`/dashboard/private-ogc-services/${ogcService.key}`" class="asset_card"> -->
+  <router-link :to="{ name: 'PrivateOGCServiceSingle', params: { key: ogcService.key, ogcService } }" class="asset_card">
     <div class="asset_card__view" :style="{'--color': cardColor}"><span>VIEW</span></div>
       <div class="asset_card__inner" :style="{'--color': cardColor}">
       <div class="asset_card__top">

@@ -18,6 +18,9 @@
     <transition name="fade" mode="out-in">
       <global-modals v-if="$store.getters.getShownGlobalModal"></global-modals>
     </transition>
+    <transition name="fade" mode="out-in">
+      <cookie-box v-if="!isCookiesOptionSet && !isCookiesBoxClosed" @close="isCookiesBoxClosed = true"></cookie-box>
+    </transition>
   </div>
 </template>
 
@@ -43,6 +46,7 @@ import AppHeader from '@/components/Header.vue';
 import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
 import GlobalModals from '@/components/GlobalModals.vue';
+import CookieBox from '@/components/CookieBox.vue';
 
 @Component({
   components: {
@@ -51,6 +55,7 @@ import GlobalModals from '@/components/GlobalModals.vue';
     AppFooter,
     Loader,
     GlobalModals,
+    CookieBox,
   },
 })
 export default class App extends Vue {
@@ -75,6 +80,8 @@ export default class App extends Vue {
   noHeader: Array<string | null | undefined>;
 
   noLoaderRoutes: Array<string>;
+
+  isCookiesBoxClosed = false;
 
   constructor() {
     super();
@@ -158,6 +165,10 @@ export default class App extends Vue {
 
   get isAnnouncementBarClosed(): boolean {
     return sessionStorage.getItem('isAnnouncementBarClosed') === 'y';
+  }
+
+  get isCookiesOptionSet(): boolean {
+    return !!localStorage.getItem('is_user_accepted_cookies');
   }
 
   mounted(): void {
