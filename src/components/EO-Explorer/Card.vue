@@ -1,8 +1,8 @@
 <template>
   <div class="eo_card d-flex">
     <div class="eo_card__img">
-      <img v-if="feature.assets && feature.assets.thumbnail && feature.assets.thumbnail.href" :src="feature.assets.thumbnail.href" alt="Thumbnail">
-      <img v-else src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZYAAADpCAIAAACImYZhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMUSURBVHhe7dQxDQAwDMCwbvwhFdyekYhkP2GQs7sD0HR/AYIsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoCsmQc7rwQGCUtr1QAAAABJRU5ErkJggg==" alt="missing thumbnail" />
+      <img v-if="thumbnail" :src="thumbnail" alt="Thumbnail">
+      <img v-else :src="fallbackThumbnail" alt="missing thumbnail" />
     </div>
     <div class="eo_card__info">
       <div class="d-flex align-items-center">
@@ -33,6 +33,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { getFeatureThumbnail, fallbackThumbnail } from '@/helper/eo-explorer';
 import { Feature } from '@/model/sentinel-hub';
 import moment from 'moment';
 
@@ -40,6 +41,14 @@ import moment from 'moment';
 })
 export default class EOExplorerCard extends Vue {
   @Prop({ required: true }) feature!: Feature;
+
+  @Prop({ required: true }) collectionId!: string;
+
+  fallbackThumbnail = fallbackThumbnail;
+
+  get thumbnail(): string {
+    return getFeatureThumbnail(this.collectionId, this.feature);
+  }
 
   formatDate(date: string): string {
     return moment(date).format('D MMMM YYYY');
