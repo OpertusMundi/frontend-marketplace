@@ -89,6 +89,7 @@
                 v-for="feature in searchResults.features"
                 :key="feature.id"
                 :feature="feature"
+                :collectionId="collectionId"
                 @viewAllMetadata="onViewAllMetadata"
                 @visualise="onVisualise"
               ></eo-explorer-card>
@@ -97,8 +98,10 @@
               <a href="" @click.prevent="goBack" class="back_btn_container"><img src="@/assets/images/icons/back_icon_dark.svg" alt="">BACK</a>
               <small class="break-word-anywhere">{{ selectedFeatureToShowMetadata }}</small>
               <hr>
-              <img v-if="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata) && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail">
-              <img v-else src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZYAAADpCAIAAACImYZhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMUSURBVHhe7dQxDQAwDMCwbvwhFdyekYhkP2GQs7sD0HR/AYIsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoCsmQc7rwQGCUtr1QAAAABJRU5ErkJggg==" alt="missing thumbnail" />
+              <!-- <img v-if="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata) && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail && searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" :src="searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).assets.thumbnail.href" alt="Thumbnail"> -->
+              <!-- <img v-else src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZYAAADpCAIAAACImYZhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAMUSURBVHhe7dQxDQAwDMCwbvwhFdyekYhkP2GQs7sD0HR/AYIsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoAwCwPCLAwIszAgzMKAMAsDwiwMCLMwIMzCgDALA8IsDAizMCDMwoCsmQc7rwQGCUtr1QAAAABJRU5ErkJggg==" alt="missing thumbnail" /> -->
+              <img v-if="searchResults.features.some(x => x.id === selectedFeatureToShowMetadata)" :src="getFeatureThumbnail(collectionId, searchResults.features.find(x => x.id === selectedFeatureToShowMetadata))" alt="Thumbnail">
+              <img v-else :src="fallbackThumbnail" alt="missing thumbnail" />
               <div v-for="[key, value] in Object.entries(searchResults.features.find(x => x.id === selectedFeatureToShowMetadata).properties)" :key="key" class="mt-xs-10 mb-xs-15">
                 <template v-if="Array.isArray(value) && value.length && (value[0] instanceof Object)">
                   <span class="metadata-property"><strong>{{ key.toUpperCase() }}</strong></span>
@@ -133,6 +136,7 @@
                   v-for="feature in clickedResultFeatures"
                   :key="feature.id"
                   :feature="feature"
+                  :collectionId="collectionId"
                   @viewAllMetadata="onViewAllMetadata"
                   @visualise="onVisualise"
                 ></eo-explorer-card>
@@ -165,6 +169,7 @@ import AdvancedFiltersExtension from '@/components/EO-Explorer/AdvancedFiltersEx
 import MetadataTable from '@/components/EO-Explorer/MetadataTable.vue';
 import SelectSentinelHubPlan from '@/components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import SentinelHubApi from '@/service/sentinel-hub';
+import { getFeatureThumbnail, fallbackThumbnail } from '@/helper/eo-explorer';
 import {
   ClientCatalogueQuery,
   SentinelHubCatalogueResponse,
@@ -266,6 +271,10 @@ export default class EOExplorer extends Vue {
   queryExtension: any = {};
 
   lastQueryData: ClientCatalogueQuery | null = null;
+
+  fallbackThumbnail = fallbackThumbnail;
+
+  getFeatureThumbnail = getFeatureThumbnail;
 
   async created(): Promise<void> {
     const { assetId, assetTitle, collectionId } = this.$route.query;
