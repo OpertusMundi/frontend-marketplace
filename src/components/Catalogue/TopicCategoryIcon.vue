@@ -16,9 +16,9 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component
 export default class TopicCategoryIcon extends Vue {
-  @Prop({ required: true }) readonly type!: 'VECTOR' | 'RASTER' | 'TABULAR' | 'WMS' | 'WFS' | 'DATA_API' | 'SENTINEL_HUB_OPEN_DATA';
+  @Prop({ required: true }) readonly type!: 'VECTOR' | 'RASTER' | 'TABULAR' | 'WMS' | 'WFS' | 'DATA_API' | 'SENTINEL_HUB_OPEN_DATA' | 'NETCDF';
 
-  getTypeLabel(type: 'VECTOR' | 'RASTER' | 'TABULAR' | 'WMS' | 'WFS' | 'DATA_API' | 'SENTINEL_HUB_OPEN_DATA'): string {
+  getTypeLabel(type: 'VECTOR' | 'RASTER' | 'TABULAR' | 'WMS' | 'WFS' | 'DATA_API' | 'SENTINEL_HUB_OPEN_DATA' | 'NETCDF'): string {
     const mappings = {
       VECTOR: 'Vector',
       RASTER: 'Raster',
@@ -27,6 +27,7 @@ export default class TopicCategoryIcon extends Vue {
       WFS: 'WFS',
       DATA_API: 'Data API',
       SENTINEL_HUB_OPEN_DATA: 'Sentinel Hub Open',
+      NETCDF: 'netCDF',
     };
 
     return mappings[type];
