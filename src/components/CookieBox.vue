@@ -34,6 +34,7 @@ export default class CookieBox extends Vue {
     bottom: 0;
     background: #fff;
     padding: 1.3em 0;
+    z-index: 999999;
 
     &__btns {
       min-width: 30%;
