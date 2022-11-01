@@ -1,5 +1,27 @@
 <template>
   <div class="dashboard__inner dashboard-clients">
+    <!-- MODALS -->
+    <modal :withSlots="true" :show="clientSecret" @dismiss="clientSecret = ''" :modalId="'clientSecret'" :showCancelButton="false" :showCloseButton="false">
+      <template v-slot:body>
+        <h1>Client Secret</h1>
+
+        <p>Here is the generated client secret:</p>
+        <p class="modal__client-secret">
+          <span><strong>{{ clientSecret }}</strong></span>
+          <button class="btn btn--std btn--outlinedark" @click="copyClientSecretToClipboard" v-if="!isClientSecretCopied">copy</button>
+          <button class="btn btn--std modal__client-secret__label-copied" v-else>copied &#10003;</button>
+        </p>
+        <p>Copy and save it somewhere safe. You will not be able to reproduce it.
+          <a href="https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/" target="_blank">Read more</a> about Client ID & Secret architecture.
+        </p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue" @click="clientSecret = ''">OK</button>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
+
     <div class="dashboard__head">
       <div class="dashboard__head__helpers">
         <h1>Clients</h1>
@@ -84,10 +106,11 @@ import moment from 'moment';
 import ClientsApi from '@/service/clients';
 import { Client } from '@/model/client';
 import Pagination from '@/components/Pagination.vue';
+import Modal from '@/components/Modal.vue';
 import store from '@/store';
 
 @Component({
-  components: { Pagination },
+  components: { Pagination, Modal },
 })
 export default class DashboardClients extends Vue {
   clientsApi = new ClientsApi();
@@ -98,9 +121,13 @@ export default class DashboardClients extends Vue {
 
   newClientAlias = '';
 
+  clientSecret = '';
+
   isShowAliasError = false;
 
   clientIdCopiedToClipboard: string | null = null;
+
+  isClientSecretCopied = false;
 
   statusFilterOptions = [
     'ALL',
@@ -168,6 +195,9 @@ export default class DashboardClients extends Vue {
 
     this.clientsApi.createClient(this.newClientAlias).then((response) => {
       if (response.success) {
+        this.isClientSecretCopied = false;
+        this.clientSecret = response.result.secret;
+
         store.commit('setLoading', false);
         this.loadClients();
       }
@@ -188,6 +218,11 @@ export default class DashboardClients extends Vue {
   copyClientIdToClipboard(clientId: string): void {
     navigator.clipboard.writeText(clientId);
     this.clientIdCopiedToClipboard = clientId;
+  }
+
+  copyClientSecretToClipboard(): void {
+    navigator.clipboard.writeText(this.clientSecret);
+    this.isClientSecretCopied = true;
   }
 
   formatDate(type: 'DATE' | 'TIME', dateString: string): string {
