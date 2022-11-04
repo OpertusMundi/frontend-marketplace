@@ -33,11 +33,33 @@
       </div>
 
       <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
-        <p><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
+        <p v-if="'featureCount' in metadata"><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
         <p><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
         <p v-if="metadata.attributes">
           <strong>ATTRIBUTE NAMES:</strong> <span v-for="(attribute, i) in metadata.attributes" :key="attribute">{{ attribute }}<span v-if="i !== metadata.attributes.length - 1">, </span></span>
         </p>
+        <p v-if="'cog' in metadata"><strong>CLOUD OPTIMISED GeoTIFF:</strong> {{ metadata.cog ? 'YES' : 'NO' }}</p>
+        <p v-if="metadata.info.bands"><strong>NUMBER OF BANDS:</strong> {{ metadata.info.bands.length }}</p>
+
+        <div class="asset__section__tabs__attribute-info mt-xs-15 mb-xs-15" v-if="metadata.resolution">
+          <div class="grid-ignore-wrapper">
+            <strong>RESOLUTION:</strong>
+            <div class="asset__section__tabs__attribute-info__statistics">
+              <span>[x]</span> <span>{{ metadata.resolution.x }} {{ metadata.resolution.unit === 'metre' ? 'm' : metadata.resolution.unit }}</span>
+              <span>[y]</span> <span>{{ metadata.resolution.y }} {{ metadata.resolution.unit === 'metre' ? 'm' : metadata.resolution.unit }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="asset__section__tabs__attribute-info" v-if="metadata.resolution">
+          <div class="grid-ignore-wrapper">
+            <strong>SIZE:</strong>
+            <div class="asset__section__tabs__attribute-info__statistics">
+              <span>[width]</span> <span>{{ metadata.info.width }} px</span>
+              <span>[height]</span> <span>{{ metadata.info.height }} px</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
@@ -265,7 +287,22 @@
           <li v-if="activeTab == 1 && catalogueItem.type === 'RASTER'">
             <template v-if="metadata.info && metadata.info.bands">
               <div v-for="(band, i) in metadata.info.bands" :key="i">
-                <p>{{ band }}</p>
+                <h3 class="mb-xs-20">{{ band }}</h3>
+
+                <div class="asset__section__tabs__attribute-info mb-xs-20" v-if="metadata.statistics">
+                  <div class="grid-ignore-wrapper">
+                    <strong>Statistics</strong>
+                    <div class="asset__section__tabs__attribute-info__statistics">
+                      <div v-for="[key, value] in Object.entries(metadata.statistics[i])" :key="key" class="grid-ignore-wrapper">
+                        <span>[<small>{{ key }}</small>]</span> <span>{{ value }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p :style="metadata.noDataValue[i] !== null ? {'margin-bottom': 0} : {}"><strong>Pixel depth:</strong> {{ metadata.histogram[i][3].length }}</p>
+                <p v-if="metadata.noDataValue[i] !== null"><strong>No-date value:</strong> {{ Array.isArray(metadata.noDataValue[i]) ? metadata.noDataValue[i].join(', ') : metadata.noDataValue }}</p>
+
                 <chart :options="getChartOptions('band_histogram', { index: i })"></chart>
                 <hr>
               </div>
@@ -694,11 +731,13 @@ export default class DataProfilingAndSamples extends Vue {
         return {
           chart: {
             type: 'column',
+            spacingTop: 16,
           },
           title: {
-            text: `${this.metadata.info.bands[data.index]}`,
-          },
-          subtitle: {
+            style: {
+              fontSize: '15px',
+              fontWeight: 600,
+            },
             text: 'Histogram',
           },
           xAxis: {
