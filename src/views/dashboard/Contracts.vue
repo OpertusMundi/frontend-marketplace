@@ -7,7 +7,7 @@
       </div>
     </div>
     <horizontal-card v-for="contractTemplate in draftContractTemplates" v-bind:key="contractTemplate.key" :title="`Template #${contractTemplate.key}`" :subtitle="contractTemplate.title" :link="{ path: 'contracts/create-template', query: { key: contractTemplate.key } }" linkText="VIEW CONTRACT" :infoText="`<strong>Last updated</strong>: ${formatDate(contractTemplate.modifiedAt)} • <strong>Version</strong>: ${contractTemplate.version}`" topRight="DRAFT" />
-    <horizontal-card v-for="contractTemplate in contractTemplates" v-bind:key="contractTemplate.key" :title="`Template #${contractTemplate.key}`" :subtitle="contractTemplate.title" :link="`/dashboard/contracts/${contractTemplate.key}`" linkText="VIEW CONTRACT" :infoText="`<strong>Last updated</strong>: ${formatDate(contractTemplate.modifiedAt)} • <strong>Version</strong>: ${contractTemplate.version}`" topRight="PUBLISHED" />
+    <horizontal-card v-for="contractTemplate in contractTemplates" v-bind:key="contractTemplate.key" :title="`Template #${contractTemplate.key}`" :subtitle="contractTemplate.title" :link="`/dashboard/contracts/${contractTemplate.key}`" linkText="VIEW CONTRACT" :infoText="`<strong>Last updated</strong>: ${formatDate(contractTemplate.modifiedAt)} • <strong>Version</strong>: ${contractTemplate.version}`" :topRight="contractTemplate.defaultContract ? 'TOPIO DEFAULT CONTRACT' : 'PUBLISHED'" />
     <pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :itemsTotal="totalContracts" @pageSelection="getContracts($event)"></pagination>
   </div>
 </template>
