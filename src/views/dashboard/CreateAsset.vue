@@ -33,6 +33,18 @@
         <p><small>This window will automatically close after you accept it and you will be able to proceed</small></p>
       </template>
     </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'contractNotAvailable'" @dismiss="modalToShow = ''" :modalId="'ContractNotAvailable'" :showCancelButton="false" :showCloseButton="false">
+      <template v-slot:body>
+        <h1>Contract not available</h1>
+
+        <p>The selected contract is not available. Please, select another one.</p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue" @click="modalToShow = ''">OK</button>
+      </template>
+    </modal>
     <!-- END OF MODALS -->
 
     <div class="dashboard__inner__steps" v-if="!uploading.status">
@@ -662,6 +674,15 @@ export default class CreateAsset extends Vue {
     });
   }
 
+  /* is called on submission to handle cases where an asset was saved as draft but meanwhile, the selected contract template was deactivated / removed */
+  async isSelectedContractAvailable(): Promise<boolean> {
+    const { contractTemplateKey } = this.asset;
+
+    const contractResponse = await this.contractApi.findOneTemplate(contractTemplateKey);
+
+    return contractResponse.success;
+  }
+
   async isSelectedContractAccepted(): Promise<boolean> {
     const { contractTemplateKey } = this.asset;
 
@@ -731,6 +752,7 @@ export default class CreateAsset extends Vue {
             if (!(await this.isSelectedContractAccepted())) {
               this.isPendingDefaultContractAcceptance = true;
               this.pollDefaultContractAcceptance();
+              store.commit('setLoading', false);
               return;
             }
             store.commit('setLoading', false);
@@ -1040,6 +1062,17 @@ export default class CreateAsset extends Vue {
   }
 
   async submitApiForm(isDraft = false): Promise<void> {
+    /* CHECK IF CONTRACT AVAILABLE */
+    store.commit('setLoading', true);
+    if (!(await this.isSelectedContractAvailable())) {
+      this.modalToShow = 'contractNotAvailable';
+      this.currentStep = 5;
+      store.commit('setLoading', false);
+      return;
+    }
+    store.commit('setLoading', false);
+    /* */
+
     try {
       let draftAsset: AssetDraft = {} as AssetDraft;
 
@@ -1077,6 +1110,17 @@ export default class CreateAsset extends Vue {
   }
 
   async submitDataFileForm(isDraft = false): Promise<void> {
+    /* CHECK IF CONTRACT AVAILABLE */
+    store.commit('setLoading', true);
+    if (!(await this.isSelectedContractAvailable())) {
+      this.modalToShow = 'contractNotAvailable';
+      this.currentStep = 5;
+      store.commit('setLoading', false);
+      return;
+    }
+    store.commit('setLoading', false);
+    /* */
+
     // fix open dataset
     if (this.assetMainType as string === 'OPEN') {
       this.asset = {
