@@ -8,7 +8,7 @@
         <h1>{{ contract.title }}</h1>
         <div class="dashboard__head__settings">
           <!-- <a href="#">ok</a> -->
-          <button href="#" class="btn btn--outlinedark" @click="deactivateContract()">DEACTIVATE</button>
+          <button v-if="!contract.defaultContract" href="#" class="btn btn--outlinedark" @click="deactivateContract()">DEACTIVATE</button>
         </div>
       </div>
     </div>
