@@ -212,9 +212,13 @@
                   <tr>
                     <th></th>
                     <template v-for="attribute in metadata.attributes">
-                      <th v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                      <th v-if="selectedAttribute.includes(attribute)" :key="attribute" class="align-middle">
                         [<small>{{ metadata.datatypes[attribute] }}</small
                         >] {{ attribute }}
+
+                        <template v-if="metadata.numericalValuePatterns && metadata.numericalValuePatterns[attribute]">
+                          <br><small>{{ metadata.numericalValuePatterns[attribute] }}</small>
+                        </template>
                       </th>
                     </template>
                   </tr>
@@ -224,6 +228,12 @@
                     <td><strong>Values in total</strong></td>
                     <template v-for="attribute in metadata.attributes">
                       <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.count[attribute] }}</td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Uniqueness</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.uniqueness && attribute in metadata.uniqueness ? metadata.uniqueness[attribute] : '-' }}</td>
                     </template>
                   </tr>
                   <tr>

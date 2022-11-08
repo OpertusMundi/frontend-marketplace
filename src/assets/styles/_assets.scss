@@ -1530,6 +1530,9 @@ table.data-table {
 				&:last-child {
 					border-right: none;
 				}
+				&.align-middle {
+					vertical-align: middle;
+				}
 			}
 		}
 	}
