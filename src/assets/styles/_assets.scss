@@ -565,6 +565,11 @@
 						font-weight: 500;
 						position: relative;
 						transition: color 0.4s ease;
+						&.no-underline {
+							&:after {
+								content: none !important;
+							}
+						}
 						&:after {
 							content: '';
 							position: absolute;

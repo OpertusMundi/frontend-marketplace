@@ -103,7 +103,7 @@
           </li>
           <!-- DROPDOWN BUTTON -->
           <li :class="toggleDropdownContainer ? 'active' : ''" class="dropdown-item">
-            <a v-if="metadata.attributes" href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
+            <a v-if="metadata.attributes" class="no-underline" href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
             <svg xmlns="http://www.w3.org/2000/svg" width="10.29" height="7.492" viewBox="0 0 10.29 7.492">
               <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
             </svg>
