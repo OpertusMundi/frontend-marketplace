@@ -67,12 +67,12 @@
         <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
           <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES' }}</a></li>
           <li class="nowrap"><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
-          <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }">Correlation Matrix</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }" v-if="catalogueItem.type === 'VECTOR'">Correlation Matrix</a></li>
           <li class="nowrap" v-for="(sample, i) in samples" :key="i">
             <a href="#" @click.prevent="activeTab = i + 4" :class="{ active: activeTab == i + 4 }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
-        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && catalogueItem.type !== 'RASTER'">
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && !['RASTER', 'NETCDF'].includes(catalogueItem.type)">
           <li>
             <a href="#" @click.prevent="changeLayout('VERTICAL')"
               ><svg :class="isVertical ? 'active' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -152,7 +152,7 @@
                         <div class="asset__section__tabs__attribute-info">
                           <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
 
-                          <strong v-if="metadata.uniqueness && attribute in metadata.uniqueness">Uniqueness</strong> <span>{{ metadata.uniqueness[attribute] }}</span>
+                          <template v-if="metadata.uniqueness && attribute in metadata.uniqueness"><strong>Uniqueness</strong> <span>{{ metadata.uniqueness[attribute] }}</span></template>
 
                           <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
                             <strong>Most frequent values</strong>
@@ -343,21 +343,28 @@
           </li>
 
           <!-- VARIABLES (NetCDF) -->
-          <li v-if="activeTab == 1 && catalogueItem.type === 'NETCDF'">
+          <li v-if="activeTab == 1 && catalogueItem.type === 'NETCDF'" class="netcdf-container">
             <template v-if="metadata.variablesList && metadata.variablesList.length">
-              <div v-for="variable in metadata.variablesList" :key="variable">
-                <h3 class="mb-xs-20">{{ variable }}</h3>
-                <div class="asset__section__tabs__attribute-info asset__section__tabs__attribute-info--small-row-gap">
-                  <template v-if="metadata.variablesProperties">
-                    <template v-if="metadata.variablesProperties[variable].type"><strong>type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
-                    <template v-if="metadata.variablesProperties[variable].size || metadata.variablesProperties[variable].size === 0"><strong>size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
-                    <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
-                    <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
-                    <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
-                  </template>
+              <template v-if="isVertical">
+                <div
+                  v-for="variable in metadata.variablesList.filter((x, i) => (i >= netCDFVariablesPagination.currentPage * netCDFVariablesPagination.itemsPerPage) && (i < (netCDFVariablesPagination.currentPage + 1) * netCDFVariablesPagination.itemsPerPage))"
+                  :key="variable"
+                >
+                  <h3 class="mb-xs-20">{{ variable }}</h3>
+                  <div class="asset__section__tabs__attribute-info asset__section__tabs__attribute-info--small-row-gap">
+                    <template v-if="metadata.variablesProperties">
+                      <template v-if="metadata.variablesProperties[variable].type"><strong>type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].size || metadata.variablesProperties[variable].size === 0"><strong>size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
+                    </template>
+                  </div>
+                  <hr>
                 </div>
-                <hr>
-              </div>
+              </template>
+
+              <pagination :currentPage="netCDFVariablesPagination.currentPage" :itemsPerPage="netCDFVariablesPagination.itemsPerPage" :itemsTotal="netCDFVariablesPagination.itemsTotal" @pageSelection="goToNetCDFVariablesPage($event)"></pagination>
             </template>
             <template v-else><p>No data</p></template>
           </li>
@@ -523,6 +530,7 @@ import {
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 import Modal from '@/components/Modal.vue';
+import Pagination from '@/components/Pagination.vue';
 import csvToSample from '@/helper/file';
 import { cloneDeep } from 'lodash';
 import { bbox as turfBBox } from '@turf/turf';
@@ -539,6 +547,7 @@ Heatmap(Highcharts);
     LPolygon,
     LGeoJson,
     Modal,
+    Pagination,
   },
 })
 export default class DataProfilingAndSamples extends Vue {
@@ -584,6 +593,12 @@ export default class DataProfilingAndSamples extends Vue {
   toggleDropdownContainer: boolean;
 
   selectedAttribute: any;
+
+  netCDFVariablesPagination: {
+    currentPage: number,
+    itemsPerPage: number,
+    itemsTotal: number,
+  };
 
   constructor() {
     super();
@@ -636,11 +651,20 @@ export default class DataProfilingAndSamples extends Vue {
       tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
+
+    this.netCDFVariablesPagination = {
+      currentPage: 0,
+      itemsPerPage: 10,
+      itemsTotal: 0,
+    };
   }
 
   mounted(): void {
     this.selectedAttribute = this.metadata.attributes; // todo: check
     console.log('heatmap link', this.metadata.heatmap);
+
+    if (this.catalogueItem.type === 'NETCDF') this.initNetCDFPagination();
+
     if (this.metadata.heatmap) {
       this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
         this.heatmapGeoJson = heatmapResponse;
@@ -682,6 +706,10 @@ export default class DataProfilingAndSamples extends Vue {
     // if (!this.isExpanded) window.scrollTo(0, 0);
     this.isExpanded = !this.isExpanded;
     document.body.style.overflowY = this.isExpanded ? 'hidden' : 'visible';
+  }
+
+  initNetCDFPagination(): void {
+    if (this.metadata.variablesList?.length) this.netCDFVariablesPagination = { ...this.netCDFVariablesPagination, itemsTotal: this.metadata.variablesList.length };
   }
 
   showDistributionPieChart(attribute: string): boolean {
@@ -1017,6 +1045,19 @@ export default class DataProfilingAndSamples extends Vue {
       }
       default: return null;
     }
+  }
+
+  goToNetCDFVariablesPage(page: number): void {
+    this.netCDFVariablesPagination = { ...this.netCDFVariablesPagination, currentPage: page };
+
+    const element = document.getElementsByClassName('netcdf-container')[0];
+    if (!element) return;
+    const y = element.getBoundingClientRect().top + window.pageYOffset - 170;
+
+    window.scrollTo({
+      top: y,
+      behavior: 'smooth',
+    });
   }
 
   setMinMaxZoomLevels(): void {
