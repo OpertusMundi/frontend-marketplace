@@ -622,6 +622,10 @@
 				font-size: em(15);
 				color: $mainFontColor;
 
+				&--small-row-gap {
+					row-gap: 7px;
+				}
+
 				strong {
 					white-space: nowrap;
 				}

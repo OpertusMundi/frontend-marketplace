@@ -65,7 +65,7 @@
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
       <div class="asset__section__head__tab-container">
         <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
-          <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : 'ATTRIBUTES' }}</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES' }}</a></li>
           <li class="nowrap"><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
           <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }">Correlation Matrix</a></li>
           <li class="nowrap" v-for="(sample, i) in samples" :key="i">
@@ -133,7 +133,7 @@
       <div class="asset__section__content__inner" v-else>
         <ul class="asset__section__tabs">
           <!-- ATTRIBUTES -->
-          <template v-if="catalogueItem.type !== 'RASTER'">
+          <template v-if="!['RASTER', 'NETCDF'].includes(catalogueItem.type)">
             <li v-if="activeTab == 1 && isVertical">
               <template v-if="metadata.attributes">
                 <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
@@ -340,6 +340,26 @@
                 <hr>
               </div>
             </template>
+          </li>
+
+          <!-- VARIABLES (NetCDF) -->
+          <li v-if="activeTab == 1 && catalogueItem.type === 'NETCDF'">
+            <template v-if="metadata.variablesList && metadata.variablesList.length">
+              <div v-for="variable in metadata.variablesList" :key="variable">
+                <h3 class="mb-xs-20">{{ variable }}</h3>
+                <div class="asset__section__tabs__attribute-info asset__section__tabs__attribute-info--small-row-gap">
+                  <template v-if="metadata.variablesProperties">
+                    <template v-if="metadata.variablesProperties[variable].type"><strong>type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
+                    <template v-if="metadata.variablesProperties[variable].size"><strong>size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
+                    <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
+                    <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
+                    <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
+                  </template>
+                </div>
+                <hr>
+              </div>
+            </template>
+            <template v-else><p>No data</p></template>
           </li>
 
           <!-- MAPS -->
