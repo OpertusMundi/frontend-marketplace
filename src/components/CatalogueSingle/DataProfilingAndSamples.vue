@@ -141,12 +141,18 @@
                     <h4 class="mb-xs-20">
                       [<small>{{ metadata.datatypes[attribute] }}</small
                       >] {{ attribute }}
+
+                      <template v-if="metadata.numericalValuePatterns && metadata.numericalValuePatterns[attribute]">
+                        <br><small>{{ metadata.numericalValuePatterns[attribute] }}</small>
+                      </template>
                     </h4>
                     <div class="row">
                       <!-- <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'"> -->
                       <div class="col-sm-6">
                         <div class="asset__section__tabs__attribute-info">
                           <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
+
+                          <strong v-if="metadata.uniqueness && attribute in metadata.uniqueness">Uniqueness</strong> <span>{{ metadata.uniqueness[attribute] }}</span>
 
                           <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
                             <strong>Most frequent values</strong>
@@ -834,6 +840,7 @@ export default class DataProfilingAndSamples extends Vue {
           chart: {
             type: 'boxplot',
             backgroundColor: 'transparent',
+            marginTop: 20,
           },
           title: {
             text: null,
