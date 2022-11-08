@@ -64,16 +64,15 @@
 
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
       <div class="asset__section__head__tab-container">
-        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
-          <li><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : 'ATTRIBUTES' }}</a></li>
-          <li><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
-          <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
-          <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
-          <li v-for="(sample, i) in samples" :key="i">
-            <a href="#" @click.prevent="activeTab = i + 3" :class="{ active: activeTab == i + 3 }">Sample {{ i + 1 }}</a>
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : 'ATTRIBUTES' }}</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }">Correlation Matrix</a></li>
+          <li class="nowrap" v-for="(sample, i) in samples" :key="i">
+            <a href="#" @click.prevent="activeTab = i + 4" :class="{ active: activeTab == i + 4 }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
-        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && catalogueItem.type !== 'RASTER'">
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && catalogueItem.type !== 'RASTER'">
           <li>
             <a href="#" @click.prevent="changeLayout('VERTICAL')"
               ><svg :class="isVertical ? 'active' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -285,6 +284,17 @@
                       </td>
                     </template>
                   </tr>
+                  <tr>
+                    <td><strong>Numerical Statistics</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="showBoxPlot(attribute)">
+                          <chart :options="getChartOptions('boxplot', { attribute })"></chart>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
                 </tbody>
               </table>
             </li>
@@ -405,7 +415,16 @@
             </div>
           </li>
 
-          <li v-if="activeTab > 2 && samples !== null">
+          <li v-if="activeTab === 3">
+            <div class="asset__section__tabs__pie-chart-container" v-if="showCorrelationMatrix()">
+              <p>Contains the correlation matrix of the dataset attributes</p>
+              <hr>
+              <chart :options="getChartOptions('correlation_matrix', {})"></chart>
+            </div>
+            <p v-else>No data</p>
+          </li>
+
+          <li v-if="activeTab > 3 && samples !== null">
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
               <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
@@ -450,6 +469,7 @@ import store from '@/store';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
+import Heatmap from 'highcharts/modules/heatmap';
 import Multiselect from 'vue-multiselect';
 import L from 'leaflet';
 import {
@@ -472,6 +492,7 @@ import { cloneDeep } from 'lodash';
 import { bbox as turfBBox } from '@turf/turf';
 
 HighchartsMore(Highcharts);
+Heatmap(Highcharts);
 
 @Component({
   components: {
@@ -634,12 +655,92 @@ export default class DataProfilingAndSamples extends Vue {
     return false;
   }
 
+  formatDistributionForChart(total: number, distribution: Record<string, number>): any {
+    const vals = Object.keys(distribution).map((x) => ({ name: x, y: (distribution[x] / total) * 100 }));
+    const remainingPercentageTo100 = 100 - vals.reduce((sum, obj) => obj.y + sum, 0);
+    if (Math.round(remainingPercentageTo100 * 100) / 100) vals.push({ name: 'other', y: remainingPercentageTo100 }); // add 'other' in pie chart if remaining percentage is at least 0.01 (2 decimals)
+    return vals;
+  }
+
+  getMostFrequentValues(distribution: Record<string, number>): { attribute: string; amount: number }[] {
+    return Object.keys(distribution)
+      .map((x) => ({ attribute: x, amount: distribution[x] }))
+      .sort((a, b) => b.amount - a.amount);
+  }
+
   showBoxPlot(attribute: string): boolean {
     if (
       this.metadata.numericalStatistics && this.metadata.numericalStatistics[attribute]
       && Object.values(this.metadata.numericalStatistics[attribute]).some((x: any) => (x.mean || x.mean === 0))
     ) return true;
     return false;
+  }
+
+  getBoxPlotValues(
+    attribute: string,
+    statistics: {min: Record<string, number>, max: Record<string, number>},
+    numericalStatistics: Record<string, Record<string, { mean: number, stdev: number, median: number, variance: number }>>,
+  ): {
+    categories: string[],
+    values: number[][],
+  } {
+    return {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      categories: Object.entries(numericalStatistics[attribute])
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value]) => key),
+      values: Object.entries(numericalStatistics[attribute])
+        // eslint-disable-next-line
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value], i) => {
+          const classValues = key.split('-');
+          if (classValues.length !== 2) return [];
+
+          const [classMinText, classMaxText] = classValues;
+          const classMin = parseFloat(classMinText);
+          const classMax = parseFloat(classMaxText);
+
+          return [
+            i === 0 ? statistics.min[attribute] : classMin,
+            value.mean - value.stdev,
+            value.mean,
+            value.mean + value.stdev,
+            // eslint-disable-next-line
+            i === Object.entries(numericalStatistics[attribute]).filter(([k, v]) => v.mean || v.mean === 0).length - 1 ? statistics.max[attribute] : classMax,
+          ];
+        }),
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+    };
+  }
+
+  showCorrelationMatrix(): boolean {
+    if (
+      this.metadata.numericalAttributeCorrelation
+      && this.metadata.numericalAttributeCorrelation.columns?.length > 1
+      && this.metadata.numericalAttributeCorrelation.cor_matrix?.length
+      && this.metadata.numericalAttributeCorrelation.cor_matrix[1]
+      && Object.values(this.metadata.numericalAttributeCorrelation.cor_matrix[0]).every((x) => x || x === 0)
+      && Object.values(this.metadata.numericalAttributeCorrelation.cor_matrix[1]).every((x) => x || x === 0)
+    ) return true;
+    return false;
+  }
+
+  getCorrelationMatrixValues(): { categories: string[], values: number[][] } {
+    const data = {
+      categories: this.metadata.numericalAttributeCorrelation.columns,
+      values: this.metadata.numericalAttributeCorrelation.cor_matrix
+        .reduce((p, c, i) => {
+          const line: number[][] = [];
+          c.forEach((x, j) => {
+            line.push([i, j, Math.round(x * 100) / 100]);
+          });
+
+          return [...p, ...line];
+        }, []),
+    };
+
+    console.log('d', data);
+    return data;
   }
 
   onDownloadAutomatedMetadata(): void {
@@ -677,6 +778,57 @@ export default class DataProfilingAndSamples extends Vue {
   // eslint-disable-next-line
   getChartOptions(type: string, data: any): any {
     switch (type) {
+      case 'correlation_matrix': {
+        const chartOptions = {
+          chart: {
+            backgroundColor: 'transparent',
+            plotBorderWidth: 1,
+          },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            categories: this.getCorrelationMatrixValues().categories,
+          },
+          yAxis: {
+            categories: this.getCorrelationMatrixValues().categories,
+            title: null,
+            reversed: true,
+          },
+          colorAxis: {
+            min: 0,
+            minColor: '#fff',
+            maxColor: '#2a6d8f',
+          },
+          legend: {
+            align: 'right',
+            layout: 'vertical',
+            margin: 0,
+            verticalAlign: 'top',
+            y: 25,
+            symbolHeight: 280,
+          },
+          tooltip: {
+            /* eslint-disable */
+            formatter: function() {
+              return `Attributes: <span><b>${(this as any).series.xAxis.categories[(this as any).point.x]}</b></span> | <span><b>${(this as any).series.yAxis.categories[(this as any).point.y]}</b></span> <br>Correlation: <b>${(this as any).point.value}</b>`;
+            },
+            /* eslint-enable */
+          },
+          series: [{
+            type: 'heatmap',
+            borderWidth: 1,
+            data: this.getCorrelationMatrixValues().values,
+            dataLabels: {
+              enabled: true,
+              color: '#000000',
+            },
+          }],
+        };
+
+        return chartOptions;
+      }
+
       case 'boxplot': {
         const chartOptions = {
           chart: {
@@ -703,7 +855,8 @@ export default class DataProfilingAndSamples extends Vue {
           series: [{
             name: 'Numerical Statistics',
             data: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).values,
-            color: '#190AFF',
+            color: '#2a6d8f',
+            fillColor: 'rgba(42, 109, 143, 0.3)',
           }],
         };
 
@@ -827,56 +980,6 @@ export default class DataProfilingAndSamples extends Vue {
       }
       default: return null;
     }
-  }
-
-  formatDistributionForChart(total: number, distribution: Record<string, number>): any {
-    const vals = Object.keys(distribution).map((x) => ({ name: x, y: (distribution[x] / total) * 100 }));
-    const remainingPercentageTo100 = 100 - vals.reduce((sum, obj) => obj.y + sum, 0);
-    if (Math.round(remainingPercentageTo100 * 100) / 100) vals.push({ name: 'other', y: remainingPercentageTo100 }); // add 'other' in pie chart if remaining percentage is at least 0.01 (2 decimals)
-    return vals;
-  }
-
-  getMostFrequentValues(distribution: Record<string, number>): { attribute: string; amount: number }[] {
-    return Object.keys(distribution)
-      .map((x) => ({ attribute: x, amount: distribution[x] }))
-      .sort((a, b) => b.amount - a.amount);
-  }
-
-  getBoxPlotValues(
-    attribute: string,
-    statistics: {min: Record<string, number>, max: Record<string, number>},
-    numericalStatistics: Record<string, Record<string, { mean: number, stdev: number, median: number, variance: number }>>,
-  ): {
-    categories: string[],
-    values: number[][],
-  } {
-    return {
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      categories: Object.entries(numericalStatistics[attribute])
-        .filter(([key, value]) => value.mean || value.mean === 0)
-        .map(([key, value]) => key),
-      values: Object.entries(numericalStatistics[attribute])
-        // eslint-disable-next-line
-        .filter(([key, value]) => value.mean || value.mean === 0)
-        .map(([key, value], i) => {
-          const classValues = key.split('-');
-          if (classValues.length !== 2) return [];
-
-          const [classMinText, classMaxText] = classValues;
-          const classMin = parseFloat(classMinText);
-          const classMax = parseFloat(classMaxText);
-
-          return [
-            i === 0 ? statistics.min[attribute] : classMin,
-            value.mean - value.stdev,
-            value.mean,
-            value.mean + value.stdev,
-            // eslint-disable-next-line
-            i === Object.entries(numericalStatistics[attribute]).filter(([k, v]) => v.mean || v.mean === 0).length - 1 ? statistics.max[attribute] : classMax,
-          ];
-        }),
-      /* eslint-enable @typescript-eslint/no-unused-vars */
-    };
   }
 
   setMinMaxZoomLevels(): void {

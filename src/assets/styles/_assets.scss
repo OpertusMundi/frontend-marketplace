@@ -514,6 +514,11 @@
 					display: none;
 				}
 				li {
+					&.nowrap {
+						> a {
+							white-space: nowrap;
+						}
+					}
 					display: inline-block;
 					font-size: em(13);
 					text-transform: uppercase;
