@@ -23,6 +23,28 @@
         <button class="btn btn--std btn--blue ml-xs-20" @click="onCancelDraft">Exit</button>
       </template>
     </modal>
+
+    <modal :withSlots="true" :show="isPendingDefaultContractAcceptance" :showCancelButton="false" :modalId="'pendingTemplateAcceptance'">
+      <template v-slot:body>
+        <h1>Accept contract?</h1>
+
+        <p class="mb-xs-10">In order to use the selected contract, you firstly need to accept it</p>
+        <p class="mt-xs-20 mb-xs-30"><a target="_blank" :href="`/dashboard/contracts/${asset.contractTemplateKey}`" class="btn btn--std btn--blue">GO TO CONTRACT</a></p>
+        <p><small>This window will automatically close after you accept it and you will be able to proceed</small></p>
+      </template>
+    </modal>
+
+    <modal :withSlots="true" :show="modalToShow === 'contractNotAvailable'" @dismiss="modalToShow = ''" :modalId="'ContractNotAvailable'" :showCancelButton="false" :showCloseButton="false">
+      <template v-slot:body>
+        <h1>Contract not available</h1>
+
+        <p>The selected contract is not available. Please, select another one.</p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue" @click="modalToShow = ''">OK</button>
+      </template>
+    </modal>
     <!-- END OF MODALS -->
 
     <div class="dashboard__inner__steps" v-if="!uploading.status">
@@ -156,6 +178,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CatalogueItemCommand } from '@/model';
 import CatalogueApi from '@/service/catalogue';
 import DraftAssetApi from '@/service/draft';
+import ContractApi from '@/service/provider-contract';
 import { required, email, regex } from 'vee-validate/dist/rules';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import Multiselect from 'vue-multiselect';
@@ -246,6 +269,8 @@ export default class CreateAsset extends Vue {
 
   draftAssetApi: DraftAssetApi;
 
+  contractApi: ContractApi;
+
   modalToShow: string;
 
   isEditingExistingDraft: boolean;
@@ -283,6 +308,8 @@ export default class CreateAsset extends Vue {
   uploading: any;
 
   apiCreationType: string | null;
+
+  isPendingDefaultContractAcceptance: boolean;
 
   errors: any;
 
@@ -331,6 +358,8 @@ export default class CreateAsset extends Vue {
 
     this.selectedPayoutMethod = null;
 
+    this.isPendingDefaultContractAcceptance = false;
+
     this.errors = [];
 
     this.uploading = {
@@ -344,6 +373,7 @@ export default class CreateAsset extends Vue {
 
     this.catalogueApi = new CatalogueApi();
     this.draftAssetApi = new DraftAssetApi();
+    this.contractApi = new ContractApi();
 
     this.uploadConfig = {
       onUploadProgress: (progressEvent: any): void => {
@@ -644,6 +674,43 @@ export default class CreateAsset extends Vue {
     });
   }
 
+  /* is called on submission to handle cases where an asset was saved as draft but meanwhile, the selected contract template was deactivated / removed */
+  async isSelectedContractAvailable(): Promise<boolean> {
+    const { contractTemplateKey } = this.asset;
+
+    const contractResponse = await this.contractApi.findOneTemplate(contractTemplateKey);
+
+    return contractResponse.success;
+  }
+
+  async isSelectedContractAccepted(): Promise<boolean> {
+    const { contractTemplateKey } = this.asset;
+
+    const contractResponse = await this.contractApi.findOneTemplate(contractTemplateKey);
+    const contract = contractResponse.result;
+
+    if (contract.defaultContract && !contract.defaultContractAccepted) return false;
+    return true;
+  }
+
+  async pollDefaultContractAcceptance(): Promise<void> {
+    const pollingTime = 1000;
+
+    const { contractTemplateKey } = this.asset;
+
+    const contractResponse = await this.contractApi.findOneTemplate(contractTemplateKey);
+    const contract = contractResponse.result;
+
+    if (contract.defaultContractAccepted) {
+      this.isPendingDefaultContractAcceptance = false;
+      this.currentStep += 1;
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, pollingTime));
+    this.pollDefaultContractAcceptance();
+  }
+
   goToStep(step: number): void {
     this.currentStep = step;
   }
@@ -660,7 +727,7 @@ export default class CreateAsset extends Vue {
     // console.dir(this.selectedPublishedAssetForApiCreation, { depth: null, colors: true });
 
     // console.log('uploadFile?', this.fileToUpload.isFileSelected);
-    this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then((isValid) => {
+    this.$refs[`step${this.currentStep}`].$refs.refObserver.validate().then(async (isValid) => {
       if (isValid) {
         if (this.assetMainType as string === 'SENTINEL_HUB_OPEN_DATA' && this.currentStep === 2) {
           this.submitSentinelHubForm();
@@ -679,6 +746,18 @@ export default class CreateAsset extends Vue {
             this.submitDataFileForm();
           }
         } else {
+          if (this.currentStep === 5) {
+            /* check contract */
+            store.commit('setLoading', true);
+            if (!(await this.isSelectedContractAccepted())) {
+              this.isPendingDefaultContractAcceptance = true;
+              this.pollDefaultContractAcceptance();
+              store.commit('setLoading', false);
+              return;
+            }
+            store.commit('setLoading', false);
+          }
+
           this.currentStep += 1;
           window.scrollTo({
             top: 0,
@@ -983,6 +1062,17 @@ export default class CreateAsset extends Vue {
   }
 
   async submitApiForm(isDraft = false): Promise<void> {
+    /* CHECK IF CONTRACT AVAILABLE */
+    store.commit('setLoading', true);
+    if (!(await this.isSelectedContractAvailable())) {
+      this.modalToShow = 'contractNotAvailable';
+      this.currentStep = 5;
+      store.commit('setLoading', false);
+      return;
+    }
+    store.commit('setLoading', false);
+    /* */
+
     try {
       let draftAsset: AssetDraft = {} as AssetDraft;
 
@@ -1020,6 +1110,17 @@ export default class CreateAsset extends Vue {
   }
 
   async submitDataFileForm(isDraft = false): Promise<void> {
+    /* CHECK IF CONTRACT AVAILABLE */
+    store.commit('setLoading', true);
+    if (!(await this.isSelectedContractAvailable())) {
+      this.modalToShow = 'contractNotAvailable';
+      this.currentStep = 5;
+      store.commit('setLoading', false);
+      return;
+    }
+    store.commit('setLoading', false);
+    /* */
+
     // fix open dataset
     if (this.assetMainType as string === 'OPEN') {
       this.asset = {

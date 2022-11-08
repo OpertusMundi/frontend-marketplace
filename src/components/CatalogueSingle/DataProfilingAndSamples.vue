@@ -33,25 +33,46 @@
       </div>
 
       <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
-        <p><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
+        <p v-if="'featureCount' in metadata"><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
         <p><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
         <p v-if="metadata.attributes">
           <strong>ATTRIBUTE NAMES:</strong> <span v-for="(attribute, i) in metadata.attributes" :key="attribute">{{ attribute }}<span v-if="i !== metadata.attributes.length - 1">, </span></span>
         </p>
+        <p v-if="'cog' in metadata"><strong>CLOUD OPTIMISED GeoTIFF:</strong> {{ metadata.cog ? 'YES' : 'NO' }}</p>
+        <p v-if="metadata.info && metadata.info.bands"><strong>NUMBER OF BANDS:</strong> {{ metadata.info.bands.length }}</p>
+
+        <div class="asset__section__tabs__attribute-info mt-xs-15 mb-xs-15" v-if="metadata.resolution">
+          <div class="grid-ignore-wrapper">
+            <strong>RESOLUTION:</strong>
+            <div class="asset__section__tabs__attribute-info__statistics">
+              <span>[x]</span> <span>{{ metadata.resolution.x }} {{ metadata.resolution.unit === 'metre' ? 'm' : metadata.resolution.unit }}</span>
+              <span>[y]</span> <span>{{ metadata.resolution.y }} {{ metadata.resolution.unit === 'metre' ? 'm' : metadata.resolution.unit }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="asset__section__tabs__attribute-info" v-if="metadata.resolution">
+          <div class="grid-ignore-wrapper">
+            <strong>SIZE:</strong>
+            <div class="asset__section__tabs__attribute-info__statistics">
+              <span>[width]</span> <span>{{ metadata.info.width }} px</span>
+              <span>[height]</span> <span>{{ metadata.info.height }} px</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
       <div class="asset__section__head__tab-container">
-        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
-          <li><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">Attributes</a></li>
-          <li><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
-          <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
-          <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
-          <li v-for="(sample, i) in samples" :key="i">
-            <a href="#" @click.prevent="activeTab = i + 3" :class="{ active: activeTab == i + 3 }">Sample {{ i + 1 }}</a>
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES' }}</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
+          <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }" v-if="catalogueItem.type === 'VECTOR'">Correlation Matrix</a></li>
+          <li class="nowrap" v-for="(sample, i) in samples" :key="i">
+            <a href="#" @click.prevent="activeTab = i + 4" :class="{ active: activeTab == i + 4 }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
-        <ul class="asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1">
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && !['RASTER', 'NETCDF'].includes(catalogueItem.type)">
           <li>
             <a href="#" @click.prevent="changeLayout('VERTICAL')"
               ><svg :class="isVertical ? 'active' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -82,7 +103,7 @@
           </li>
           <!-- DROPDOWN BUTTON -->
           <li :class="toggleDropdownContainer ? 'active' : ''" class="dropdown-item">
-            <a v-if="metadata.attributes" href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
+            <a v-if="metadata.attributes" class="no-underline" href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
             <svg xmlns="http://www.w3.org/2000/svg" width="10.29" height="7.492" viewBox="0 0 10.29 7.492">
               <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
             </svg>
@@ -112,151 +133,240 @@
       <div class="asset__section__content__inner" v-else>
         <ul class="asset__section__tabs">
           <!-- ATTRIBUTES -->
-          <li v-if="activeTab == 1 && isVertical">
-            <template v-if="metadata.attributes">
-              <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
-                <template v-if="selectedAttribute.includes(attribute)">
-                  <h4 class="mb-xs-20">
-                    [<small>{{ metadata.datatypes[attribute] }}</small
-                    >] {{ attribute }}
-                  </h4>
-                  <div class="row">
-                    <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
-                      <div class="asset__section__tabs__attribute-info">
-                        <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
+          <template v-if="!['RASTER', 'NETCDF'].includes(catalogueItem.type)">
+            <li v-if="activeTab == 1 && isVertical">
+              <template v-if="metadata.attributes">
+                <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
+                  <template v-if="selectedAttribute.includes(attribute)">
+                    <h4 class="mb-xs-20">
+                      [<small>{{ metadata.datatypes[attribute] }}</small
+                      >] {{ attribute }}
 
-                        <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
-                          <strong>Most frequent values</strong>
-                          <div>
-                            <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
-                              <span
-                                >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
-                                >]</span
-                              >
+                      <template v-if="metadata.numericalValuePatterns && metadata.numericalValuePatterns[attribute]">
+                        <br><small>{{ metadata.numericalValuePatterns[attribute] }}</small>
+                      </template>
+                    </h4>
+                    <div class="row">
+                      <!-- <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'"> -->
+                      <div class="col-sm-6">
+                        <div class="asset__section__tabs__attribute-info">
+                          <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
+
+                          <template v-if="metadata.uniqueness && attribute in metadata.uniqueness"><strong>Uniqueness</strong> <span>{{ metadata.uniqueness[attribute] }}</span></template>
+
+                          <div v-if="attribute in metadata.distribution" class="grid-ignore-wrapper">
+                            <strong>Most frequent values</strong>
+                            <div>
+                              <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                                <span
+                                  >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
+                                  >]</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
+                            <strong>Distinct values</strong>
+                            <div>
+                              <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
+                            </div>
+                          </div>
+
+                          <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
+                            <strong>Statistics</strong>
+                            <div class="asset__section__tabs__attribute-info__statistics">
+                              <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                            </div>
+                          </div>
+
+                          <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
+                            <strong>Quantiles</strong>
+                            <div class="asset__section__tabs__attribute-info__quantiles">
+                              <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
                             </div>
                           </div>
                         </div>
-
-                        <div v-if="attribute in metadata.distinct" class="grid-ignore-wrapper">
-                          <strong>Distinct values</strong>
-                          <div>
-                            <span v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></span>
-                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
+                          <p><strong>Distribution</strong></p>
+                          <chart :options="getChartOptions('distribution', { total: metadata.count[attribute], distribution: metadata.distribution[attribute]})"></chart>
                         </div>
-
-                        <div v-if="attribute in metadata.statistics.min" class="grid-ignore-wrapper">
-                          <strong>Statistics</strong>
-                          <div class="asset__section__tabs__attribute-info__statistics">
-                            <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
-                          </div>
-                        </div>
-
-                        <div v-if="attribute in metadata.quantiles['5']" class="grid-ignore-wrapper">
-                          <strong>Quantiles</strong>
-                          <div class="asset__section__tabs__attribute-info__quantiles">
-                            <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
-                          </div>
+                        <div class="asset__section__tabs__pie-chart-container" v-if="showBoxPlot(attribute)">
+                          <p><strong>Numerical Statistics</strong></p>
+                          <chart :options="getChartOptions('boxplot', { attribute })"></chart>
                         </div>
                       </div>
                     </div>
-                    <div class="col-sm-6 asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
-                      <p><strong>Distribution</strong></p>
-                      <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
+
+                    <hr v-if="i !== metadata.attributes.length - 1" />
+                  </template>
+                </div>
+              </template>
+            </li>
+            <!-- HORIZONTAL RENDER -->
+            <li v-else-if="activeTab == 1 && !isVertical">
+              <table class="data-table" v-if="metadata.attributes">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <template v-for="attribute in metadata.attributes">
+                      <th v-if="selectedAttribute.includes(attribute)" :key="attribute" class="align-middle">
+                        [<small>{{ metadata.datatypes[attribute] }}</small
+                        >] {{ attribute }}
+
+                        <template v-if="metadata.numericalValuePatterns && metadata.numericalValuePatterns[attribute]">
+                          <br><small>{{ metadata.numericalValuePatterns[attribute] }}</small>
+                        </template>
+                      </th>
+                    </template>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Values in total</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.count[attribute] }}</td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Uniqueness</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.uniqueness && attribute in metadata.uniqueness ? metadata.uniqueness[attribute] : '-' }}</td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Most frequent values</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="attribute in metadata.distribution">
+                          <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
+                            <span
+                              >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
+                              >]</span
+                            >
+                          </div>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Distinct values</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="attribute in metadata.distinct">
+                          <div v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></div>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Statistics</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="attribute in metadata.statistics.min">
+                          <div class="asset__section__tabs__attribute-info__statistics">
+                            <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
+                          </div>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Quantiles</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="attribute in metadata.quantiles['5']">
+                          <div class="asset__section__tabs__attribute-info__statistics">
+                            <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
+                          </div>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Distribution</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="showDistributionPieChart(attribute)">
+                          <chart :options="getChartOptions('distribution', { total: metadata.count[attribute], distribution: metadata.distribution[attribute] })"></chart>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                  <tr>
+                    <td><strong>Numerical Statistics</strong></td>
+                    <template v-for="attribute in metadata.attributes">
+                      <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
+                        <template v-if="showBoxPlot(attribute)">
+                          <chart :options="getChartOptions('boxplot', { attribute })"></chart>
+                        </template>
+                        <span v-else> - </span>
+                      </td>
+                    </template>
+                  </tr>
+                </tbody>
+              </table>
+            </li>
+          </template>
+
+          <!-- BANDS (RASTER) -->
+          <li v-if="activeTab == 1 && catalogueItem.type === 'RASTER'">
+            <template v-if="metadata.info && metadata.info.bands">
+              <div v-for="(band, i) in metadata.info.bands" :key="i">
+                <h3 class="mb-xs-20">{{ band }}</h3>
+
+                <div class="asset__section__tabs__attribute-info mb-xs-20" v-if="metadata.statistics">
+                  <div class="grid-ignore-wrapper">
+                    <strong>Statistics</strong>
+                    <div class="asset__section__tabs__attribute-info__statistics">
+                      <div v-for="[key, value] in Object.entries(metadata.statistics[i])" :key="key" class="grid-ignore-wrapper">
+                        <span>[<small>{{ key }}</small>]</span> <span>{{ value }}</span>
+                      </div>
                     </div>
                   </div>
+                </div>
 
-                  <hr v-if="i !== metadata.attributes.length - 1" />
-                </template>
+                <p :style="metadata.noDataValue[i] !== null ? {'margin-bottom': 0} : {}"><strong>Pixel depth:</strong> {{ metadata.histogram[i][3].length }}</p>
+                <p v-if="metadata.noDataValue[i] !== null"><strong>No-date value:</strong> {{ Array.isArray(metadata.noDataValue[i]) ? metadata.noDataValue[i].join(', ') : metadata.noDataValue }}</p>
+
+                <chart :options="getChartOptions('band_histogram', { index: i })"></chart>
+                <hr>
               </div>
             </template>
           </li>
-          <!-- HORIZONTAL RENDER -->
-          <li v-else-if="activeTab == 1 && !isVertical">
-            <table class="data-table" v-if="metadata.attributes">
-              <thead>
-                <tr>
-                  <th></th>
-                  <template v-for="attribute in metadata.attributes">
-                    <th v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      [<small>{{ metadata.datatypes[attribute] }}</small
-                      >] {{ attribute }}
-                    </th>
-                  </template>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Values in total</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">{{ metadata.count[attribute] }}</td>
-                  </template>
-                </tr>
-                <tr>
-                  <td><strong>Most frequent values</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      <template v-if="attribute in metadata.distribution">
-                        <div v-for="attributeValuePair in getMostFrequentValues(metadata.distribution[attribute])" :key="attributeValuePair.attribute">
-                          <span
-                            >{{ attributeValuePair.attribute }} [<small>{{ attributeValuePair.amount }}</small
-                            >]</span
-                          >
-                        </div>
-                      </template>
-                      <span v-else> - </span>
-                    </td>
-                  </template>
-                </tr>
-                <tr>
-                  <td><strong>Distinct values</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      <template v-if="attribute in metadata.distinct">
-                        <div v-for="(distinctValue, i) in metadata.distinct[attribute]" :key="distinctValue">{{ distinctValue }}<span v-if="i !== metadata.distinct[attribute].length - 1">, </span></div>
-                      </template>
-                      <span v-else> - </span>
-                    </td>
-                  </template>
-                </tr>
-                <tr>
-                  <td><strong>Statistics</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      <template v-if="attribute in metadata.statistics.min">
-                        <div class="asset__section__tabs__attribute-info__statistics">
-                          <span>Min</span> <span>{{ metadata.statistics.min[attribute] }}</span> <span>Max</span> <span>{{ metadata.statistics.max[attribute] }}</span> <span>Mean</span> <span>{{ metadata.statistics.mean[attribute] }}</span> <span>Median</span> <span>{{ metadata.statistics.median[attribute] }}</span> <span>Std</span> <span>{{ metadata.statistics.std[attribute] }}</span> <span>Sum</span> <span>{{ metadata.statistics.sum[attribute] }}</span>
-                        </div>
-                      </template>
-                      <span v-else> - </span>
-                    </td>
-                  </template>
-                </tr>
-                <tr>
-                  <td><strong>Quantiles</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      <template v-if="attribute in metadata.quantiles['5']">
-                        <div class="asset__section__tabs__attribute-info__statistics">
-                          <span>5</span> <span>{{ metadata.quantiles['5'][attribute] }}</span> <span>25</span> <span>{{ metadata.quantiles['25'][attribute] }}</span> <span>50</span> <span>{{ metadata.quantiles['50'][attribute] }}</span> <span>75</span> <span>{{ metadata.quantiles['75'][attribute] }}</span> <span>95</span> <span>{{ metadata.quantiles['95'][attribute] }}</span>
-                        </div>
-                      </template>
-                      <span v-else> - </span>
-                    </td>
-                  </template>
-                </tr>
-                <tr>
-                  <td><strong>Distribution</strong></td>
-                  <template v-for="attribute in metadata.attributes">
-                    <td v-if="selectedAttribute.includes(attribute)" :key="attribute">
-                      <template v-if="showDistributionPieChart(attribute)">
-                        <chart :options="getChartOptions(metadata.count[attribute], metadata.distribution[attribute])"></chart>
-                      </template>
-                      <span v-else> - </span>
-                    </td>
-                  </template>
-                </tr>
-              </tbody>
-            </table>
+
+          <!-- VARIABLES (NetCDF) -->
+          <li v-if="activeTab == 1 && catalogueItem.type === 'NETCDF'" class="netcdf-container">
+            <template v-if="metadata.variablesList && metadata.variablesList.length">
+              <template v-if="isVertical">
+                <div
+                  v-for="variable in metadata.variablesList.filter((x, i) => (i >= netCDFVariablesPagination.currentPage * netCDFVariablesPagination.itemsPerPage) && (i < (netCDFVariablesPagination.currentPage + 1) * netCDFVariablesPagination.itemsPerPage))"
+                  :key="variable"
+                >
+                  <h3 class="mb-xs-20">{{ variable }}</h3>
+                  <div class="asset__section__tabs__attribute-info asset__section__tabs__attribute-info--small-row-gap">
+                    <template v-if="metadata.variablesProperties">
+                      <template v-if="metadata.variablesProperties[variable].type"><strong>type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].size || metadata.variablesProperties[variable].size === 0"><strong>size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
+                    </template>
+                  </div>
+                  <hr>
+                </div>
+              </template>
+
+              <pagination :currentPage="netCDFVariablesPagination.currentPage" :itemsPerPage="netCDFVariablesPagination.itemsPerPage" :itemsTotal="netCDFVariablesPagination.itemsTotal" @pageSelection="goToNetCDFVariablesPage($event)"></pagination>
+            </template>
+            <template v-else><p>No data</p></template>
           </li>
 
           <!-- MAPS -->
@@ -348,7 +458,16 @@
             </div>
           </li>
 
-          <li v-if="activeTab > 2 && samples !== null">
+          <li v-if="activeTab === 3">
+            <div class="asset__section__tabs__pie-chart-container" v-if="showCorrelationMatrix()">
+              <p>Contains the correlation matrix of the dataset attributes</p>
+              <hr>
+              <chart :options="getChartOptions('correlation_matrix', {})"></chart>
+            </div>
+            <p v-else>No data</p>
+          </li>
+
+          <li v-if="activeTab > 3 && samples !== null">
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
               <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
@@ -391,6 +510,9 @@ import {
 } from 'vue-property-decorator';
 import store from '@/store';
 import { Chart } from 'highcharts-vue';
+import Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more';
+import Heatmap from 'highcharts/modules/heatmap';
 import Multiselect from 'vue-multiselect';
 import L from 'leaflet';
 import {
@@ -408,9 +530,13 @@ import {
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
 import Modal from '@/components/Modal.vue';
+import Pagination from '@/components/Pagination.vue';
 import csvToSample from '@/helper/file';
 import { cloneDeep } from 'lodash';
 import { bbox as turfBBox } from '@turf/turf';
+
+HighchartsMore(Highcharts);
+Heatmap(Highcharts);
 
 @Component({
   components: {
@@ -421,6 +547,7 @@ import { bbox as turfBBox } from '@turf/turf';
     LPolygon,
     LGeoJson,
     Modal,
+    Pagination,
   },
 })
 export default class DataProfilingAndSamples extends Vue {
@@ -466,6 +593,12 @@ export default class DataProfilingAndSamples extends Vue {
   toggleDropdownContainer: boolean;
 
   selectedAttribute: any;
+
+  netCDFVariablesPagination: {
+    currentPage: number,
+    itemsPerPage: number,
+    itemsTotal: number,
+  };
 
   constructor() {
     super();
@@ -518,11 +651,20 @@ export default class DataProfilingAndSamples extends Vue {
       tilesUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     };
+
+    this.netCDFVariablesPagination = {
+      currentPage: 0,
+      itemsPerPage: 10,
+      itemsTotal: 0,
+    };
   }
 
   mounted(): void {
     this.selectedAttribute = this.metadata.attributes; // todo: check
     console.log('heatmap link', this.metadata.heatmap);
+
+    if (this.catalogueItem.type === 'NETCDF') this.initNetCDFPagination();
+
     if (this.metadata.heatmap) {
       this.catalogueApi.getAssetHeatmap(this.metadata.heatmap).then((heatmapResponse) => {
         this.heatmapGeoJson = heatmapResponse;
@@ -566,6 +708,10 @@ export default class DataProfilingAndSamples extends Vue {
     document.body.style.overflowY = this.isExpanded ? 'hidden' : 'visible';
   }
 
+  initNetCDFPagination(): void {
+    if (this.metadata.variablesList?.length) this.netCDFVariablesPagination = { ...this.netCDFVariablesPagination, itemsTotal: this.metadata.variablesList.length };
+  }
+
   showDistributionPieChart(attribute: string): boolean {
     if (attribute in this.metadata.distribution && this.getMostFrequentValues(this.metadata.distribution[attribute]).length > 1) {
       return true;
@@ -573,9 +719,93 @@ export default class DataProfilingAndSamples extends Vue {
     return false;
   }
 
-  // getSampleDownloadOptions(): string[] {
-  //   return this.metadata.samples.map((x, i) => `sample_${i + 1}.csv`);
-  // }
+  formatDistributionForChart(total: number, distribution: Record<string, number>): any {
+    const vals = Object.keys(distribution).map((x) => ({ name: x, y: (distribution[x] / total) * 100 }));
+    const remainingPercentageTo100 = 100 - vals.reduce((sum, obj) => obj.y + sum, 0);
+    if (Math.round(remainingPercentageTo100 * 100) / 100) vals.push({ name: 'other', y: remainingPercentageTo100 }); // add 'other' in pie chart if remaining percentage is at least 0.01 (2 decimals)
+    return vals;
+  }
+
+  getMostFrequentValues(distribution: Record<string, number>): { attribute: string; amount: number }[] {
+    return Object.keys(distribution)
+      .map((x) => ({ attribute: x, amount: distribution[x] }))
+      .sort((a, b) => b.amount - a.amount);
+  }
+
+  showBoxPlot(attribute: string): boolean {
+    if (
+      this.metadata.numericalStatistics && this.metadata.numericalStatistics[attribute]
+      && Object.values(this.metadata.numericalStatistics[attribute]).some((x: any) => (x.mean || x.mean === 0))
+    ) return true;
+    return false;
+  }
+
+  getBoxPlotValues(
+    attribute: string,
+    statistics: {min: Record<string, number>, max: Record<string, number>},
+    numericalStatistics: Record<string, Record<string, { mean: number, stdev: number, median: number, variance: number }>>,
+  ): {
+    categories: string[],
+    values: number[][],
+  } {
+    return {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      categories: Object.entries(numericalStatistics[attribute])
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value]) => key),
+      values: Object.entries(numericalStatistics[attribute])
+        // eslint-disable-next-line
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value], i) => {
+          const classValues = key.split('-');
+          if (classValues.length !== 2) return [];
+
+          const [classMinText, classMaxText] = classValues;
+          const classMin = parseFloat(classMinText);
+          const classMax = parseFloat(classMaxText);
+
+          return [
+            i === 0 ? statistics.min[attribute] : classMin,
+            value.mean - value.stdev,
+            value.mean,
+            value.mean + value.stdev,
+            // eslint-disable-next-line
+            i === Object.entries(numericalStatistics[attribute]).filter(([k, v]) => v.mean || v.mean === 0).length - 1 ? statistics.max[attribute] : classMax,
+          ];
+        }),
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+    };
+  }
+
+  showCorrelationMatrix(): boolean {
+    if (
+      this.metadata.numericalAttributeCorrelation
+      && this.metadata.numericalAttributeCorrelation.columns?.length > 1
+      && this.metadata.numericalAttributeCorrelation.cor_matrix?.length
+      && this.metadata.numericalAttributeCorrelation.cor_matrix[1]
+      && Object.values(this.metadata.numericalAttributeCorrelation.cor_matrix[0]).every((x) => x || x === 0)
+      && Object.values(this.metadata.numericalAttributeCorrelation.cor_matrix[1]).every((x) => x || x === 0)
+    ) return true;
+    return false;
+  }
+
+  getCorrelationMatrixValues(): { categories: string[], values: number[][] } {
+    const data = {
+      categories: this.metadata.numericalAttributeCorrelation.columns,
+      values: this.metadata.numericalAttributeCorrelation.cor_matrix
+        .reduce((p, c, i) => {
+          const line: number[][] = [];
+          c.forEach((x, j) => {
+            line.push([i, j, Math.round(x * 100) / 100]);
+          });
+
+          return [...p, ...line];
+        }, []),
+    };
+
+    console.log('d', data);
+    return data;
+  }
 
   onDownloadAutomatedMetadata(): void {
     fileDownload(JSON.stringify(this.metadata), 'metadata.json');
@@ -609,83 +839,225 @@ export default class DataProfilingAndSamples extends Vue {
     csvExporter.generateCsv(csvArr);
   }
 
-  getChartOptions(total: number, distribution: Record<string, number>): any {
-    const chartOptions = {
-      chart: {
-        type: 'pie',
-        backgroundColor: 'transparent',
-      },
-      colorByPoint: true,
-      credits: {
-        enabled: false,
-      },
-      navigation: {
-        buttonOptions: {
-          enabled: false,
-        },
-      },
-      // colors: this.pieColor,
-      title: {
-        text: '',
-      },
-      subtitle: {
-        text: '',
-      },
-
-      accessibility: {
-        announceNewData: {
-          enabled: true,
-        },
-        point: {
-          valueSuffix: '%',
-        },
-      },
-
-      plotOptions: {
-        series: {
-          dataLabels: {
-            enabled: true,
-            // format: '{point.name}: {point.y:.1f}%',
-            format: '{point.name}',
+  // eslint-disable-next-line
+  getChartOptions(type: string, data: any): any {
+    switch (type) {
+      case 'correlation_matrix': {
+        const chartOptions = {
+          chart: {
+            backgroundColor: 'transparent',
+            plotBorderWidth: 1,
           },
-        },
-      },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            categories: this.getCorrelationMatrixValues().categories,
+          },
+          yAxis: {
+            categories: this.getCorrelationMatrixValues().categories,
+            title: null,
+            reversed: true,
+          },
+          colorAxis: {
+            min: 0,
+            minColor: '#fff',
+            maxColor: '#2a6d8f',
+          },
+          legend: {
+            align: 'right',
+            layout: 'vertical',
+            margin: 0,
+            verticalAlign: 'top',
+            y: 25,
+            symbolHeight: 280,
+          },
+          tooltip: {
+            /* eslint-disable */
+            formatter: function() {
+              return `Attributes: <span><b>${(this as any).series.xAxis.categories[(this as any).point.x]}</b></span> | <span><b>${(this as any).series.yAxis.categories[(this as any).point.y]}</b></span> <br>Correlation: <b>${(this as any).point.value}</b>`;
+            },
+            /* eslint-enable */
+          },
+          series: [{
+            type: 'heatmap',
+            borderWidth: 1,
+            data: this.getCorrelationMatrixValues().values,
+            dataLabels: {
+              enabled: true,
+              color: '#000000',
+            },
+          }],
+        };
 
-      tooltip: {
-        // headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        headerFormat: '',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>',
-      },
+        return chartOptions;
+      }
 
-      series: [
-        {
-          // name: 'Browsers',
-          colorByPoint: true,
-          dataLabels: {
-            connectorShape: 'straight',
-            style: {
-              fontSize: 8,
+      case 'boxplot': {
+        const chartOptions = {
+          chart: {
+            type: 'boxplot',
+            backgroundColor: 'transparent',
+            marginTop: 20,
+          },
+          title: {
+            text: null,
+          },
+          legend: {
+            enabled: false,
+          },
+          xAxis: {
+            categories: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).categories,
+            title: {
+              text: 'Classes',
             },
           },
-          data: this.formatDistributionForChart(total, distribution),
-        },
-      ],
-    };
+          yAxis: {
+            title: {
+              text: 'Values',
+            },
+          },
+          series: [{
+            name: 'Numerical Statistics',
+            data: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).values,
+            color: '#2a6d8f',
+            fillColor: 'rgba(42, 109, 143, 0.3)',
+          }],
+        };
 
-    return chartOptions;
+        return chartOptions;
+      }
+
+      case 'distribution': {
+        const chartOptions = {
+          chart: {
+            type: 'pie',
+            backgroundColor: 'transparent',
+          },
+          colorByPoint: true,
+          credits: {
+            enabled: false,
+          },
+          navigation: {
+            buttonOptions: {
+              enabled: false,
+            },
+          },
+          // colors: this.pieColor,
+          title: {
+            text: '',
+          },
+          subtitle: {
+            text: '',
+          },
+
+          accessibility: {
+            announceNewData: {
+              enabled: true,
+            },
+            point: {
+              valueSuffix: '%',
+            },
+          },
+
+          plotOptions: {
+            series: {
+              dataLabels: {
+                enabled: true,
+                // format: '{point.name}: {point.y:.1f}%',
+                format: '{point.name}',
+              },
+            },
+          },
+
+          tooltip: {
+            // headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            headerFormat: '',
+            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>',
+          },
+
+          series: [
+            {
+              // name: 'Browsers',
+              colorByPoint: true,
+              dataLabels: {
+                connectorShape: 'straight',
+                style: {
+                  fontSize: 8,
+                },
+              },
+              data: this.formatDistributionForChart(data.total, data.distribution),
+            },
+          ],
+        };
+
+        return chartOptions;
+      }
+      case 'band_histogram': {
+        return {
+          chart: {
+            type: 'column',
+            spacingTop: 16,
+          },
+          title: {
+            style: {
+              fontSize: '15px',
+              fontWeight: 600,
+            },
+            text: 'Histogram',
+          },
+          xAxis: {
+            title: {
+              style: {
+                fontWeight: 700,
+              },
+              text: 'Pixel Value',
+            },
+          },
+          yAxis: {
+            title: {
+              style: {
+                fontWeight: 700,
+              },
+              text: 'Frequency',
+            },
+          },
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            column: {
+              pointPadding: 0,
+              padding: 0,
+              borderWidth: 0,
+              groupPadding: 0,
+            },
+          },
+          tooltip: {
+            headerFormat: 'Pixel Value: <b>{point.x}</b> <br/>',
+            pointFormat: 'Frequency: <span style="color:{point.color}"><b>{point.y}</b></span>',
+          },
+          series: [{
+            color: '#190AFF',
+            data: this.metadata.histogram[data.index][3],
+          }],
+        };
+      }
+      default: return null;
+    }
   }
 
-  formatDistributionForChart(total: number, distribution: Record<string, number>): any {
-    const vals = Object.keys(distribution).map((x) => ({ name: x, y: (distribution[x] / total) * 100 }));
-    const remainingPercentageTo100 = 100 - vals.reduce((sum, obj) => obj.y + sum, 0);
-    if (Math.round(remainingPercentageTo100 * 100) / 100) vals.push({ name: 'other', y: remainingPercentageTo100 }); // add 'other' in pie chart if remaining percentage is at least 0.01 (2 decimals)
-    return vals;
-  }
+  goToNetCDFVariablesPage(page: number): void {
+    this.netCDFVariablesPagination = { ...this.netCDFVariablesPagination, currentPage: page };
 
-  getMostFrequentValues(distribution: Record<string, number>): { attribute: string; amount: number }[] {
-    return Object.keys(distribution)
-      .map((x) => ({ attribute: x, amount: distribution[x] }))
-      .sort((a, b) => b.amount - a.amount);
+    const element = document.getElementsByClassName('netcdf-container')[0];
+    if (!element) return;
+    const y = element.getBoundingClientRect().top + window.pageYOffset - 170;
+
+    window.scrollTo({
+      top: y,
+      behavior: 'smooth',
+    });
   }
 
   setMinMaxZoomLevels(): void {

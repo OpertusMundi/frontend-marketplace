@@ -122,6 +122,18 @@ export interface ProviderTemplateContract {
    * Parent master contract
    */
   masterContract?: MasterContractHistory;
+  /**
+   * True if this is the default contract
+   */
+  defaultContract: boolean;
+  /**
+   * True if the provider has read and accepted the default contract
+   */
+  defaultContractAccepted: boolean;
+  /**
+   * Date of contract acceptance in ISO format
+   */
+  defaultContractAcceptedAt: string;
 }
 
 export interface ProviderTemplateContractCommand {

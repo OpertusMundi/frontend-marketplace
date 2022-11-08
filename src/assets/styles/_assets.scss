@@ -477,6 +477,9 @@
 					margin: 10px 0 10px 15px;
 					color: $darkColor;
 				}
+				> div {
+					margin: 15px 0 15px 15px;
+				}
 				&--includes-buttons {
 					strong {
 						line-height: 35px;
@@ -511,6 +514,11 @@
 					display: none;
 				}
 				li {
+					&.nowrap {
+						> a {
+							white-space: nowrap;
+						}
+					}
 					display: inline-block;
 					font-size: em(13);
 					text-transform: uppercase;
@@ -557,6 +565,11 @@
 						font-weight: 500;
 						position: relative;
 						transition: color 0.4s ease;
+						&.no-underline {
+							&:after {
+								content: none !important;
+							}
+						}
 						&:after {
 							content: '';
 							position: absolute;
@@ -608,6 +621,10 @@
 				row-gap: 15px;
 				font-size: em(15);
 				color: $mainFontColor;
+
+				&--small-row-gap {
+					row-gap: 7px;
+				}
 
 				strong {
 					white-space: nowrap;
@@ -1521,6 +1538,9 @@ table.data-table {
 				border-right: 1px solid $greyColor;
 				&:last-child {
 					border-right: none;
+				}
+				&.align-middle {
+					vertical-align: middle;
 				}
 			}
 		}
