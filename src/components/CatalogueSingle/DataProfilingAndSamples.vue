@@ -39,7 +39,7 @@
           <strong>ATTRIBUTE NAMES:</strong> <span v-for="(attribute, i) in metadata.attributes" :key="attribute">{{ attribute }}<span v-if="i !== metadata.attributes.length - 1">, </span></span>
         </p>
         <p v-if="'cog' in metadata"><strong>CLOUD OPTIMISED GeoTIFF:</strong> {{ metadata.cog ? 'YES' : 'NO' }}</p>
-        <p v-if="metadata.info.bands"><strong>NUMBER OF BANDS:</strong> {{ metadata.info.bands.length }}</p>
+        <p v-if="metadata.info && metadata.info.bands"><strong>NUMBER OF BANDS:</strong> {{ metadata.info.bands.length }}</p>
 
         <div class="asset__section__tabs__attribute-info mt-xs-15 mb-xs-15" v-if="metadata.resolution">
           <div class="grid-ignore-wrapper">
@@ -144,7 +144,8 @@
                       >] {{ attribute }}
                     </h4>
                     <div class="row">
-                      <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'">
+                      <!-- <div :class="showDistributionPieChart(attribute) ? 'col-sm-6' : 'col-sm-12'"> -->
+                      <div class="col-sm-6">
                         <div class="asset__section__tabs__attribute-info">
                           <strong>Values in total</strong> <span>{{ metadata.count[attribute] }}</span>
 
@@ -182,9 +183,15 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm-6 asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
-                        <p><strong>Distribution</strong></p>
-                        <chart :options="getChartOptions('distribution', { total: metadata.count[attribute], distribution: metadata.distribution[attribute]})"></chart>
+                      <div class="col-sm-6">
+                        <div class="asset__section__tabs__pie-chart-container" v-if="showDistributionPieChart(attribute)">
+                          <p><strong>Distribution</strong></p>
+                          <chart :options="getChartOptions('distribution', { total: metadata.count[attribute], distribution: metadata.distribution[attribute]})"></chart>
+                        </div>
+                        <div class="asset__section__tabs__pie-chart-container" v-if="showBoxPlot(attribute)">
+                          <p><strong>Numerical Statistics</strong></p>
+                          <chart :options="getChartOptions('boxplot', { attribute })"></chart>
+                        </div>
                       </div>
                     </div>
 
@@ -441,6 +448,8 @@ import {
 } from 'vue-property-decorator';
 import store from '@/store';
 import { Chart } from 'highcharts-vue';
+import Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more';
 import Multiselect from 'vue-multiselect';
 import L from 'leaflet';
 import {
@@ -461,6 +470,8 @@ import Modal from '@/components/Modal.vue';
 import csvToSample from '@/helper/file';
 import { cloneDeep } from 'lodash';
 import { bbox as turfBBox } from '@turf/turf';
+
+HighchartsMore(Highcharts);
 
 @Component({
   components: {
@@ -623,9 +634,13 @@ export default class DataProfilingAndSamples extends Vue {
     return false;
   }
 
-  // getSampleDownloadOptions(): string[] {
-  //   return this.metadata.samples.map((x, i) => `sample_${i + 1}.csv`);
-  // }
+  showBoxPlot(attribute: string): boolean {
+    if (
+      this.metadata.numericalStatistics && this.metadata.numericalStatistics[attribute]
+      && Object.values(this.metadata.numericalStatistics[attribute]).some((x: any) => (x.mean || x.mean === 0))
+    ) return true;
+    return false;
+  }
 
   onDownloadAutomatedMetadata(): void {
     fileDownload(JSON.stringify(this.metadata), 'metadata.json');
@@ -662,6 +677,39 @@ export default class DataProfilingAndSamples extends Vue {
   // eslint-disable-next-line
   getChartOptions(type: string, data: any): any {
     switch (type) {
+      case 'boxplot': {
+        const chartOptions = {
+          chart: {
+            type: 'boxplot',
+            backgroundColor: 'transparent',
+          },
+          title: {
+            text: null,
+          },
+          legend: {
+            enabled: false,
+          },
+          xAxis: {
+            categories: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).categories,
+            title: {
+              text: 'Classes',
+            },
+          },
+          yAxis: {
+            title: {
+              text: 'Values',
+            },
+          },
+          series: [{
+            name: 'Numerical Statistics',
+            data: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).values,
+            color: '#190AFF',
+          }],
+        };
+
+        return chartOptions;
+      }
+
       case 'distribution': {
         const chartOptions = {
           chart: {
@@ -792,6 +840,43 @@ export default class DataProfilingAndSamples extends Vue {
     return Object.keys(distribution)
       .map((x) => ({ attribute: x, amount: distribution[x] }))
       .sort((a, b) => b.amount - a.amount);
+  }
+
+  getBoxPlotValues(
+    attribute: string,
+    statistics: {min: Record<string, number>, max: Record<string, number>},
+    numericalStatistics: Record<string, Record<string, { mean: number, stdev: number, median: number, variance: number }>>,
+  ): {
+    categories: string[],
+    values: number[][],
+  } {
+    return {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      categories: Object.entries(numericalStatistics[attribute])
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value]) => key),
+      values: Object.entries(numericalStatistics[attribute])
+        // eslint-disable-next-line
+        .filter(([key, value]) => value.mean || value.mean === 0)
+        .map(([key, value], i) => {
+          const classValues = key.split('-');
+          if (classValues.length !== 2) return [];
+
+          const [classMinText, classMaxText] = classValues;
+          const classMin = parseFloat(classMinText);
+          const classMax = parseFloat(classMaxText);
+
+          return [
+            i === 0 ? statistics.min[attribute] : classMin,
+            value.mean - value.stdev,
+            value.mean,
+            value.mean + value.stdev,
+            // eslint-disable-next-line
+            i === Object.entries(numericalStatistics[attribute]).filter(([k, v]) => v.mean || v.mean === 0).length - 1 ? statistics.max[attribute] : classMax,
+          ];
+        }),
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+    };
   }
 
   setMinMaxZoomLevels(): void {
