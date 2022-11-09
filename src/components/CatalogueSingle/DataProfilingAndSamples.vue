@@ -353,11 +353,11 @@
                   <h3 class="mb-xs-20">{{ variable }}</h3>
                   <div class="asset__section__tabs__attribute-info asset__section__tabs__attribute-info--small-row-gap">
                     <template v-if="metadata.variablesProperties">
-                      <template v-if="metadata.variablesProperties[variable].type"><strong>type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
-                      <template v-if="metadata.variablesProperties[variable].size || metadata.variablesProperties[variable].size === 0"><strong>size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
-                      <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
-                      <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
-                      <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].type"><strong>Type</strong> <span>{{ metadata.variablesProperties[variable].type }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].size || metadata.variablesProperties[variable].size === 0"><strong>Size</strong> <span>{{ metadata.variablesProperties[variable].size }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].long_name"><strong>Long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].units"><strong>Units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
+                      <template v-if="metadata.variablesProperties[variable].dimensions"><strong>Dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
                       <template v-if="metadata.noDataValues && (metadata.noDataValues[variable] || metadata.noDataValues[variable] === 0)"><strong>No data values</strong> <span>{{ metadata.noDataValues[variable] }}</span></template>
                     </template>
 
