@@ -358,6 +358,23 @@
                       <template v-if="metadata.variablesProperties[variable].long_name"><strong>long name</strong> <span>{{ metadata.variablesProperties[variable].long_name }}</span></template>
                       <template v-if="metadata.variablesProperties[variable].units"><strong>units</strong> <span>{{ metadata.variablesProperties[variable].units }}</span></template>
                       <template v-if="metadata.variablesProperties[variable].dimensions"><strong>dimensions</strong> <span>{{ metadata.variablesProperties[variable].dimensions.length ? metadata.variablesProperties[variable].dimensions.join(', ') : '-' }}</span></template>
+                      <template v-if="metadata.noDataValues && (metadata.noDataValues[variable] || metadata.noDataValues[variable] === 0)"><strong>No data values</strong> <span>{{ metadata.noDataValues[variable] }}</span></template>
+                    </template>
+
+                    <template>
+                      <div v-if="metadata.statistics && metadata.statistics[variable]" class="grid-ignore-wrapper">
+                        <strong>Statistics</strong>
+                        <div class="asset__section__tabs__attribute-info__statistics">
+                          <template v-if="metadata.statistics[variable].count || metadata.statistics[variable].count === 0"><span>Count</span> <span>{{ metadata.statistics[variable].count }}</span></template>
+                          <template v-if="metadata.statistics[variable].missing || metadata.statistics[variable].missing === 0"><span>Missing</span> <span>{{ metadata.statistics[variable].missing }}</span></template>
+                          <template v-if="metadata.statistics[variable].min || metadata.statistics[variable].min === 0"><span>Min</span> <span>{{ metadata.statistics[variable].min }}</span></template>
+                          <template v-if="metadata.statistics[variable].max || metadata.statistics[variable].max === 0"><span>Max</span> <span>{{ metadata.statistics[variable].max }}</span></template>
+                          <template v-if="metadata.statistics[variable].mean || metadata.statistics[variable].mean === 0"><span>Mean</span> <span>{{ metadata.statistics[variable].mean }}</span></template>
+                          <template v-if="metadata.statistics[variable].std || metadata.statistics[variable].std === 0"><span>Std</span> <span>{{ metadata.statistics[variable].std }}</span></template>
+                          <template v-if="metadata.statistics[variable].variance || metadata.statistics[variable].variance === 0"><span>Variance</span> <span>{{ metadata.statistics[variable].variance }}</span></template>
+                          <template v-if="typeof metadata.statistics[variable].contiguous === 'boolean'"><span>Contiguous</span> <span>{{ metadata.statistics[variable].contiguous ? 'yes' : 'no' }}</span></template>
+                        </div>
+                      </div>
                     </template>
                   </div>
                   <hr>
