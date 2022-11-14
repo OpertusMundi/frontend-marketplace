@@ -108,7 +108,7 @@
               <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
             </svg>
             <!-- DROPDOWN CONTAINER -->
-            <div v-if="toggleDropdownContainer" class="dropdown-container">
+            <div v-if="toggleDropdownContainer" class="dropdown-container dropdown-container--asset-profiling">
               <div class="dropdown-container__inner">
                 <ul class="dropdown-container__list" v-if="metadata.attributes">
                   <li v-for="(attribute, i) in metadata.attributes" :key="attribute" class="dropdown-container__list__item">
