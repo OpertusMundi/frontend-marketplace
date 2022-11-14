@@ -877,9 +877,13 @@ export default class DataProfilingAndSamples extends Vue {
             reversed: true,
           },
           colorAxis: {
-            min: 0,
-            minColor: '#fff',
-            maxColor: '#2a6d8f',
+            min: -1,
+            max: 1,
+            stops: [
+              [0, '#d32f2f'],
+              [0.5, '#fff'],
+              [1, '#2a6d8f'],
+            ],
           },
           legend: {
             align: 'right',
