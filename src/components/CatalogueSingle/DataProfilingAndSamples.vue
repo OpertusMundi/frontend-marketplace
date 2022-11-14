@@ -911,6 +911,9 @@ export default class DataProfilingAndSamples extends Vue {
       }
 
       case 'boxplot': {
+        // eslint-disable-next-line
+        const that = this;
+
         const chartOptions = {
           chart: {
             type: 'boxplot',
@@ -940,6 +943,23 @@ export default class DataProfilingAndSamples extends Vue {
             color: '#2a6d8f',
             fillColor: 'rgba(42, 109, 143, 0.3)',
           }],
+          tooltip: {
+            /* eslint-disable */
+            headerFormat: '',
+            pointFormatter: function () {
+              const index = (this as any).index;
+
+              const values = Object.values(that.metadata.numericalStatistics[data.attribute])[index] as {
+                mean: number,
+                median: number,
+                variance: number,
+                stdev: number,
+              };
+
+              return `<b>Mean:</b> ${values.mean}<br><b>Median:</b> ${values.median}<br><b>Variance:</b> ${values.variance}<br><b>St Dev:</b> ${values.stdev}<br>`;
+            }
+            /* eslint-enable */
+          },
         };
 
         return chartOptions;
