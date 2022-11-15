@@ -12,8 +12,13 @@
           <button class="btn btn--std modal__client-secret__label-copied" v-else>copied &#10003;</button>
         </p>
         <p>Copy and save it somewhere safe. You will not be able to reproduce it.
-          <a href="https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/" target="_blank">Read more</a> about Client ID & Secret architecture.
+          <!-- <a href="https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/" target="_blank">Read more</a> about Client ID & Secret architecture. -->
         </p>
+        <small>
+          <p>The pair of <code>client_id</code> and <code>client_secret</code> is a form of credentials that identifies a consumer of topio.market API services. These credentials are used to (periodically) obtain an <code>access_token</code> from topio.market Identity Server. The <code>access_token</code> will in turn will be used, as a common <code>Authorization</code> request header, to access the service endpoints.</p>
+          <p>The flow described above is a standard method of authentication known as OAuth2 <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.4" target="_blank">client credentials grant</a>.</p>
+          <p>The full OAuth2/OpenId configuration can be retrieved from the Identity server <a href="https://accounts.topio.market/auth/realms/Beta-Topio-Market-Services/.well-known/openid-configuration" target="_blank">here</a>.</p>
+        </small>
       </template>
 
       <template v-slot:footer>
