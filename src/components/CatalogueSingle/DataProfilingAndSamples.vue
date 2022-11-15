@@ -108,7 +108,7 @@
               <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
             </svg>
             <!-- DROPDOWN CONTAINER -->
-            <div v-if="toggleDropdownContainer" class="dropdown-container">
+            <div v-if="toggleDropdownContainer" class="dropdown-container dropdown-container--asset-profiling">
               <div class="dropdown-container__inner">
                 <ul class="dropdown-container__list" v-if="metadata.attributes">
                   <li v-for="(attribute, i) in metadata.attributes" :key="attribute" class="dropdown-container__list__item">
@@ -487,11 +487,11 @@
           <li v-if="activeTab > 3 && samples !== null">
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
-              <button v-if="mode === 'review' && activeTab === i + 3 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
-              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
-              <button v-if="mode === 'review' && activeTab === i + 3 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
+              <button v-if="mode === 'review' && activeTab === i + 4 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
+              <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
+              <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
 
-              <div v-if="activeTab === i + 3" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right">
+              <div v-if="activeTab === i + 4" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right">
                 <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
                   <g data-name="Group 753">
                     <g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333" /></g>
@@ -501,7 +501,7 @@
                   </g>
                 </svg>
               </div>
-              <div v-if="activeTab === i + 3" class="samples_table__wrapper">
+              <div v-if="activeTab === i + 4" class="samples_table__wrapper">
                 <table class="samples_table">
                   <tr class="samples_table__header">
                     <th v-for="(attribute, j) in Object.keys(tempSamples[i])" :key="j">{{ attribute }}</th>
@@ -877,9 +877,13 @@ export default class DataProfilingAndSamples extends Vue {
             reversed: true,
           },
           colorAxis: {
-            min: 0,
-            minColor: '#fff',
-            maxColor: '#2a6d8f',
+            min: -1,
+            max: 1,
+            stops: [
+              [0, '#d32f2f'],
+              [0.5, '#fff'],
+              [1, '#2a6d8f'],
+            ],
           },
           legend: {
             align: 'right',
@@ -911,6 +915,9 @@ export default class DataProfilingAndSamples extends Vue {
       }
 
       case 'boxplot': {
+        // eslint-disable-next-line
+        const that = this;
+
         const chartOptions = {
           chart: {
             type: 'boxplot',
@@ -940,6 +947,23 @@ export default class DataProfilingAndSamples extends Vue {
             color: '#2a6d8f',
             fillColor: 'rgba(42, 109, 143, 0.3)',
           }],
+          tooltip: {
+            /* eslint-disable */
+            headerFormat: '',
+            pointFormatter: function () {
+              const index = (this as any).index;
+
+              const values = Object.values(that.metadata.numericalStatistics[data.attribute])[index] as {
+                mean: number,
+                median: number,
+                variance: number,
+                stdev: number,
+              };
+
+              return `<b>Mean:</b> ${values.mean}<br><b>Median:</b> ${values.median}<br><b>Variance:</b> ${values.variance}<br><b>St Dev:</b> ${values.stdev}<br>`;
+            }
+            /* eslint-enable */
+          },
         };
 
         return chartOptions;

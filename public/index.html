@@ -25,6 +25,23 @@
     <!-- Inject Thymeleaf template variables -->
     <meta name="_csrf" th:content="<%= '${_csrf.token}' %>" />
     <meta name="_csrf_header" th:content="<%= '${_csrf.headerName}' %>" />
+
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:image:src"   th:content="<%= '${tags.imageUrl}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:image:alt"   th:content="<%= '${tags.title}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:site"           content="@Topio/" />
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:card"           content="summary_large_image" />
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:title"       th:content="<%= '${tags.title}' %>"  />
+    <meta th:if="<%= '${tags != null}' %>" name="twitter:description" th:content="<%= '${tags.description}' %>" />
+
+    <meta th:if="<%= '${tags != null}' %>" property="og:image"        th:content="<%= '${tags.imageUrl}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:image:alt"    th:content="<%= '${tags.title}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:image:width"  th:content="<%= '${tags.imageWidth}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:image:height" th:content="<%= '${tags.imageHeight}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:site_name"       content="Topio">
+    <meta th:if="<%= '${tags != null}' %>" property="og:type"         th:content="<%= '${tags.type}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:title"        th:content="<%= '${tags.title}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:url"          th:content="<%= '${tags.url}' %>" />
+    <meta th:if="<%= '${tags != null}' %>" property="og:description"  th:content="<%= '${tags.description}' %>" />
   </head>
   <body>
     <noscript>

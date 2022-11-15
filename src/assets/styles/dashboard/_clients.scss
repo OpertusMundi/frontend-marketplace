@@ -1,4 +1,9 @@
 .dashboard-clients {
+  code {
+    font-size: .92rem;
+    font-weight: 600;
+  }
+
   .dashboard__head__helpers {
     display: flex;
     flex-direction: column;
@@ -101,6 +106,15 @@
   }
 
   .modal {
+    p {
+      margin-bottom: 1.4em;
+    }
+    small {
+      p {
+        margin-bottom: .8em;
+      }
+    }
+
     &__client-secret {
       margin: 1em 0;
       display: flex;

@@ -14,7 +14,7 @@ import {
   EnumSortField, AssetDraft, AssetDraftQuery, AssetDraftReviewCommand,
 } from '@/model/draft';
 import {
-  AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand,
+  AssetFileAdditionalResourceCommand, ExternalLinkCommand, FileResourceCommand, UserFileResourceCommand,
 } from '@/model/asset';
 import { AxiosRequestConfig } from 'axios';
 
@@ -268,6 +268,17 @@ export default class DraftAssetApi extends Api {
       ...config,
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((response: AxiosServerResponse<AssetDraft>) => {
+      const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
+
+      return data;
+    });
+  }
+
+  public async addExternalLink(key: string, command: ExternalLinkCommand): Promise<ServerResponse<AssetDraft>> {
+    const url = `/action/drafts/${key}/resources/url`;
+
+    return this.post<ExternalLinkCommand, ServerResponse<AssetDraft>>(url, command).then((response: AxiosServerResponse<AssetDraft>) => {
       const { data } = response;
       if (data.success === false) showApiErrorModal(data.messages);
 
