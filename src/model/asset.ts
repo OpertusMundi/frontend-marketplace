@@ -227,6 +227,29 @@ export interface FileResourceCommand {
   format: string;
 }
 
+export interface ExternalLinkCommand {
+  /**
+   * Geometry data CRS
+   */
+  crs: string,
+  /**
+   * File encoding
+   */
+  encoding: string,
+  /**
+   * File name
+   */
+  fileName: string,
+  /**
+   * File format
+   */
+  format: string,
+  /**
+   * A URL to an external resource. Only secure URLs are allowed
+   */
+  url: string,
+}
+
 export interface UserFileResourceCommand {
   /**
    * Geometry data CRS e.g. EPSG:4326

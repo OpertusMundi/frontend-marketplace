@@ -97,7 +97,7 @@
 
               <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
+                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
@@ -107,7 +107,6 @@
               <template v-if="assetMainType === 'OPEN'">
                 <open-asset-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></open-asset-metadata>
                 <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
-                <!-- <delivery ref="step4" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></delivery> -->
                 <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" v-if="currentStep === 4"></open-asset-delivery>
                 <review ref="step5" :accessToFileType="getAccessToFileType" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
@@ -192,7 +191,12 @@ import {
   CatalogueItem, EnumConformity, EnumDeliveryMethod, DraftApiFromAssetCommand, EnumDraftCommandType, DraftApiFromFileCommand, SentinelHubItemCommand, EnumResponsiblePartyRole,
 } from '@/model/catalogue';
 import { EnumAssetType, EnumAssetTypeCategory, EnumSpatialDataServiceType } from '@/model/enum';
-import { AssetFileAdditionalResourceCommand, FileResourceCommand, UserFileResourceCommand } from '@/model/asset';
+import {
+  AssetFileAdditionalResourceCommand,
+  FileResourceCommand,
+  UserFileResourceCommand,
+  ExternalLinkCommand,
+} from '@/model/asset';
 import { EnumContractType } from '@/model/contract';
 import store from '@/store';
 import Type from '@/components/Assets/Create/Type.vue';
@@ -228,6 +232,12 @@ interface FileToUpload {
   fileName: string;
   fileExtension: string;
   crs: string;
+  encoding: string;
+}
+
+interface LinkToAsset {
+  url: string;
+  fileName: string;
   encoding: string;
 }
 
@@ -293,8 +303,6 @@ export default class CreateAsset extends Vue {
 
   selectedPublishedFileForDataFileCreation: UserFileResourceCommand | null;
 
-  // contract: string;
-
   totalSteps = 7;
 
   currentStep = 1;
@@ -304,6 +312,8 @@ export default class CreateAsset extends Vue {
   additionalResourcesToUpload: { resourceCommand: AssetFileAdditionalResourceCommand; file: File }[];
 
   fileToUpload: FileToUpload;
+
+  linkToAsset: LinkToAsset;
 
   uploading: any;
 
@@ -335,6 +345,12 @@ export default class CreateAsset extends Vue {
       fileName: '',
       fileExtension: '',
       crs: '',
+      encoding: 'UTF-8',
+    };
+
+    this.linkToAsset = {
+      url: '',
+      fileName: '',
       encoding: 'UTF-8',
     };
 
@@ -813,7 +829,7 @@ export default class CreateAsset extends Vue {
 
   onSaveDraft(): void {
     if (this.assetMainType === EnumAssetTypeCategory.DATA_FILE) {
-      if (this.fileToUpload.isFileSelected) {
+      if (this.fileToUpload.isFileSelected || this.linkToAsset.url) {
         this.modalToShow = 'saveDraftFileAlert';
         return;
       }
@@ -988,6 +1004,28 @@ export default class CreateAsset extends Vue {
 
     const asset = uploadResourceResponse.result.command;
     return asset;
+  }
+
+  async addExternalLink(draftAssetKey: string, linkData: LinkToAsset, asset: CatalogueItemCommand): Promise<CatalogueItemCommand> {
+    this.showUploadingMessage(false, 'Your resource is being added');
+
+    const data: ExternalLinkCommand = {
+      crs: asset.referenceSystem,
+      encoding: linkData.encoding,
+      fileName: linkData.fileName,
+      format: asset.format,
+      url: linkData.url,
+    };
+
+    const externalLinkResponse = await this.draftAssetApi.addExternalLink(draftAssetKey, data);
+
+    if (!externalLinkResponse.success) {
+      console.log('err', externalLinkResponse);
+      this.showUploadingMessage(true, 'An error occurred');
+      throw new Error('error');
+    }
+
+    return externalLinkResponse.result.command;
   }
 
   async addResourceFromFileSystem(draftKey: string): Promise<CatalogueItemCommand> {
@@ -1169,7 +1207,9 @@ export default class CreateAsset extends Vue {
 
       if (this.fileToUpload.isFileSelected) this.asset = await this.uploadResource(draftAsset.key, this.uploadConfig);
 
-      if (this.selectedPublishedFileForDataFileCreation) this.asset = await this.addResourceFromFileSystem(draftAsset.key);
+      if (this.linkToAsset.url && this.linkToAsset.fileName) this.asset = await this.addExternalLink(draftAsset.key, this.linkToAsset, this.asset as CatalogueItemCommand);
+
+      if (this.selectedPublishedFileForDataFileCreation?.path) this.asset = await this.addResourceFromFileSystem(draftAsset.key);
 
       console.log('dak', draftAsset.key);
       await this.submitAsset(draftAsset.key);

@@ -117,10 +117,6 @@
                   <validation-provider v-slot="{ errors }" rules="required">
                     <div class="form-group mt-xs-20">
                       <label for="fileEncoding">Encoding</label>
-                      <!-- <input class="form-group__text" id="fileEncoding" type="text" placeholder="e.g. UTF-8" v-model="fileToUploadLocal.encoding" />
-                      <div class="errors" v-if="errors.length">
-                        <span class="mt-xs-20">Encoding is required</span>
-                      </div> -->
                       <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileToUploadLocal.encoding" @tag="fileToUploadLocal = { ...fileToUploadLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
                       <div class="errors" v-if="errors.length">
                         <span class="mt-xs-20">Encoding is required</span>
@@ -137,7 +133,29 @@
                 </p>
               </div>
               <div>
-                <input type="text" name="linkToAsset" class="form-group__text" id="" placeholder="Paste link here" v-model="linkToAsset" />
+                <validation-provider v-slot="{ errors }" name="URL" rules="required|secure_link">
+                  <div class="form-group">
+                    <label for="linkToAssetURL">URL *</label>
+                    <input type="text" class="form-group__text" name="linkToAssetURL" id="linkToAssetURL" placeholder="Paste link here" v-model="linkToAssetLocal.url">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="File name" :rules="`required|filename_extension:${format}`">
+                  <div class="form-group">
+                    <label for="linkToAssetFileName">File name *</label>
+                    <input type="text" class="form-group__text" name="linkToAssetFileName" id="linkToAssetFileName" placeholder="" v-model="linkToAssetLocal.fileName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" rules="required">
+                  <div class="form-group mt-xs-20">
+                    <label for="fileEncoding">Encoding</label>
+                    <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="linkToAssetLocal.encoding" @tag="linkToAssetLocal = { ...linkToAssetLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
+                    <div class="errors" v-if="errors.length">
+                      <span class="mt-xs-20">Encoding is required</span>
+                    </div>
+                  </div>
+                </validation-provider>
               </div>
             </div>
             <div v-else-if="byPlatform === 'TOPIO_DRIVE' && byOwnMeans === 'DIGITAL_PLATFORM'" class="col-md-4">
@@ -193,59 +211,6 @@
             </div>
           </div>
         </div>
-
-        <!-- <div class="dashboard__form__step__delivery__inner" v-if="deliveryType === 'owm_means'">
-          <div class="dashboard__form__step__title">
-            <p>Please select one of the following options and provide the requested information. Delivery must take place within three (3) working days following a proof of payment provided to us by the consumer.</p>
-          </div>
-          <validation-provider v-slot="{ errors }" name="Own Means" rules="required">
-          <div class="form-group">
-            <label class="control control-radio">
-              Digital delivery
-              <input type="radio" name="asset_access" value="digital" />
-              <div class="control_indicator"></div>
-            </label>
-            <label class="control control-radio">
-              Physical media
-              <input type="radio" name="asset_access" value="physical" />
-              <div class="control_indicator"></div>
-            </label>
-            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-          </div>
-          </validation-provider>
-          <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--digital">
-            <validation-provider v-slot="{ errors }" name="Notes for buyer" rules="required">
-            <div class="form-group">
-              <label for="asset_link">Notes for buyer</label>
-              <textarea name="" id="" cols="20" rows="5"></textarea>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-            </validation-provider>
-          </div>
-          <div class="dashboard__form__step__delivery__access dashboard__form__step__delivery__access--physical">
-            <validation-provider v-slot="{ errors }" name="Type of physical media" rules="required">
-              <div class="form-group">
-                <label for="">Type of physical media</label>
-                <input type="text" class="form-group__text" id="">
-                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-              </div>
-            </validation-provider>
-            <validation-provider v-slot="{ errors }" name="Number of objects" rules="required">
-              <div class="form-group">
-                <label for="">Number of objects</label>
-                <input type="text" class="form-group__text" id="">
-                <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-              </div>
-            </validation-provider>
-            <validation-provider v-slot="{ errors }" name="Notes for buyer" rules="required">
-            <div class="form-group">
-              <label for="asset_link">Notes for buyer</label>
-              <textarea name="" id="" cols="20" rows="5"></textarea>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-            </validation-provider>
-          </div>
-        </div> -->
       </div>
     </div>
   </validation-observer>
@@ -260,8 +225,38 @@ import Multiselect from 'vue-multiselect';
 import { EnumDeliveryMethod, DraftApiFromFileCommand } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
 import { EnumResourceSource, EnumResourceType, FileResource } from '@/model/asset';
+import store from '@/store';
+
+const secureLinkValidator = {
+  message() {
+    return 'A secure (https://) URL is required';
+  },
+  validate(value: string) {
+    if (value.startsWith('https://')) return true;
+    return false;
+  },
+};
+
+const fileNameExtensionValidator = {
+  message(value: string, args: any) {
+    const format = args[0];
+    const { fileTypes } = store.getters.getConfig?.configuration?.asset;
+    return `File name must have one of the following extensions: ${(fileTypes.some((x) => x.format === format) ? fileTypes.find((x) => x.format === format).extensions : []).join(', ')}`;
+  },
+  validate(value: string, args: any) {
+    const format = args[0];
+    const { fileTypes } = store.getters.getConfig?.configuration?.asset;
+    if (!fileTypes) return false;
+    const acceptedExtensions = fileTypes.some((x) => x.format === format) ? fileTypes.find((x) => x.format === format).extensions : [];
+
+    if (acceptedExtensions.some((x) => value.endsWith(`.${x}`))) return true;
+    return false;
+  },
+};
 
 extend('required', required);
+extend('secure_link', secureLinkValidator);
+extend('filename_extension', fileNameExtensionValidator);
 
 interface FileToUpload {
   isFileSelected: boolean;
@@ -269,6 +264,12 @@ interface FileToUpload {
   fileName: string;
   fileExtension: string;
   crs: string;
+  encoding: string;
+}
+
+interface LinkToAsset {
+  url: string;
+  fileName: string;
   encoding: string;
 }
 
@@ -285,7 +286,11 @@ export default class Delivery extends Vue {
 
   @Prop({ required: true }) private fileToUpload!: FileToUpload;
 
+  @Prop({ required: true }) private linkToAsset!: LinkToAsset;
+
   @Prop({ required: true }) private resources!: FileResource[];
+
+  @Prop({ required: true }) readonly format!: string;
 
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>;
@@ -299,7 +304,7 @@ export default class Delivery extends Vue {
 
   byPlatform: 'DIRECT_UPLOAD' | 'LINK_TO_ASSET' | 'TOPIO_DRIVE' | null;
 
-  linkToAsset: string | null;
+  linkToAssetLocal: LinkToAsset;
 
   fileTopioDrive: any | null;
 
@@ -312,13 +317,13 @@ export default class Delivery extends Vue {
 
     this.deliveryMethodLocal = this.deliveryMethod;
 
-    this.fileToUploadLocal = this.fileToUpload;
+    this.fileToUploadLocal = { ...this.fileToUpload };
 
     this.byOwnMeans = 0;
 
     this.byPlatform = null;
 
-    this.linkToAsset = '';
+    this.linkToAssetLocal = { ...this.linkToAsset };
 
     this.fileTopioDrive = {};
 
@@ -338,6 +343,13 @@ export default class Delivery extends Vue {
     }
   }
 
+  @Watch('byPlatform')
+  onPlatformDeliveryMethodChange(): void {
+    this.fileToUploadLocal = { ...this.fileToUploadLocal, isFileSelected: false, encoding: 'UTF-8' };
+    this.linkToAssetLocal = { url: '', fileName: '', encoding: 'UTF-8' };
+    this.fileTopioDrive = {};
+  }
+
   @Watch('deliveryMethodLocal')
   onDeliveryMethodChange(deliveryMethod: EnumDeliveryMethod): void {
     this.$emit('update:deliveryMethod', deliveryMethod);
@@ -355,14 +367,14 @@ export default class Delivery extends Vue {
 
   @Watch('fileTopioDrive', { deep: true })
   onfileTopioDriveChange(fileTopioDrive: DraftApiFromFileCommand | null): void {
-    this.fileToUploadLocal = {
-      isFileSelected: false,
-      file: {} as File,
-      fileName: '',
-      fileExtension: '',
-      crs: '',
-      encoding: '',
-    };
+    // this.fileToUploadLocal = {
+    //   isFileSelected: false,
+    //   file: {} as File,
+    //   fileName: '',
+    //   fileExtension: '',
+    //   crs: '',
+    //   encoding: '',
+    // };
 
     this.$emit('update:selectedPublishedFileForDataFileCreation', { ...fileTopioDrive, encoding: this.fileTopioDriveEncoding });
     this.$emit('update:fileToUpload', this.fileToUploadLocal);
@@ -375,14 +387,17 @@ export default class Delivery extends Vue {
     this.$emit('update:fileToUpload', this.fileToUploadLocal);
   }
 
+  @Watch('linkToAssetLocal', { deep: true })
+  onLinkToAssetLocalChange(): void {
+    console.log('link-to-asset change');
+    this.$emit('update:linkToAsset', this.linkToAssetLocal);
+  }
+
   // eslint-disable-next-line
   readFile(e): void {
     console.log(e);
     const [file] = e.srcElement.files;
-    // this.fileToUploadLocal.isFileSelected = true;
-    // this.fileToUploadLocal.file = file;
-    // this.fileToUploadLocal.fileName = file.name;
-    // this.fileToUploadLocal.fileExtension = file.name.split('.').pop();
+
     this.fileToUploadLocal = {
       ...this.fileToUploadLocal,
       isFileSelected: true,
@@ -390,7 +405,6 @@ export default class Delivery extends Vue {
       fileName: file.name,
       fileExtension: file.name.split('.').pop(),
     };
-    // this.$emit('update:fileToUpload', this.fileToUploadLocal);
   }
 
   removeResource(id: string): void {
