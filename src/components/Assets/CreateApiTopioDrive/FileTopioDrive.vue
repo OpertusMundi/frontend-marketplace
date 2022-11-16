@@ -1,9 +1,9 @@
 <template>
   <div class="file_manager__inner">
     <div class="file_manager__head">
-      <div class="file_manager__head__helpers">
-        <div class="asset_search asset_search--grey-border">
-          <div class="asset_search__upper asset_search__upper--sm asset_search__upper--no-z-index asset_search__upper--no-functional-search-button">
+      <div class="file_manager__head__helpers file_manager__head__helpers--flex-0">
+        <div class="asset_search asset_search--sm asset_search--grey-border">
+          <div class="asset_search__upper asset_search__upper--no-z-index asset_search__upper--no-functional-search-button">
             <input type="text" name="" id="" v-model="searchString" placeholder="Search in folder" class="asset_search__upper__input" />
             <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt="" /></div>
             <!-- <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="@/assets/images/icons/close_icon.svg" alt="" /></div> -->

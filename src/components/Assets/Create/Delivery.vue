@@ -249,7 +249,7 @@ const fileNameExtensionValidator = {
     if (!fileTypes) return false;
     const acceptedExtensions = fileTypes.some((x) => x.format === format) ? fileTypes.find((x) => x.format === format).extensions : [];
 
-    if (acceptedExtensions.some((x) => value.endsWith(`.${x}`))) return true;
+    if (acceptedExtensions.some((x) => value.endsWith(`.${x}`) && value.split('.')[0])) return true;
     return false;
   },
 };
