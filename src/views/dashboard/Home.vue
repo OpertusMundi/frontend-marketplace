@@ -4,6 +4,19 @@
       <h1>Hello, {{ fullName }}!</h1>
     </div>
 
+    <div class="stats-card stats-card--pending-info-box"
+        v-if="$store.getters.getProfile && !$store.getters.isPendingInfoBoxHidden && (!isUserKYCUBOValidated || ($store.getters.hasRole(['ROLE_PROVIDER', 'ROLE_VENDOR_PROVIDER']) && !isUserBankAccountSubmitted))"
+      >
+      <div>
+        <span v-if="!isUserKYCUBOValidated">KYC / UBO validation pending</span>
+        <span v-if="$store.getters.hasRole(['ROLE_PROVIDER', 'ROLE_VENDOR_PROVIDER']) && !isUserBankAccountSubmitted">Bank information pending</span>
+      </div>
+      <div>
+        <router-link to="/dashboard/settings" class="btn btn--std btn--blue">go to settings</router-link>
+        <small class="btn-later" @click="$store.commit('setPendingInfoBoxHidden', true)">I 'll do it later</small>
+      </div>
+    </div>
+
     <!-- USER / CONSUMER -->
     <div v-if="!isProvider">
       <!-- <div> -->
@@ -273,6 +286,38 @@ export default class DashboardHome extends Vue {
 
   get isLoading(): boolean {
     return this.isLoadingItemsNum || this.isLoadingLatestOrders || this.isLoadingLatestPurchases || this.isLoadingLatestActiveSubscriptions;
+  }
+
+  get isUserKYCUBOValidated(): boolean {
+    const profile = this.$store.getters.getProfile;
+
+    if (this.$store.getters.hasRole([EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER])) {
+      if (!profile.consumer) return false;
+      if (!profile.consumer.current && !profile.consumer.draft) return false;
+      if (!profile.consumer.current && profile.consumer.draft.kycLevel === 'LIGHT') return false;
+      if (!profile.consumer.draft && profile.consumer.current.kycLevel === 'LIGHT') return false;
+      if (profile.consumer.current.kycLevel === 'LIGHT' && profile.consumer.draft.kycLevel === 'LIGHT') return false;
+    }
+
+    if (this.$store.getters.hasRole([EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER])) {
+      if (!profile.provider) return false;
+      if (!profile.provider.current && !profile.provider.draft) return false;
+      if (!profile.provider.current && profile.provider.draft.kycLevel === 'LIGHT') return false;
+      if (!profile.provider.draft && profile.provider.current.kycLevel === 'LIGHT') return false;
+      if (profile.provider.current.kycLevel === 'LIGHT' && profile.provider.draft.kycLevel === 'LIGHT') return false;
+    }
+
+    return true;
+  }
+
+  get isUserBankAccountSubmitted(): boolean {
+    const profile = this.$store.getters.getProfile;
+    if (!profile.provider) return false;
+    if (!profile.provider.current && !profile.provider.draft) return false;
+    if (!profile.provider.current && !profile.provider.draft.bankAccount) return false;
+    if (!profile.provider.draft && !profile.provider.current.bankAccount) return false;
+    if (!profile.provider.current.bankAccount && !profile.provider.draft.bankAccount) return false;
+    return true;
   }
 
   @Watch('isLoading', { immediate: true })

@@ -13,6 +13,7 @@ import Messages from './modules/messages.module';
 import GlobalModals from './modules/global-modals.module';
 import ApiErrors from './modules/api-errors.module';
 import Announcement from './modules/announcement';
+import Dashboard from './modules/dashboard.module';
 
 Vue.use(Vuex);
 
@@ -31,6 +32,7 @@ const store = new Vuex.Store({
     globalModals: GlobalModals,
     apiErrors: ApiErrors,
     announcement: Announcement,
+    dashboard: Dashboard,
   },
   plugins: [createPersistedState({
     paths: ['user', 'config', 'shop', 'router', 'catalogueFilters', 'notifications'],

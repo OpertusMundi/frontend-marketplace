@@ -161,6 +161,10 @@ export default class BlogPost extends Vue {
     }, 0);
   }
 
+  destroyed(): void {
+    window.removeEventListener('resize', this.fixSizeOfVideos);
+  }
+
   get windowInnerWidth(): number {
     return window.innerWidth;
   }
@@ -192,7 +196,10 @@ export default class BlogPost extends Vue {
     const { data: categories } = categoriesResponse;
     this.categories = categories;
 
-    this.makeIFramesFullWidth();
+    this.fixSizeOfVideos();
+
+    window.addEventListener('resize', this.fixSizeOfVideos);
+
     if (!this.$route.params.postDate && this.post) this.getPreviousAndNextPost(this.post.date);
     if (!this.$route.params.categoryID && !this.$route.params.postID && this.post && this.post.categories && this.post.categories[0]) this.getRelatedPosts(this.post.categories[0], this.post.id);
 
@@ -241,23 +248,83 @@ export default class BlogPost extends Vue {
     return moment(date).format('D MMM YYYY');
   }
 
-  makeIFramesFullWidth(): void {
+  // makeIFramesFullWidth(): void {
+  //   this.$nextTick(() => {
+  //     const iframeElements = document.querySelectorAll('iframe');
+  //     const targetWidth = (document.querySelector('.blog-inner-container') as HTMLElement).clientWidth;
+
+  //     iframeElements.forEach((elem) => {
+  //       if (elem.width === '100%') return;
+
+  //       const height = parseFloat(elem.height);
+  //       const width = parseFloat(elem.width);
+
+  //       const aspectRatio = width / height;
+
+  //       const targetHeight = targetWidth / aspectRatio;
+  //       /* eslint-disable no-param-reassign */
+  //       elem.width = '100%';
+  //       elem.height = `${targetHeight}px`;
+  //       /* eslint-enable no-param-reassign */
+  //     });
+  //   });
+  // }
+
+  fixSizeOfVideos(): void {
     this.$nextTick(() => {
+      const containerWidth = (document.querySelector('.blog-inner-container') as HTMLElement).clientWidth;
+      const viewportHeight = window.innerHeight;
+
+      /* iframe elements */
       const iframeElements = document.querySelectorAll('iframe');
-      const targetWidth = (document.querySelector('.blog-inner-container') as HTMLElement).clientWidth;
 
       iframeElements.forEach((elem) => {
-        if (elem.width === '100%') return;
+        /* eslint-disable no-param-reassign */
+        if (elem.parentElement) elem.parentElement.style.textAlign = 'center';
+        /* eslint-enable no-param-reassign */
 
         const height = parseFloat(elem.height);
         const width = parseFloat(elem.width);
 
         const aspectRatio = width / height;
 
-        const targetHeight = targetWidth / aspectRatio;
+        let targetWidth = containerWidth;
+        let targetHeight = containerWidth / aspectRatio;
+
+        if (targetHeight > 0.8 * viewportHeight) {
+          targetHeight = 0.8 * viewportHeight;
+          targetWidth = targetHeight * aspectRatio;
+        }
+
         /* eslint-disable no-param-reassign */
-        elem.width = '100%';
+        elem.width = `${targetWidth}px`;
         elem.height = `${targetHeight}px`;
+        /* eslint-enable no-param-reassign */
+      });
+
+      /* video elements */
+      const videoElements = document.querySelectorAll('video');
+
+      videoElements.forEach((elem) => {
+        /* eslint-disable no-param-reassign */
+        if (elem.parentElement?.classList.contains('wp-video')) elem.parentElement.style.width = `${containerWidth}px`;
+        /* eslint-enable no-param-reassign */
+
+        const { width, height } = elem;
+
+        const aspectRatio = width / height;
+
+        let targetWidth = containerWidth;
+        let targetHeight = containerWidth / aspectRatio;
+
+        if (targetHeight > 0.8 * viewportHeight) {
+          targetHeight = 0.8 * viewportHeight;
+          targetWidth = targetHeight * aspectRatio;
+        }
+
+        /* eslint-disable no-param-reassign */
+        elem.width = targetWidth;
+        elem.height = targetHeight;
         /* eslint-enable no-param-reassign */
       });
     });

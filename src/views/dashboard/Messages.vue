@@ -15,8 +15,8 @@
         </div>
       </div>
       <!-- <div class="dashboard__head__helpers">
-        <div class="asset_search asset_search--grey-border">
-          <div class="asset_search__upper asset_search__upper--sm">
+        <div class="asset_search asset_search--sm asset_search--grey-border">
+          <div class="asset_search__upper">
             <input type="text" name="" id="" placeholder="Search in messages" class="asset_search__upper__input">
             <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="/assets/images/icons/search_black.svg" alt=""></div>
             <div class="asset_search__upper__icon asset_search__upper__icon--close"><img src="/assets/images/icons/close_icon.svg" alt=""></div>
