@@ -762,7 +762,7 @@ export default class CreateAsset extends Vue {
             this.submitDataFileForm();
           }
         } else {
-          if (this.currentStep === 5) {
+          if (this.currentStep === 5 && !this.asset.openDataset) {
             /* check contract */
             store.commit('setLoading', true);
             if (!(await this.isSelectedContractAccepted())) {
@@ -1149,14 +1149,16 @@ export default class CreateAsset extends Vue {
 
   async submitDataFileForm(isDraft = false): Promise<void> {
     /* CHECK IF CONTRACT AVAILABLE */
-    store.commit('setLoading', true);
-    if (!(await this.isSelectedContractAvailable())) {
-      this.modalToShow = 'contractNotAvailable';
-      this.currentStep = 5;
+    if (!this.asset.openDataset) {
+      store.commit('setLoading', true);
+      if (!(await this.isSelectedContractAvailable())) {
+        this.modalToShow = 'contractNotAvailable';
+        this.currentStep = 5;
+        store.commit('setLoading', false);
+        return;
+      }
       store.commit('setLoading', false);
-      return;
     }
-    store.commit('setLoading', false);
     /* */
 
     // fix open dataset
@@ -1169,6 +1171,10 @@ export default class CreateAsset extends Vue {
         // contractTemplateKey: '',
       };
     }
+
+    /* if resource is URL, remove previous URLs */
+    if (this.linkToAsset.url && this.linkToAsset.fileName && this.asset.resources.length) this.asset.resources = [];
+    /* */
 
     console.log('DATA FILE SUBMISSION =>');
     console.log(this.fileToUpload.isFileSelected, 'IS FILE SELECTED');
