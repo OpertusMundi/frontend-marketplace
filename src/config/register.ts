@@ -29,7 +29,7 @@ const inputsConfig: InputsConfig = [
   {
     id: 'mobile',
     label: 'Mobile',
-    placeholder: 'Phone number *',
+    placeholder: 'Phone number',
   },
 ];
 

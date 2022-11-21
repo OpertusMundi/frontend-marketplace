@@ -45,7 +45,7 @@
                 <span class="login__form__group__error">{{ errors[0] }}</span>
               </div>
             </validation-provider>
-            <validation-provider :name="getInputData('mobile', 'label')" rules="required" v-slot="{ errors }">
+            <validation-provider :name="getInputData('mobile', 'label')" rules="phone_number" v-slot="{ errors }">
               <div class="login__form__group">
                 <input type="text" name="Mobile" v-model="account.profile.mobile" id="mobile" :placeholder="getInputData('mobile', 'placeholder') || ''">
                 <span class="login__form__group__error">{{ errors[0] }}</span>
@@ -103,9 +103,17 @@ import { navigateToKeycloakLogin } from '@/helper/login';
 import { inputsConfig } from '@/config/register';
 import { PlatformAccountCommand, AccountProfileCommand } from '@/model/account';
 
+const phoneNumber = {
+  validate(value: string) {
+    if (value.split('').every((x) => ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+'].includes(x))) return true;
+    return false;
+  },
+};
+
 extend('required', required);
 extend('email', email);
 extend('confirmed', confirmed);
+extend('phone_number', phoneNumber);
 
 @Component({
   components: { ShapeRegister, ValidationProvider, ValidationObserver },
@@ -162,8 +170,11 @@ export default class Login extends Vue {
       this.termsNotAcceptedError = true;
       return;
     }
-    console.log('account', this.account);
     this.loading = true;
+
+    if (!this.account.profile.mobile) delete this.account.profile.mobile;
+
+    console.log('account', this.account);
     this.accountApi.register(this.account).then((registrationResponse) => {
       if (registrationResponse.success) {
         this.$router.push('/confirmemail');

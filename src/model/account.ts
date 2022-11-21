@@ -430,7 +430,7 @@ export interface AccountProfileCommand extends ProfileBase {
   /**
    * User mobile
    */
-  mobile: string;
+  mobile?: string;
 }
 
 /**
