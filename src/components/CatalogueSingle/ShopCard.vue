@@ -171,7 +171,7 @@
 
     <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
     <ul class="asset__shopcard__buyinfo">
-      <li><strong>Delivery type: </strong> {{ catalogueItem.deliveryMethod }}</li>
+      <li><strong>Delivery type: </strong> {{ labelize(catalogueItem.deliveryMethod) }}</li>
       <!-- <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li> -->
       <!-- <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li> -->
       <li><strong>Delivered from: </strong>{{ catalogueItem.publisher.name }}</li>
@@ -197,6 +197,7 @@ import {
 } from '@/model/pricing-model';
 import { CartAddItemCommand } from '@/model/cart';
 import { EnumFavoriteAction, EnumFavoriteType } from '@/model/favorite';
+import labelize from '@/helper/labels';
 import store from '@/store';
 
 @Component({
@@ -220,6 +221,8 @@ export default class ShopCard extends Vue {
 
   cartErrors: string;
 
+  labelize: typeof labelize;
+
   constructor() {
     super();
 
@@ -233,6 +236,7 @@ export default class ShopCard extends Vue {
     this.isSelectAreasModalOn = false;
     this.cartErrors = '';
     this.selectedPricingModel = this.catalogueItem.pricingModels[0].model;
+    this.labelize = labelize;
   }
 
   @Watch('selectedPricingModel')
