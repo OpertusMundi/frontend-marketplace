@@ -65,7 +65,6 @@ import { ProviderTemplateContract, MasterContract, ProviderTemplateContractComma
 import ContractViewer from '@/components/Contracts/ContractViewer.vue';
 import store from '@/store';
 import moment from 'moment';
-import { saveAs } from 'file-saver';
 
 @Component({
   components: {
@@ -126,13 +125,10 @@ export default class ContractSingle extends Vue {
     return moment(date).format('MMM Do YYYY');
   }
 
-  exportPdf(): void {
+  async exportPdf(): Promise<void> {
     store.commit('setLoading', true);
-    this.providerContractApi.printTemplate(this.$route.params.key).then((response) => {
-      const blob = new Blob([(response as any).data], { type: 'application/pdf' });
-      saveAs(blob, this.$route.params.key);
-      store.commit('setLoading', false);
-    });
+    await this.providerContractApi.printTemplate(this.$route.params.key, true);
+    store.commit('setLoading', false);
   }
 
   deactivateContract(): void {
