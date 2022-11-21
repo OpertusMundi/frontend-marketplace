@@ -98,6 +98,17 @@ h6 {
 	}
 }
 
+.xs_container {
+	width: 100%;
+	max-width: 800px;
+	position: relative;
+	margin: 0 auto;
+	padding: 0 25px;
+	@media (max-width: 576px) {
+		padding: 0 15px;
+	}
+}
+
 .rating {
 	color: #fff;
 	i {
