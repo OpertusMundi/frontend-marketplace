@@ -12,6 +12,13 @@
     padding-left: 15px;
     padding-right: 15px;
   }
+  &--no-left-spacing {
+    padding-left: 0;
+
+    .filters__block__select {
+      margin-left: 0;
+    }
+  }
   &__block{
     display: flex;
     flex-wrap: wrap;

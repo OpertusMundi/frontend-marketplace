@@ -43,6 +43,34 @@
               </div>
             </div>
 
+            <div class="filters filters--no-left-spacing mt-xs-20">
+              <div class="filters__block">
+                <div class="filters__block__select">
+                  <label for="filter">TYPE </label>
+                  <select v-model="publishedAssetsTypeFilter" name="filter">
+                    <option v-for="filterOption in publishedAssetsTypeFilterOptions" :key="filterOption.value" :value="filterOption.value">{{ filterOption.label }}</option>
+                  </select>
+                </div>
+                <div class="filters__block__select">
+                  <label for="filter">&uarr;&darr;</label>
+                  <select v-model="publishedAssetsOrder" name="filter">
+                    <option v-for="filterOption in publishedAssetsOrderOptions" :key="filterOption.label" :value="filterOption.label">{{ filterOption.label }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- a dummy hidden input to be cathced by validation observer if no pricing model is selected -->
+            <div v-if="!selectedPublishedAssetForApiCreationLocal">
+              <validation-provider v-slot="{ errors }" name="pricing models" rules="required">
+                <div class="form-group mt-xs-20">
+                  <!-- <input :value="pricingModels.length ? 'x' : ''" type="text"> -->
+                  <input type="text" hidden>
+                  <div class="errors" v-if="errors.length"><span class="mt-xs-20">Select an asset</span></div>
+                </div>
+              </validation-provider>
+            </div>
+
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
             </div>
@@ -67,7 +95,7 @@
         </div>
 
         <!-- RIGHT  -->
-        <div class="col-md-4">
+        <div class="col-md-4" v-show="creationType">
           <div class="dashboard__form__step__title">
             <h3>Type of API</h3>
             <p>What type of API would you like to publish</p>
@@ -114,6 +142,7 @@ import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import store from '@/store';
 import { CatalogueItem, CatalogueItemCommand, DraftApiFromFileCommand } from '@/model/catalogue';
 import { Debounce } from 'vue-debounce-decorator';
+import { Order } from '@/model/request';
 
 extend('required', required);
 
@@ -164,6 +193,14 @@ export default class ApiDetails extends Vue {
 
   publishedAssetsSearchText: string;
 
+  publishedAssetsTypeFilter: EnumAssetType | null;
+
+  publishedAssetsTypeFilterOptions: { value: EnumAssetType | null, label: string }[];
+
+  publishedAssetsOrder: string;
+
+  publishedAssetsOrderOptions: { label: string, orderBy: EnumProviderAssetSortField, orderType: Order }[];
+
   publishedAssetsPaginationData: {
     currentPage: number,
     itemsPerPage: number,
@@ -194,6 +231,25 @@ export default class ApiDetails extends Vue {
     this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
 
     this.publishedAssetsSearchText = '';
+
+    this.publishedAssetsTypeFilter = null;
+    this.publishedAssetsTypeFilterOptions = [
+      { value: null, label: 'ALL' },
+      { value: EnumAssetType.VECTOR, label: 'VECTOR' },
+      { value: EnumAssetType.RASTER, label: 'RASTER' },
+      { value: EnumAssetType.BUNDLE, label: 'BUNDLE' },
+    ];
+
+    this.publishedAssetsOrder = 'NEWEST';
+
+    this.publishedAssetsOrderOptions = [
+      { label: 'NEWEST', orderBy: EnumProviderAssetSortField.DATE_PUBLISHED, orderType: 'DESC' },
+      { label: 'OLDEST', orderBy: EnumProviderAssetSortField.DATE_PUBLISHED, orderType: 'ASC' },
+      { label: 'TITLE ASCENDING', orderBy: EnumProviderAssetSortField.TITLE, orderType: 'ASC' },
+      { label: 'TITLE DESCENDING', orderBy: EnumProviderAssetSortField.TITLE, orderType: 'DESC' },
+      { label: 'TYPE ASCENDING', orderBy: EnumProviderAssetSortField.TYPE, orderType: 'ASC' },
+      { label: 'TYPE DESCENDING', orderBy: EnumProviderAssetSortField.TYPE, orderType: 'DESC' },
+    ];
 
     this.publishedAssetsPaginationData = {
       currentPage: 0,
@@ -247,6 +303,16 @@ export default class ApiDetails extends Vue {
     this.loadPublishedAssets();
   }
 
+  @Watch('publishedAssetsTypeFilter')
+  onPublishedAssetsTypeFilterChange(): void {
+    this.loadPublishedAssets();
+  }
+
+  @Watch('publishedAssetsOrder')
+  onPublishedAssetsOrderChange(): void {
+    this.loadPublishedAssets();
+  }
+
   @Debounce(400)
   onPublishedAssetsSearchTextChange(searchText: string): void {
     this.publishedAssetsSearchText = searchText;
@@ -264,11 +330,16 @@ export default class ApiDetails extends Vue {
   loadPublishedAssets(page = 0): void {
     store.commit('setLoading', true);
 
+    this.selectedPublishedAssetForApiCreationLocal = null;
+
     const query: ProviderDraftQuery = {
       q: this.publishedAssetsSearchText,
-      type: EnumAssetType.VECTOR,
+      ...(this.publishedAssetsTypeFilter && { type: this.publishedAssetsTypeFilter }),
       pageRequest: { page, size: this.publishedAssetsPaginationData.itemsPerPage },
-      sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
+      sorting: {
+        id: this.publishedAssetsOrderOptions.find((x) => x.label === this.publishedAssetsOrder)?.orderBy || '' as EnumProviderAssetSortField,
+        order: this.publishedAssetsOrderOptions.find((x) => x.label === this.publishedAssetsOrder)?.orderType || '' as Order,
+      },
     };
 
     this.providerAssetsApi
