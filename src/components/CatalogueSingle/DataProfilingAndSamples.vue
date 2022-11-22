@@ -488,6 +488,7 @@
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
               <button v-if="mode === 'review' && activeTab === i + 4 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
+              <button v-if="mode === 'review' && activeTab === i + 4 && !indexesOfReplacedSamples.includes(i) && Object.keys(tempSamples[i]).length" @click="onHideSample(i)" class="btn btn--std btn--outlineblue">hide</button>
               <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
               <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
 
@@ -502,7 +503,8 @@
                 </svg>
               </div>
               <div v-if="activeTab === i + 4" class="samples_table__wrapper">
-                <table class="samples_table">
+                <div v-if="Object.keys(tempSamples[i]).length === 0">This sample will be hidden</div>
+                <table v-else class="samples_table">
                   <tr class="samples_table__header">
                     <th v-for="(attribute, j) in Object.keys(tempSamples[i])" :key="j">{{ attribute }}</th>
                   </tr>
@@ -690,8 +692,11 @@ export default class DataProfilingAndSamples extends Vue {
     if (this.metadata.samples) {
       this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
         console.log('samples!', samplesResponse);
-        this.samples = samplesResponse;
-        this.tempSamples = cloneDeep(samplesResponse);
+
+        const nonEmptySamples = samplesResponse.filter((x) => Object.keys(x).length);
+
+        this.samples = nonEmptySamples;
+        this.tempSamples = cloneDeep(nonEmptySamples);
       });
     }
   }
@@ -1237,6 +1242,11 @@ export default class DataProfilingAndSamples extends Vue {
         console.log('error updating samples...');
       }
     });
+  }
+
+  onHideSample(i: number): void {
+    this.tempSamples[i] = {};
+    this.indexesOfReplacedSamples.push(i);
   }
 }
 </script>
