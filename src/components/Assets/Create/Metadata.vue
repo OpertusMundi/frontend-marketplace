@@ -38,6 +38,9 @@
           </modal>
           <!-- END OF MODALS -->
 
+          <h3>Mandatory</h3>
+          <hr>
+
           <validation-provider v-slot="{ errors }" name="Title" rules="required">
           <div class="form-group">
             <label for="metadata_title">Title *</label>
@@ -52,10 +55,10 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
+          <validation-provider v-slot="{ errors }" name="Version" rules="required">
             <div class="form-group">
-              <label for="">Abstract *</label>
-              <textarea v-model="assetLocal.abstract" placeholder="Short asset description"></textarea>
+              <label for="">Version *</label>
+              <input type="text" class="form-group__text" id="" name="version" v-model="assetLocal.version">
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
@@ -66,13 +69,17 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <!-- <validation-provider v-slot="{ errors }" name="Language">
-          <div class="form-group">
-            <label for="metadata_language">Language</label>
-            <input type="text" class="form-group__text" name="metadata_language" id="metadata_language" v-model="assetLocal.language">
-            <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-          </div>
-          </validation-provider> -->
+          <validation-provider v-slot="{ errors }" name="Abstract" rules="required">
+            <div class="form-group">
+              <label for="">Abstract *</label>
+              <textarea v-model="assetLocal.abstract" placeholder="Short asset description"></textarea>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+            </div>
+          </validation-provider>
+
+          <h3>Identification</h3>
+          <hr>
+
           <validation-provider v-slot="{ errors }" name="Language">
             <div class="form-group">
               <label for="multiselect_language">Language</label>
@@ -80,55 +87,49 @@
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Editor's name">
+          <validation-provider v-slot="{ errors }" name="Keywords">
             <div class="form-group">
-              <label for="editor">Editor</label>
-              <input type="text" name="publisherName" class="form-group__text" id="" v-model="assetLocal.publisherName">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Editor's email" rules="email">
-            <div class="form-group">
-              <label for="">Editor’s email</label>
-              <input type="text" class="form-group__text" id="" name="publisherEmail" v-model="assetLocal.publisherEmail">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Maintenance manager name">
-            <div class="form-group">
-              <label for="">Maintenance manager</label>
-              <input type="text" class="form-group__text" id="" name="metadataPointOfContactName" v-model="assetLocal.metadataPointOfContactName">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Maintenance manager’s email" rules="email">
-            <div class="form-group">
-              <label for="">Maintenance manager’s email</label>
-              <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="assetLocal.metadataPointOfContactEmail">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Version" rules="required">
-            <div class="form-group">
-              <label for="">Version *</label>
-              <input type="text" class="form-group__text" id="" name="version" v-model="assetLocal.version">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider>
-          <!-- <validation-provider v-slot="{ errors }" name="Metadata language">
-            <div class="form-group">
-              <label for="">Metadata language</label>
-              <input type="text" class="form-group__text" name="metadataLanguage" id="" v-model="assetLocal.metadataLanguage">
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-            </div>
-          </validation-provider> -->
-          <validation-provider v-slot="{ errors }" name="Metadata language">
-            <div class="form-group">
-              <label for="multiselect_metadata_language">Metadata language</label>
-              <multiselect id="multiselect_metadata_language" @input="onSelectMetadataLanguage" v-model="selectedMetadataLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select metadata language"></multiselect>
+              <label for="multiselect_keywords">Keywords</label>
+              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" @remove="(x) => onRemoveKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
             </div>
           </validation-provider>
+          <validation-provider v-slot="{ errors }" name="Topic">
+            <div class="form-group">
+              <label for="multiselect_topic">Topic</label>
+              <multiselect id="multiselect_topic" v-model="assetLocal.topicCategory" :options="getTopicCategories()" :multiple="true" :close-on-select="true" :show-labels="false" placeholder="Select topic(s)"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
+          <validation-provider v-slot="{ errors }" name="Suitable For">
+            <div class="form-group">
+              <label for="multiselect_suitablefor">Suitable for</label>
+              <multiselect id="multiselect_suitablefor" v-model="assetLocal.suitableFor" tag-placeholder="Press enter to add a category" :options="assetLocal.suitableFor" :multiple="true" :taggable="true" @tag="(x) => assetLocal.suitableFor.push(x)" :close-on-select="false" :show-labels="false" placeholder="Type a category"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
+
+          <h3>Geography</h3>
+          <hr>
+
+          <validation-provider v-slot="{ errors }" name="Reference system" rules="required">
+            <div class="form-group" v-show="!isSpatialMetadataHidden">
+              <label for="ajax">Reference system *</label>
+              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
+          <validation-provider v-slot="{ errors }" name="Scales">
+            <div class="form-group" v-show="!isSpatialMetadataHidden">
+              <label for="multiselect_scales">Scales</label>
+              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
+
+          <h3>Temporal reference</h3>
+          <hr>
+
           <validation-provider name="Date start">
             <div class="form-group">
               <label for="">Date start (of resource temporal extent)</label>
@@ -159,61 +160,116 @@
               <datepicker input-class="form-group__text" :value="assetLocal.revisionDate" @input="assetLocal.revisionDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.revisionDate=''"></datepicker>
             </div>
           </validation-provider>
+
+          <h3>Responsible party</h3>
+          <hr>
+
+          <div v-for="responsibleParty, i in assetLocal.responsibleParty" :key="responsibleParty.key">
+            <validation-observer>
+              <hr v-if="i > 1">
+              <h4 class="mb-xs-20">Responsible party #{{i + 1}}</h4>
+              <validation-provider v-slot="{ errors }" name="Name" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <div class="form-group">
+                  <label :for="`rp_name_${i}`">Name</label>
+                  <input type="text" :name="`rp_name_${i}`" class="form-group__text" :id="`rp_name_${i}`" v-model="assetLocal.responsibleParty[i].name">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Organisation" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <div class="form-group">
+                  <label :for="`rp_organisation_${i}`">Organisation</label>
+                  <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organizationName">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Role" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                <div class="form-group">
+                  <label :for="`rp_role_${i}`"></label>
+                  <multiselect :id="`rp_role_${i}`" v-model="assetLocal.responsibleParty[i].role" :options="['PUBLISHER', 'OWNER', 'CUSTODIAN', 'USER', 'DISTRIBUTOR', 'ORIGINATOR', 'POINT_OF_CONTACT', 'PROCESSOR', 'AUTHOR']" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Role"></multiselect>
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Email" rules="email">
+                <div class="form-group">
+                  <label :for="`rp_email_${i}`">Email</label>
+                  <input type="text" :name="`rp_email_${i}`" class="form-group__text" :id="`rp_email_${i}`" v-model="assetLocal.responsibleParty[i].email">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Phone">
+                <div class="form-group">
+                  <label :for="`rp_phone_${i}`">Phone</label>
+                  <input type="text" :name="`rp_phone_${i}`" class="form-group__text" :id="`rp_phone_${i}`" v-model="assetLocal.responsibleParty[i].phone">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Address">
+                <div class="form-group">
+                  <label :for="`rp_address_${i}`">Address</label>
+                  <input type="text" :name="`rp_address_${i}`" class="form-group__text" :id="`rp_address_${i}`" v-model="assetLocal.responsibleParty[i].address">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+              <validation-provider v-slot="{ errors }" name="Service hours">
+                <div class="form-group">
+                  <label :for="`rp_service_hours_${i}`">Service hours</label>
+                  <input type="text" :name="`rp_service_hours_${i}`" class="form-group__text" :id="`rp_service_hours_${i}`" v-model="assetLocal.responsibleParty[i].serviceHours">
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </div>
+              </validation-provider>
+            </validation-observer>
+          </div>
+
+          <button class="btn btn--std btn--dark mb-xs-20" @click="addResponsibleParty">add responsible party</button>
+
+          <h3>Metadata info</h3>
+          <hr>
+
+          <validation-provider v-slot="{ errors }" name="Metadata language">
+            <div class="form-group">
+              <label for="multiselect_metadata_language">Metadata language</label>
+              <multiselect id="multiselect_metadata_language" @input="onSelectMetadataLanguage" v-model="selectedMetadataLanguage" label="name" track-by="code" :options="languages" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select metadata language"></multiselect>
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+            </div>
+          </validation-provider>
           <validation-provider name="Metadata date">
             <div class="form-group">
               <label for="">Metadata date</label>
               <datepicker input-class="form-group__text" :value="assetLocal.metadataDate" @input="assetLocal.metadataDate = formatDate($event)" :clear-button="true" @cleared="assetLocal.metadataDate=''"></datepicker>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Topic">
+          <validation-provider v-slot="{ errors }" name="Metadata point of contact name">
             <div class="form-group">
-              <label for="multiselect_topic">Topic</label>
-              <multiselect id="multiselect_topic" v-model="assetLocal.topicCategory" :options="getTopicCategories()" :multiple="true" :close-on-select="true" :show-labels="false" placeholder="Select topic(s)"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <label for="">Metadata point of contact name</label>
+              <input type="text" class="form-group__text" id="" name="metadataPointOfContactName" v-model="assetLocal.metadataPointOfContactName">
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Suitable For">
+          <validation-provider v-slot="{ errors }" name="Metadata point of contact email" rules="email">
             <div class="form-group">
-              <label for="multiselect_suitablefor">Suitable for</label>
-              <multiselect id="multiselect_suitablefor" v-model="assetLocal.suitableFor" tag-placeholder="Press enter to add a category" :options="assetLocal.suitableFor" :multiple="true" :taggable="true" @tag="(x) => assetLocal.suitableFor.push(x)" :close-on-select="false" :show-labels="false" placeholder="Type a category"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <label for="">Metadata point of contact email</label>
+              <input type="text" class="form-group__text" id="" name="metadataPointOfContactEmail" v-model="assetLocal.metadataPointOfContactEmail">
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Keywords">
+
+          <!-- ------------------------------------ -->
+
+          <!-- <validation-provider v-slot="{ errors }" name="Editor's name">
             <div class="form-group">
-              <label for="multiselect_keywords">Keywords</label>
-              <multiselect id="multiselect_keywords" :value="keywordsForDisplay" :options="assetLocal.keywords.map((x) => x.keyword)" tag-placeholder="Press enter to add a keyword" :multiple="true" :taggable="true" @tag="(x) => onAddKeyword(x)" @remove="(x) => onRemoveKeyword(x)" :close-on-select="false" :show-labels="false" placeholder="Type a keyword"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <label for="editor">Editor</label>
+              <input type="text" name="publisherName" class="form-group__text" id="" v-model="assetLocal.publisherName">
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
-          <validation-provider v-slot="{ errors }" name="Scales">
-            <div class="form-group" v-show="!isSpatialMetadataHidden">
-              <label for="multiselect_scales">Scales</label>
-              <multiselect id="multiselect_scales" :value="scalesForDisplay" :options="assetLocal.scales.map((x) => x.scale)" tag-placeholder="Press enter to add a scale" :multiple="true" :taggable="true" @tag="(x) => onAddScale(x)" @remove="(x) => onRemoveScale(x)" :close-on-select="false" :show-labels="false" placeholder="Type a scale number"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-            </div>
-          </validation-provider>
-          <!-- <validation-provider v-slot="{ errors }" name="Type">
+          <validation-provider v-slot="{ errors }" name="Editor's email" rules="email">
             <div class="form-group">
-              <label for="multiselect_epsg">Reference system</label>
-              <multiselect id="multiselect_epsg" @input="onEpsgSelection($event)" v-model="selectedEpsgLabel" :options="menusData.epsgLabels" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Select reference system"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
+              <label for="">Editor’s email</label>
+              <input type="text" class="form-group__text" id="" name="publisherEmail" v-model="assetLocal.publisherEmail">
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider> -->
-          <validation-provider v-slot="{ errors }" name="Reference system" rules="required">
-            <div class="form-group" v-show="!isSpatialMetadataHidden">
-              <label for="ajax">Reference system *</label>
-              <multiselect id="ajax" @input="onEpsgSelection($event)" v-model="selectedEpsg" :options="epsgList" label="name" track-by="code" :loading="isLoadingEpsg" :searchable="true" @search-change="asyncFindEpsg" :close-on-select="true" :show-labels="false" placeholder="Search reference system"></multiselect>
-              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
-            </div>
-          </validation-provider>
-          <!-- <template v-if="assetLocal.type === 'TABULAR'">
-            <hr>
-            <div class="d-flex align-items-center form-group">
-              <input type="checkbox" id="data_profiling" v-model="assetLocal.dataProfilingEnabled" class="mr-xs-10 mb-xs-10">
-              <label for="data_profiling">Compute automated metadata</label>
-            </div>
-          </template> -->
+
         </div>
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
@@ -285,7 +341,7 @@ import Datepicker from 'vuejs-datepicker';
 import Modal from '@/components/Modal.vue';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
-import { EnumTopicCategory } from '@/model/catalogue';
+import { EnumResponsiblePartyRole, EnumTopicCategory, ResponsibleParty } from '@/model/catalogue';
 import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
@@ -356,7 +412,14 @@ export default class Metadata extends Vue {
 
     this.spatialApi = new SpatialApi();
 
-    this.assetLocal = this.asset;
+    // this.assetLocal = this.asset;
+
+    this.assetLocal = {
+      ...this.asset,
+      responsibleParty: this.asset.responsibleParty
+        ? this.asset.responsibleParty.map((x, i) => ({ ...x, key: i > 0 ? `${Date.now()}${Math.random()}` : 'topio' }))
+        : null,
+    };
 
     this.additionalResourcesTemp = [];
 
@@ -433,6 +496,31 @@ export default class Metadata extends Vue {
     if (this.assetLocal.metadataLanguage && this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)) this.selectedMetadataLanguage = this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)!;
   }
 
+  isSomeResponsiblePartyDataFilled(key: string): boolean {
+    if (!this.assetLocal.responsibleParty) return false;
+
+    const responsibleParty = (this.assetLocal.responsibleParty as (ResponsibleParty & { key: string })[]).find((x) => x.key === key);
+    if (!responsibleParty) return false;
+    if (responsibleParty.organizationName || responsibleParty.name || responsibleParty.role) return true;
+
+    return false;
+  }
+
+  addResponsibleParty(): void {
+    if (!this.assetLocal.responsibleParty) return;
+
+    this.assetLocal.responsibleParty.push({
+      address: '',
+      email: '',
+      name: '',
+      organizationName: '',
+      phone: '',
+      role: '' as EnumResponsiblePartyRole,
+      serviceHours: '',
+      key: `${Date.now()}${Math.random()}`,
+    } as ResponsibleParty & { key: string });
+  }
+
   asyncFindEpsg(q: string): void {
     if (!q) return;
     console.log(q);
@@ -462,8 +550,22 @@ export default class Metadata extends Vue {
 
   @Watch('assetLocal', { deep: true })
   onAssetChange(asset: CatalogueItemCommand): void {
+    const assetFixed: CatalogueItemCommand = {
+      ...asset,
+      responsibleParty: asset.responsibleParty
+        ? asset.responsibleParty.map((x) => ({
+          address: x.address,
+          email: x.email,
+          name: x.name,
+          organizationName: x.organizationName,
+          phone: x.phone,
+          role: x.role,
+          serviceHours: x.serviceHours,
+        })) : null,
+    };
+
     console.log('updated metadata');
-    this.$emit('update:asset', asset);
+    this.$emit('update:asset', assetFixed);
   }
 
   @Watch('assetLocal.type', { immediate: false })
