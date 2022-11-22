@@ -1,5 +1,20 @@
 <template>
   <div class="page contact-page">
+    <!-- MODALS -->
+    <modal :withSlots="true" :show="isShownModalMessageSent" :modalId="'modalMessageSent'" :showCancelButton="false" :showCloseButton="false" :closeOnClickOutside="false">
+      <template v-slot:body>
+        <h1 class="mt-xs-100 mb-xs-100">Your message has been successfully delivered</h1>
+      </template>
+
+      <template v-slot:footer>
+        <div class="mt-xs-100 mb-xs-100">
+          <router-link to="/" class="btn btn--std btn--blue">home page</router-link>
+          <router-link to="/catalogue" class="btn btn--std btn--blue ml-xs-20">browse assets</router-link>
+        </div>
+      </template>
+    </modal>
+    <!-- END OF MODALS -->
+
     <div class="page__inner pb-sm-100">
       <div class="xs_container contact-page__container">
         <div class="contact-page__top">
@@ -52,7 +67,7 @@
             <div>
               <div class="form-group-checkbox form-group-checkbox--centered">
                 <div>
-                  <input @change="onAcceptTermsChange" type="checkbox" v-model="isTermsAccepted" id="terms">
+                  <input @change="onAcceptTermsChange" type="checkbox" v-model="messageData.privacyTermsAccepted" id="terms">
                   <label for="terms">By submitting my personal information, I accept the <router-link to="/privacy">Privacy Policy</router-link></label>
                 </div>
                 <span class="contact-page__accept-terms__errors mt-xs-10" v-if="isErrorTermsNotAccepted">You must accept Privacy Policy to Register</span>
@@ -63,6 +78,11 @@
             <button class="btn btn--std btn--blue" @click="submitMessage">submit</button>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="contact-page__footer">
+      <div class="xs_container">
+        <p>If your are interested in learning about trading your datasets and becoming a Topio vendor or finding and using new datasets, please also visit our <router-link to="/faq">Frequently Asked Questions</router-link> page.</p>
       </div>
     </div>
   </div>
@@ -78,8 +98,12 @@ import {
   localize,
 } from 'vee-validate';
 import en from 'vee-validate/dist/locale/en.json';
+import Modal from '@/components/Modal.vue';
+import MessageApi from '@/service/message';
+import { ContactMessage } from '@/model/message';
 import { getFormInputData } from '@/helper/form-config';
 import { inputsConfig } from '@/config/contact';
+import store from '@/store';
 
 extend('required', required);
 extend('email', email);
@@ -99,21 +123,25 @@ extend('phone_number', phoneNumberValidator);
   components: {
     ValidationProvider,
     ValidationObserver,
+    Modal,
   },
 })
 export default class Contact extends Vue {
-  messageData = {
+  messageApi = new MessageApi();
+
+  messageData: ContactMessage = {
     firstName: '',
     lastName: '',
     email: '',
     phoneNumber: '',
     companyName: '',
     message: '',
+    privacyTermsAccepted: false,
   };
 
-  isTermsAccepted = false;
-
   isErrorTermsNotAccepted = false;
+
+  isShownModalMessageSent = false;
 
   getInputData(id: string, type: 'label' | 'placeholder' | 'customErrorMessages'): string | {[key: string]: string} | null {
     return getFormInputData(inputsConfig, type, id);
@@ -124,7 +152,7 @@ export default class Contact extends Vue {
   }
 
   submitMessage(): void {
-    if (!this.isTermsAccepted) {
+    if (!this.messageData.privacyTermsAccepted) {
       this.isErrorTermsNotAccepted = true;
       return;
     }
@@ -138,7 +166,13 @@ export default class Contact extends Vue {
         return;
       }
 
-      console.log('SUBMIT');
+      store.commit('setLoading', true);
+      this.messageApi.submitContactForm(this.messageData).then((response) => {
+        if (response.success) {
+          this.isShownModalMessageSent = true;
+          store.commit('setLoading', false);
+        }
+      });
     });
   }
 }

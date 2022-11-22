@@ -2,7 +2,13 @@ import Api from '@/service/api';
 import { showApiErrorModal } from '@/helper/api-errors';
 import { AxiosResponse } from 'axios';
 import { ServerResponse } from '@/model/response';
-import { MessagesResponse, MessageThreadResponse, Message } from '@/model/message';
+import {
+  MessagesResponse,
+  MessageThreadResponse,
+  Message,
+  ContactMessage,
+  ContactMessageResponse,
+} from '@/model/message';
 
 const baseUri = '/action/messages';
 
@@ -70,6 +76,17 @@ export default class MessageApi extends Api {
     const url = `${baseUri}/thread/${threadKey}`;
 
     return this.put<void, MessageThreadResponse>(url, null)
+      .then((response) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async submitContactForm(message: ContactMessage): Promise<ServerResponse<ContactMessageResponse>> {
+    const url = `${baseUri}/contact-form`;
+
+    return this.post<ContactMessage, ServerResponse<ContactMessageResponse>>(url, message)
       .then((response) => {
         const { data } = response;
 
