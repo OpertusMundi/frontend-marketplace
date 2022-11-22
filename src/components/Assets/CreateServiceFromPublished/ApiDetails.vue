@@ -38,6 +38,7 @@
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
             </div>
+            <pagination class="mt-xs-20" :currentPage="publishedAssetsPaginationData.currentPage" :itemsPerPage="publishedAssetsPaginationData.itemsPerPage" :itemsTotal="publishedAssetsPaginationData.itemsTotal" @pageSelection="onPublishedAssetsPageSelect"></pagination>
           </div>
           <div v-else class="dashboard__form__step__title">
             <p>Selected data file</p>
@@ -98,11 +99,12 @@ import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import ProviderAssetsApi from '@/service/provider-assets';
 import AssetApiDetailsCard from '@/components/Assets/AssetApiDetailsCard.vue';
+import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
+import Pagination from '@/components/Pagination.vue';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import store from '@/store';
 import { CatalogueItem, CatalogueItemCommand, DraftApiFromFileCommand } from '@/model/catalogue';
-import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
 
 extend('required', required);
 
@@ -119,6 +121,7 @@ enum CreationType {
     ValidationObserver,
     AssetApiDetailsCard,
     FileTopioDrive,
+    Pagination,
   },
 })
 export default class ApiDetails extends Vue {
@@ -150,6 +153,12 @@ export default class ApiDetails extends Vue {
 
   selectedPublishedFileForApiCreationLocal: DraftApiFromFileCommand | null;
 
+  publishedAssetsPaginationData: {
+    currentPage: number,
+    itemsPerPage: number,
+    itemsTotal: number,
+  };
+
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>;
   };
@@ -172,6 +181,12 @@ export default class ApiDetails extends Vue {
     this.publishedAssets = [];
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
     this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
+
+    this.publishedAssetsPaginationData = {
+      currentPage: 0,
+      itemsPerPage: 10,
+      itemsTotal: 0,
+    };
   }
 
   @Watch('creationType', { deep: true })
@@ -219,19 +234,31 @@ export default class ApiDetails extends Vue {
       this.creationType = CreationType.PUBLISHED_ASSET;
     }
     this.$emit('update:apiCreationType', this.creationType);
+
+    this.loadPublishedAssets();
+  }
+
+  loadPublishedAssets(page = 0): void {
     store.commit('setLoading', true);
+
     const query: ProviderDraftQuery = {
       q: '',
       type: EnumAssetType.VECTOR,
-      pageRequest: { page: 0, size: 1000 },
+      pageRequest: { page, size: this.publishedAssetsPaginationData.itemsPerPage },
       sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
     };
+
     this.providerAssetsApi
       .find(query)
       .then((response) => {
         if (response.success) {
-          console.log('successfully fetched provider assets', response);
           this.publishedAssets = response.result.items;
+
+          this.publishedAssetsPaginationData = {
+            ...this.publishedAssetsPaginationData,
+            currentPage: response.result.pageRequest.page,
+            itemsTotal: response.result.count,
+          };
         } else {
           console.log('error fetching provider assets', response);
         }
@@ -242,6 +269,17 @@ export default class ApiDetails extends Vue {
       .finally(() => {
         store.commit('setLoading', false);
       });
+  }
+
+  onPublishedAssetsPageSelect(page: number): void {
+    const elem = document.querySelector('.dashboard__form__step__api_details .overflow-y');
+    if (!elem) return;
+    elem.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+
+    this.loadPublishedAssets(page);
   }
 
   onSelectPublishedAsset(asset: CatalogueItem): void {
