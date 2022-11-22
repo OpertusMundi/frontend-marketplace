@@ -114,15 +114,17 @@
                 </div>
 
                 <template v-if="fileToUploadLocal.isFileSelected">
-                  <validation-provider v-slot="{ errors }" rules="required">
-                    <div class="form-group mt-xs-20">
-                      <label for="fileEncoding">Encoding</label>
-                      <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileToUploadLocal.encoding" @tag="fileToUploadLocal = { ...fileToUploadLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
-                      <div class="errors" v-if="errors.length">
-                        <span class="mt-xs-20">Encoding is required</span>
+                  <div v-show="assetType !== 'RASTER'">
+                    <validation-provider v-slot="{ errors }" rules="required">
+                      <div class="form-group mt-xs-20">
+                        <label for="fileEncoding">Encoding</label>
+                        <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileToUploadLocal.encoding" @tag="fileToUploadLocal = { ...fileToUploadLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
+                        <div class="errors" v-if="errors.length">
+                          <span class="mt-xs-20">Encoding is required</span>
+                        </div>
                       </div>
-                    </div>
-                  </validation-provider>
+                    </validation-provider>
+                  </div>
                 </template>
               </div>
             </div>
@@ -147,15 +149,17 @@
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>
                 </validation-provider>
-                <validation-provider v-slot="{ errors }" rules="required">
-                  <div class="form-group mt-xs-20">
-                    <label for="fileEncoding">Encoding</label>
-                    <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="linkToAssetLocal.encoding" @tag="linkToAssetLocal = { ...linkToAssetLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
-                    <div class="errors" v-if="errors.length">
-                      <span class="mt-xs-20">Encoding is required</span>
+                <div v-show="assetType !== 'RASTER'">
+                  <validation-provider v-slot="{ errors }" rules="required">
+                    <div class="form-group mt-xs-20">
+                      <label for="fileEncoding">Encoding</label>
+                      <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="linkToAssetLocal.encoding" @tag="linkToAssetLocal = { ...linkToAssetLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
+                      <div class="errors" v-if="errors.length">
+                        <span class="mt-xs-20">Encoding is required</span>
+                      </div>
                     </div>
-                  </div>
-                </validation-provider>
+                  </validation-provider>
+                </div>
               </div>
             </div>
             <div v-else-if="byPlatform === 'TOPIO_DRIVE' && byOwnMeans === 'DIGITAL_PLATFORM'" class="col-md-4">
@@ -170,15 +174,17 @@
               <div class="dashboard__form__step__title">
                 <p>Select an asset from your topio Drive.</p>
               </div>
-              <validation-provider v-slot="{ errors }" rules="required">
-                <div class="form-group mt-xs-20">
-                  <label for="fileEncoding">Encoding</label>
-                  <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileTopioDriveEncoding" @tag="fileTopioDriveEncoding = $event" tag-placeholder="Custom encoding"></multiselect>
-                  <div class="errors" v-if="errors.length">
-                    <span class="mt-xs-20">Encoding is required</span>
+              <div v-show="assetType !== 'RASTER'">
+                <validation-provider v-slot="{ errors }" rules="required">
+                  <div class="form-group mt-xs-20">
+                    <label for="fileEncoding">Encoding</label>
+                    <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="fileTopioDriveEncoding" @tag="fileTopioDriveEncoding = $event" tag-placeholder="Custom encoding"></multiselect>
+                    <div class="errors" v-if="errors.length">
+                      <span class="mt-xs-20">Encoding is required</span>
+                    </div>
                   </div>
-                </div>
-              </validation-provider>
+                </validation-provider>
+              </div>
               <div>
                 <file-topio-drive :fileApi.sync="fileTopioDrive"></file-topio-drive>
               </div>
@@ -289,6 +295,8 @@ export default class Delivery extends Vue {
   @Prop({ required: true }) private linkToAsset!: LinkToAsset;
 
   @Prop({ required: true }) private resources!: FileResource[];
+
+  @Prop({ required: true }) readonly assetType!: string;
 
   @Prop({ required: true }) readonly format!: string;
 

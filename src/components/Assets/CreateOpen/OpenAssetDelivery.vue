@@ -47,15 +47,17 @@
                 <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
               </div>
             </validation-provider>
-            <validation-provider v-slot="{ errors }" rules="required">
-              <div class="form-group mt-xs-20">
-                <label for="fileEncoding">Encoding</label>
-                <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="linkToAssetLocal.encoding" @tag="linkToAssetLocal = { ...linkToAssetLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
-                <div class="errors" v-if="errors.length">
-                  <span class="mt-xs-20">Encoding is required</span>
+            <div v-show="assetType !== 'RASTER'">
+              <validation-provider v-slot="{ errors }" rules="required">
+                <div class="form-group mt-xs-20">
+                  <label for="fileEncoding">Encoding</label>
+                  <multiselect :options="popularEncodings" :taggable="true" :multiple="false" v-model="linkToAssetLocal.encoding" @tag="linkToAssetLocal = { ...linkToAssetLocal, encoding: $event }" tag-placeholder="Custom encoding"></multiselect>
+                  <div class="errors" v-if="errors.length">
+                    <span class="mt-xs-20">Encoding is required</span>
+                  </div>
                 </div>
-              </div>
-            </validation-provider>
+              </validation-provider>
+            </div>
           </div>
         </template>
         <template v-if="type === 'TOPIO_DRIVE'">
@@ -129,6 +131,8 @@ interface LinkToAsset {
 })
 export default class OpenAssetDelivery extends Vue {
   @Prop({ required: true }) private linkToAsset!: LinkToAsset;
+
+  @Prop({ required: true }) readonly assetType!: string;
 
   @Prop({ required: true }) readonly format!: string;
 

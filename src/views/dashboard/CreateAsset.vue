@@ -97,7 +97,7 @@
 
               <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
+                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :assetType="asset.type" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
@@ -107,7 +107,7 @@
               <template v-if="assetMainType === 'OPEN'">
                 <open-asset-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></open-asset-metadata>
                 <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
-                <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :linkToAsset.sync="linkToAsset" :format="asset.format" v-if="currentStep === 4"></open-asset-delivery>
+                <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :linkToAsset.sync="linkToAsset" :assetType="asset.type" :format="asset.format" v-if="currentStep === 4"></open-asset-delivery>
                 <review ref="step5" :accessToFileType="getAccessToFileType" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
 
