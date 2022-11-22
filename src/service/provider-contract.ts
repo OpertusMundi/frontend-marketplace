@@ -237,12 +237,14 @@ export default class ContractApi extends Api {
    * @param key
    * @returns
    */
-  public async printTemplate(key: string): Promise<AxiosServerResponse<BinaryType>> {
+  public async printTemplate(key: string, save = false, downloadFilename? : string): Promise<ServerResponse<Blob>> {
     const url = `/action/contract/provider/templates/pdf/${key}`;
 
-    return this.get<ServerResponse<BinaryType>>(url, {
+    const response = this.get<Blob>(url, {
       responseType: 'blob',
     });
+
+    return processResponse(response, save, downloadFilename);
   }
 
   /**

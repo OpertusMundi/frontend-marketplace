@@ -68,7 +68,17 @@
             <div class="col-sm-4">
               <div v-if="contractModeOption==='select_existing' && selectedContractTemplateIndex !== null">
                 <h5>Contract preview</h5>
-                <h3>{{ contractTemplates[selectedContractTemplateIndex].title }}</h3>
+                <div class="dashboard__form__review__item dashboard__form__review__item--no-margin-bottom mt-xs-20">
+                  <div class="dashboard__form__review__item__body">
+                    <ul>
+                      <li>Title: {{ contractTemplates[selectedContractTemplateIndex].title }}</li>
+                      <li>Version: {{ contractTemplates[selectedContractTemplateIndex].version }}</li>
+                      <li>Created at: {{ formatDate(contractTemplates[selectedContractTemplateIndex].createdAt) }}</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <button class="btn btn--std btn--outlineblue mt-xs-10" @click="downloadContract(contractTemplates[selectedContractTemplateIndex].key)">download</button>
               </div>
             </div>
           </div>
@@ -109,6 +119,7 @@ import { EnumProviderContractSortField, ProviderTemplateContract } from '@/model
 import { EnumContractType } from '@/model/contract';
 import { EnumAssetTypeCategory } from '@/model/enum';
 import moment from 'moment';
+import store from '@/store';
 
 extend('required', required);
 
@@ -242,6 +253,12 @@ export default class Contract extends Vue {
 
   removeCustomContract(): void {
     this.customContractToUploadLocal = null;
+  }
+
+  async downloadContract(key: string): Promise<void> {
+    store.commit('setLoading', true);
+    await this.contractApi.printTemplate(key, true);
+    store.commit('setLoading', false);
   }
 
   formatDate(date: string): string {

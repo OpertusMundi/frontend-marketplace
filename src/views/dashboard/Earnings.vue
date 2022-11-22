@@ -56,7 +56,17 @@
       </div>
 
       <hr class="mt-xs-50 mb-xs-50 seperator-transaction-history" />
-      <h2 class="mb-xs-30">Transaction history</h2>
+      <div class="d-flex space-between">
+        <h2 class="mb-xs-30">Transaction history</h2>
+        <div>
+          <div class="asset_search asset_search--sm asset_search--grey-border">
+            <div class="asset_search__upper asset_search__upper--no-functional-search-button">
+              <input type="text" name="" id="" placeholder="Search by reference number" class="asset_search__upper__input" @input="onReferenceNumberSearchChange($event.target.value)">
+              <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="filters">
         <div class="filters__block">
           <p class="filters__title">
@@ -82,6 +92,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Debounce } from 'vue-debounce-decorator';
 import ProviderOrderApi from '@/service/provider-order';
 import { EnumOrderSortField, EnumOrderStatus, ProviderOrder } from '@/model/order';
 import OrderCard from '@/components/Orders/OrderCard.vue';
@@ -110,6 +121,8 @@ export default class Earnings extends Vue {
 
   selectedOrderOption: string;
 
+  referenceNumberSearch = '';
+
   constructor() {
     super();
 
@@ -124,6 +137,11 @@ export default class Earnings extends Vue {
     this.selectedOrderOption = 'MODIFIED DESCENDING';
   }
 
+  @Debounce(500)
+  onReferenceNumberSearchChange(search: string): void {
+    this.referenceNumberSearch = search.startsWith('#') ? search.slice(1) : search;
+  }
+
   created(): void {
     this.getSucceededOrders(0);
   }
@@ -133,9 +151,15 @@ export default class Earnings extends Vue {
     this.getSucceededOrders(0);
   }
 
+  @Watch('referenceNumberSearch')
+  onDebouncedSearch(): void {
+    this.getSucceededOrders(0);
+  }
+
   getSucceededOrders(page: number, scrollBehavior = false): void {
     store.commit('setLoading', true);
-    const referenceNumber = null;
+
+    const referenceNumber = this.referenceNumberSearch || null;
     const size = this.itemsPerPage;
 
     const orderOptions = [
@@ -178,6 +202,7 @@ export default class Earnings extends Vue {
 </script>
 <style lang="scss">
 @import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/abstracts/_flexbox-utilities.scss';
 @import '@/assets/styles/_dashboard.scss';
 @import '@/assets/styles/_filters.scss';
 @import '@/assets/styles/_stats.scss';

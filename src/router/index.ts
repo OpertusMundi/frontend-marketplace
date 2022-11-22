@@ -61,6 +61,11 @@ const routes: RouteConfig[] = [
     component: (): Promise<any> => import(/* webpackChunkName: "faq" */ '../views/faq/Faq.vue'),
   },
   {
+    path: '/contact',
+    name: 'Contact',
+    component: (): Promise<any> => import(/* webpackChunkName: "contact" */ '../views/Contact.vue'),
+  },
+  {
     path: '/faq/:slug',
     name: 'single-faq',
     component: (): Promise<any> => import(/* webpackChunkName: "singlefaq" */ '../views/faq/SingleFaq.vue'),

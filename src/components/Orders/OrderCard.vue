@@ -4,13 +4,12 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__title">{{ `Order #${order.referenceNumber}` }}</div>
-        <div class="asset_card__top__right asset_card__top__right--blue"><span>{{ order.status }}</span></div>
+        <div class="asset_card__top__right asset_card__top__right--blue"><span>{{ formatOrderStatus(order.status) }}</span></div>
       </div>
       <div class="asset_card__center">
         <div>
           <span v-for="(asset, i) in order.items" :key="asset.assetId">{{ asset.description }}{{ i !== order.items.length - 1 ? ', ' : '' }}</span>
         </div>
-        <!-- <div class="asset_card__price">300€</div> -->
       </div>
       <div class="asset_card__bottom">
         <div class="asset_card__bottom__left">
@@ -30,6 +29,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { ConsumerOrder as Order } from '@/model/order';
+import labelize from '@/helper/labels';
 import moment from 'moment';
 
 @Component
@@ -44,6 +44,10 @@ export default class OrderCard extends Vue {
 
   formatDate(date: string): string {
     return moment(date).format('MMM Do YY');
+  }
+
+  formatOrderStatus(text: string): string {
+    return labelize(text) || text.replaceAll('_', ' ');
   }
 }
 </script>

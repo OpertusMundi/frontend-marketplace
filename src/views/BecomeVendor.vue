@@ -2,7 +2,7 @@
   <div class="page becomevendor">
     <div class="page__inner pb-sm-100">
       <div class="m_container">
-        <h1>Become a vendor</h1>
+        <h1>Become a supplier</h1>
         <div class="dashboard__form">
           <ul class="dashboard__form__nav">
             <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Company</a></li>

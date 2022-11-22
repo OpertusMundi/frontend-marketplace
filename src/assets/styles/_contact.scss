@@ -1,0 +1,39 @@
+.contact-page {
+    &__top {
+        text-align: center;
+
+        h1 {
+            margin: .8em 0;
+        }
+
+        p {
+            margin-bottom: 2em;
+        }
+    }
+    &__form {
+        background: transparent;
+        border-radius: 0;
+    }
+    &__accept-terms {
+        a {
+            color: $secondColor;
+        }
+        input {
+            accent-color: $secondColor;
+        }
+        .form-group-checkbox {
+            flex-direction: column;
+            > div {
+                display: flex;
+            }
+        }
+        &__errors {
+            color: red;
+            font-size: 0.78em;
+        }
+    }
+    &__btn-container {
+        display: flex;
+        justify-content: center;
+    }
+}

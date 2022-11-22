@@ -359,6 +359,10 @@
           width: 80px;
         }
       }
+
+      &--no-margin-bottom {
+        margin-bottom: 0;
+      }
     }
 
     .form-group {
