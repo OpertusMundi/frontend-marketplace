@@ -110,7 +110,7 @@
             <h6>About</h6>
             <router-link to="/about">What is Topio</router-link>
             <router-link to="/blog">Blog</router-link>
-            <router-link to="/">Contact</router-link>
+            <router-link to="/contact">Contact</router-link>
             <router-link to="/faq">FAQ</router-link>
           </div>
           <div class="footer__upper__item">

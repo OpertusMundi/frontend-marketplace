@@ -91,9 +91,32 @@ interface MessageThreadResponse extends ServerResponse<Thread> {
   }[]
 }
 
+interface ContactMessage {
+  companyName?: string,
+  email: string,
+  firstName?: string,
+  lastName?: string,
+  message: string,
+  phoneCountryCode?: string,
+  phoneNumber?: string,
+  privacyTermsAccepted: boolean,
+}
+
+interface ContactMessageResponse extends ContactMessage {
+  companyName: string,
+  firstName: string,
+  lastName: string,
+  phoneCountryCode: string,
+  phoneNumber: string,
+  status: 'PENDING' | 'COMPLETED',
+  updatedAt: string,
+}
+
 export {
   ClientContact,
   MessagesResponse,
   MessageThreadResponse,
   Message,
+  ContactMessage,
+  ContactMessageResponse,
 };
