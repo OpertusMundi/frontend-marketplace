@@ -933,7 +933,7 @@ export default class DataProfilingAndSamples extends Vue {
           xAxis: {
             categories: this.getBoxPlotValues(data.attribute, this.metadata.statistics, this.metadata.numericalStatistics).categories,
             title: {
-              text: 'Classes',
+              text: 'Quartiles',
             },
           },
           yAxis: {
