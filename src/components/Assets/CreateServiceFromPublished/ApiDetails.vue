@@ -35,6 +35,14 @@
         <div class="col-md-4" v-if="creationType === 'PUBLISHED_ASSET'">
           <div class="dashboard__form__step__title overflow-y" v-if="!disabled">
             <p>Select one of your published data files</p>
+
+            <div class="asset_search asset_search--sm asset_search--grey-border mt-xs-20">
+              <div class="asset_search__upper asset_search__upper--no-z-index asset_search__upper--no-functional-search-button">
+                <input type="text" name="" id="" placeholder="Search in your assets" class="asset_search__upper__input" @input="onPublishedAssetsSearchTextChange($event.target.value)" />
+                <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt="" /></div>
+              </div>
+            </div>
+
             <div v-for="asset in publishedAssets" :key="asset.id">
               <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssetForApiCreationLocal && selectedPublishedAssetForApiCreationLocal.id === asset.id" :asset="asset"></asset-api-details-card>
             </div>
@@ -105,6 +113,7 @@ import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider
 import { EnumAssetType, EnumSpatialDataServiceType } from '@/model/enum';
 import store from '@/store';
 import { CatalogueItem, CatalogueItemCommand, DraftApiFromFileCommand } from '@/model/catalogue';
+import { Debounce } from 'vue-debounce-decorator';
 
 extend('required', required);
 
@@ -153,6 +162,8 @@ export default class ApiDetails extends Vue {
 
   selectedPublishedFileForApiCreationLocal: DraftApiFromFileCommand | null;
 
+  publishedAssetsSearchText: string;
+
   publishedAssetsPaginationData: {
     currentPage: number,
     itemsPerPage: number,
@@ -181,6 +192,8 @@ export default class ApiDetails extends Vue {
     this.publishedAssets = [];
     this.selectedPublishedAssetForApiCreationLocal = this.selectedPublishedAssetForApiCreation;
     this.selectedPublishedFileForApiCreationLocal = this.selectedPublishedFileForApiCreation;
+
+    this.publishedAssetsSearchText = '';
 
     this.publishedAssetsPaginationData = {
       currentPage: 0,
@@ -229,6 +242,16 @@ export default class ApiDetails extends Vue {
     Vue.set(this.assetLocal, 'spatialDataServiceType', serviceType);
   }
 
+  @Watch('publishedAssetsSearchText')
+  onDebouncedSearch(): void {
+    this.loadPublishedAssets();
+  }
+
+  @Debounce(400)
+  onPublishedAssetsSearchTextChange(searchText: string): void {
+    this.publishedAssetsSearchText = searchText;
+  }
+
   created(): void {
     if (this.apiCreationType === 'UNDEFINED') {
       this.creationType = CreationType.PUBLISHED_ASSET;
@@ -242,7 +265,7 @@ export default class ApiDetails extends Vue {
     store.commit('setLoading', true);
 
     const query: ProviderDraftQuery = {
-      q: '',
+      q: this.publishedAssetsSearchText,
       type: EnumAssetType.VECTOR,
       pageRequest: { page, size: this.publishedAssetsPaginationData.itemsPerPage },
       sorting: { id: EnumProviderAssetSortField.TITLE, order: 'ASC' },
