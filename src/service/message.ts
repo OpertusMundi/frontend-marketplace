@@ -72,6 +72,17 @@ export default class MessageApi extends Api {
       });
   }
 
+  public async sendMessageToHelpdesk(subject: string, text: string): Promise<ServerResponse<Message>> {
+    const url = `${baseUri}/helpdesk`;
+
+    return this.post<{ subject: string, text: string }, ServerResponse<Message>>(url, { subject, text })
+      .then((response) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
   public async markThreadAsRead(threadKey: string): Promise<MessageThreadResponse> {
     const url = `${baseUri}/thread/${threadKey}`;
 

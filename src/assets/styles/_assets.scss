@@ -947,6 +947,8 @@
 			border-radius: 50px;
 			border: 2px solid $darkColor;
 			text-align: center;
+			padding: 0;
+			overflow: hidden;
 			&--m {
 				border: none;
 				img {
@@ -961,7 +963,8 @@
 				display: block;
 				transform: translate(-50%, -50%);
 				width: 100%;
-				padding: 12px;
+				object-fit: contain;
+				padding: 0;
 			}
 		}
 		&__info {
@@ -1514,11 +1517,17 @@
 	height: 400px;
 	background: #ddd;
 	margin-bottom: 40px;
+
+	&--auto-height {
+		height: auto;
+		width: 100%;
+	}
 }
 
 .tab_maps-map-thumbnail img {
 	height: 100%;
 	width: 100%;
+	display: block;
 }
 
 .grid-ignore-wrapper {

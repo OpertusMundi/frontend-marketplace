@@ -31,12 +31,9 @@
         </div>
         <div class="filters__block">
           <div class="filters__block__select">
-            <label for="filter">FOLDER:</label>
-            <select name="filter" id="filter">
-              <option value="1">INBOX</option>
-              <option value="2">Option 2</option>
-              <option value="3">Option 3</option>
-              <option value="4">Option 4</option>
+            <select name="filter" id="filter" v-model="typeFilter">
+              <option value="ALL">ALL</option>
+              <option value="UNREAD">UNREAD</option>
             </select>
           </div>
         </div>
@@ -200,12 +197,19 @@ export default class DashboardMessages extends Vue {
     itemsTotal: 0,
   };
 
+  typeFilter: 'ALL' | 'UNREAD' = 'ALL';
+
   created(): void {
     this.findMessages();
   }
 
   @Watch('$store.getters.getUnreadMessagesCount')
   onUnreadMessagesCountChange(): void {
+    this.findMessages();
+  }
+
+  @Watch('typeFilter')
+  onTypeFilterChange(): void {
     this.findMessages();
   }
 
@@ -248,7 +252,9 @@ export default class DashboardMessages extends Vue {
   findMessages(page = 0): void {
     store.commit('setLoading', true);
 
-    this.messageApi.find(page, this.paginationData.itemsPerPage, null, null, 'THREAD_ONLY').then((response) => {
+    const view = this.typeFilter === 'ALL' ? 'THREAD_ONLY' : 'THREAD_ONLY_UNREAD';
+
+    this.messageApi.find(page, this.paginationData.itemsPerPage, null, null, view).then((response) => {
       Vue.set(this.paginationData, 'itemsTotal', response.result.count);
       Vue.set(this.paginationData, 'currentPage', response.result.pageRequest.page);
       Vue.set(this.paginationData, 'itemsPerPage', response.result.pageRequest.size);

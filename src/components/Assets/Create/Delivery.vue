@@ -247,15 +247,17 @@ const fileNameExtensionValidator = {
   message(value: string, args: any) {
     const format = args[0];
     const { fileTypes } = store.getters.getConfig?.configuration?.asset;
-    return `File name must have one of the following extensions: ${(fileTypes.some((x) => x.format === format) ? fileTypes.find((x) => x.format === format).extensions : []).join(', ')}`;
+    return `File name must have one of the following extensions: ${(fileTypes.some((x) => x.format === format) ? [...fileTypes.find((x) => x.format === format).extensions, ...(fileTypes.find((x) => x.format === format).bundleExtensions || [])] : []).join(', ')}`;
   },
   validate(value: string, args: any) {
     const format = args[0];
     const { fileTypes } = store.getters.getConfig?.configuration?.asset;
     if (!fileTypes) return false;
-    const acceptedExtensions = fileTypes.some((x) => x.format === format) ? fileTypes.find((x) => x.format === format).extensions : [];
+    const acceptedExtensions = fileTypes.some((x) => x.format === format)
+      ? [...fileTypes.find((x) => x.format === format).extensions, ...(fileTypes.find((x) => x.format === format).bundleExtensions || [])]
+      : [];
 
-    if (acceptedExtensions.some((x) => value.endsWith(`.${x}`) && value.split('.')[0])) return true;
+    if (acceptedExtensions.some((x) => value.toLowerCase().endsWith(`.${x.toLowerCase()}`) && value.split('.')[0])) return true;
     return false;
   },
 };
