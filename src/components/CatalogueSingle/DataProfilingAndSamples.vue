@@ -438,7 +438,7 @@
                   <button v-if="mode === 'review' && hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'thumbnail')">SHOW</button>
                 </div>
                 <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-                <div class="tab_maps-map tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
+                <div class="tab_maps-map tab_maps-map--auto-height tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
                   <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail" />
                 </div>
               </div>
