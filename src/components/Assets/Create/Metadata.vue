@@ -165,59 +165,61 @@
           <hr>
 
           <div v-for="responsibleParty, i in assetLocal.responsibleParty" :key="responsibleParty.key">
-            <validation-observer>
-              <hr v-if="i > 1">
-              <h4 class="mb-xs-20">Responsible party #{{i + 1}}</h4>
-              <validation-provider v-slot="{ errors }" name="Name" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
-                <div class="form-group">
-                  <label :for="`rp_name_${i}`">Name</label>
-                  <input type="text" :name="`rp_name_${i}`" class="form-group__text" :id="`rp_name_${i}`" v-model="assetLocal.responsibleParty[i].name">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Organisation" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
-                <div class="form-group">
-                  <label :for="`rp_organisation_${i}`">Organisation</label>
-                  <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organizationName">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Role" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
-                <div class="form-group">
-                  <label :for="`rp_role_${i}`"></label>
-                  <multiselect :id="`rp_role_${i}`" v-model="assetLocal.responsibleParty[i].role" :options="['PUBLISHER', 'OWNER', 'CUSTODIAN', 'USER', 'DISTRIBUTOR', 'ORIGINATOR', 'POINT_OF_CONTACT', 'PROCESSOR', 'AUTHOR']" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Role"></multiselect>
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Email" rules="email">
-                <div class="form-group">
-                  <label :for="`rp_email_${i}`">Email</label>
-                  <input type="text" :name="`rp_email_${i}`" class="form-group__text" :id="`rp_email_${i}`" v-model="assetLocal.responsibleParty[i].email">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Phone">
-                <div class="form-group">
-                  <label :for="`rp_phone_${i}`">Phone</label>
-                  <input type="text" :name="`rp_phone_${i}`" class="form-group__text" :id="`rp_phone_${i}`" v-model="assetLocal.responsibleParty[i].phone">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Address">
-                <div class="form-group">
-                  <label :for="`rp_address_${i}`">Address</label>
-                  <input type="text" :name="`rp_address_${i}`" class="form-group__text" :id="`rp_address_${i}`" v-model="assetLocal.responsibleParty[i].address">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-              <validation-provider v-slot="{ errors }" name="Service hours">
-                <div class="form-group">
-                  <label :for="`rp_service_hours_${i}`">Service hours</label>
-                  <input type="text" :name="`rp_service_hours_${i}`" class="form-group__text" :id="`rp_service_hours_${i}`" v-model="assetLocal.responsibleParty[i].serviceHours">
-                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
-                </div>
-              </validation-provider>
-            </validation-observer>
+            <template v-if="i > 0"> <!-- exclude 1st responsible party (publisher) -->
+              <validation-observer>
+                <hr v-if="i > 1">
+                <h4 class="mb-xs-20">Responsible party #{{i + 1}}</h4>
+                <validation-provider v-slot="{ errors }" name="Name" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_name_${i}`">Name</label>
+                    <input type="text" :name="`rp_name_${i}`" class="form-group__text" :id="`rp_name_${i}`" v-model="assetLocal.responsibleParty[i].name">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Organisation" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_organisation_${i}`">Organisation</label>
+                    <input type="text" :name="`rp_organisation_${i}`" class="form-group__text" :id="`rp_organisation_${i}`" v-model="assetLocal.responsibleParty[i].organizationName">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Role" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
+                  <div class="form-group">
+                    <label :for="`rp_role_${i}`">Role</label>
+                    <multiselect :id="`rp_role_${i}`" v-model="assetLocal.responsibleParty[i].role" :options="['OWNER', 'CUSTODIAN', 'USER', 'DISTRIBUTOR', 'ORIGINATOR', 'POINT_OF_CONTACT', 'PROCESSOR', 'AUTHOR']" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Role"></multiselect>
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Email" rules="email">
+                  <div class="form-group">
+                    <label :for="`rp_email_${i}`">Email</label>
+                    <input type="text" :name="`rp_email_${i}`" class="form-group__text" :id="`rp_email_${i}`" v-model="assetLocal.responsibleParty[i].email">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Phone">
+                  <div class="form-group">
+                    <label :for="`rp_phone_${i}`">Phone</label>
+                    <input type="text" :name="`rp_phone_${i}`" class="form-group__text" :id="`rp_phone_${i}`" v-model="assetLocal.responsibleParty[i].phone">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Address">
+                  <div class="form-group">
+                    <label :for="`rp_address_${i}`">Address</label>
+                    <input type="text" :name="`rp_address_${i}`" class="form-group__text" :id="`rp_address_${i}`" v-model="assetLocal.responsibleParty[i].address">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+                <validation-provider v-slot="{ errors }" name="Service hours">
+                  <div class="form-group">
+                    <label :for="`rp_service_hours_${i}`">Service hours</label>
+                    <input type="text" :name="`rp_service_hours_${i}`" class="form-group__text" :id="`rp_service_hours_${i}`" v-model="assetLocal.responsibleParty[i].serviceHours">
+                    <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                  </div>
+                </validation-provider>
+              </validation-observer>
+            </template>
           </div>
 
           <button class="btn btn--std btn--dark mb-xs-20" @click="addResponsibleParty">add responsible party</button>

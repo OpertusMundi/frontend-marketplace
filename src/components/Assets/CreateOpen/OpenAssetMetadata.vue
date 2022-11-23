@@ -187,7 +187,7 @@
                 </validation-provider>
                 <validation-provider v-slot="{ errors }" name="Role" :rules="isSomeResponsiblePartyDataFilled(responsibleParty.key) ? 'required':''">
                   <div class="form-group">
-                    <label :for="`rp_role_${i}`"></label>
+                    <label :for="`rp_role_${i}`">Role</label>
                     <multiselect :id="`rp_role_${i}`" v-model="assetLocal.responsibleParty[i].role" :options="['OWNER', 'CUSTODIAN', 'USER', 'DISTRIBUTOR', 'ORIGINATOR', 'POINT_OF_CONTACT', 'PROCESSOR', 'AUTHOR']" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Role"></multiselect>
                     <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
                   </div>

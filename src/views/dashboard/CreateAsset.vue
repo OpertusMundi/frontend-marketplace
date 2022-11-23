@@ -215,6 +215,7 @@ import ApiMetadata from '@/components/Assets/CreateServiceFromPublished/ApiMetad
 import SentinelHubMetadata from '@/components/Assets/CreateSentinelHub/SentinelHubMetadata.vue';
 import Modal from '@/components/Modal.vue';
 import { EnumPricingModel } from '@/model/pricing-model';
+import { Address } from '@/model/account';
 
 Vue.use(VueCardFormat);
 
@@ -518,8 +519,8 @@ export default class CreateAsset extends Vue {
         }] : [],
         publicAccessLimitations: '',
         publicationDate: '',
-        publisherEmail: '',
-        publisherName: '',
+        publisherEmail: store.getters.getProfile?.provider?.current?.email || '',
+        publisherName: store.getters.getProfile?.provider?.current?.name || '',
         referenceSystem: '4326',
         resourceLocator: '',
         responsibleParty: this.assetMainType as string === 'OPEN' ? [{
@@ -538,7 +539,15 @@ export default class CreateAsset extends Vue {
           phone: '',
           role: '' as EnumResponsiblePartyRole,
           serviceHours: '',
-        }] : [],
+        }] : [{
+          address: store.getters.getProfile?.provider?.current?.headquartersAddress ? this.getAddressAsText(store.getters.getProfile.provider.current.headquartersAddress) : '',
+          email: store.getters.getProfile?.provider?.current?.email || '',
+          name: store.getters.getProfile?.provider?.current?.name || '',
+          organizationName: store.getters.getProfile?.provider?.current?.name || '',
+          phone: store.getters.getProfile?.provider?.current?.phone || '',
+          role: EnumResponsiblePartyRole.PUBLISHER,
+          serviceHours: '',
+        }],
         revisionDate: '',
         resources: [],
         scales: [],
@@ -856,6 +865,10 @@ export default class CreateAsset extends Vue {
     const acceptedExtensions = fileTypeInfo.bundleSupported && Array.isArray(fileTypeInfo.bundleExtensions) ? fileTypeInfo.extensions.concat(fileTypeInfo.bundleExtensions) : fileTypeInfo.extensions;
     if (acceptedExtensions.includes(this.fileToUpload.fileExtension)) return true;
     return false;
+  }
+
+  getAddressAsText(address: Address): string {
+    return `${address.line1 ? `${address.line1}, ` : ''}${address.line2 ? `${address.line2}, ` : ''}${address.city ? `${address.city}, ` : ''}${address.region ? `${address.region}, ` : ''}${address.postalCode ? `${address.postalCode}, ` : ''}${address.country ? `${address.country}, ` : ''}`;
   }
 
   async createDraft(): Promise<AssetDraft> {
