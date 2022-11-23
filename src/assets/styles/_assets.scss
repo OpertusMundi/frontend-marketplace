@@ -947,6 +947,8 @@
 			border-radius: 50px;
 			border: 2px solid $darkColor;
 			text-align: center;
+			padding: 0;
+			overflow: hidden;
 			&--m {
 				border: none;
 				img {
@@ -961,7 +963,8 @@
 				display: block;
 				transform: translate(-50%, -50%);
 				width: 100%;
-				padding: 12px;
+				object-fit: contain;
+				padding: 0;
 			}
 		}
 		&__info {

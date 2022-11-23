@@ -2,6 +2,9 @@
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  &--transparent {
+    background: transparent;
+  }
   &__nav {
     width: 100%;
     background-color: transparent;
