@@ -232,13 +232,18 @@
             <multiselect id="multiselect_conformity" @input="onSelectConformity" v-model="selectedConformity" :options="conformityOptions" label="label" track-by="value" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select conformity"></multiselect>
           </div>
 
-          <validation-provider v-slot="{ errors }" name="Standard" :rules="asset.conformity === 'CONFORMANT' ? 'required':''">
+          <validation-provider v-slot="{ errors }" name="Standard" :rules="assetLocal.conformity === 'CONFORMANT' ? 'required':''">
             <div class="form-group">
               <label for="standard">Standard</label>
-              <input :disabled="asset.conformity !== 'CONFORMANT'" type="text" name="standard" class="form-group__text" id="standard" v-model="assetLocal.conformityStandard">
+              <input :disabled="assetLocal.conformity !== 'CONFORMANT'" type="text" name="standard" class="form-group__text" id="standard" v-model="assetLocal.conformityStandard">
               <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
             </div>
           </validation-provider>
+
+          <div class="form-group">
+            <label for="lineage">Lineage</label>
+            <textarea name="lineage" id="lineage" v-model="assetLocal.lineage"></textarea>
+          </div>
 
           <h3>Metadata info</h3>
           <hr>
