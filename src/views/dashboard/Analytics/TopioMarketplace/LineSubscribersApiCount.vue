@@ -253,6 +253,7 @@ export default class LineSubscribersApiCount extends Vue {
       xAxis: {
         categories: this.lineChartDate,
         type: 'datetime',
+        reversed: true,
       },
       yAxis: {
         gridLineDashStyle: 'Dot',
