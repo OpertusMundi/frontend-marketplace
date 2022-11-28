@@ -97,7 +97,7 @@
 
               <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
-                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :assetType="asset.type" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
+                <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :deliveryMethodOptions.sync="asset.deliveryMethodOptions" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :assetType="asset.type" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
@@ -498,6 +498,11 @@ export default class CreateAsset extends Vue {
         dateEnd: '',
         dateStart: '',
         deliveryMethod: this.assetMainType as string === 'OPEN' ? EnumDeliveryMethod.DIGITAL_PLATFORM : EnumDeliveryMethod.NONE,
+        deliveryMethodOptions: {
+          mediaType: 'CD-ROM',
+          notes: '',
+          numberOfItems: 1,
+        },
         format: '',
         ingested: false,
         keywords: [],
@@ -1186,6 +1191,9 @@ export default class CreateAsset extends Vue {
         // contractTemplateKey: '',
       };
     }
+
+    // remove deliveryMethodOptions for non-physical delivery
+    if ((this.asset as CatalogueItemCommand).deliveryMethod !== EnumDeliveryMethod.PHYSICAL_PROVIDER) delete (this.asset as CatalogueItemCommand).deliveryMethodOptions;
 
     /* if resource is URL, remove previous URLs */
     if (this.linkToAsset.url && this.linkToAsset.fileName && this.asset.resources.length) this.asset.resources = [];

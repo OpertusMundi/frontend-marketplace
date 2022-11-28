@@ -208,11 +208,14 @@
               </div>
               <div class="form-group">
                 <label for="">Type of physical media</label>
-                <input type="text" name="typeMedia" class="form-group__text" id="" />
-                <label for="">Number of objects</label>
-                <input type="text" name="numberObjects" class="form-group__text" id="" />
+                <multiselect :options="['CD-ROM', 'DVD-ROM']" :multiple="false" v-model="deliveryMethodOptionsLocal.mediaType"></multiselect>
+                <validation-provider v-slot="{ errors }" rules="positive_integer">
+                  <label for="">Number of objects *</label>
+                  <input type="text" name="numberObjects" class="form-group__text" id="" v-model.number="deliveryMethodOptionsLocal.numberOfItems" />
+                  <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+                </validation-provider>
                 <label for="">Notes for buyer</label>
-                <textarea class="form-group__text" cols="20" rows="5" value="notes for buyer"></textarea>
+                <textarea class="form-group__text" cols="20" rows="5" v-model="deliveryMethodOptionsLocal.notes"></textarea>
               </div>
             </div>
           </div>
@@ -228,7 +231,7 @@ import {
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
 import Multiselect from 'vue-multiselect';
-import { EnumDeliveryMethod, DraftApiFromFileCommand } from '@/model/catalogue';
+import { EnumDeliveryMethod, DraftApiFromFileCommand, DeliveryMethodOptions } from '@/model/catalogue';
 import FileTopioDrive from '@/components/Assets/CreateApiTopioDrive/FileTopioDrive.vue';
 import { EnumResourceSource, EnumResourceType, FileResource } from '@/model/asset';
 import store from '@/store';
@@ -262,9 +265,20 @@ const fileNameExtensionValidator = {
   },
 };
 
+const positiveIntegerValidator = {
+  validate(value: string) {
+    const v = `${value}`;
+    if (v.split('').every((x) => ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(x)) && parseInt(value, 10) >= 1) {
+      return true;
+    }
+    return 'Number must be a positive integer';
+  },
+};
+
 extend('required', required);
 extend('secure_link', secureLinkValidator);
 extend('filename_extension', fileNameExtensionValidator);
+extend('positive_integer', positiveIntegerValidator);
 
 interface FileToUpload {
   isFileSelected: boolean;
@@ -292,6 +306,8 @@ interface LinkToAsset {
 export default class Delivery extends Vue {
   @Prop({ required: true }) private deliveryMethod!: EnumDeliveryMethod;
 
+  @Prop({ required: true }) private deliveryMethodOptions!: DeliveryMethodOptions;
+
   @Prop({ required: true }) private fileToUpload!: FileToUpload;
 
   @Prop({ required: true }) private linkToAsset!: LinkToAsset;
@@ -307,6 +323,8 @@ export default class Delivery extends Vue {
   };
 
   deliveryMethodLocal: EnumDeliveryMethod | null;
+
+  deliveryMethodOptionsLocal: DeliveryMethodOptions;
 
   fileToUploadLocal: FileToUpload;
 
@@ -326,6 +344,8 @@ export default class Delivery extends Vue {
     super();
 
     this.deliveryMethodLocal = this.deliveryMethod;
+
+    this.deliveryMethodOptionsLocal = { ...this.deliveryMethodOptions };
 
     this.fileToUploadLocal = { ...this.fileToUpload };
 
@@ -351,6 +371,8 @@ export default class Delivery extends Vue {
         this.byPlatform = 'TOPIO_DRIVE';
       }
     }
+
+    if (!this.deliveryMethodOptionsLocal) this.deliveryMethodOptionsLocal = { mediaType: 'CD-ROM', notes: '', numberOfItems: 1 };
   }
 
   @Watch('byPlatform')
@@ -363,6 +385,11 @@ export default class Delivery extends Vue {
   @Watch('deliveryMethodLocal')
   onDeliveryMethodChange(deliveryMethod: EnumDeliveryMethod): void {
     this.$emit('update:deliveryMethod', deliveryMethod);
+  }
+
+  @Watch('deliveryMethodOptionsLocal', { deep: true })
+  onDeliveryMethodOptionsChange(deliveryMethodOptions: DeliveryMethodOptions): void {
+    this.$emit('update:deliveryMethodOptions', deliveryMethodOptions);
   }
 
   @Watch('byOwnMeans')
