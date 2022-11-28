@@ -16,7 +16,7 @@
           </span>
         </div>
         <div class="asset_card__top__right">
-          <a href="#" @click.prevent="onRemoveFromFavorites(asset.key)">
+          <a href="#" @click.prevent="onRemoveFromFavorites(asset.key)" v-if="!hideFavoriteToggleButton">
             <img src="@/assets/images/icons/favorites/favorite_icon__dashboard__asset_card.svg" alt="">
           </a>
         </div>
@@ -60,6 +60,8 @@ import store from '@/store';
 @Component
 export default class AssetFavoriteCard extends Vue {
   @Prop({ required: true }) readonly asset!: FavoriteAsset;
+
+  @Prop() readonly hideFavoriteToggleButton?: boolean;
 
   favoriteApi: FavoriteApi;
 

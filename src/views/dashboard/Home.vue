@@ -46,11 +46,11 @@
       <div class="row">
         <div class="col-md-6">
           <h3 class="mb-xs-20">Latest messages</h3>
-          <p>No messages</p>
+          <dashboard-home-messages></dashboard-home-messages>
         </div>
         <div class="col-md-6">
           <h3 class="mb-xs-20">Recently favourited assets</h3>
-          <p>No favourited assets</p>
+          <dashboard-home-favorite-assets></dashboard-home-favorite-assets>
         </div>
       </div>
     </div>
@@ -134,6 +134,8 @@ import LineChart from '@/components/Charts/LineChart.vue';
 import OrderCard from '@/components/Orders/OrderCard.vue';
 import PurchaseCard from '@/components/Purchases/PurchaseCard.vue';
 import HorizontalCard from '@/components/HorizontalCard.vue';
+import DashboardHomeMessages from '@/components/DashboardHome/Messages.vue';
+import DashboardHomeFavoriteAssets from '@/components/DashboardHome/FavoriteAssets.vue';
 import ProviderAssetsApi from '@/service/provider-assets';
 import ProviderOrderApi from '@/service/provider-order';
 import ConsumerOrderApi from '@/service/consumer-order';
@@ -187,6 +189,8 @@ interface TemporalDimension {
     HorizontalCard,
     SalesLineChart,
     SalesBarChart,
+    DashboardHomeMessages,
+    DashboardHomeFavoriteAssets,
   },
 })
 export default class DashboardHome extends Vue {
