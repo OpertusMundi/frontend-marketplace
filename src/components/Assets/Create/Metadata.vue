@@ -224,6 +224,22 @@
 
           <button class="btn btn--std btn--dark mb-xs-20" @click="addResponsibleParty">add responsible party</button>
 
+          <h3>Conformity & Lineage</h3>
+          <hr>
+
+          <div class="form-group">
+            <label for="multiselect_conformity">Conformity</label>
+            <multiselect id="multiselect_conformity" @input="onSelectConformity" v-model="selectedConformity" :options="conformityOptions" label="label" track-by="value" :multiple="false" :close-on-select="true" :show-labels="false" placeholder="Select conformity"></multiselect>
+          </div>
+
+          <validation-provider v-slot="{ errors }" name="Standard" :rules="asset.conformity === 'CONFORMANT' ? 'required':''">
+            <div class="form-group">
+              <label for="standard">Standard</label>
+              <input :disabled="asset.conformity !== 'CONFORMANT'" type="text" name="standard" class="form-group__text" id="standard" v-model="assetLocal.conformityStandard">
+              <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span></div>
+            </div>
+          </validation-provider>
+
           <h3>Metadata info</h3>
           <hr>
 
@@ -343,7 +359,12 @@ import Datepicker from 'vuejs-datepicker';
 import Modal from '@/components/Modal.vue';
 import store from '@/store';
 import { CatalogueItemCommand } from '@/model';
-import { EnumResponsiblePartyRole, EnumTopicCategory, ResponsibleParty } from '@/model/catalogue';
+import {
+  EnumConformity,
+  EnumResponsiblePartyRole,
+  EnumTopicCategory,
+  ResponsibleParty,
+} from '@/model/catalogue';
 import { AssetFileAdditionalResourceCommand, AssetUriAdditionalResource, EnumAssetAdditionalResource } from '@/model/asset';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
@@ -396,6 +417,10 @@ export default class Metadata extends Vue {
   // epsgsList: { code: string, name: string }[]; // deprecated
 
   // selectedEpsgLabel: string | null; // deprecated
+
+  selectedConformity: { value: EnumConformity, label: string };
+
+  conformityOptions: { value: EnumConformity, label: string }[];
 
   selectedLanguage: { code: string, name: string };
 
@@ -464,6 +489,13 @@ export default class Metadata extends Vue {
     // this.epsgsList = [];
 
     // this.selectedEpsgLabel = null;
+
+    this.conformityOptions = [
+      { value: EnumConformity.CONFORMANT, label: 'CONFORMANT' },
+      { value: EnumConformity.NOT_CONFORMANT, label: 'NOT CONFORMANT' },
+      { value: EnumConformity.NOT_EVALUATED, label: 'NOT EVALUATED' },
+    ];
+    this.selectedConformity = this.conformityOptions.find((x) => x.value === EnumConformity.NOT_EVALUATED) || {} as { value: EnumConformity, label: '' };
 
     this.selectedLanguage = { name: '', code: '' };
     this.selectedMetadataLanguage = { name: '', code: '' };
@@ -542,6 +574,11 @@ export default class Metadata extends Vue {
 
   onSelectMetadataLanguage(language: { code: string, name: string }): void {
     if (language && language.code) this.assetLocal.metadataLanguage = language.code;
+  }
+
+  onSelectConformity(conformity: { value: EnumConformity, label: string }): void {
+    if (conformity?.value) this.assetLocal.conformity = conformity.value;
+    this.assetLocal.conformityStandard = '';
   }
 
   onEpsgSelection(selectedEpsg: { code: string, name: string }): void {

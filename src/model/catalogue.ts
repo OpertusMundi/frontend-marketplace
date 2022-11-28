@@ -263,6 +263,10 @@ interface BaseCatalogueItem {
    */
   conformity: EnumConformity;
   /**
+   * Title of the implementing rules/standard the resource conforms to
+   */
+  conformityStandard: string;
+  /**
    * A point or period of time associated with the creation event in the lifecycle of the resource
    */
   creationDate: string;
