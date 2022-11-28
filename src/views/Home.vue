@@ -91,122 +91,8 @@
         </section>
         <section class="homepage__assets" data-aos="fade-in" data-aos-delay="500">
           <h4 class="homepage__assets__title">Popular Assets</h4>
-          <div class="a_carousel draggable">
-            <a href="" class="a_carousel__item a_carousel__item--green">
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/vector_icon.svg" alt="" />
-                  <span>Vector</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price a_carousel__item__footer__price--open">
-                    <img src="@/assets/images/icons/cc_icons/cc-by-nc-Attribution-NonCommercial.svg" alt="" />
-                    <span>OPEN</span>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <a href="" class="a_carousel__item a_carousel__item--purple">
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/raster_icon.svg" alt="" />
-                  <span>Raster</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">
-                    The Historical Centre of the Municipality of Athens
-                  </h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/bag-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price">300€</div>
-                </div>
-              </div>
-            </a>
-            <a href="" class="a_carousel__item a_carousel__item--blue">
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/api_icon.svg" alt="" />
-                  <span>API</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">Swimming Shore Water</h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/check-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price">300€</div>
-                </div>
-              </div>
-            </a>
-            <a href="" class="a_carousel__item a_carousel__item--green">
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/tiles_icon.svg" alt="" />
-                  <span>Tiles</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">Spatial and residential</h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price">300€</div>
-                </div>
-              </div>
-            </a>
-            <a href="" class="a_carousel__item a_carousel__item--green">
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/vector_icon.svg" alt="" />
-                  <span>Vector</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price">300€</div>
-                </div>
-              </div>
-            </a>
-            <a href="" class="a_carousel__item a_carousel__item--green">
-              <div class="a_carousel__item__bundle">BUNDLE</div>
-              <div class="a_carousel__item__view"><span>VIEW ASSET</span></div>
-              <div class="a_carousel__item__inner">
-                <div class="a_carousel__item__top">
-                  <img src="@/assets/images/icons/vector_icon.svg" alt="" />
-                  <span>Vector</span>
-                </div>
-                <div class="a_carousel__item__main">
-                  <h4 class="a_carousel__item__main__title">Lakes of Greece</h4>
-                  <div class="a_carousel__item__main__rating">★★★★★<span>4.8/5</span></div>
-                  <div class="a_carousel__item__main__vendor">@Ministry of Environment</div>
-                </div>
-                <div class="a_carousel__item__footer">
-                  <div class="a_carousel__item__footer__stats"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>1546</span></div>
-                  <div class="a_carousel__item__footer__price">300€</div>
-                </div>
-              </div>
-            </a>
-          </div>
+          <assets-carousel :assets="popularAssets"></assets-carousel>
+
           <div class="homepage__assets__btn">
             <router-link to="/catalogue" class="btn btn--std btn--blue">ALL ASSETS</router-link>
           </div>
@@ -257,6 +143,8 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import Shape from '@/components/Shape.vue';
 import Search from '@/components/Search.vue';
+import AssetsCarousel from '@/components/AssetsCarousel.vue';
+import AnalyticsApi from '@/service/analytics';
 import AOS from 'aos';
 import VueYoutube from 'vue-youtube';
 import 'aos/dist/aos.css';
@@ -266,13 +154,16 @@ import axios from 'axios';
 import store from '@/store';
 import { Configuration } from '@/model';
 import { EnumAssetType } from '@/model/enum';
+import { PopularAsset } from '@/model/analytics';
 
 Vue.use(VueYoutube);
 
 @Component({
-  components: { Shape, Search },
+  components: { Shape, Search, AssetsCarousel },
 })
 export default class Header extends Vue {
+  analyticsApi: AnalyticsApi;
+
   searchResultsActive = false;
 
   isVideoClicked: boolean;
@@ -285,19 +176,25 @@ export default class Header extends Vue {
 
   wpUrl: string;
 
+  popularAssets: PopularAsset[];
+
   constructor() {
     super();
+
+    this.analyticsApi = new AnalyticsApi();
 
     this.pagedata = null;
     this.isVideoClicked = false;
     this.isVideoStarted = false;
     this.videoElem = null;
     this.wpUrl = '';
+    this.popularAssets = [];
   }
 
   created(): void {
     console.log('created');
     // this.wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint;
+    this.loadPopularAssets();
   }
 
   get config(): Configuration | null {
@@ -326,6 +223,12 @@ export default class Header extends Vue {
     slider.init();
     window.addEventListener('resize', this.carouselLeftOffset);
     document.documentElement.style.setProperty('overflow-y', 'scroll');
+  }
+
+  loadPopularAssets(): void {
+    this.analyticsApi.getMostPopularAssets().then((response) => {
+      this.popularAssets = response.result;
+    });
   }
 
   destroyed(): void {

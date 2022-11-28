@@ -61,6 +61,21 @@ export enum EnumSpatialOperation {
   CONTAINS = 'CONTAINS',
 }
 
+export interface DeliveryMethodOptions {
+  /**
+   * Type of physical media
+   */
+  mediaType: string,
+  /**
+   * Notes for buyer
+   */
+  notes: string,
+  /**
+   * Number of objects
+   */
+  numberOfItems: number,
+}
+
 export interface CatalogueQuery extends PageRequest {
   /*
    * Query string used for full text search operation
@@ -262,6 +277,10 @@ interface BaseCatalogueItem {
    * Degree of conformity with the implementing rules/standard of the metadata followed
    */
   conformity: EnumConformity;
+  /**
+   * Title of the implementing rules/standard the resource conforms to
+   */
+  conformityStandard: string;
   /**
    * A point or period of time associated with the creation event in the lifecycle of the resource
    */
@@ -1080,6 +1099,10 @@ export interface CatalogueItemCommand extends BaseCatalogueItemCommand {
    * Channel of asset distribution
    */
   deliveryMethod: EnumDeliveryMethod;
+  /**
+   * Delivery method options of the item
+   */
+  deliveryMethodOptions?: DeliveryMethodOptions;
   /*
    * The file format, physical medium, or dimensions of the resource
    */

@@ -1437,6 +1437,9 @@ export default class DashboardHome extends Vue {
     console.log(draft);
 
     this.isUserDataLoaded = false;
+
+    draft.termsAndConditionsAccepted = true;
+
     this.providerApi.updateRegistration(draft).then((resp) => {
       console.log(resp);
       this.loadUserData();

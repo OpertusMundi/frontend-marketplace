@@ -38,15 +38,15 @@
       </div>
     </router-link>
     <div class="asset_card__right_dropdown_container">
-      <div @click="isRightDropdownOpen = !isRightDropdownOpen" class="asset_card__three_dots_btn">
+      <div @click="toggleRightDropdown" class="asset_card__three_dots_btn">
         <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17"><g data-name="Group 2622" fill="#333"><circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5"/><circle data-name="Ellipse 170" cx="1.5" cy="1.5" r="1.5" transform="translate(0 14)"/><circle data-name="Ellipse 171" cx="1.5" cy="1.5" r="1.5" transform="translate(0 7)"/></g></svg>
       </div>
       <transition name="fade" mode="out-in">
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
             <li @click="createNewDraftFromPublished">Edit</li>
-            <li v-if="!['SERVICE', 'TABULAR'].includes(asset.type)" @click="createService('WMS')">Create WMS</li>
-            <li v-if="!['SERVICE', 'TABULAR'].includes(asset.type)" @click="createService('WFS')">Create WFS</li>
+            <li v-if="!['SERVICE', 'TABULAR'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WMS')" @click="createService('WMS')">Create WMS</li>
+            <li v-if="!['SERVICE', 'TABULAR'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WFS')" @click="createService('WFS')">Create WFS</li>
             <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
@@ -57,6 +57,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import DraftAssetApi from '@/service/draft';
+import CatalogueApi from '@/service/catalogue';
 // import { AssetDraft } from '@/model/draft';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
 import getPriceOrMinimumPrice from '@/helper/cards';
@@ -70,14 +71,36 @@ export default class AssetPublishedCard extends Vue {
 
   draftAssetApi: DraftAssetApi;
 
+  catalogueApi: CatalogueApi;
+
   isRightDropdownOpen: boolean;
+
+  rightDropdownServiceCreationExcludedOptions: string[];
 
   constructor() {
     super();
 
     this.draftAssetApi = new DraftAssetApi();
+    this.catalogueApi = new CatalogueApi();
 
     this.isRightDropdownOpen = false;
+    this.rightDropdownServiceCreationExcludedOptions = [];
+  }
+
+  async toggleRightDropdown(): Promise<void> {
+    if (this.isRightDropdownOpen) {
+      this.isRightDropdownOpen = false;
+      return;
+    }
+
+    store.commit('setLoading', true);
+
+    const relatedAssetsResponse = await this.catalogueApi.findRelated(this.asset.id);
+    this.rightDropdownServiceCreationExcludedOptions = relatedAssetsResponse.result.items.map((x) => x.spatialDataServiceType).filter((x) => x) as string[];
+
+    this.isRightDropdownOpen = true;
+
+    store.commit('setLoading', false);
   }
 
   // TODO: api must return asset type
@@ -96,20 +119,6 @@ export default class AssetPublishedCard extends Vue {
   formatStatus(status: string): string {
     return status.replaceAll('_', ' ');
   }
-
-  // getRouterLink(assetStatus: string, assetKey: string, assetPublished: string): string {
-  //   const links = {
-  //     DRAFT: `/dashboard/assets/create/${assetKey}`,
-  //     SUBMITTED: '',
-  //     PENDING_HELPDESK_REVIEW: '',
-  //     HELPDESK_REJECTED: '',
-  //     PENDING_PROVIDER_REVIEW: `/review/${assetKey}`,
-  //     PROVIDER_REJECTED: '',
-  //     POST_PROCESSING: '',
-  //     PUBLISHED: `/catalogue/${assetPublished}`,
-  //   };
-  //   return links[assetStatus];
-  // }
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');

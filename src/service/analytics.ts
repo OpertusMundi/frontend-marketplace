@@ -8,7 +8,7 @@ import {
   CoverageQuery,
   AssetTotalValueQuery,
   PopularAsset,
-  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery, VendorCountQuery,
+  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery, VendorCountQuery, EnumAssetSource, EnumAssetQueryMetric,
 } from '@/model/analytics';
 import { AxiosResponse } from 'axios';
 
@@ -110,22 +110,25 @@ export default class AnalyticsApi extends Api {
       });
   }
 
-  public async getMostPopularAssets(query: AssetQuery): Promise<ServerResponse<PopularAsset[]>> {
-    const url = '/action/analytics/popular-assets';
+  public async getMostPopularAssets(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAsset[]>> {
+    const url = `/action/analytics/popular-assets?includeAssets=true&limit=${limit}`;
 
-    return this.post<AssetQuery, ServerResponse<PopularAsset[]>>(url, query)
-      .then((response: AxiosServerResponse<PopularAsset[]>) => {
+    const queryDefault = { metric: EnumAssetQueryMetric.COUNT, source: EnumAssetSource.VIEW };
+    const q: AssetQuery = query ? { ...queryDefault, ...query } : queryDefault;
+
+    return this.post<AssetQuery, ServerResponse<{ asset: PopularAsset }[]>>(url, q)
+      .then((response: AxiosServerResponse<{ asset: PopularAsset }[]>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 
-        return data;
+        return { ...data, result: data.result.map((x) => x.asset) };
       });
   }
 
   public async getMostPopularTerms(): Promise<ServerResponse<PopularTerm[]>> {
     const url = '/action/analytics/popular-terms';
 
-    return this.get<ServerResponse<PopularTerm[]>>(url)
+    return this.post<{source: 'SEARCH', metric: 'COUNT_VIEWS'}, ServerResponse<PopularTerm[]>>(url, { source: 'SEARCH', metric: 'COUNT_VIEWS' })
       .then((response: AxiosServerResponse<PopularTerm[]>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
