@@ -50,7 +50,8 @@
 
           <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
 
-          <other-available-options :catalogueItem="catalogueItem"></other-available-options>
+          <other-available-options-sh :catalogueItem="catalogueItem" v-if="catalogueItem.type === 'SENTINEL_HUB_OPEN_DATA'"></other-available-options-sh>
+          <other-available-options :catalogueItem="catalogueItem" v-else></other-available-options>
         </div>
       </div>
 
@@ -111,6 +112,7 @@ import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProvid
 import ShopCardProviderReviewOpen from '../components/CatalogueSingle/ShopCardProviderReviewOpen.vue';
 import VendorInformation from '../components/CatalogueSingle/VendorInformation.vue';
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
+import OtherAvailableOptionsSH from '../components/CatalogueSingle/OtherAvailableOptionsSH.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
 import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
 import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
@@ -132,6 +134,7 @@ import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelH
     ShopCardProviderReviewOpen,
     VendorInformation,
     OtherAvailableOptions,
+    'other-available-options-sh': OtherAvailableOptionsSH,
     RelatedAssets,
     ApiUsageExample,
     ApiLayerProfiler,
