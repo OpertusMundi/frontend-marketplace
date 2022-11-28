@@ -125,7 +125,7 @@ export default class AnalyticsApi extends Api {
   public async getMostPopularTerms(): Promise<ServerResponse<PopularTerm[]>> {
     const url = '/action/analytics/popular-terms';
 
-    return this.get<ServerResponse<PopularTerm[]>>(url)
+    return this.post<{source: 'SEARCH', metric: 'COUNT_VIEWS'}, ServerResponse<PopularTerm[]>>(url, { source: 'SEARCH', metric: 'COUNT_VIEWS' })
       .then((response: AxiosServerResponse<PopularTerm[]>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
