@@ -7,19 +7,20 @@
       <div class="dashboard__head__helpers dashboard__head__helpers--justify-center mt-xs-30">
         <h1>{{ subscription.item.title }}</h1>
         <div class="dashboard__head__settings" @mouseover="showOptions = true" @mouseout="showOptions = false">
-          <a href="#" @click.prevent=""
-            ><svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17">
+          <a href="#" @click.prevent="">
+            <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17">
               <g data-name="Group 2622" fill="#333">
                 <circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5"></circle>
                 <circle data-name="Ellipse 170" cx="1.5" cy="1.5" r="1.5" transform="translate(0 14)"></circle>
                 <circle data-name="Ellipse 171" cx="1.5" cy="1.5" r="1.5" transform="translate(0 7)"></circle>
-              </g></svg
-          ></a>
+              </g>
+            </svg>
+          </a>
           <transition name="fade" mode="out-in">
             <div class="dashboard__head__settings__options" v-show="showOptions">
               <ul>
                 <li><a href="#">Upgrade plan</a></li>
-                <li><a href="#">Cancel subscription</a></li>
+                <li><a href="#" @click.prevent="cancelSubscription">Cancel subscription</a></li>
               </ul>
             </div>
           </transition>
@@ -91,6 +92,15 @@ export default class SubscriptionsPreview extends Vue {
 
   formatDate(date: string): string {
     return moment(date).format('MMM Do YYYY');
+  }
+
+  cancelSubscription(): void {
+    store.commit('setLoading', true);
+
+    this.consumerApi.cancelSubscription(this.subscription?.key || '').then((response) => {
+      store.commit('setLoading', false);
+      if (response.success) this.$router.push('/dashboard/subscriptions');
+    });
   }
 }
 </script>
