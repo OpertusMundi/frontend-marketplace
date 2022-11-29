@@ -34,6 +34,18 @@
       </template>
     </modal>
 
+    <modal :withSlots="true" :show="modalToShow === 'serviceAlreadyCreated'" @dismiss="modalToShow = ''" :modalId="'serviceAlreadyCreated'" :showCancelButton="false" :showCloseButton="false">
+      <template v-slot:body>
+        <h1>Already created!</h1>
+
+        <p>A service of the selected type is already created by the selected asset.</p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn btn--std btn--blue" @click="modalToShow = ''">OK</button>
+      </template>
+    </modal>
+
     <modal :withSlots="true" :show="modalToShow === 'contractNotAvailable'" @dismiss="modalToShow = ''" :modalId="'ContractNotAvailable'" :showCancelButton="false" :showCloseButton="false">
       <template v-slot:body>
         <h1>Contract not available</h1>
@@ -778,8 +790,23 @@ export default class CreateAsset extends Vue {
             this.submitDataFileForm();
           }
         } else {
+          /* check if this service type is already created by the selected asset */
+          if (this.currentStep === 2 && this.assetMainType === 'API' && this.selectedPublishedAssetForApiCreation) {
+            store.commit('setLoading', true);
+
+            const relatedAssetsResponse = await this.catalogueApi.findRelated(this.selectedPublishedAssetForApiCreation.id);
+            const relatedAssetsServiceTypes = relatedAssetsResponse.result.items.map((x) => x.spatialDataServiceType).filter((x) => x);
+
+            if (relatedAssetsServiceTypes.includes(this.serviceType)) {
+              store.commit('setLoading', false);
+              this.modalToShow = 'serviceAlreadyCreated';
+              return;
+            }
+            store.commit('setLoading', false);
+          }
+
+          /* check contract */
           if (this.currentStep === 5 && !this.asset.openDataset) {
-            /* check contract */
             store.commit('setLoading', true);
             if (!(await this.isSelectedContractAccepted())) {
               this.isPendingDefaultContractAcceptance = true;
@@ -1012,6 +1039,7 @@ export default class CreateAsset extends Vue {
       fileName: this.fileToUpload.fileName,
       format: (this.asset as CatalogueItemCommand).format,
       ...(this.fileToUpload.encoding && { encoding: this.fileToUpload.encoding }),
+      crs: this.asset.referenceSystem,
     };
 
     const uploadResourceResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, fileInfo, config);
@@ -1055,6 +1083,7 @@ export default class CreateAsset extends Vue {
       path: this.selectedPublishedFileForDataFileCreation?.path as string,
       format: (this.asset as CatalogueItemCommand).format,
       encoding: this.selectedPublishedFileForDataFileCreation?.encoding as string,
+      crs: this.asset.referenceSystem,
     };
 
     const addResourceFromFileSystemResponse = await this.draftAssetApi.addResourceFromFileSystem(draftKey, filetFromTopioDrive);

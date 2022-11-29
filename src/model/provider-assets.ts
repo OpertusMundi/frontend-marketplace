@@ -11,7 +11,7 @@ export enum EnumProviderAssetSortField {
 
 export interface ProviderDraftQuery {
     q: string;
-    type?: EnumAssetType,
+    type?: EnumAssetType | EnumAssetType[],
     pageRequest: PageRequest,
     sorting: Sorting<EnumProviderAssetSortField>,
 }

@@ -48,7 +48,8 @@
             <shop-card-provider-review v-else :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
           </template>
 
-          <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')"></vendor-information>
+          <vendor-information-sh v-if="catalogueItem.type === 'SENTINEL_HUB_OPEN_DATA'"></vendor-information-sh>
+          <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')" v-else></vendor-information>
 
           <other-available-options-sh :catalogueItem="catalogueItem" v-if="catalogueItem.type === 'SENTINEL_HUB_OPEN_DATA'"></other-available-options-sh>
           <other-available-options :catalogueItem="catalogueItem" v-else></other-available-options>
@@ -111,6 +112,7 @@ import ShopCardOpen from '../components/CatalogueSingle/ShopCardOpen.vue';
 import ShopCardProviderReview from '../components/CatalogueSingle/ShopCardProviderReview.vue';
 import ShopCardProviderReviewOpen from '../components/CatalogueSingle/ShopCardProviderReviewOpen.vue';
 import VendorInformation from '../components/CatalogueSingle/VendorInformation.vue';
+import VendorInformationSH from '../components/CatalogueSingle/VendorInformationSH.vue';
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import OtherAvailableOptionsSH from '../components/CatalogueSingle/OtherAvailableOptionsSH.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
@@ -133,6 +135,7 @@ import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelH
     ShopCardProviderReview,
     ShopCardProviderReviewOpen,
     VendorInformation,
+    'vendor-information-sh': VendorInformationSH,
     OtherAvailableOptions,
     'other-available-options-sh': OtherAvailableOptionsSH,
     RelatedAssets,
