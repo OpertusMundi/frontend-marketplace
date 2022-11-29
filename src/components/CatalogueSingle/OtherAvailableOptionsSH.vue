@@ -47,7 +47,9 @@ export default class OtherAvailableOptionsSH extends Vue {
 
   created(): void {
     this.catalogueApi.find({ type: [EnumAssetType.SENTINEL_HUB_OPEN_DATA], page: 0, size: 20 }).then((response) => {
-      this.assets = shuffle(response.result.items).filter((x, i) => i < 3);
+      this.assets = shuffle(response.result.items)
+        .filter((x) => x.id !== this.catalogueItem.id)
+        .filter((x, i) => i < 3);
     });
   }
 
