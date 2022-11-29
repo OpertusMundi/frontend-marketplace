@@ -533,6 +533,8 @@ export default class Metadata extends Vue {
     if (this.assetLocal.language && this.languages.find((x) => x.code === this.assetLocal.language)) this.selectedLanguage = this.languages.find((x) => x.code === this.assetLocal.language)!;
     // eslint-disable-next-line
     if (this.assetLocal.metadataLanguage && this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)) this.selectedMetadataLanguage = this.languages.find((x) => x.code === this.assetLocal.metadataLanguage)!;
+    // eslint-disable-next-line
+    if (this.assetLocal.conformity && this.conformityOptions.find((x) => x.value === this.assetLocal.conformity)) this.selectedConformity = this.conformityOptions.find((x) => x.value === this.assetLocal.conformity)!;
   }
 
   isSomeResponsiblePartyDataFilled(key: string): boolean {
