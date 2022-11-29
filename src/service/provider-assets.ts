@@ -18,7 +18,7 @@ export default class ProviderAssetsApi extends Api {
     const { page, size } = query.pageRequest;
     const { id: field, order } = query.sorting;
 
-    const queryString = `q=${query.q}&type=${query.type || ''}&page=${page}&size=${size}&orderBy=${field}&order=${order}`;
+    const queryString = `q=${query.q}&type=${Array.isArray(query.type) ? query.type.join(',') : (query.type || '')}&page=${page}&size=${size}&orderBy=${field}&order=${order}`;
     const url = `/action/assets?${queryString}`;
 
     return this.get<CatalogueQueryResponse>(url)

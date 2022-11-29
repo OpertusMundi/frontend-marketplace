@@ -334,7 +334,8 @@ export default class ApiDetails extends Vue {
 
     const query: ProviderDraftQuery = {
       q: this.publishedAssetsSearchText,
-      ...(this.publishedAssetsTypeFilter && { type: this.publishedAssetsTypeFilter }),
+      type: this.publishedAssetsTypeFilter || [EnumAssetType.BUNDLE, EnumAssetType.VECTOR, EnumAssetType.RASTER],
+      // ...(this.publishedAssetsTypeFilter && { type: this.publishedAssetsTypeFilter }),
       pageRequest: { page, size: this.publishedAssetsPaginationData.itemsPerPage },
       sorting: {
         id: this.publishedAssetsOrderOptions.find((x) => x.label === this.publishedAssetsOrder)?.orderBy || '' as EnumProviderAssetSortField,
