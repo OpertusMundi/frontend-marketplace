@@ -129,13 +129,13 @@ export default class ConsumerApi extends Api {
    *
    * @param key
    */
-     public async cancelSubscription(key: string): Promise<ServerResponse<ConsumerAccountSubscription>> {
-      const url = `/action/consumer/subscriptions/${key}`;
-  
-      return this.delete<ServerResponse<ConsumerAccountSubscription>>(url).then((response) => {
-        const { data } = response;
+  public async cancelSubscription(key: string): Promise<ServerResponse<ConsumerAccountSubscription>> {
+    const url = `/action/consumer/subscriptions/${key}`;
 
-        return data;
-      });
-    }
+    return this.delete<ServerResponse<ConsumerAccountSubscription>>(url).then((response) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
 }
