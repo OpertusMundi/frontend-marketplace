@@ -10,7 +10,7 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price"><small style="font-size: .8em;">from</small> {{ minPrice }}€</div>
+          <div class="asset_card__price" v-if="minPrice"><small style="font-size: .8em;">from</small> {{ minPrice }}€</div>
         </div>
         <div class="asset_card__bottom">
           <div class="asset_card__bottom__left">
@@ -28,9 +28,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { shuffle } from 'lodash';
 import CatalogueApi from '@/service/catalogue';
-import SentinelHubApi from '@/service/sentinel-hub';
 import { CatalogueItem } from '@/model';
 import { EnumAssetType } from '@/model/enum';
+import { SHSubscriptionPricingModelCommand } from '@/model/pricing-model';
 
 @Component
 export default class OtherAvailableOptionsSH extends Vue {
@@ -38,19 +38,16 @@ export default class OtherAvailableOptionsSH extends Vue {
 
   catalogueApi = new CatalogueApi();
 
-  sentinelHubApi = new SentinelHubApi();
-
   assets: CatalogueItem[] | null = null;
 
-  minPrice: number | null = null;
+  get minPrice(): number | null {
+    const prices = this.catalogueItem.pricingModels.map((x) => (x.model as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax || 0);
+    return Math.min(...prices);
+  }
 
   created(): void {
     this.catalogueApi.find({ type: [EnumAssetType.SENTINEL_HUB_OPEN_DATA], page: 0, size: 20 }).then((response) => {
       this.assets = shuffle(response.result.items).filter((x, i) => i < 3);
-    });
-
-    this.sentinelHubApi.getSubscriptionPlans().then((response) => {
-      this.minPrice = Math.min(...response.result.map((x) => x.billing.monthly));
     });
   }
 

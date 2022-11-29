@@ -8,6 +8,7 @@ import {
   FreePricingModelCommand,
   PerCallPricingModelCommand,
   PerRowPricingModelCommand,
+  SHSubscriptionPricingModelCommand,
 } from '@/model/pricing-model';
 
 const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { prefix: string, value: string, suffix: string } => {
@@ -61,6 +62,12 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
       minPrice = (pricingModel as PerRowPricingModelCommand).price;
       res.value = `${(pricingModel as PerRowPricingModelCommand).price}`;
       res.suffix = 'per row';
+    }
+    // eslint-disable-next-line
+    if (pricingModel.type === EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION && (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax && (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax! < minPrice) {
+      minPrice = (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax || 0;
+      res.value = `${(pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax}`;
+      res.suffix = '';
     }
   }
 
