@@ -1039,6 +1039,7 @@ export default class CreateAsset extends Vue {
       fileName: this.fileToUpload.fileName,
       format: (this.asset as CatalogueItemCommand).format,
       ...(this.fileToUpload.encoding && { encoding: this.fileToUpload.encoding }),
+      crs: this.asset.referenceSystem,
     };
 
     const uploadResourceResponse = await this.draftAssetApi.uploadResource(draftAssetKey, this.fileToUpload.file, fileInfo, config);
@@ -1082,6 +1083,7 @@ export default class CreateAsset extends Vue {
       path: this.selectedPublishedFileForDataFileCreation?.path as string,
       format: (this.asset as CatalogueItemCommand).format,
       encoding: this.selectedPublishedFileForDataFileCreation?.encoding as string,
+      crs: this.asset.referenceSystem,
     };
 
     const addResourceFromFileSystemResponse = await this.draftAssetApi.addResourceFromFileSystem(draftKey, filetFromTopioDrive);
