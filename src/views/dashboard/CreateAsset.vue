@@ -581,18 +581,7 @@ export default class CreateAsset extends Vue {
         userOnlyForVas: false,
         version: '',
         vettingRequired: false,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [20.94818115234375, 36.40359962073253],
-              [23.57940673828125, 36.40359962073253],
-              [23.57940673828125, 38.31795595794451],
-              [20.94818115234375, 38.31795595794451],
-              [20.94818115234375, 36.40359962073253],
-            ],
-          ],
-        } as GeoJSON.Polygon,
+        geometry: null,
       } as CatalogueItemCommand;
     } else {
       this.asset = {
@@ -649,18 +638,7 @@ export default class CreateAsset extends Vue {
         userOnlyForVas: false,
         version: '',
         vettingRequired: false,
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [20.94818115234375, 36.40359962073253],
-              [23.57940673828125, 36.40359962073253],
-              [23.57940673828125, 38.31795595794451],
-              [20.94818115234375, 38.31795595794451],
-              [20.94818115234375, 36.40359962073253],
-            ],
-          ],
-        } as GeoJSON.Polygon,
+        geometry: null,
       } as SentinelHubItemCommand;
     }
   }

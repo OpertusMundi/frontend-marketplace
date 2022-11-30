@@ -300,7 +300,7 @@ interface BaseCatalogueItem {
   /*
    * Geometry as GeoJSON
    */
-  geometry: GeoJSON.Polygon;
+  geometry: GeoJSON.Polygon | null;
   /*
    * The topic of the resource
    */
