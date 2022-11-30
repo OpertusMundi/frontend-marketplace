@@ -14,6 +14,7 @@ import { CatalogueItem } from '@/model';
 import AssetsCarousel from '@/components/AssetsCarousel.vue';
 import CatalogueApi from '@/service/catalogue';
 import moment from 'moment/moment';
+import { EnumTopicCategory } from '@/model/catalogue';
 
 @Component({
   components: { AssetsCarousel },
@@ -38,9 +39,13 @@ export default class RelatedAssets extends Vue {
 
     let relatedAssets: CatalogueItem[] = [];
 
-    const relatedAssetsByTopicCategoryResponse = await this.catalogueApi.find({ topic: this.catalogueItem.topicCategory, size: relatedAssetsAmmount });
+    const relatedAssetsByTopicCategoryResponse = await this.catalogueApi.find({ topic: this.catalogueItem.topicCategory, size: relatedAssetsAmmount + 1 }); // fetch one more to exclude current asset
     if (relatedAssetsByTopicCategoryResponse.success) {
       relatedAssets = [...relatedAssets, ...relatedAssetsByTopicCategoryResponse.result.items];
+
+      // exclude current asset if fetched
+      relatedAssets = relatedAssets.filter((x) => x.id !== this.catalogueItem.id);
+      if (relatedAssets.length > relatedAssetsAmmount) relatedAssets = relatedAssets.filter((x, i) => i < relatedAssetsAmmount);
 
       if (relatedAssets.length >= relatedAssetsAmmount) {
         this.relatedAssets = relatedAssets;
@@ -48,7 +53,10 @@ export default class RelatedAssets extends Vue {
       }
     }
 
-    const otherAssetsResponse = await this.catalogueApi.find({ size: (relatedAssetsAmmount - relatedAssets.length) });
+    const allTopics = Object.keys(EnumTopicCategory);
+    const allTopicsExcludingCurrent = allTopics.filter((x) => !this.catalogueItem.topicCategory.includes(x as EnumTopicCategory)) as EnumTopicCategory[];
+
+    const otherAssetsResponse = await this.catalogueApi.find({ topic: allTopicsExcludingCurrent, size: (relatedAssetsAmmount - relatedAssets.length) });
     if (otherAssetsResponse.success) {
       relatedAssets = [...relatedAssets, ...otherAssetsResponse.result.items];
       this.relatedAssets = relatedAssets;
