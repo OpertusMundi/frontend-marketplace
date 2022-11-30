@@ -8,7 +8,7 @@
       </template>
 
       <template v-slot:footer>
-        <button class="btn btn--std btn--blue ml-xs-20" @click="cancelSubscription">Save Draft</button>
+        <button class="btn btn--std btn--blue ml-xs-20" @click="cancelSubscription">OK</button>
       </template>
     </modal>
 
@@ -43,7 +43,54 @@
       <ul class="contract-single__info">
         <li>
           <strong>Plan Description</strong>
-          <p>-</p>
+          <p>
+            <span v-if="subscription.pricingModel.type === 'FIXED_PER_ROWS'">
+              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum rows: {{ subscription.pricingModel.minRows }} <br /></span>
+              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+            </span>
+            <span v-if="subscription.pricingModel.type === 'FIXED_FOR_POPULATION'">
+              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br /></span>
+              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+            </span>
+            <span v-if="subscription.pricingModel.type === 'PER_CALL'">
+              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per call<br /></span>
+              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} calls<br /></div>
+            </span>
+            <span v-if="subscription.pricingModel.type === 'PER_ROW'">
+              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per row<br /></span>
+              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} rows<br /></div>
+            </span>
+            <span v-if="subscription.pricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
+              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">Monthly price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
+              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">Annual price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
+            </span>
+
+            <span style="display: flex; margin-top: 0.5em;">
+              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Use restricted for: </strong>
+              <span v-if="getDomainRestrictions(subscription.pricingModel).length">
+                <span v-for="(domain, i) in getDomainRestrictions(subscription.pricingModel)" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions(subscription.pricingModel).length - 1">, </span></span>
+              </span>
+              <span v-else>Any domain</span>
+            </span>
+
+            <span style="display: flex; margin-top: 0.3em;">
+              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Coverage: </strong>
+              <span v-if="getCoverageRestrictions(subscription.pricingModel).length">
+                <span v-for="(area, i) in getCoverageRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions(subscription.pricingModel).length - 1">, </span></span>
+              </span>
+              <span v-else>Worldwide</span>
+            </span>
+
+            <span style="display: flex; margin-top: 0.3em;">
+              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Consumers: </strong>
+              <span v-if="getConsumerRestrictions(subscription.pricingModel).length">
+                <span v-for="(area, i) in getConsumerRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions(subscription.pricingModel).length - 1">, </span></span>
+              </span>
+              <span v-else>Worldwide</span>
+            </span>
+          </p>
         </li>
         <li>
           <strong>Provided by</strong>
@@ -53,11 +100,11 @@
           <strong>Start date</strong>
           <p>{{ formatDate(subscription.addedOn) }}</p>
         </li>
-        <li>
-          <strong>Expiration update</strong>
-          <p>{{ formatDate(subscription.addedOn) }}</p>
+        <li class="mt-xs-50">
+          <strong>Asset details</strong>
         </li>
       </ul>
+      <card :asset="subscription.item"></card>
     </div>
   </div>
 </template>
@@ -66,10 +113,15 @@
 import { Component, Vue } from 'vue-property-decorator';
 import ConsumerAPI from '@/service/consumer';
 import { ConsumerAccountSubscription } from '@/model/account-asset';
+import Modal from '@/components/Modal.vue';
+import Card from '@/components/Catalogue/Card.vue';
 import store from '@/store';
 import moment from 'moment';
+import { BasePricingModelCommand } from '@/model/pricing-model';
 
-@Component
+@Component({
+  components: { Modal, Card },
+})
 export default class SubscriptionsPreview extends Vue {
   subscriptionKey: string | null;
 
@@ -117,6 +169,27 @@ export default class SubscriptionsPreview extends Vue {
       store.commit('setLoading', false);
       if (response.success) this.$router.push('/dashboard/subscriptions');
     });
+  }
+
+  getDomainRestrictions(pricingModel: BasePricingModelCommand): string[] {
+    if (!pricingModel.domainRestrictions) return [];
+    return pricingModel?.domainRestrictions as string[];
+  }
+
+  getCoverageRestrictions(pricingModel: BasePricingModelCommand): string[] {
+    const continents = Array.isArray(pricingModel?.coverageRestrictionContinents) ? pricingModel?.coverageRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(pricingModel?.coverageRestrictionCountries) ? pricingModel?.coverageRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
+  }
+
+  getConsumerRestrictions(pricingModel: BasePricingModelCommand): string[] {
+    const continents = Array.isArray(pricingModel?.consumerRestrictionContinents) ? pricingModel?.consumerRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(pricingModel?.consumerRestrictionCountries) ? pricingModel?.consumerRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
   }
 }
 </script>

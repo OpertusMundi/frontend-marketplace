@@ -8,7 +8,7 @@
 
     <div class="filters">
       <div class="filters__block">
-        <p class="filters__title" v-if="totalSubscriptions">{{ totalSubscriptions }} SUBSCRIPTION<span v-if="totalSubscriptions > 1">s</span></p>
+        <p class="filters__title" v-if="totalSubscriptions">{{ totalSubscriptions }} SUBSCRIPTION<template v-if="totalSubscriptions > 1">S</template></p>
       </div>
       <div class="filters__block">
         <div class="filters__block__select">
@@ -20,7 +20,7 @@
       </div>
     </div>
     <template v-if="subscriptions">
-      <horizontal-card v-for="subscription in subscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" price="500€/mo" subtitle="" :link="`/dashboard/subscriptions/${subscription.key}`" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>@${subscription.provider.name}</a>`" topRight="ACTIVE" />
+      <horizontal-card v-for="subscription in subscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" :price="getSubscriptionPrice(subscription.pricingModel)" subtitle="" :link="`/dashboard/subscriptions/${subscription.key}`" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>${subscription.provider.name}</a>`" topRight="ACTIVE" />
       <pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :itemsTotal="totalSubscriptions" @pageSelection="getSubscriptions($event)"></pagination>
     </template>
   </div>
@@ -31,7 +31,15 @@ import { Component, Vue } from 'vue-property-decorator';
 import HorizontalCard from '@/components/HorizontalCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import { EnumConsumerSubSortField, ConsumerAccountSubscription } from '@/model/account-asset';
-import { EnumSpatialDataServiceType } from '@/model/enum';
+import {
+  BasePricingModelCommand,
+  EnumPricingModel,
+  FixedPopulationPricingModelCommand,
+  FixedRowPricingModelCommand,
+  PerCallPricingModelCommand,
+  PerRowPricingModelCommand,
+  SHSubscriptionPricingModelCommand,
+} from '@/model/pricing-model';
 
 import { Sorting } from '@/model/request';
 import ConsumerAPI from '@/service/consumer';
@@ -90,12 +98,45 @@ export default class Subscriptions extends Vue {
         this.totalSubscriptions = response.data.result.count;
         this.subscriptions = response.data.result.items;
       })
-      .catch((e) => {
+      .catch(() => {
         store.commit('setLoading', false);
       });
   }
 
-  setSortOrder(event): void {
+  getSubscriptionPrice(pricingModel: BasePricingModelCommand): string {
+    const { type } = pricingModel;
+
+    let text = '';
+
+    switch (type) {
+      case EnumPricingModel.FIXED_PER_ROWS: {
+        text = `${(pricingModel as FixedRowPricingModelCommand).price} / 1,000 rows`;
+        break;
+      }
+      case EnumPricingModel.FIXED_FOR_POPULATION: {
+        text = `${(pricingModel as FixedPopulationPricingModelCommand).price} / 10,000 people`;
+        break;
+      }
+      case EnumPricingModel.PER_CALL: {
+        text = `${(pricingModel as PerCallPricingModelCommand).price} / call`;
+        break;
+      }
+      case EnumPricingModel.PER_ROW: {
+        text = `${(pricingModel as PerRowPricingModelCommand).price} / row`;
+        break;
+      }
+      case EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION: {
+        text = `${(pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax} / month`;
+        break;
+      }
+      default:
+    }
+
+    return text;
+  }
+
+  // eslint-disable-next-line
+  setSortOrder(event: any): void {
     this.sortOrder.id = event.target.value;
     this.currentPage = 0;
     this.getSubscriptions(0);
