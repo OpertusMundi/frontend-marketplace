@@ -6,8 +6,8 @@
         <h2>Available servers for your subscription</h2>
       </div>
     </div>
-    <div class="notebooks pt-xs-50">
-      <div class="notebooks__inner" v-if="configuration">
+    <div class="notebooks pt-xs-50" v-if="configuration">
+      <div class="notebooks__inner">
         <notebook-card
           v-for="(profile, index) in configuration.profiles"
           v-bind:key="`notebook_${index}`"
