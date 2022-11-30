@@ -3,7 +3,7 @@
     <div class="s_container">
       <div class="asset__related__content">
         <div class="asset__related__content__right">
-          <h6>About the vendor</h6>
+          <h6>About the supplier</h6>
           <div class="asset__vendor_info__card">
             <img src="/assets/img/sentinel-hub/sh-logo.jpg" alt="" height="80" width="80">
             <div class="asset__vendor_info__card__info">
