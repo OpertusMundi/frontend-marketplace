@@ -172,6 +172,10 @@
     <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
     <ul class="asset__shopcard__buyinfo">
       <li><strong>Delivery type: </strong> {{ labelize(catalogueItem.deliveryMethod) }}</li>
+      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.mediaType"><strong>Media type: </strong> {{ catalogueItem.deliveryMethodOptions.mediaType }}</li>
+      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.numberOfItems"><strong>Number of items: </strong> {{ catalogueItem.deliveryMethodOptions.numberOfItems }}</li>
+      <li style="display: inline-block" v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.notes"><strong>Notes: </strong> {{ catalogueItem.deliveryMethodOptions.notes }}</li>
+
       <!-- <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li> -->
       <!-- <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li> -->
       <li><strong>Delivered from: </strong>{{ catalogueItem.publisher.name }}</li>
