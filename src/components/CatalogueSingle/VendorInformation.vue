@@ -3,7 +3,7 @@
     <div class="s_container">
       <div class="asset__related__content">
         <div class="asset__related__content__right" v-if="catalogueItem && catalogueItem.publisher">
-          <h6>About the vendor</h6>
+          <h6>About the supplier</h6>
           <div class="asset__vendor_info__card">
             <img :src="catalogueItem.publisher.logoImage ? 'data:' + catalogueItem.publisher.logoImageMimeType + ';base64, ' + catalogueItem.publisher.logoImage : defaultLogo()" alt="" height="80" width="80">
             <div class="asset__vendor_info__card__info">
