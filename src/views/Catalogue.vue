@@ -642,9 +642,15 @@ export default class Catalogue extends Vue {
         isChecked: false,
       },
       {
+        id: EnumAssetType.SENTINEL_HUB_OPEN_DATA,
+        name: 'Earth Observation',
+        pillLabel: 'Earth Observation',
+        isChecked: false,
+      },
+      {
         id: EnumAssetType.BUNDLE,
-        name: 'Bundle',
-        pillLabel: 'Bundle',
+        name: 'Collection',
+        pillLabel: 'Collection',
         isChecked: false,
       },
     ];

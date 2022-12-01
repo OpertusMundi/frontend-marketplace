@@ -13,7 +13,7 @@
         <div class="horizontalcard__title">{{ title }}</div>
         <!-- <div class="horizontalcard__price">Order Placed</div> -->
         <div class="horizontalcard__top__right horizontalcard__top__right--blue">
-          <span>{{ topRight }}</span>
+          <span v-html="topRight"></span>
         </div>
       </div>
       <div class="horizontalcard__middle">{{ subtitle }}</div>

@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <div class="mt-xs-20" v-if="catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE'">
+      <div class="mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
           <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
           <label :for="`p_variation_${pr_model.model.key}`">{{ formatPricingModelType(pr_model.model.type) }}
@@ -138,7 +138,7 @@
     </div>
 
     <div v-if="!catalogueItem.availableToPurchase" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToWishlist() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO WISHLIST</a></div>
-    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SUBSCRIBE</a></div>
+    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue mt-xs-10 mb-xs-10" style="display: block; width: min-content;">SUBSCRIBE</a></div>
     <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
