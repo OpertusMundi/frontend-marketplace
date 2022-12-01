@@ -20,7 +20,7 @@
       </div>
     </div>
     <template v-if="subscriptions">
-      <horizontal-card v-for="subscription in subscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" :price="getSubscriptionPrice(subscription.pricingModel)" subtitle="" :link="`/dashboard/subscriptions/${subscription.key}`" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>${subscription.provider.name}</a>`" topRight="ACTIVE" />
+      <horizontal-card v-for="subscription in subscriptions" v-bind:key="subscription.assetId" :title="subscription.item.title" :price="getSubscriptionPrice(subscription.pricingModel)" subtitle="" :link="`/dashboard/subscriptions/${subscription.key}`" linkText="VIEW SUBSCRIPTION" :infoText="`<strong>Start date</strong>: ${formatDate(subscription.addedOn)} <a href='#'>${subscription.provider.name}</a>`" :topRight="subscription.status === 'INACTIVE' ? `<span style='color: #6c6c6c'>INACTIVE</span>` : subscription.status" />
       <pagination :currentPage="currentPage" :itemsPerPage="itemsPerPage" :itemsTotal="totalSubscriptions" @pageSelection="getSubscriptions($event)"></pagination>
     </template>
   </div>

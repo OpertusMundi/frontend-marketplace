@@ -17,8 +17,12 @@
         ><svg class="mr-xs-10" xmlns="http://www.w3.org/2000/svg" width="6.938" height="9.904" viewBox="0 0 6.938 9.904"><path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l4.383,5.283,3.273-3.961h0l1.092-1.322" transform="translate(-7254.398 -472.947) rotate(90)" fill="none" stroke="#333" stroke-width="1.5" /></svg>BACK</router-link
       >
       <div class="dashboard__head__helpers dashboard__head__helpers--justify-center mt-xs-30">
-        <h1>{{ subscription.item.title }}</h1>
-        <div class="dashboard__head__settings" @mouseover="showOptions = true" @mouseout="showOptions = false">
+        <h1 v-if="subscription.status === 'ACTIVE'">{{ subscription.item.title }}</h1>
+        <div v-else>
+          <h3 style="color: #6c6c6c">INACTIVE</h3>
+          <h1>{{ subscription.item.title }}</h1>
+        </div>
+        <div class="dashboard__head__settings" @mouseover="showOptions = true" @mouseout="showOptions = false" v-if="subscription.status === 'ACTIVE'">
           <a href="#" @click.prevent="">
             <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17">
               <g data-name="Group 2622" fill="#333">
