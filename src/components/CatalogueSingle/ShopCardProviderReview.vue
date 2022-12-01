@@ -25,7 +25,7 @@
         </div>
       </div> -->
 
-      <div class="mt-xs-20" v-if="catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].type !== 'FREE'">
+      <div class="mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.key">
           <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.key}`" v-model="selectedPricingModel" :value="pr_model">
           <label :for="`p_variation_${pr_model.key}`">{{ formatPricingModelType(pr_model.type) }}
