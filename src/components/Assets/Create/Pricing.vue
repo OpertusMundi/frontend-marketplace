@@ -31,12 +31,14 @@
                 <div class="form-group">
                   <form>
                     <div v-for="model in pricingModelTypes" :key="model.priceModel">
-                      <label class="control control-radio" :for="`model_option_${model.priceModel}`">
-                        <!-- <input @change="onChangePricingModelType(model.priceModel)" v-model="tempSelectedType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel"> -->
-                        <input @change="onChangePricingModelType(model.priceModel)" v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel">
-                        {{ model.name }}
-                        <div class="control_indicator"></div>
-                      </label>
+                      <template v-if="model.priceModel !== 'FREE' || deliveryMethod === 'DIGITAL_PLATFORM'">
+                        <label class="control control-radio" :for="`model_option_${model.priceModel}`">
+                          <!-- <input @change="onChangePricingModelType(model.priceModel)" v-model="tempSelectedType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel"> -->
+                          <input @change="onChangePricingModelType(model.priceModel)" v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel">
+                          {{ model.name }}
+                          <div class="control_indicator"></div>
+                        </label>
+                      </template>
                     </div>
                   </form>
                   <div class="errors" v-if="errors"><span v-for="error in errors" v-bind:key="error">{{ error }}</span> </div>
@@ -267,8 +269,9 @@ import {
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
 } from '@/model/pricing-model';
-import store from '@/store';
 import { EnumContinent } from '@/model/enum';
+import { EnumDeliveryMethod } from '@/model/catalogue';
+import store from '@/store';
 
 extend('required', required);
 extend('min_value', min_value);
@@ -286,6 +289,8 @@ export default class Pricing extends Vue {
   @Prop({ required: true }) private pricingModels!: BasePricingModelCommand[];
 
   @Prop({ required: true }) private selectedPricingModelForEditing!: number | null;
+
+  @Prop({ required: true }) readonly deliveryMethod!: EnumDeliveryMethod;
 
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>,

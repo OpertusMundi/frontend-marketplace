@@ -65,15 +65,15 @@ export interface DeliveryMethodOptions {
   /**
    * Type of physical media
    */
-  mediaType: string,
+  mediaType?: string,
   /**
    * Notes for buyer
    */
-  notes: string,
+  notes?: string,
   /**
    * Number of objects
    */
-  numberOfItems: number,
+  numberOfItems?: number,
 }
 
 export interface CatalogueQuery extends PageRequest {
