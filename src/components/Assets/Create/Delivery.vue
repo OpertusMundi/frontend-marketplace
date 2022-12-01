@@ -197,7 +197,7 @@
               </div>
               <div class="form-group">
                 <label for="">Notes for buyer</label>
-                <textarea class="form-group__text" cols="20" rows="5" value="test"></textarea>
+                <textarea class="form-group__text" cols="20" rows="5" v-model="deliveryMethodOptionsLocal.notes"></textarea>
               </div>
             </div>
             <div v-if="deliveryMethodLocal === 'PHYSICAL_PROVIDER' && byOwnMeans === 'MEANS'" class="col-md-4">

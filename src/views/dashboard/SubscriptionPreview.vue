@@ -31,7 +31,7 @@
           <transition name="fade" mode="out-in">
             <div class="dashboard__head__settings__options" v-show="showOptions">
               <ul>
-                <li><a href="#">Upgrade plan</a></li>
+                <!-- <li><a href="#">Upgrade plan</a></li> -->
                 <li><a href="#" @click.prevent="modalToShow = 'cancelSubscription'">Cancel subscription</a></li>
               </ul>
             </div>
