@@ -34,17 +34,6 @@
           {{ EnumAnalyticsExploreDescription.VIEWER_MARKET_SEGMENT_DESC }}
         </div>
       </a>
-      <a href="#" class="analytics__types__item"
-         @click.prevent="activeTab = EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS"
-         :class="{ active: activeTab === EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS }">
-        <div class="analytics__types__item__upper">
-          <img src="@/assets/images/icons/dashboard/pie_chart_icon.svg" alt="">
-          <h5>{{ EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS }}</h5>
-        </div>
-        <div class="analytics__types__item__desc">
-          {{ EnumAnalyticsExploreDescription.SUBSCRIBER_SEGMENTS_DESC }}
-        </div>
-      </a>
     </div>
     <div class="analytics__cards">
       <div class="analytics__cards__item"
@@ -73,15 +62,6 @@
           :asset-query-metric-type="EnumAssetQueryMetric.COUNT"
           :symbol="''"
           :symbol-title="'Views'"/>
-      </div>
-      <div class="analytics__cards__item"
-           v-show="activeTab === EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS">
-        <PieSubscribersApi
-          :card-heading="EnumAnalyticsExplore.SUBSCRIBER_SEGMENTS"
-          :card-description="EnumAnalyticsExploreDescription.SUBSCRIBER_SEGMENTS_DESC"
-          :asset-source-enum="enumAssetSource.VIEW"
-          :symbol="''"
-          :symbolTitle="'Transactions'"/>
       </div>
     </div>
   </div>

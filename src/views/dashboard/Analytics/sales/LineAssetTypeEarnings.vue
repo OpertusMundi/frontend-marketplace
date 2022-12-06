@@ -28,15 +28,18 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+        <div v-if="false" class="graphcard__head__filters__assets">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
+                           v-on:triggerchange="getAnalytics()"/>
         </div>
       </div>
     </div>
@@ -45,13 +48,17 @@
       <thead>
       <tr>
         <th class="data_table__header">Asset</th>
-        <th v-for="(name, index) in timePoints" class="data_table__header" :key="`segment_name_${index}`">{{ formatDate(name) }}</th>
+        <th v-for="(name, index) in timePoints" class="data_table__header"
+            :key="`segment_name_${index}`">{{ formatDate(name) }}
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="value in data.data" :key="value.id">{{ formatValue(value) }}</td>
+        <td class="data_table__data" v-for="value in data.data" :key="value.id">
+          {{ formatValue(value) }}
+        </td>
       </tr>
       </tbody>
     </table>
@@ -157,15 +164,8 @@ export default class LineAssetTypeEarnings extends Vue {
     this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
-    this.getAnalytics();
-  }
-
   async mounted(): Promise<any> {
-    await this.getAssets();
-    // await this.getAnalytics();
+    await this.getAnalytics();
   }
 
   getAnalytics(): void {
@@ -174,7 +174,6 @@ export default class LineAssetTypeEarnings extends Vue {
         enabled: false,
       },
       dimension: this.EnumAssetTypeDimension,
-      assets: this.assetsQuery,
       metric: this.EnumSalesQueryMetric,
       time: {
         unit: this.temporalUnit,
@@ -182,13 +181,14 @@ export default class LineAssetTypeEarnings extends Vue {
         max: this.temporalUnitMax,
       },
     };
-    this.analyticsApi.executeEarningsAssetTypeQuery(query).then((response) => {
-      this.analyticsData = response.result;
-      this.timePoints = this.getTimeResponse();
-      this.lineChartDate = this.formatTheDate();
-      this.seriesData = DataTransform.groupByAssetsToSeriesData(this.analyticsData.points, 'asset');
-      this.chartOptions = this.getOptions();
-    });
+    this.analyticsApi.executeEarningsAssetTypeQuery(query)
+      .then((response) => {
+        this.analyticsData = response.result;
+        this.timePoints = this.getTimeResponse();
+        this.lineChartDate = this.formatTheDate();
+        this.seriesData = DataTransform.groupByAssetsToSeriesData(this.analyticsData.points, 'asset');
+        this.chartOptions = this.getOptions();
+      });
   }
 
   filteredAssets(assets: CatalogueItem[]): any {
@@ -239,6 +239,7 @@ export default class LineAssetTypeEarnings extends Vue {
       xAxis: {
         categories: this.lineChartDate,
         type: 'datetime',
+        reversed: true,
       },
       yAxis: {
         gridLineDashStyle: 'Dot',
@@ -405,47 +406,47 @@ export default class LineAssetTypeEarnings extends Vue {
 
   formatTheDate(): string[] {
     const formattedDate: Array<any> = [];
-    if (this.assetsQuery?.length > 0) {
-      this.timePoints.forEach((date: any) => {
-        if (Object.prototype.hasOwnProperty.call(date, 'day')) {
-          const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
-            .format('MMM D, YY');
-          formattedDate.push(dayFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
-          const monthFormat = moment(`${date.year}-${date.month}`)
-            // .set({ year: date.year, month: date.month })
-            .format('MMMM YYYY');
-          formattedDate.push(monthFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const startWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .startOf('isoWeek')
-            .format('MMM D');
-          const endWeek = moment(`${date.year}`)
-            .add(date.week, 'weeks')
-            .endOf('isoWeek')
-            .format('MMM D, YY');
-          const weekFormat = `${startWeek} - ${endWeek}`;
-          formattedDate.push(weekFormat);
-        } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
-          const yearFormat = moment(`${date.year}`)
-            .format('YYYY');
-          formattedDate.push(yearFormat);
-        }
-      });
-    }
+    this.timePoints.forEach((date: any) => {
+      if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+        const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+          .format('MMM D, YY');
+        formattedDate.push(dayFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+        const monthFormat = moment(`${date.year}-${date.month}`)
+          // .set({ year: date.year, month: date.month })
+          .format('MMMM YYYY');
+        formattedDate.push(monthFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const startWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .startOf('isoWeek')
+          .format('MMM D');
+        const endWeek = moment(`${date.year}`)
+          .add(date.week, 'weeks')
+          .endOf('isoWeek')
+          .format('MMM D, YY');
+        const weekFormat = `${startWeek} - ${endWeek}`;
+        formattedDate.push(weekFormat);
+      } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+        const yearFormat = moment(`${date.year}`)
+          .format('YYYY');
+        formattedDate.push(yearFormat);
+      }
+    });
     return formattedDate;
   }
 
   formatValue(value: string): any {
     const regex = value.toString();
-    return regex.replace(/(\.\d{2})\d*/, '$1').replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
+    return regex.replace(/(\.\d{2})\d*/, '$1')
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1,');
   }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+
 .multiselect__option--highlight {
   background: none !important;
 }

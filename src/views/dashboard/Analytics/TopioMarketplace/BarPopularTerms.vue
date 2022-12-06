@@ -29,24 +29,31 @@
       </div>
       <div class="graphcard__head__filters">
         <div v-if="false" class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <asset-mini-card :asset="props.option"></asset-mini-card>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
+                           v-on:triggerchange="getAnalytics()"/>
         </div>
       </div>
     </div>
@@ -55,13 +62,18 @@
       <thead>
       <tr>
         <th class="data_table__header">{{ cardHeading }}</th>
-        <th v-for="(name, index) in assetNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
+        <th v-for="(name, index) in assetNames" class="data_table__header" :key="index">
+          {{ upperCaseTransform(name) }}
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{
+            value[0]
+          }}
+        </td>
       </tr>
       </tbody>
     </table>
@@ -81,7 +93,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  DataSeries, EnumTemporalUnit, EnumAssetSource,
+  DataSeries, EnumTemporalUnit, EnumAssetSource, BaseQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 
@@ -132,9 +144,9 @@ export default class BarPopularTerms extends Vue {
 
   chartDate: any;
 
-  datetimeSeries: any
+  datetimeSeries: any;
 
-  assetNames: string[]
+  assetNames: string[];
 
   EnumTemporalUnit: typeof EnumTemporalUnit;
 
@@ -164,22 +176,31 @@ export default class BarPopularTerms extends Vue {
   }
 
   getAnalytics(): void {
-    this.analyticsApi.getMostPopularTerms().then((response) => {
-      console.log('response: ', response);
-      if (response.success) {
-        this.seriesData = [{
-          name: 'Value counts',
-          data: response.result.map((serie) => Object.values(serie)),
-        }];
-        this.assetNames = response.result.map((serie) => Object.keys(serie)[0]);
-        this.chartOptions = this.getOptions();
-      }
-    });
+    const query: BaseQuery = {
+      time: {
+        unit: this.temporalUnit,
+        min: this.temporalUnitMin,
+        max: this.temporalUnitMax,
+      },
+    };
+    this.analyticsApi.getMostPopularTerms(query)
+      .then((response) => {
+        console.log('response: ', response);
+        if (response.success) {
+          this.seriesData = [{
+            name: 'Value counts',
+            data: response.result.map((serie) => Object.values(serie)),
+          }];
+          this.assetNames = response.result.map((serie) => Object.keys(serie)[0]);
+          this.chartOptions = this.getOptions();
+        }
+      });
   }
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+    this.assetsQuery = newVal.filter((el) => el)
+      .map((a) => a.assetPublished);
     this.getAnalytics();
   }
 
@@ -199,13 +220,14 @@ export default class BarPopularTerms extends Vue {
       id: EnumSortField.CREATED_ON,
       order: 'ASC' as Order,
     };
-    await this.draftAssetApi.find(query, pageRequest, sort).then((resp) => {
-      if (resp.data.success) {
-        this.assets = resp.data.result.items;
-      } else {
-        console.log('error', resp.data);
-      }
-    });
+    await this.draftAssetApi.find(query, pageRequest, sort)
+      .then((resp) => {
+        if (resp.data.success) {
+          this.assets = resp.data.result.items;
+        } else {
+          console.log('error', resp.data);
+        }
+      });
   }
 
   getOptions(): any {
@@ -288,6 +310,7 @@ export default class BarPopularTerms extends Vue {
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+
 .multiselect__option--highlight {
   background: none !important;
 }

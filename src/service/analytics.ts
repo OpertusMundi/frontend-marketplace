@@ -8,7 +8,14 @@ import {
   CoverageQuery,
   AssetTotalValueQuery,
   PopularAsset,
-  PopularTerm, SubscribersQuery, EarningsAssetTypeQuery, GoogleAnalyticsQuery, VendorCountQuery, EnumAssetSource, EnumAssetQueryMetric,
+  PopularTerm,
+  SubscribersQuery,
+  EarningsAssetTypeQuery,
+  GoogleAnalyticsQuery,
+  VendorCountQuery,
+  BaseQuery,
+  EnumAssetSource,
+  EnumAssetQueryMetric,
 } from '@/model/analytics';
 import { AxiosResponse } from 'axios';
 
@@ -125,10 +132,12 @@ export default class AnalyticsApi extends Api {
       });
   }
 
-  public async getMostPopularTerms(): Promise<ServerResponse<PopularTerm[]>> {
+  public async getMostPopularTerms(query?: BaseQuery | null): Promise<ServerResponse<PopularTerm[]>> {
     const url = '/action/analytics/popular-terms';
 
-    return this.post<{source: 'SEARCH', metric: 'COUNT_VIEWS'}, ServerResponse<PopularTerm[]>>(url, { source: 'SEARCH', metric: 'COUNT_VIEWS' })
+    const queryData = query ? { source: 'SEARCH', metric: 'COUNT_VIEWS', ...query } : { source: 'SEARCH', metric: 'COUNT_VIEWS' };
+
+    return this.post<BaseQuery, ServerResponse<PopularTerm[]>>(url, queryData)
       .then((response: AxiosServerResponse<PopularTerm[]>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
@@ -165,7 +174,7 @@ export default class AnalyticsApi extends Api {
     const url = '/action/analytics/google-analytics';
 
     return this.post<GoogleAnalyticsQuery, ServerResponse<DataSeries>>(url, query)
-      .then((response:AxiosResponse<ServerResponse<DataSeries>>) => {
+      .then((response: AxiosResponse<ServerResponse<DataSeries>>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 
@@ -177,7 +186,7 @@ export default class AnalyticsApi extends Api {
     const url = '/action/analytics/vendor-count';
 
     return this.post<VendorCountQuery, ServerResponse<DataSeries>>(url, query)
-      .then((response:AxiosResponse<ServerResponse<DataSeries>>) => {
+      .then((response: AxiosResponse<ServerResponse<DataSeries>>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 
@@ -214,5 +223,17 @@ export default class AnalyticsApi extends Api {
     });
 
     return result;
+  }
+
+  public executeAssetCountQuery(query: AssetTotalValueQuery): Promise<ServerResponse<DataSeries>> {
+    const endPoint = '/action/analytics/asset-count';
+
+    return this.post<AssetTotalValueQuery, ServerResponse<DataSeries>>(endPoint, query)
+      .then((response: AxiosResponse<ServerResponse<DataSeries>>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+
+        return data;
+      });
   }
 }

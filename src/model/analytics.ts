@@ -46,7 +46,7 @@ interface SegmentDimension {
   segments?: EnumTopicCategory;
 }
 
-interface BaseQuery {
+export interface BaseQuery {
   /**
    * Temporal dimension constraints
    */

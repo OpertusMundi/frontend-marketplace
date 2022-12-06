@@ -28,29 +28,29 @@
         </div>
       </div>
       <div class="graphcard__head__filters">
-        <div v-if="false" class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
-                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
-                       placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
-                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
-                       placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
-                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
-                       placeholder="Select asset">
-            <template slot="option" slot-scope="props">
-              <asset-mini-card :asset="props.option"></asset-mini-card>
-            </template>
-          </multiselect>
-        </div>
+        <!--        <div v-if="false" class="graphcard__head__filters__assets">-->
+        <!--          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"-->
+        <!--                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"-->
+        <!--                       placeholder="Select asset">-->
+        <!--            <template slot="option" slot-scope="props">-->
+        <!--              <asset-mini-card :asset="props.option"></asset-mini-card>-->
+        <!--            </template>-->
+        <!--          </multiselect>-->
+        <!--          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"-->
+        <!--                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"-->
+        <!--                       placeholder="Select asset">-->
+        <!--            <template slot="option" slot-scope="props">-->
+        <!--              <asset-mini-card :asset="props.option"></asset-mini-card>-->
+        <!--            </template>-->
+        <!--          </multiselect>-->
+        <!--          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"-->
+        <!--                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"-->
+        <!--                       placeholder="Select asset">-->
+        <!--            <template slot="option" slot-scope="props">-->
+        <!--              <asset-mini-card :asset="props.option"></asset-mini-card>-->
+        <!--            </template>-->
+        <!--          </multiselect>-->
+        <!--        </div>-->
         <div class="graphcard__head__filters__time">
           <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
                            v-on:triggerchange="getAnalytics()"/>
@@ -90,7 +90,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  AssetQuery,
+  AssetQuery, AssetTotalValueQuery,
   DataSeries,
   EnumAssetQueryMetric,
   EnumAssetSource,
@@ -131,15 +131,11 @@ export default class LineAssetsTotal extends Vue {
 
   ProviderAssetsApi: ProviderAssetsApi;
 
-  assets: CatalogueItem[];
-
   selectedAssets: CatalogueItem[];
 
   analyticsApi: AnalyticsApi;
 
   analyticsData: DataSeries;
-
-  assetsQuery: string[];
 
   timePoints: TimeResponse[];
 
@@ -159,12 +155,10 @@ export default class LineAssetsTotal extends Vue {
 
   constructor() {
     super();
-    this.assets = [];
     this.selectedAssets = [];
     this.analyticsApi = new AnalyticsApi();
     this.analyticsData = {} as DataSeries;
     this.chartOptions = null;
-    this.assetsQuery = [];
     this.timePoints = [];
     this.temporalUnitMin = '';
     this.temporalUnitMax = '';
@@ -175,36 +169,19 @@ export default class LineAssetsTotal extends Vue {
     this.ProviderAssetsApi = new ProviderAssetsApi();
   }
 
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: CatalogueItem[]): void {
-    this.assetsQuery = newVal.filter((el) => el).map((a) => a.id);
-    this.getAnalytics();
-  }
-
-  filteredAssets(assets: CatalogueItem[]): any {
-    return assets.filter((asset) => this.selectedAssets.every((selected) => selected.id !== asset.id));
-  }
-
   async mounted(): Promise<any> {
-    // await this.getAssets();
     await this.getAnalytics();
   }
 
   getAnalytics(): void {
-    const query: AssetQuery = {
-      segments: {
-        enabled: true,
-      },
-      source: EnumAssetSource.VIEW,
-      assets: this.assetsQuery,
-      metric: EnumAssetQueryMetric.COUNT,
+    const query: AssetTotalValueQuery = {
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
         max: this.temporalUnitMax,
       },
     };
-    this.analyticsApi.executeAssetQuery(query)
+    this.analyticsApi.executeAssetCountQuery(query)
       .then((response) => {
         console.log('response total assets: ', response);
         if (response.success) {
@@ -212,33 +189,8 @@ export default class LineAssetsTotal extends Vue {
           this.analyticsData = response.result;
           this.timePoints = this.getTimeResponse();
           this.lineChartDate = this.formatTheDate();
-          this.seriesData = DataTransform.groupByAssetsToSeriesData(this.analyticsData.points, 'segment');
+          this.seriesData = [{ name: this.cardHeading, data: this.analyticsData.points.map((e) => e.value) }]; // Format data series with object literals
           this.chartOptions = this.getOptions();
-        }
-      });
-  }
-
-  getAssets(): void {
-    const query: ProviderDraftQuery = {
-      q: '',
-      type: EnumAssetType.VECTOR,
-      pageRequest: {
-        page: 0,
-        size: 100,
-      },
-      sorting: {
-        id: EnumProviderAssetSortField.TYPE,
-        order: 'ASC',
-      },
-    };
-    this.ProviderAssetsApi.find(query)
-      .then((response: CatalogueQueryResponse) => {
-        if (response.success) {
-          this.assets = response.result.items.map((item) => ({
-            ...item,
-            price: getPriceOrMinimumPrice(item),
-            priceRendered: renderedPriceAsString(getPriceOrMinimumPrice(item)),
-          }));
         }
       });
   }
@@ -392,66 +344,6 @@ export default class LineAssetsTotal extends Vue {
   getTimeResponse(): Array<any> {
     return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time)
       .reverse();
-  }
-
-  formatSeries(): any[] {
-    const series: Array<any> = [];
-    if (this.assetsQuery?.length > 1) {
-      this.assetsQuery.forEach((assetName) => {
-        const data: Array<number> = [];
-        this.timePoints.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
-            .map((a) => a.value);
-          if (value.length > 0) {
-            data.push(value[0]);
-          } else {
-            data.push(0);
-          }
-        });
-        const assetTitle = this.assets.find(({ id }) => id === assetName);
-        const assetObj = {
-          marker: {
-            enabled: true,
-            symbol: 'circle',
-            lineWidth: 1,
-            radius: 4,
-            states: {
-              hover: {
-                enabled: true,
-              },
-            },
-          },
-          name: assetTitle?.title,
-          showInLegend: true,
-          data,
-        };
-        series.push(assetObj);
-      });
-    } else {
-      this.assetsQuery.forEach((assetName) => {
-        const assetTitle = this.assets.find(({ id }) => id === assetName);
-        const data = this.analyticsData?.points.map((a) => a.value);
-        const assetObj = {
-          name: assetTitle?.title,
-          marker: {
-            enabled: true,
-            symbol: 'circle',
-            lineWidth: 1,
-            radius: 4,
-            states: {
-              hover: {
-                enabled: true,
-              },
-            },
-          },
-          showInLegend: true,
-          data,
-        };
-        series.push(assetObj);
-      });
-    }
-
-    return series;
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
