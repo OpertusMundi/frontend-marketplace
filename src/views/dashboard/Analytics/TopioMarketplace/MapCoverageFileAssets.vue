@@ -12,7 +12,7 @@
         <div class="graphcard__head__filters__assets">
           <multiselect v-model="segmentModel" :options="segments" :searchable="true"
                        :close-on-select="true" :show-labels="false"
-                       placeholder="Select asset">
+                       placeholder="Select Segment">
             <template slot="option" slot-scope="props">
               <AssetSegmentCard :segment="props.option"></AssetSegmentCard>
             </template>
@@ -281,14 +281,20 @@ export default class MapCoverageFileAssets extends Vue {
     };
   }
 
-  formatSeries(): any {
-    this.seriesData = Object.values(
+  formatSeries(): void {
+    const array: Array<[string, number]> = Object.values(
       this.analyticsData.points.reduce((acc, object: any) => {
         const entry = object.location.code.toLowerCase();
         (acc[entry] || (acc[entry] = [entry, 0]))[1] += object.value;
         return acc;
       }, {}),
     );
+    this.seriesData = array.map((e) => {
+      if (e[0] === 'el') {
+        e[0] = 'gr';
+      }
+      return e;
+    });
   }
 
   tableCountries(): any {

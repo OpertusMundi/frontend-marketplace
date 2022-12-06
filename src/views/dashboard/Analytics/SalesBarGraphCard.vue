@@ -243,6 +243,9 @@ export default class SalesBarGraphCard extends Vue {
           borderColor: 'white',
           borderRadius: 6,
         },
+        column: {
+          minPointLength: 3,
+        },
       },
       showInLegend: true,
       colors: ['#190AFF', '#358F8B', '#A843B5'],

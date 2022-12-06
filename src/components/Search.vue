@@ -182,7 +182,7 @@ export default class Search extends Vue {
   created(): void {
     this.updateProfile();
 
-    this.analyticsApi.getMostPopularTerms().then((response) => {
+    this.analyticsApi.getMostPopularTerms({}).then((response) => {
       if (response.success) {
         this.popularTerms = response.result
           .filter((x) => Object.keys(x)[0])

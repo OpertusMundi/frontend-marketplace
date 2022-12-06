@@ -251,6 +251,9 @@ export default class ViewsBarGraphCard extends Vue {
           borderColor: 'white',
           borderRadius: 6,
         },
+        column: {
+          minPointLength: 3,
+        },
       },
       showInLegend: true,
       colors: ['#190AFF', '#358F8B', '#A843B5'],
@@ -260,6 +263,7 @@ export default class ViewsBarGraphCard extends Vue {
       xAxis: {
         categories: this.chartDate,
         type: 'datetime',
+        reversed: true,
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,
