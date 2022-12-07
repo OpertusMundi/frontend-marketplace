@@ -32,19 +32,8 @@
               </div>
             </div>
 
-            <!-- a dummy hidden input to be cathced by validation observer if no pricing model is selected -->
-            <div v-if="selectedPublishedAssets.length < 2">
-              <validation-provider v-slot="{ errors }" name="pricing models" rules="required">
-                <div class="form-group mt-xs-20">
-                  <!-- <input :value="pricingModels.length ? 'x' : ''" type="text"> -->
-                  <input type="text" hidden>
-                  <div class="errors" v-if="errors.length"><span class="mt-xs-20">Select an asset</span></div>
-                </div>
-              </validation-provider>
-            </div>
-
             <div v-for="asset in publishedAssets" :key="asset.id">
-              <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="selectedPublishedAssets.map(x => x.id).includes(asset.id)" :asset="asset"></asset-api-details-card>
+              <asset-api-details-card @click.native="onSelectPublishedAsset(asset)" :selected="assetLocal.resources.map(x => x.id).includes(asset.id)" :asset="asset"></asset-api-details-card>
             </div>
             <pagination class="mt-xs-20" :currentPage="publishedAssetsPaginationData.currentPage" :itemsPerPage="publishedAssetsPaginationData.itemsPerPage" :itemsTotal="publishedAssetsPaginationData.itemsTotal" @pageSelection="onPageSelect"></pagination>
 
@@ -54,9 +43,22 @@
 
         <div class="col-md-5">
           <div class="dashboard__form__step__title">
-            <h3>Additional Resources</h3>
-            <p>Provide any additional files for the documentation of your asset.</p>
-            <p>{{ selectedPublishedAssets.length }}</p>
+            <p>Selected</p>
+            <div v-for="asset in assetLocal.resources" :key="asset.id">
+              <a target="_blank" :href="`/catalogue/${asset.id}`">
+                <asset-api-details-card :selected="false" :asset="asset"></asset-api-details-card>
+              </a>
+            </div>
+
+            <!-- a dummy hidden input to be cathced by validation observer if no pricing model is selected -->
+            <div v-if="assetLocal.resources.length < 2">
+              <validation-provider v-slot="{ errors }" name="pricing models" rules="required">
+                <div class="form-group mt-xs-20">
+                  <input type="text" hidden>
+                  <div class="errors" v-if="errors.length"><span class="mt-xs-20">Select at least 2 assets</span></div>
+                </div>
+              </validation-provider>
+            </div>
           </div>
         </div>
       </div>
@@ -69,6 +71,7 @@ import {
   Component,
   Vue,
   Watch,
+  Prop,
 } from 'vue-property-decorator';
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import { Debounce } from 'vue-debounce-decorator';
@@ -78,8 +81,8 @@ import ProviderAssetsApi from '@/service/provider-assets';
 import { EnumAssetType } from '@/model/enum';
 import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
 import { Order } from '@/model/request';
+import { CatalogueItem, CatalogueItemCommand } from '@/model';
 import store from '@/store';
-import { CatalogueItem } from '@/model';
 
 @Component({
   components: {
@@ -90,11 +93,13 @@ import { CatalogueItem } from '@/model';
   },
 })
 export default class SelectedAssets extends Vue {
+  @Prop({ required: true }) asset!: CatalogueItemCommand;
+
+  assetLocal = { ...this.asset };
+
   providerAssetsApi = new ProviderAssetsApi();
 
   publishedAssets: CatalogueItem[] = [];
-
-  selectedPublishedAssets: CatalogueItem[] = [];
 
   publishedAssetsSearchText = '';
 
@@ -132,8 +137,23 @@ export default class SelectedAssets extends Vue {
     this.loadPublishedAssets();
   }
 
+  @Watch('assetLocal', { deep: true })
+  onAssetChange(asset: CatalogueItemCommand): void {
+    this.$emit('update:asset', asset);
+  }
+
   @Watch('publishedAssetsSearchText')
   onDebouncedSearch(): void {
+    this.loadPublishedAssets();
+  }
+
+  @Watch('publishedAssetsTypeFilter')
+  onPublishedAssetsTypeFilterChange(): void {
+    this.loadPublishedAssets();
+  }
+
+  @Watch('publishedAssetsOrder')
+  onPublishedAssetsOrderChange(): void {
     this.loadPublishedAssets();
   }
 
@@ -192,11 +212,11 @@ export default class SelectedAssets extends Vue {
   }
 
   onSelectPublishedAsset(asset: CatalogueItem): void {
-    if (this.selectedPublishedAssets.map((x) => x.id).includes(asset.id)) {
-      this.selectedPublishedAssets = this.selectedPublishedAssets.filter((x) => x.id !== asset.id);
+    if (this.assetLocal.resources.map((x) => x.id).includes(asset.id)) {
+      this.assetLocal.resources = this.assetLocal.resources.filter((x) => x.id !== asset.id);
       return;
     }
-    this.selectedPublishedAssets.push(asset);
+    this.assetLocal.resources.push(asset);
   }
 }
 </script>

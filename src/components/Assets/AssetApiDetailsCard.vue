@@ -12,7 +12,8 @@
       {{ asset.title }}
     </div>
     <div class="asset_card_api_details__bottom">
-      <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.publicationDate"><strong>Last updated: </strong>{{ formatDate(asset.publicationDate) }}</span>
+      <span><strong :class="{'min-spacings': !!isMini}">Version: </strong>{{ asset.version }}</span>
+      <span v-if="asset.publicationDate"><strong style="white-space: nowrap;" :class="{'min-spacings': !!isMini}">Last updated: </strong>{{ formatDate(asset.publicationDate) }}</span>
     </div>
   </div>
 </template>
@@ -27,6 +28,8 @@ export default class AssetApiDetailsCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;
 
   @Prop({ required: true }) readonly selected!: boolean;
+
+  @Prop({ required: false }) readonly isMini?: boolean;
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');
@@ -43,4 +46,9 @@ export default class AssetApiDetailsCard extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+
+  .min-spacings {
+    width: min-content !important;
+    padding-right: 5px !important;
+  }
 </style>

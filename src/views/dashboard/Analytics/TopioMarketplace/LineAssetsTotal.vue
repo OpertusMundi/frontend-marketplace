@@ -80,7 +80,7 @@
 </template>
 <script lang="ts">
 import {
-  Component, Prop, Vue, Watch,
+  Component, Prop, Vue,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -90,19 +90,13 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  AssetQuery, AssetTotalValueQuery,
+  AssetTotalValueQuery,
   DataSeries,
-  EnumAssetQueryMetric,
-  EnumAssetSource,
   EnumTemporalUnit,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
-import DataTransform from '@/helper/analytics';
 import moment from 'moment';
-import { CatalogueItem, CatalogueQueryResponse } from '@/model';
-import { EnumProviderAssetSortField, ProviderDraftQuery } from '@/model/provider-assets';
-import { EnumAssetType } from '@/model/enum';
-import getPriceOrMinimumPrice, { renderedPriceAsString } from '@/helper/cards';
+import { CatalogueItem } from '@/model';
 
 interface TimeResponse {
   day: number;

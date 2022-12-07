@@ -269,7 +269,7 @@ import {
   FixedRowPricingModelCommand,
   FreePricingModelCommand,
 } from '@/model/pricing-model';
-import { EnumContinent } from '@/model/enum';
+import { EnumAssetType, EnumContinent } from '@/model/enum';
 import { EnumDeliveryMethod } from '@/model/catalogue';
 import store from '@/store';
 
@@ -291,6 +291,8 @@ export default class Pricing extends Vue {
   @Prop({ required: true }) private selectedPricingModelForEditing!: number | null;
 
   @Prop({ required: true }) readonly deliveryMethod!: EnumDeliveryMethod;
+
+  @Prop({ required: true }) readonly assetType!: EnumAssetType;
 
   $refs!: {
     refObserver: InstanceType<typeof ValidationObserver>,
@@ -353,7 +355,9 @@ export default class Pricing extends Vue {
 
     this.selectedPricingModelForEditingLocal = this.selectedPricingModelForEditing;
 
-    this.pricingModelTypes = [
+    this.pricingModelTypes = this.assetType === EnumAssetType.BUNDLE ? [
+      { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
+    ] : [
       { name: 'Free', priceModel: EnumPricingModel.FREE },
       { name: 'Fixed', priceModel: EnumPricingModel.FIXED },
       { name: 'Fixed per rows', priceModel: EnumPricingModel.FIXED_PER_ROWS },

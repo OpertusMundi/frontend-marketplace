@@ -19,7 +19,7 @@
       <div class="xs_container contact-page__container">
         <div class="contact-page__top">
           <h1>Contact</h1>
-          <p>For any question or comment you may have, please feel free to contact us</p>
+          <p>For any question or comment you may have, please feel free to contact us via the form below or send an email at <a href = "mailto:hello@topio.market">hello@topio.market</a></p>
         </div>
         <div class="dashboard__form contact-page__form">
           <validation-observer ref="contact_form">

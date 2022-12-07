@@ -14,14 +14,40 @@
                 <ul>
                   <li>
                     <strong>{{ asset.spatialDataServiceType ? 'Published Asset type:' : 'Type:' }}</strong
-                    >{{ asset.type }}
+                    >{{ asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}
                   </li>
                   <li v-if="asset.spatialDataServiceType"><strong>Service type:</strong>{{ asset.spatialDataServiceType }}</li>
                 </ul>
               </div>
             </div>
 
-            <div class="dashboard__form__review__item">
+            <div class="dashboard__form__review__item" v-if="asset.type === 'BUNDLE'">
+              <div class="dashboard__form__review__item__head">
+                <h5>Selected Assets</h5>
+                <a href="#" @click.prevent="goToStep(2)">EDIT</a>
+              </div>
+              <div class="dashboard__form__review__item__body">
+                <a target="_blank" :href="`/catalogue/${asset.id}`" v-for="asset in bundleAssets" :key="asset.id">
+                  <asset-api-details-card :selected="false" :isMini="true" :asset="asset"></asset-api-details-card>
+                </a>
+              </div>
+            </div>
+
+            <div class="dashboard__form__review__item" v-if="asset.type === 'BUNDLE'">
+              <div class="dashboard__form__review__item__head">
+                <h5>Collection Details</h5>
+                <a href="#" @click.prevent="goToStep(2)">EDIT</a>
+              </div>
+              <div class="dashboard__form__review__item__body">
+                <ul>
+                  <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
+                  <li v-if="asset.version"><strong>Version:</strong>{{ asset.version }}</li>
+                  <li v-if="asset.abstract"><strong>Version:</strong>{{ asset.abstract }}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="dashboard__form__review__item" v-if="asset.type !== 'BUNDLE'">
               <div class="dashboard__form__review__item__head">
                 <h5>Metadata</h5>
                 <a href="#" @click.prevent="goToStep(2)">EDIT</a>
@@ -199,7 +225,7 @@
                 </ul>
               </div>
             </div>
-            <div class="dashboard__form__review__item">
+            <div class="dashboard__form__review__item" v-if="asset.type !== 'BUNDLE'">
               <div class="dashboard__form__review__item__head">
                 <h5>Delivery</h5>
                 <a href="#" @click.prevent="asset.openDataset ? goToStep(4) : goToStep(3)">EDIT</a>
@@ -267,10 +293,12 @@
 import {
   Component, Vue, Prop, Watch,
 } from 'vue-property-decorator';
-import { CatalogueItemCommand, ServerResponse } from '@/model';
+import { CatalogueItem, CatalogueItemCommand, ServerResponse } from '@/model';
+import { EnumAssetType } from '@/model/enum';
 import { ValidationObserver } from 'vee-validate';
 import ContractApi from '@/service/provider-contract';
 import SpatialApi from '@/service/spatial';
+import AssetApiDetailsCard from '@/components/Assets/AssetApiDetailsCard.vue';
 import store from '@/store';
 import { ProviderTemplateContract } from '@/model/provider-contract';
 import { EpsgCode } from '@/model/spatial';
@@ -278,6 +306,7 @@ import { EpsgCode } from '@/model/spatial';
 @Component({
   components: {
     ValidationObserver,
+    AssetApiDetailsCard,
   },
 })
 export default class Review extends Vue {
@@ -299,6 +328,8 @@ export default class Review extends Vue {
 
   referenceSystemTitle: string;
 
+  bundleAssets: CatalogueItem[] = [];
+
   constructor() {
     super();
 
@@ -308,6 +339,8 @@ export default class Review extends Vue {
     this.vettingRequiredLocal = this.vettingRequired;
     this.contractTitle = '';
     this.referenceSystemTitle = '';
+
+    if (this.asset.type === EnumAssetType.BUNDLE) this.bundleAssets = this.asset.resources as unknown as CatalogueItem[];
   }
 
   created(): void {
