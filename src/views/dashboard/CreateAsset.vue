@@ -69,10 +69,20 @@
       </div>
 
       <div class="dashboard__form">
-        <ul v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)" class="dashboard__form__nav">
+        <ul v-if="assetMainType === 'DATA_FILE'" class="dashboard__form__nav">
           <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
           <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Metadata</a></li>
           <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Delivery</a></li>
+          <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
+          <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
+          <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
+          <li><a href="#" :class="[currentStep == 7 ? 'active' : '', currentStep < 7 ? 'inactive' : '']" @click="goToStep(7)">Review</a></li>
+        </ul>
+
+        <ul v-if="assetMainType === 'COLLECTION'" class="dashboard__form__nav">
+          <li><a href="#" :class="[currentStep == 1 ? 'active' : '', currentStep < 1 ? 'inactive' : '']" @click="goToStep(1)">Asset Type</a></li>
+          <li><a href="#" :class="[currentStep == 2 ? 'active' : '', currentStep < 2 ? 'inactive' : '']" @click="goToStep(2)">Assets</a></li>
+          <li><a href="#" :class="[currentStep == 3 ? 'active' : '', currentStep < 3 ? 'inactive' : '']" @click="goToStep(3)">Details</a></li>
           <li><a href="#" :class="[currentStep == 4 ? 'active' : '', currentStep < 4 ? 'inactive' : '']" @click="goToStep(4)">Pricing</a></li>
           <li><a href="#" :class="[currentStep == 5 ? 'active' : '', currentStep < 5 ? 'inactive' : '']" @click="goToStep(5)">Contract</a></li>
           <li><a href="#" :class="[currentStep == 6 ? 'active' : '', currentStep < 6 ? 'inactive' : '']" @click="goToStep(6)">Payout</a></li>
@@ -104,13 +114,22 @@
 
         <div class="dashboard__form__steps">
           <transition name="fade" mode="out-in">
-            <div class="dashboard__form__steps__inner">
+            <div class="dashboard__form__steps__inner" :style="currentStep === 2 && assetMainType === 'COLLECTION' ? 'height: auto' : ''">
               <type ref="step1" :assetMainType.sync="assetMainType" :disabled="isEditingExistingDraft" v-if="currentStep == 1"></type>
 
-              <template v-if="['DATA_FILE', 'COLLECTION'].includes(assetMainType)">
+              <template v-if="assetMainType === 'DATA_FILE'">
                 <metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></metadata>
                 <delivery ref="step3" :resources="asset.resources" :deliveryMethod.sync="asset.deliveryMethod" :deliveryMethodOptions.sync="asset.deliveryMethodOptions" :fileToUpload.sync="fileToUpload" :linkToAsset.sync="linkToAsset" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :assetType="asset.type" :format="asset.format" @removeResource="onRemoveResource" v-if="currentStep === 3"></delivery>
-                <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :deliveryMethod="asset.deliveryMethod" v-if="currentStep === 4"></pricing>
+                <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :assetType="asset.type" :deliveryMethod="asset.deliveryMethod" v-if="currentStep === 4"></pricing>
+                <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
+                <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
+              </template>
+
+              <template v-if="assetMainType === 'COLLECTION'">
+                <selected-assets ref="step2" :asset.sync="asset" v-if="currentStep === 2"></selected-assets>
+                <collection-details ref="step3" :asset.sync="asset" v-if="currentStep === 3"></collection-details>
+                <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :assetType="asset.type" :deliveryMethod="asset.deliveryMethod" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
                 <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
@@ -208,6 +227,7 @@ import {
   FileResourceCommand,
   UserFileResourceCommand,
   ExternalLinkCommand,
+  Resource,
 } from '@/model/asset';
 import { EnumContractType } from '@/model/contract';
 import store from '@/store';
@@ -218,6 +238,8 @@ import Pricing from '@/components/Assets/Create/Pricing.vue';
 import Delivery from '@/components/Assets/Create/Delivery.vue';
 import Payout from '@/components/Assets/Create/Payout.vue';
 import Review from '@/components/Assets/Create/Review.vue';
+import SelectedAssets from '@/components/Assets/CreateBundle/SelectedAssets.vue';
+import CollectionDetails from '@/components/Assets/CreateBundle/CollectionDetails.vue';
 import OpenAssetMetadata from '@/components/Assets/CreateOpen/OpenAssetMetadata.vue';
 import OpenAssetDelivery from '@/components/Assets/CreateOpen/OpenAssetDelivery.vue';
 import License from '@/components/Assets/CreateOpen/License.vue';
@@ -267,6 +289,8 @@ interface LinkToAsset {
     Delivery,
     Payout,
     Review,
+    SelectedAssets,
+    CollectionDetails,
     OpenAssetMetadata,
     OpenAssetDelivery,
     License,
@@ -577,7 +601,7 @@ export default class CreateAsset extends Vue {
         suitableFor: [],
         title: '',
         topicCategory: [],
-        type: '' as EnumAssetType,
+        type: this.assetMainType === 'COLLECTION' ? 'BUNDLE' : '' as EnumAssetType,
         userOnlyForVas: false,
         version: '',
         vettingRequired: false,
@@ -764,6 +788,8 @@ export default class CreateAsset extends Vue {
           if (this.assetMainType === EnumAssetTypeCategory.API) {
             this.submitApiForm();
             console.log('submit form for service');
+          } else if (this.assetMainType === EnumAssetTypeCategory.COLLECTION) {
+            this.submitBundleForm();
           } else {
             this.submitDataFileForm();
           }
@@ -1074,6 +1100,22 @@ export default class CreateAsset extends Vue {
 
     const asset = addResourceFromFileSystemResponse.result.command;
     return asset;
+  }
+
+  async submitBundleForm(): Promise<void> {
+    /* */
+    if (this.asset.type === 'BUNDLE') {
+      (this.asset as CatalogueItemCommand).deliveryMethod = EnumDeliveryMethod.DIGITAL_PLATFORM;
+      if ('deliveryMethodOptions' in this.asset) delete this.asset.deliveryMethodOptions;
+    }
+    /* */
+
+    /* fix format of resources for collections */
+    if (this.asset.type === 'BUNDLE') this.asset.resources = this.asset.resources.map((x) => ({ id: x.id, type: 'ASSET' })) as unknown as Resource[];
+    /* */
+
+    const draft = await this.createDraft();
+    this.submitAsset(draft.key);
   }
 
   async submitSentinelHubForm(): Promise<void> {

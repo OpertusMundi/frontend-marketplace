@@ -10,14 +10,16 @@
 
           <div class="asset__sections">
 
-            <overview :mode="mode" :catalogueItem="catalogueItem"></overview>
+            <overview :mode="mode" :catalogueItem="catalogueItem" v-if="catalogueItem.type !== 'BUNDLE'"></overview>
+
+            <bundle-assets :catalogueItem="catalogueItem" v-if="catalogueItem.type === 'BUNDLE'"></bundle-assets>
 
             <!-- <api-usage-example v-if="catalogueItem && catalogueItem.type === 'SERVICE'"></api-usage-example> -->
 
             <terms-and-restrictions v-if="mode === 'catalogue' && !catalogueItem.openDataset" :catalogueItem="catalogueItem"></terms-and-restrictions>
 
             <!-- <data-profiling-and-samples :mode="mode" :assetKey="reviewModeAssetKey ? reviewModeAssetKey : ''" :catalogueItem="catalogueItem.automatedMetadata ? catalogueItem.automatedMetadata[0] : null"></data-profiling-and-samples> -->
-            <data-profiling-and-samples v-if="(!['SERVICE', 'SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type) && catalogueItem.deliveryMethod === 'DIGITAL_PLATFORM')" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
+            <data-profiling-and-samples v-if="(!['SERVICE', 'SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA', 'BUNDLE'].includes(catalogueItem.type) && catalogueItem.deliveryMethod === 'DIGITAL_PLATFORM')" :mode="mode" :assetKey="reviewModeAssetKey" :catalogueItem="catalogueItem"></data-profiling-and-samples>
             <api-layer-profiler v-if="catalogueItem.type === 'SERVICE'" :mode="mode" :catalogueItem="catalogueItem"></api-layer-profiler>
             <satellite-images-explorer
               v-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type) && mode === 'catalogue'"
@@ -28,7 +30,7 @@
             ></satellite-images-explorer>
 
             <!-- <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata> -->
-            <metadata :catalogueItem="catalogueItem"></metadata>
+            <metadata :catalogueItem="catalogueItem" v-if="catalogueItem.type !== 'BUNDLE'"></metadata>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -122,6 +124,7 @@ import SatelliteImagesExplorer from '../components/CatalogueSingle/SatelliteImag
 import Metadata from '../components/CatalogueSingle/Metadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelHubPlan.vue';
+import BundleAssets from '../components/CatalogueSingle/BundleAssets.vue';
 
 @Component({
   components: {
@@ -146,6 +149,7 @@ import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelH
     SelectAreas,
     SelectSentinelHubPlan,
     Modal,
+    BundleAssets,
   },
 })
 export default class CatalogueSingle extends Vue {

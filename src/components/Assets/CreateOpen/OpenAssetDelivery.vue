@@ -108,6 +108,8 @@ const fileNameExtensionValidator = {
       ? [...fileTypes.find((x) => x.format === format).extensions, ...(fileTypes.find((x) => x.format === format).bundleExtensions || [])]
       : [];
 
+    acceptedExtensions.push('zip');
+
     if (acceptedExtensions.some((x) => value.toLowerCase().endsWith(`.${x.toLowerCase()}`) && value.split('.')[0])) return true;
     return false;
   },
