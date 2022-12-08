@@ -36,7 +36,11 @@
         <div class="asset__sidebar">
 
           <template v-if="isItemLoaded && mode === 'catalogue'">
-            <shop-card-open v-if="catalogueItem.openDataset" :catalogueItem="catalogueItem"></shop-card-open>
+            <shop-card-open
+              v-if="catalogueItem.openDataset"
+              :catalogueItem="catalogueItem"
+              @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
+            ></shop-card-open>
             <shop-card
               v-else
               :catalogueItem="catalogueItem"
