@@ -290,10 +290,10 @@
               </div>
 
               <!-- AREA OF INTEREST -->
-              <div v-show="filterMoreSubmenuItemSelected == 'areaOfInterest'">
+              <!-- <div v-show="filterMoreSubmenuItemSelected == 'areaOfInterest'">
                 <h4>Area of Interest</h4>
                 <span style="color: orange">more to be added</span>
-              </div>
+              </div> -->
 
               <!-- ATTRIBUTES -->
               <div v-show="filterMoreSubmenuItemSelected == 'attributes'">
@@ -586,7 +586,8 @@ export default class Catalogue extends Vue {
     super();
 
     this.filterMenuItems = [{ id: 'type', name: 'TYPE' }, { id: 'coverage', name: 'COVERAGE' }, { id: 'price', name: 'PRICE' }, { id: 'topic', name: 'TOPIC' }, { id: 'update', name: 'UPDATE' }, { id: 'format', name: 'FORMAT' }, { id: 'crs', name: 'CRS' }, { id: 'scale', name: 'SCALE' }, { id: 'more', name: 'MORE' }];
-    this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Supplier' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
+    // this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'areaOfInterest', name: 'Area of Interest' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Supplier' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
+    this.filterMoreSubmenuItems = [{ id: 'numberOfFeatures', name: 'Number of Features' }, { id: 'attributes', name: 'Attributes' }, { id: 'vendor', name: 'Supplier' }, { id: 'language', name: 'Language' }, { id: 'license', name: 'License' }];
 
     // this.query = '';
     this.queryResults = [];
