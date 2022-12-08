@@ -3,6 +3,7 @@
     <div class="dashboard__head">
       <div class="dashboard__head__helpers dashboard__head__helpers--full-width">
         <h1>topio OGC</h1>
+        <router-link to="/dashboard/private-ogc-service-file-selection" class="btn--std btn--blue">CREATE SERVICE</router-link>
       </div>
     </div>
 

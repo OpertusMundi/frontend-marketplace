@@ -183,6 +183,12 @@ const routes: RouteConfig[] = [
         meta: { requiresRole: [EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER], layout: 'dashboard' },
       },
       {
+        path: 'private-ogc-service-file-selection',
+        name: 'PrivateOGCServiceFileSelection',
+        component: (): Promise<any> => import(/* webpackChunkName: "privateogcservicefileselection" */ '../views/dashboard/PrivateOGCServiceFileSelection.vue'),
+        meta: { requiresRole: [EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER], layout: 'dashboard' },
+      },
+      {
         path: 'notebooks',
         name: 'Notebooks',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardnotebooks" */ '../views/dashboard/Notebooks.vue'),
