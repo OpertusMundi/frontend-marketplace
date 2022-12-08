@@ -743,13 +743,24 @@ export default class Catalogue extends Vue {
     this.filters.vendors = [''];
     this.filters.attributes = [''];
     this.filters.languages = [];
+    // this.filters.licenses = [
+    //   // eslint-disable-next-line
+    //   { id: 'open', name: 'Open license', pillLabel: 'open', isChecked: false },
+    //   // eslint-disable-next-line
+    //   { id: 'within_organisation', name: 'Within your organisation', pillLabel: 'within organisation', isChecked: false },
+    //   // eslint-disable-next-line
+    //   { id: 'web_gis', name: 'Web-GIS applications', pillLabel: 'web-GIS', isChecked: false },
+    // ];
     this.filters.licenses = [
-      // eslint-disable-next-line
-      { id: 'open', name: 'Open license', pillLabel: 'open', isChecked: false },
-      // eslint-disable-next-line
-      { id: 'within_organisation', name: 'Within your organisation', pillLabel: 'within organisation', isChecked: false },
-      // eslint-disable-next-line
-      { id: 'web_gis', name: 'Web-GIS applications', pillLabel: 'web-GIS', isChecked: false },
+      /* eslint-disable object-curly-newline */
+      { id: 'CC BY', name: 'Attribution (CC BY)', pillLabel: 'CC BY', isChecked: false },
+      { id: 'CC BY-SA', name: 'Attribution - ShareAlike (CC BY-SA)', pillLabel: 'CC BY-SA', isChecked: false },
+      { id: 'CC BY-ND', name: 'Attribution - NoDerivs (CC BY-ND)', pillLabel: 'CC BY-ND', isChecked: false },
+      { id: 'CC BY-NC', name: 'Attribution - NonCommercial (CC BY-NC)', pillLabel: 'CC BY-NC', isChecked: false },
+      { id: 'CC BY-NC-SA', name: 'Attribution - NonCommercial - ShareAlike (CC BY-NC-SA)', pillLabel: 'CC BY-NC-SA', isChecked: false },
+      { id: 'CC BY-NC-ND', name: 'Attribution - NonCommercial - NoDerivs (CC BY-NC-ND)', pillLabel: 'CC BY-NC-ND', isChecked: false },
+      { id: 'ODBL V1.0', name: 'Open Data Commons Open Database License (ODbL) v1.0', pillLabel: 'ODBL V1.0', isChecked: false },
+      /* eslint-enable object-curly-newline */
     ];
 
     this.filtersApplied = cloneDeep(this.filters);
