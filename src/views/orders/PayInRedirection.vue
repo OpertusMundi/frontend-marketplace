@@ -27,12 +27,24 @@ export default class PayInRedirection extends Vue {
 
   infoPage: { title: string, btnText: string, btnLink: string };
 
+  pollingStartTime: number;
+
+  pollingInterval: number;
+
+  pollingTimeout: number;
+
   constructor() {
     super();
 
     this.consumerPayInApi = new ConsumerPayInApi();
 
     this.infoPage = { title: '', btnText: 'VIEW ORDER', btnLink: '' };
+
+    this.pollingStartTime = 0;
+
+    this.pollingInterval = 1 * 1000;
+
+    this.pollingTimeout = 20 * 1000;
   }
 
   mounted():void {
@@ -48,18 +60,29 @@ export default class PayInRedirection extends Vue {
     this.consumerPayInApi.getPayIn(payInKey).then((response) => {
       if (response.success) {
         console.log('success, pay in response:', response);
+
+        // handle empty-result issue in API call
+        if (!response.result) {
+          Vue.set(this.infoPage, 'title', 'Please, wait...');
+          if (!this.pollingStartTime) this.pollingStartTime = Date.now();
+
+          if (Date.now() - this.pollingStartTime < this.pollingTimeout) {
+            setTimeout(() => {
+              this.getPayIn(payInKey);
+            }, this.pollingInterval);
+          } else {
+            Vue.set(this.infoPage, 'btnLink', '/dashboard');
+            store.commit('setLoading', false);
+          }
+
+          return;
+        }
+
         const cases = [
           { status: EnumTransactionStatus.SUCCEEDED, title: 'Order succeeded!' },
           { status: EnumTransactionStatus.FAILED, title: 'Order failed' },
           { status: EnumTransactionStatus.CREATED, title: 'Order created' },
         ];
-
-        // handle empty-result issue in API call
-        if (!response.result && response.success) {
-          Vue.set(this.infoPage, 'title', cases.find((x) => x.status === EnumTransactionStatus.SUCCEEDED)?.title || '');
-          Vue.set(this.infoPage, 'btnLink', '/dashboard');
-          return;
-        }
 
         // eslint-disable-next-line
         const title = cases.find((x) => x.status === response.result.status)!.title;
