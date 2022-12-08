@@ -335,7 +335,6 @@
               <!-- LICENSE -->
               <div v-show="filterMoreSubmenuItemSelected == 'license'">
                 <h4>Permitted use</h4>
-                <span style="color: orange">more to be added</span>
                 <div v-for="license in filters.licenses" :key="license.id">
                   <div class="checkbox-group mt-xs-10">
                     <input v-model="license.isChecked" type="checkbox" class="mr-xs-10" :id="`license_${license.id}`">
