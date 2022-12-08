@@ -6,7 +6,7 @@
       </div>
     </div>
 
-    <private-ogc-service-card v-for="ogcService in ogcServices" :key="ogcService.key" :ogcService="ogcService"></private-ogc-service-card>
+    <private-ogc-service-card v-for="ogcService in ogcServices" :key="ogcService.key" :ogcService="ogcService" @delete="onDeleteService"></private-ogc-service-card>
 
     <pagination
       :currentPage="paginationData.currentPage"
@@ -67,6 +67,17 @@ export default class PrivateOGCServices extends Vue {
 
   onPageSelect(page: number): void {
     this.getOGCServices(page, this.paginationData.itemsPerPage);
+  }
+
+  onDeleteService(key: string): void {
+    store.commit('setLoading', true);
+    this.privateOGCServiceAPI.deleteService(key)
+      .then(() => {
+        this.getOGCServices(0, this.paginationData.itemsPerPage);
+      })
+      .catch(() => {
+        store.commit('setLoading', false);
+      });
   }
 }
 </script>

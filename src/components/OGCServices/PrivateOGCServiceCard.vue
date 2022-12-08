@@ -1,39 +1,52 @@
 <template>
-  <!-- <router-link :to="`/dashboard/private-ogc-services/${ogcService.key}`" class="asset_card"> -->
-  <router-link :to="{ name: 'PrivateOGCServiceSingle', params: { key: ogcService.key, ogcService } }" class="asset_card">
-    <div class="asset_card__view" :style="{'--color': cardColor}"><span>VIEW</span></div>
-      <div class="asset_card__inner" :style="{'--color': cardColor}">
-      <div class="asset_card__top">
-        <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="ogcService.serviceType === 'WMS'">
-          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="ogcService.serviceType === 'WFS'">
-          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="ogcService.serviceType === 'DATA_API'">
-          <span class="asset_card__type">{{ ogcService.serviceType }}</span>
-        </div>
-        <div class="asset_card__top__right"><span>{{ ogcService.owner.username }}</span></div>
-      </div>
-      <div class="asset_card__center">
-        <div class="asset_card__title">{{ ogcService.title }}</div>
-          <div class="asset_card__price" v-if="ogcService.pricingModel">
-            <small>FROM </small> {{ ogcService.pricingModel.price }}<span>€ </span><small>per call</small>
+  <div class="asset_card__wrapper">
+    <router-link :to="{ name: 'PrivateOGCServiceSingle', params: { key: ogcService.key, ogcService } }" class="asset_card">
+      <div class="asset_card__view" :style="{'--color': cardColor}"><span>VIEW</span></div>
+        <div class="asset_card__inner" :style="{'--color': cardColor}">
+        <div class="asset_card__top">
+          <div class="asset_card__top__left">
+            <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="ogcService.serviceType === 'WMS'">
+            <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="ogcService.serviceType === 'WFS'">
+            <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="ogcService.serviceType === 'DATA_API'">
+            <span class="asset_card__type">{{ ogcService.serviceType }}</span>
           </div>
-      </div>
-      <div class="asset_card__bottom">
-        <div class="asset_card__bottom__left">
-          <div v-if="ogcService.statistics && ogcService.statistics.rating !== null" class="rating rating--dark">
-            <span v-for="i in 5" :key="i" :class="{'active': Math.round(ogcService.statistics.rating) >= i}">★</span>
-            <i>{{ ogcService.statistics.rating }}/5</i>
+          <div class="asset_card__top__right"><span>{{ ogcService.owner.username }}</span></div>
+        </div>
+        <div class="asset_card__center">
+          <div class="asset_card__title">{{ ogcService.title }}</div>
+            <div class="asset_card__price" v-if="ogcService.pricingModel">
+              <small>FROM </small> {{ ogcService.pricingModel.price }}<span>€ </span><small>per call</small>
+            </div>
+        </div>
+        <div class="asset_card__bottom">
+          <div class="asset_card__bottom__left">
+            <div v-if="ogcService.statistics && ogcService.statistics.rating !== null" class="rating rating--dark">
+              <span v-for="i in 5" :key="i" :class="{'active': Math.round(ogcService.statistics.rating) >= i}">★</span>
+              <i>{{ ogcService.statistics.rating }}/5</i>
+            </div>
+            <div class="asset_card__bottom__left__info">
+              <span><strong>Version: </strong>{{ ogcService.version }}</span><span v-if="ogcService.updatedOn"><strong>Last updated: </strong>{{ formatDate(ogcService.updatedOn) }}</span>
+            </div>
           </div>
-          <div class="asset_card__bottom__left__info">
-            <span><strong>Version: </strong>{{ ogcService.version }}</span><span v-if="ogcService.updatedOn"><strong>Last updated: </strong>{{ formatDate(ogcService.updatedOn) }}</span>
+          <div class="asset_card__bottom__right" v-if="ogcService.statistics">
+            <span>{{ ogcService.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
           </div>
         </div>
-        <div class="asset_card__bottom__right" v-if="ogcService.statistics">
-          <span>{{ ogcService.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
-        </div>
       </div>
+    </router-link>
+    <div class="asset_card__right_dropdown_container">
+      <div @click="isRightDropdownOpen = !isRightDropdownOpen" class="asset_card__three_dots_btn">
+        <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17"><g data-name="Group 2622" fill="#333"><circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5"/><circle data-name="Ellipse 170" cx="1.5" cy="1.5" r="1.5" transform="translate(0 14)"/><circle data-name="Ellipse 171" cx="1.5" cy="1.5" r="1.5" transform="translate(0 7)"/></g></svg>
+      </div>
+      <transition name="fade" mode="out-in">
+        <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
+          <ul>
+            <li @click="deleteService">Delete</li>
+          </ul>
+        </div>
+      </transition>
     </div>
-  </router-link>
+  </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
@@ -44,10 +57,16 @@ import { PrivateOGCService } from '@/model/private-ogc-services';
 export default class PrivateOGCServiceCard extends Vue {
   @Prop({ required: true }) readonly ogcService!: PrivateOGCService;
 
+  isRightDropdownOpen = false;
+
   cardColor = '#6F43B5';
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');
+  }
+
+  deleteService(): void {
+    this.$emit('delete', this.ogcService.key);
   }
 }
 </script>
