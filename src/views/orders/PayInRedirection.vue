@@ -54,6 +54,13 @@ export default class PayInRedirection extends Vue {
           { status: EnumTransactionStatus.CREATED, title: 'Order created' },
         ];
 
+        // handle empty-result issue in API call
+        if (!response.result && response.success) {
+          Vue.set(this.infoPage, 'title', cases.find((x) => x.status === EnumTransactionStatus.SUCCEEDED)?.title || '');
+          Vue.set(this.infoPage, 'btnLink', '/dashboard');
+          return;
+        }
+
         // eslint-disable-next-line
         const title = cases.find((x) => x.status === response.result.status)!.title;
         Vue.set(this.infoPage, 'title', title);
