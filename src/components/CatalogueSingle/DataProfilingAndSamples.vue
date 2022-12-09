@@ -477,9 +477,13 @@
 
           <li v-if="activeTab === 3">
             <div class="asset__section__tabs__pie-chart-container" v-if="showCorrelationMatrix()">
-              <p>Contains the correlation matrix of the dataset attributes</p>
+              <div class="d-flex align-items-center space-between">
+                <p>Contains the correlation matrix of the dataset attributes</p>
+                <button v-if="mode === 'review' && !hiddenMetadata.includes('numericalAttributeCorrelation')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'numericalAttributeCorrelation')">HIDE</button>
+                <button v-if="mode === 'review' && hiddenMetadata.includes('numericalAttributeCorrelation')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'numericalAttributeCorrelation')">SHOW</button>
+              </div>
               <hr>
-              <chart :options="getChartOptions('correlation_matrix', {})"></chart>
+              <chart :options="getChartOptions('correlation_matrix', {})"  v-if="!hiddenMetadata.includes('numericalAttributeCorrelation')"></chart>
             </div>
             <p v-else>No data</p>
           </li>
