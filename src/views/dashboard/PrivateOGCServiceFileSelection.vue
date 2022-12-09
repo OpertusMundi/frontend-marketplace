@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard__inner">
-    <div class="dashboard__head">
+    <div class="dashboard__head dashboard__head--column">
+      <router-link to="/dashboard/private-ogc-services"><a href="#" class="asset__head__breadcrumps"><svg class="mr-xs-10" xmlns="http://www.w3.org/2000/svg" width="6.938" height="9.904" viewBox="0 0 6.938 9.904"><path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l4.383,5.283,3.273-3.961h0l1.092-1.322" transform="translate(-7254.398 -472.947) rotate(90)" fill="none" stroke="#333" stroke-width="1.5"/></svg>BACK</a></router-link>
       <div class="dashboard__head__helpers">
         <h1>Select from Topio Drive</h1>
       </div>
@@ -69,13 +70,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import FileSystemApi from '@/service/file';
-import ProfileApi from '@/service/profile';
 import { ServerResponse } from '@/model';
-import { SimpleResponse } from '@/model/response';
 import { DirectoryInfo, FileInfo, FileUploadCommand } from '@/model/file';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
 import moment from 'moment';
 
 @Component({
