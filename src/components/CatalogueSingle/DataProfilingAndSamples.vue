@@ -65,11 +65,10 @@
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
       <div class="asset__section__head__tab-container">
         <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
-          <li class="nowrap"><a href="#" @click.prevent="activeTab = 1" :class="{ active: activeTab == 1 }">{{ catalogueItem.type === 'RASTER' ? 'BANDS' : catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES' }}</a></li>
-          <li class="nowrap"><a href="#" @click.prevent="activeTab = 2" :class="{ active: activeTab == 2 }">Maps</a></li>
-          <li class="nowrap"><a href="#" @click.prevent="activeTab = 3" :class="{ active: activeTab == 3 }" v-if="catalogueItem.type === 'VECTOR'">Correlation Matrix</a></li>
+          <li class="nowrap" v-for="(tab, i) in tabs" :key="tab"><a href="#" @click.prevent="activeTab = i + 1" :class="{ active: activeTab === i + 1 }">{{ tab }}</a></li>
+
           <li class="nowrap" v-for="(sample, i) in samples" :key="i">
-            <a href="#" @click.prevent="activeTab = i + 4" :class="{ active: activeTab == i + 4 }">Sample {{ i + 1 }}</a>
+            <a href="#" @click.prevent="activeTab = i + samplesStartingTab" :class="{ active: activeTab == i + samplesStartingTab }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
         <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && !['RASTER', 'NETCDF'].includes(catalogueItem.type)">
@@ -133,8 +132,8 @@
       <div class="asset__section__content__inner" v-else>
         <ul class="asset__section__tabs">
           <!-- ATTRIBUTES -->
-          <template v-if="!['RASTER', 'NETCDF'].includes(catalogueItem.type)">
-            <li v-if="activeTab == 1 && isVertical">
+          <template v-if="tabs[activeTab - 1] === 'ATTRIBUTES'">
+            <li v-if="isVertical">
               <template v-if="metadata.attributes">
                 <div v-for="(attribute, i) in metadata.attributes" :key="attribute">
                   <template v-if="selectedAttribute.includes(attribute)">
@@ -206,7 +205,7 @@
               </template>
             </li>
             <!-- HORIZONTAL RENDER -->
-            <li v-else-if="activeTab == 1 && !isVertical">
+            <li v-else>
               <table class="data-table" v-if="metadata.attributes">
                 <thead>
                   <tr>
@@ -317,7 +316,7 @@
           </template>
 
           <!-- BANDS (RASTER) -->
-          <li v-if="activeTab == 1 && catalogueItem.type === 'RASTER'">
+          <li v-if="tabs[activeTab - 1] === 'BANDS'">
             <template v-if="metadata.info && metadata.info.bands">
               <div v-for="(band, i) in metadata.info.bands" :key="i">
                 <h3 class="mb-xs-20">{{ band }}</h3>
@@ -343,7 +342,7 @@
           </li>
 
           <!-- VARIABLES (NetCDF) -->
-          <li v-if="activeTab == 1 && catalogueItem.type === 'NETCDF'" class="netcdf-container">
+          <li v-if="tabs[activeTab - 1] === 'VARIABLES'" class="netcdf-container">
             <template v-if="metadata.variablesList && metadata.variablesList.length">
               <template v-if="isVertical">
                 <div
@@ -387,7 +386,7 @@
           </li>
 
           <!-- MAPS -->
-          <li v-if="activeTab == 2">
+          <li v-if="tabs[activeTab - 1] === 'MAPS'">
             <div v-if="!metadata.mbr && !metadata.convexHull && !metadata.thumbnail && !metadata.heatmap && (!metadata.clusters || !metadata.clusters.features.length)">
               <h5>No maps to show</h5>
             </div>
@@ -475,7 +474,7 @@
             </div>
           </li>
 
-          <li v-if="activeTab === 3">
+          <li v-if="tabs[activeTab - 1] === 'CORRELATION MATRIX'">
             <div class="asset__section__tabs__pie-chart-container" v-if="showCorrelationMatrix()">
               <div class="d-flex align-items-center space-between">
                 <p>Contains the correlation matrix of the dataset attributes</p>
@@ -488,15 +487,15 @@
             <p v-else>No data</p>
           </li>
 
-          <li v-if="activeTab > 3 && samples !== null">
+          <li v-if="activeTab >= samplesStartingTab && samples !== null">
             <div v-for="(sampleTab, i) in tempSamples" :key="i">
               <!-- <button v-if="activeTab === i + 3" style="float: right" @click="onDownloadSample(i)">download {{ i }}</button> -->
-              <button v-if="mode === 'review' && activeTab === i + 4 && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
-              <button v-if="mode === 'review' && activeTab === i + 4 && !indexesOfReplacedSamples.includes(i) && Object.keys(tempSamples[i]).length" @click="onHideSample(i)" class="btn btn--std btn--outlineblue">hide</button>
-              <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
-              <button v-if="mode === 'review' && activeTab === i + 4 && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
+              <button v-if="mode === 'review' && activeTab === i + samplesStartingTab && !indexesOfReplacedSamples.includes(i)" @click="onReplaceSample(i)" class="btn btn--std btn--outlineblue">replace</button>
+              <button v-if="mode === 'review' && activeTab === i + samplesStartingTab && !indexesOfReplacedSamples.includes(i) && Object.keys(tempSamples[i]).length" @click="onHideSample(i)" class="btn btn--std btn--outlineblue">hide</button>
+              <button v-if="mode === 'review' && activeTab === i + samplesStartingTab && indexesOfReplacedSamples.includes(i)" @click="onRevertSample(i)" class="btn btn--std btn--outlineblue">revert</button>
+              <button v-if="mode === 'review' && activeTab === i + samplesStartingTab && indexesOfReplacedSamples.includes(i)" @click="onSubmitSample(i)" class="btn btn--std btn--blue">save</button>
 
-              <div v-if="activeTab === i + 4" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right">
+              <div v-if="activeTab === i + samplesStartingTab" title="download CSV" @click="onDownloadSample(i)" class="asset__section__head__sample_download__btn float-right">
                 <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
                   <g data-name="Group 753">
                     <g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333" /></g>
@@ -506,7 +505,7 @@
                   </g>
                 </svg>
               </div>
-              <div v-if="activeTab === i + 4" class="samples_table__wrapper">
+              <div v-if="activeTab === i + samplesStartingTab" class="samples_table__wrapper">
                 <div v-if="Object.keys(tempSamples[i]).length === 0">This sample will be hidden</div>
                 <table v-else class="samples_table">
                   <tr class="samples_table__header">
@@ -611,6 +610,10 @@ export default class DataProfilingAndSamples extends Vue {
 
   indexesOfReplacedSamples: number[];
 
+  samplesStartingTab: number;
+
+  tabs: string[];
+
   isVertical: boolean;
 
   toggleDropdownContainer: boolean;
@@ -632,6 +635,8 @@ export default class DataProfilingAndSamples extends Vue {
     this.toggleDropdownContainer = false;
     this.selectedAttribute = [];
 
+    this.tabs = [];
+
     this.metadata = {};
     if (this.catalogueItem.automatedMetadata) [this.metadata] = this.catalogueItem.automatedMetadata;
     console.log('met', this.metadata);
@@ -646,6 +651,7 @@ export default class DataProfilingAndSamples extends Vue {
 
     this.samples = [];
     this.tempSamples = [];
+    this.samplesStartingTab = 0;
 
     this.heatmapGeoJson = null;
 
@@ -693,6 +699,15 @@ export default class DataProfilingAndSamples extends Vue {
         this.heatmapGeoJson = heatmapResponse;
       });
     }
+
+    // eslint-disable-next-line
+    const tabs = [this.catalogueItem.type === 'RASTER' ? 'BANDS' : this.catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES'];
+    if (this.metadata.mbr || this.metadata.convexHull || this.metadata.thumbnail || this.metadata.heatmap || this.metadata.clusters?.features?.length) tabs.push('MAPS');
+    if (this.metadata.numericalAttributeCorrelation) tabs.push('CORRELATION MATRIX');
+
+    this.tabs = tabs;
+    this.samplesStartingTab = this.tabs.length + 1;
+
     if (this.metadata.samples) {
       this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
         console.log('samples!', samplesResponse);
