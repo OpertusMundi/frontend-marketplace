@@ -8,7 +8,7 @@
       <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="type === 'WFS'">
       <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="type === 'DATA_API'">
     </div>
-    {{ `${getTypeLabel(type)} Dataset` }}
+    {{ getTypeLabel(type) }}
   </div>
 </template>
 <script lang="ts">
@@ -20,15 +20,15 @@ export default class TopicCategoryIcon extends Vue {
 
   getTypeLabel(type: 'VECTOR' | 'RASTER' | 'TABULAR' | 'WMS' | 'WFS' | 'DATA_API' | 'SENTINEL_HUB_OPEN_DATA' | 'NETCDF' | 'BUNDLE'): string {
     const mappings = {
-      VECTOR: 'Vector',
-      RASTER: 'Raster',
-      TABULAR: 'Tabular',
-      WMS: 'WMS',
-      WFS: 'WFS',
-      DATA_API: 'Data API',
-      SENTINEL_HUB_OPEN_DATA: 'Sentinel Hub Open',
-      NETCDF: 'netCDF',
-      BUNDLE: 'Collection',
+      VECTOR: 'Vector Dataset',
+      RASTER: 'Raster Dataset',
+      TABULAR: 'Tabular Dataset',
+      WMS: 'WMS Dataset',
+      WFS: 'WFS Dataset',
+      DATA_API: 'Data API Dataset',
+      SENTINEL_HUB_OPEN_DATA: 'Sentinel Hub Open Dataset',
+      NETCDF: 'netCDF Dataset',
+      BUNDLE: 'Collection of Datasets',
     };
 
     return mappings[type];
