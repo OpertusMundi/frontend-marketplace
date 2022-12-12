@@ -64,8 +64,9 @@
                     <path id="Path_8969" data-name="Path 8969" d="M701.841,368.651a1,1,0,0,0-1.229.7l-3.628,13.28H684.092l-3.629-13.28a1,1,0,1,0-1.93.527l3.83,14.017a1,1,0,0,0,.965.736h14.42a1,1,0,0,0,.965-.736l3.829-14.017A1,1,0,0,0,701.841,368.651Z" fill="#ffffff" />
                     <path id="Path_8970" data-name="Path 8970" d="M683.553,370.615h0a1,1,0,0,0,1-1c0-.285.1-6.98,6-6.98,5.873,0,5.969,6.7,5.969,6.978a1,1,0,0,0,2,0c0-3.105-1.666-8.978-7.97-8.978-6.325,0-8,5.873-8,8.978A1,1,0,0,0,683.553,370.615Z" fill="#ffffff" />
                   </g>
-                </g></svg
-              ><span>{{ cartCount() }}</span>
+                </g>
+              </svg>
+              <span>{{ cartCount() }}</span>
             </a>
             <div class="header__notif" v-if="$route.meta.layout == 'dashboard'">
               <svg xmlns="http://www.w3.org/2000/svg" width="24.31" height="25.977" viewBox="0 0 24.31 25.977">
@@ -80,8 +81,8 @@
             </div>
           </div>
           <a href="#" class="header__mobile__search" v-if="$route.meta.layout != 'dashboard'"
-            ><svg @click.prevent="showSearchModal = true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff" /></svg
-          ></a>
+            ><svg @click.prevent="showSearchModal = true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_8967" data-name="Path 8967" d="M781.8,258.8l-8.266-8.266a8.658,8.658,0,1,0-6.771,3.263h.07a.96.96,0,0,0-.008-1.92h-.007a6.746,6.746,0,1,1,4.934-2.2,1.554,1.554,0,0,0-.153,1.636l8.844,8.844A.96.96,0,1,0,781.8,258.8Z" transform="translate(-758.086 -236.44)" fill="#fff" /></svg>
+          </a>
         </div>
         <div class="header__menu" v-if="$route.meta.layout != 'dashboard'">
           <nav>
@@ -136,8 +137,8 @@
                         </div>
                         <router-link class="header__submenu__block__link" to="/vendor-benefits">
                           <span @click="showSubmenuSell = !showSubmenuSell"
-                            >HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
-                          ></span>
+                            >HOW IT WORKS<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg>
+                          </span>
                         </router-link>
                       </div>
                     </div>
@@ -264,8 +265,8 @@
                         </div>
                         <router-link class="header__submenu__block__link" to="/user-benefits">
                           <span @click="showSubmenuBuy = !showSubmenuBuy"
-                            >LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
-                          ></span>
+                            >LEARN MORE<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg>
+                          </span>
                         </router-link>
                       </div>
                     </div>
@@ -328,8 +329,8 @@
                         <hr />
                         <p @click="showSubmenuUse = !showSubmenuUse">
                           <router-link to="/documentation"
-                            >VIEW DOCUMENTATION<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg
-                          ></router-link>
+                            >VIEW DOCUMENTATION<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg>
+                          </router-link>
                         </p>
                       </div>
                     </div>
@@ -429,7 +430,7 @@
                       <router-link to="/dashboard/messages"><span class="notification--unread">You have unread messages</span></router-link>
                       <hr>
                     </li>
-                    <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification.id)">
+                    <li v-for="notification in notifications" :key="notification.id" @click.prevent="onSelectNotification(notification)">
                       <router-link to="">
                         <div :class="{ 'notification--unread': !notification.read }" v-html="notification.text"></div>
                         <br />
@@ -453,8 +454,9 @@
                       <path id="Path_8969" data-name="Path 8969" d="M701.841,368.651a1,1,0,0,0-1.229.7l-3.628,13.28H684.092l-3.629-13.28a1,1,0,1,0-1.93.527l3.83,14.017a1,1,0,0,0,.965.736h14.42a1,1,0,0,0,.965-.736l3.829-14.017A1,1,0,0,0,701.841,368.651Z" fill="#ffffff" />
                       <path id="Path_8970" data-name="Path 8970" d="M683.553,370.615h0a1,1,0,0,0,1-1c0-.285.1-6.98,6-6.98,5.873,0,5.969,6.7,5.969,6.978a1,1,0,0,0,2,0c0-3.105-1.666-8.978-7.97-8.978-6.325,0-8,5.873-8,8.978A1,1,0,0,0,683.553,370.615Z" fill="#ffffff" />
                     </g>
-                  </g></svg
-                ><span>{{ cartCount() }}</span>
+                  </g>
+                </svg>
+                <span>{{ cartCount() }}</span>
               </router-link>
               <transition name="fade" mode="out-in">
                 <div class="user_menu__dropdown user_menu__dropdown--x-large" v-show="showCart">
@@ -560,7 +562,13 @@ import Search from '@/components/Search.vue';
 import {
   ServerResponse, LogoutResult, Cart, CartItem,
 } from '@/model';
-import { Notification } from '@/model/notification';
+import {
+  EnumNotificationEventType,
+  Notification,
+  AssetPublishingAcceptedData,
+  AssetPublishedData,
+  OrderDeliveryRequestData,
+} from '@/model/notification';
 import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import Modal from '@/components/Modal.vue';
@@ -696,9 +704,8 @@ export default class Header extends Vue {
     }
   }
 
-  onSelectNotification(id: string): void {
-    console.log(id);
-    this.notificationApi.readNotification(id).then((response) => {
+  onSelectNotification(notification: Notification): void {
+    this.notificationApi.readNotification(notification.id).then((response) => {
       if (response.success) {
         console.log('marked notification as read');
         this.pollNotificationsAndMessages();
@@ -706,6 +713,24 @@ export default class Header extends Vue {
         console.log('error marking notification as read');
       }
     });
+
+    const { eventType } = notification;
+
+    switch (eventType) {
+      case EnumNotificationEventType.ASSET_PUBLISHING_ACCEPTED: {
+        this.$router.push(`/review/${(notification.data as AssetPublishingAcceptedData).draftKey}`);
+        break;
+      }
+      case EnumNotificationEventType.ASSET_PUBLISHED: {
+        this.$router.push(`/catalogue/${(notification.data as AssetPublishedData).assetId}`);
+        break;
+      }
+      case EnumNotificationEventType.DELIVERY_REQUEST: {
+        this.$router.push(`/dashboard/order/${(notification.data as OrderDeliveryRequestData).orderKey}`);
+        break;
+      }
+      default:
+    }
   }
 
   showNotificationBadge(): boolean {
