@@ -4,7 +4,7 @@
       <div class="asset_card__top">
         <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg"
                                                 alt=""><span>{{
-            asset.type
+            `${asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type}`
           }}</span><span>{{ asset.format }}</span>
         </div>
         <div class="asset_card__top__right"><span>{{ asset.deliveryMethod }}</span></div>

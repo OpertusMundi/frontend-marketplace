@@ -12,7 +12,7 @@
               <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'WMS'" />
               <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'WFS'" />
               <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'DATA_API'" />
-              <span class="asset_card__type">{{ asset.command.type === 'SERVICE' ? asset.command.spatialDataServiceType : asset.command.type }}</span>
+              <span class="asset_card__type">{{ asset.command.type === 'SERVICE' ? asset.command.spatialDataServiceType : asset.command.type === 'BUNDLE' ? 'COLLECTION' : asset.command.type }}</span>
               <span v-for="(category, i) in asset.command.topicCategory" :key="category"> {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span> </span>
             </div>
           </div>
