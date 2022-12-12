@@ -1361,8 +1361,8 @@ export default class Catalogue extends Vue {
     const orderOptions = [
       { option: 'NAME ASCENDING', orderBy: EnumElasticSearchSortField.TITLE, order: 'ASC' },
       { option: 'NAME DESCENDING', orderBy: EnumElasticSearchSortField.TITLE, order: 'DESC' },
-      { option: 'DATE ASCENDING', orderBy: EnumElasticSearchSortField.REVISION_DATE, order: 'ASC' },
-      { option: 'DATE DESCENDING', orderBy: EnumElasticSearchSortField.REVISION_DATE, order: 'DESC' },
+      { option: 'DATE ASCENDING', orderBy: EnumElasticSearchSortField.PUBLICATION_DATE, order: 'ASC' },
+      { option: 'DATE DESCENDING', orderBy: EnumElasticSearchSortField.PUBLICATION_DATE, order: 'DESC' },
       { option: 'SCORE ASCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'ASC' },
       { option: 'SCORE DESCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'DESC' },
     ];
