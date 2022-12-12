@@ -9,7 +9,7 @@
           <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WMS'">
           <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WFS'">
           <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'DATA_API'">
-          <span class="asset_card__type">{{ item.asset.type }}</span>
+          <span class="asset_card__type">{{ item.asset.type === 'BUNDLE' ? 'COLLECTION' : item.asset.type }}</span>
         </div>
       </div>
       <div class="asset_card__center">

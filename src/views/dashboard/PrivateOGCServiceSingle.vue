@@ -9,15 +9,43 @@
         </div>
 
         <div class="private-ogc-single__detail">
-          <p class="private-ogc-single__detail__title">URI</p>
-          <template v-if="service.ingestData && service.ingestData.endpoints">
-            <p class="private-ogc-single__detail__value" v-for="endpoint in service.ingestData.endpoints" :key="endpoint.uri">
-              <span>({{ endpoint.type }})</span>
-              {{ endpoint.uri }}
-            </p>
+          <template v-if="servicesData.length">
+            <div v-for="(service, i) in servicesData" :key="i">
+              <p class="private-ogc-single__detail__title">Type</p>
+              <p class="private-ogc-single__detail__value">
+                {{ service.type }}
+              </p>
+
+              <p class="private-ogc-single__detail__title mt-xs-10">URI</p>
+              <p class="private-ogc-single__detail__value">
+                <!-- <span>({{ service.type }})</span> -->
+                {{ service.uri }}
+              </p>
+
+              <p class="private-ogc-single__detail__title mt-xs-10">Requests</p>
+              <p class="private-ogc-single__detail__value">
+                <ul>
+                  <li v-for="request in service.availableRequests" :key="request">&#8226; {{ request }}</li>
+                </ul>
+              </p>
+
+              <div v-for="[paramKey, paramVal] in service.parameters" :key="paramKey">
+                <p class="private-ogc-single__detail__title mt-xs-10">{{ paramKey }}</p>
+                <p class="private-ogc-single__detail__value">
+                  {{ paramVal }}
+                </p>
+              </div>
+
+              <p class="private-ogc-single__detail__title mt-xs-10">Example</p>
+              <p class="private-ogc-single__detail__value">
+                {{ service.example }}
+              </p>
+            </div>
           </template>
-          <div v-else class="private-ogc-single__detail__value"><span>(Not available)</span></div>
+          <div v-else class="private-ogc-single__detail__value"><span>(URI not yet available)</span></div>
         </div>
+
+        <hr style="width: 100%;">
 
         <div class="private-ogc-single__detail">
           <p class="private-ogc-single__detail__title">Original file</p>
@@ -47,7 +75,17 @@ export default class PrivateOGCServiceSingle extends Vue {
 
   privateOGCServicesApi = new PrivateOGCServicesApi();
 
+  servicesData: {
+    uri: string,
+    type: string,
+    parameters: string[][],
+    availableRequests: string[],
+    example: string,
+  }[] = [];
+
   async created(): Promise<void> {
+    console.log('CREATED!!!!');
+
     this.service = this.$route.params.ogcService as unknown as PrivateOGCService;
 
     if (!this.service) {
@@ -62,6 +100,32 @@ export default class PrivateOGCServiceSingle extends Vue {
         return;
       }
       this.service = serviceResponse.result;
+    }
+
+    if (this.service.ingestData?.endpoints?.length) {
+      this.servicesData = this.service.ingestData.endpoints
+        .map((x) => {
+          const parameters = x.uri.split('?')[1]
+            ? x.uri
+              .split('?')[1]
+              .split('&')
+              .map((y) => y.split('='))
+              .filter((y) => y[0].toLowerCase() !== 'request')
+              .map((y) => [y[0].split('').map((z, i) => (i === 0 ? z.toUpperCase() : z)).join(''), y[1]])
+            : [];
+
+          return {
+            uri: x.uri.split('?')[0],
+            type: x.type,
+            // eslint-disable-next-line
+            availableRequests: x.type === 'WMS' ? ['GetCapabilities', 'GetMap', 'GetLegendGraphic', 'DescribeLayer'] : x.type === 'WFS' ? ['GetCapabilities', 'GetFeature', 'DescribeFeatureType'] : x.type as unknown as string === 'WMTS' ? ['GetCapabilities', 'GetTile'] : [],
+            example: x.uri,
+            parameters,
+          };
+        });
+
+      console.log('LAAAA', this.servicesData);
+
       store.commit('setLoading', false);
     }
   }

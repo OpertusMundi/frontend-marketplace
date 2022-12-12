@@ -30,7 +30,7 @@ export enum EnumNotificationSortField {
   SEND_AT = 'SEND_AT',
 }
 
-interface AssetPublishedData {
+export interface AssetPublishedData {
   type: EnumNotificationEventType.ASSET_PUBLISHED;
   draftKey: string;
   assetId: string;
@@ -38,7 +38,7 @@ interface AssetPublishedData {
   assetVersion: string;
 }
 
-interface AssetPublishingAcceptedData {
+export interface AssetPublishingAcceptedData {
   type: EnumNotificationEventType.ASSET_PUBLISHING_ACCEPTED;
   draftKey: string;
   assetName: string;
@@ -98,7 +98,7 @@ interface CopyTopioFileSuccessData {
   resourceFileName: string;
 }
 
-interface OrderDeliveryRequestData {
+export interface OrderDeliveryRequestData {
   type: EnumNotificationEventType.DELIVERY_REQUEST;
   orderKey: string;
   assetName: string;
