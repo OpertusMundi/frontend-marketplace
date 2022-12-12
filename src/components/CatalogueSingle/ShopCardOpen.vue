@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <button class="btn btn--std btn--blue" style="width: 100%" @click="downloadAsset">download</button>
+      <button class="btn btn--std btn--blue" style="width: 100%" @click="$store.getters.isAuthenticated ? downloadAsset() : $emit('showModalLoginToAddToCart')">download</button>
       <hr>
       <ul class="asset__shopcard__open-asset-delivery-info">
         <li><strong>Delivered from: </strong> <span>topio</span></li>

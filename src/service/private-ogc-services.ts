@@ -64,4 +64,14 @@ export default class PrivateOGCServicesApi extends Api {
         return data;
       });
   }
+
+  public async deleteService(serviceKey: string): Promise<ServerResponse<null>> {
+    const url = `${baseUri}/${serviceKey}`;
+
+    return this.delete<ServerResponse<null>>(url).then((response) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
 }
