@@ -45,7 +45,7 @@ export enum EnumDeliveryMethod {
 
 export enum EnumElasticSearchSortField {
   TITLE = 'TITLE',
-  REVISION_DATE = 'REVISION_DATE',
+  PUBLICATION_DATE = 'PUBLICATION_DATE',
   SCORE = 'SCORE',
 }
 
