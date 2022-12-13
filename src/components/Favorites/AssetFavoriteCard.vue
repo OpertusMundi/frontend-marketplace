@@ -49,8 +49,9 @@ import CardIcon from '@/components/Catalogue/CardIcon.vue';
 // } from '@/model';
 import moment from 'moment';
 import { FavoriteAsset } from '@/model/favorite';
+import { EnumAssetType } from '@/model/enum';
 import FavoriteApi from '@/service/favorite';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import store from '@/store';
 
 @Component({
@@ -69,17 +70,7 @@ export default class AssetFavoriteCard extends Vue {
     this.favoriteApi = new FavoriteApi();
   }
 
-  getColor(): string {
-    let color = '#358F8B';
-    if (this.asset.asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (this.asset.asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (this.asset.asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.asset.asset.type as EnumAssetType);
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');

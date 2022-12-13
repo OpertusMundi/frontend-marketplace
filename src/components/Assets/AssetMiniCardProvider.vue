@@ -35,6 +35,7 @@ import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
 import { CatalogueItem } from '@/model';
+import { getAssetCardColor } from '@/helper/cards';
 
 interface CatalogueItemWithPrice extends CatalogueItem {
   priceRendered: string;
@@ -46,18 +47,7 @@ interface CatalogueItemWithPrice extends CatalogueItem {
 export default class AssetMiniCardProvider extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItemWithPrice;
 
-  // TODO: api must return asset type
-  getColor(): string {
-    let color = '#358F8B';
-    if (this.asset.type === EnumAssetType.VECTOR) {
-      color = '#358F8B';
-    } else if (this.asset.type === EnumAssetType.SERVICE) {
-      color = '#6F43B5';
-    } else if (this.asset.type === EnumAssetType.RASTER) {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
   formatDate(date: string): string {
     return moment(date)

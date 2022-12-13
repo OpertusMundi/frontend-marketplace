@@ -4,11 +4,12 @@ import { EnumAssetType } from '@/model/enum';
 export const assetTypeColorMappings: {
   type: EnumAssetType,
   color: string,
-  icon: string,
 }[] = [
-  { type: EnumAssetType.VECTOR, color: '#90ff00', icon: '' },
-  { type: EnumAssetType.RASTER, color: 'blue', icon: '' },
-  { type: EnumAssetType.SERVICE, color: 'green', icon: '' },
-  { type: EnumAssetType.SENTINEL_HUB_OPEN_DATA, color: 'yellow', icon: '' },
-  { type: EnumAssetType.BUNDLE, color: 'dodgerblue', icon: '' },
+  { type: EnumAssetType.VECTOR, color: '#358F8B' },
+  { type: EnumAssetType.RASTER, color: '#358F8B' },
+  { type: EnumAssetType.NETCDF, color: '#358F8B' },
+  { type: EnumAssetType.TABULAR, color: '#358F8B' },
+  { type: EnumAssetType.SERVICE, color: '#6F43B5' },
+  { type: EnumAssetType.SENTINEL_HUB_OPEN_DATA, color: '#197196' },
+  { type: EnumAssetType.BUNDLE, color: '#A2A644' },
 ];

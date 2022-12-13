@@ -1,8 +1,8 @@
 <template>
   <div class="asset_card__wrapper">
     <router-link :to="{ name: 'PrivateOGCServiceSingle', params: { key: ogcService.key, ogcService } }" class="asset_card">
-      <div class="asset_card__view" :style="{'--color': cardColor}"><span>VIEW</span></div>
-        <div class="asset_card__inner" :style="{'--color': cardColor}">
+      <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
+        <div class="asset_card__inner" :style="{'--color': getColor()}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
             <card-icon :asset="ogcService"></card-icon>
@@ -51,6 +51,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import moment from 'moment';
 import { PrivateOGCService } from '@/model/private-ogc-services';
+import { EnumAssetType } from '@/model/enum';
+import { getAssetCardColor } from '@/helper/cards';
 
 @Component({
   components: { CardIcon },
@@ -60,7 +62,7 @@ export default class PrivateOGCServiceCard extends Vue {
 
   isRightDropdownOpen = false;
 
-  cardColor = '#6F43B5';
+  getColor = (): string => getAssetCardColor(EnumAssetType.SERVICE);
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');

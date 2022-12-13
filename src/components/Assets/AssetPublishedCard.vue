@@ -52,9 +52,10 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import DraftAssetApi from '@/service/draft';
 import CatalogueApi from '@/service/catalogue';
+import { EnumAssetType } from '@/model/enum';
 // import { AssetDraft } from '@/model/draft';
 // import { DraftApiFromAssetCommand, EnumDraftCommandType, CatalogueItemCommand } from '@/model/catalogue';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import moment from 'moment';
 import { CatalogueItem, DraftApiFromAssetCommand, EnumDraftCommandType } from '@/model/catalogue';
 import store from '@/store';
@@ -99,18 +100,7 @@ export default class AssetPublishedCard extends Vue {
     store.commit('setLoading', false);
   }
 
-  // TODO: api must return asset type
-  getColor(): string {
-    let color = '#358F8B';
-    if (this.asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (this.asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (this.asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
   formatStatus(status: string): string {
     return status.replaceAll('_', ' ');

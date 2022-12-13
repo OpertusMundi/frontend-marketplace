@@ -60,7 +60,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import moment from 'moment';
 
 @Component({
@@ -81,19 +82,7 @@ export default class AssetDraftCard extends Vue {
     this.isRightDropdownOpen = false;
   }
 
-  // TODO: api must return asset type
-  getColor(): string {
-    let color = '#358F8B';
-    if (!this.asset.command || !this.asset.command.type) return color; // in buggy case that no type is returned
-    if (this.asset.command && this.asset.command.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (this.asset.command && this.asset.command.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (this.asset.command && this.asset.command.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
   formatStatus(status: string): string {
     return status.replaceAll('_', ' ');

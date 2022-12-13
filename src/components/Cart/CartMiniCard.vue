@@ -26,6 +26,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CartItem } from '@/model/cart';
 import { EnumAssetType } from '@/model/enum';
+import { getAssetCardColor } from '@/helper/cards';
 // import moment from 'moment';
 
 @Component({
@@ -34,19 +35,7 @@ import { EnumAssetType } from '@/model/enum';
 export default class CartMiniCard extends Vue {
   @Prop({ required: true }) readonly item!: CartItem;
 
-  // TODO
-  getColor(): string {
-    // const color = '#358F8B';
-    let color = '#358F8B';
-    if (this.item.asset.type && this.item.asset.type === EnumAssetType.VECTOR) {
-      color = '#358F8B';
-    } else if (this.item.asset.type && this.item.asset.type === EnumAssetType.SERVICE) {
-      color = '#6F43B5';
-    } else if (this.item.asset.type && this.item.asset.type === EnumAssetType.RASTER) {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.item.asset.type as EnumAssetType);
 
   // formatDate(date: string): string {
   //   return moment(date).format('MMM Do YY');

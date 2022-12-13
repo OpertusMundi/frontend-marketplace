@@ -35,8 +35,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CatalogueItem } from '@/model';
+import { EnumAssetType } from '@/model/enum';
 import CatalogueApi from '@/service/catalogue';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
 @Component({
   components: { CardIcon },
@@ -54,17 +55,7 @@ export default class OtherAvailableOptions extends Vue {
     });
   }
 
-  getColor(asset: CatalogueItem): string {
-    let color = '#358F8B';
-    if (asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (asset: CatalogueItem): string => getAssetCardColor(asset.type as EnumAssetType);
 
   getPrice(asset: CatalogueItem): {prefix: string, value: string, suffix: string} {
     return getPriceOrMinimumPrice(asset);

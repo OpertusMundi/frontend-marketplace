@@ -2,8 +2,8 @@
   <div class="asset__otheroptions">
     <h5>Other EO Collections</h5>
     <router-link :to="`/catalogue/${asset.id}`" class="asset_card asset_card--sm" v-for="asset in assets" :key="asset.id">
-      <div class="asset_card__view" :style="{'--color': getColor()}"><span>VIEW</span></div>
-        <div class="asset_card__inner" :style="{'--color': getColor()}">
+      <div class="asset_card__view" :style="{'--color': getColor(asset)}"><span>VIEW</span></div>
+        <div class="asset_card__inner" :style="{'--color': getColor(asset)}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
             <card-icon :asset="asset"></card-icon>
@@ -35,6 +35,7 @@ import CatalogueApi from '@/service/catalogue';
 import { CatalogueItem } from '@/model';
 import { EnumAssetType } from '@/model/enum';
 import { SHSubscriptionPricingModelCommand } from '@/model/pricing-model';
+import { getAssetCardColor } from '@/helper/cards';
 
 @Component({
   components: { CardIcon },
@@ -59,9 +60,7 @@ export default class OtherAvailableOptionsSH extends Vue {
     });
   }
 
-  getColor(): string {
-    return '#358F8B';
-  }
+  getColor = (asset: CatalogueItem): string => getAssetCardColor(asset.type as EnumAssetType);
 }
 </script>
 <style lang="scss">
