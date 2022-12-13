@@ -431,7 +431,7 @@
           <div class="filters__block__select">
             <label for="filter">&uarr;&darr;</label>
             <select v-model="selectedOrderOption" name="filter" id="filter">
-              <option v-for="orderOption in ['NAME ASCENDING', 'NAME DESCENDING', 'DATE ASCENDING', 'DATE DESCENDING', 'SCORE ASCENDING', 'SCORE DESCENDING']" :key="orderOption">{{ orderOption }}</option>
+              <option v-for="orderOption in ['NAME ASCENDING', 'NAME DESCENDING', 'DATE ASCENDING', 'DATE DESCENDING', 'RELEVANCE ASCENDING', 'RELEVANCE DESCENDING']" :key="orderOption">{{ orderOption }}</option>
             </select>
           </div>
         </div>
@@ -1363,8 +1363,8 @@ export default class Catalogue extends Vue {
       { option: 'NAME DESCENDING', orderBy: EnumElasticSearchSortField.TITLE, order: 'DESC' },
       { option: 'DATE ASCENDING', orderBy: EnumElasticSearchSortField.PUBLICATION_DATE, order: 'ASC' },
       { option: 'DATE DESCENDING', orderBy: EnumElasticSearchSortField.PUBLICATION_DATE, order: 'DESC' },
-      { option: 'SCORE ASCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'ASC' },
-      { option: 'SCORE DESCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'DESC' },
+      { option: 'RELEVANCE ASCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'ASC' },
+      { option: 'RELEVANCE DESCENDING', orderBy: EnumElasticSearchSortField.SCORE, order: 'DESC' },
     ];
     // eslint-disable-next-line
     filterSet.orderBy = orderOptions.find((x) => x.option === this.selectedOrderOption)!.orderBy;
