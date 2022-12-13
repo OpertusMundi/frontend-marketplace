@@ -1,10 +1,7 @@
 <template>
   <div class="asset__shopcard">
     <div class="asset__shopcard__variations">
-      <!-- <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.id">
-        <input type="radio" name="variations" :id="`p_variation_${pr_model.id}`" v-model="selectedPricingModel" :value="pr_model.id">
-        <label :for="`p_variation_${pr_model.id}`">{{ pr_model.totalPrice === 0 ? 'FREE' : pr_model.totalPrice + prModelCurrencyFormat(pr_model.currency) }} <span v-if="pr_model.includesUpdates">({{ pr_model.yearsOfUpdates }} year{{pr_model.yearsOfUpdates > 1 ? 's' : ''}} of updates)</span><span v-else>(no updates)</span></label>
-      </div> -->
+
       <div class="asset__shopcard__price">
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FREE'" class="asset__shopcard__price"><span>FREE</span></span>
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'"><span>{{ selectedPricingModel.totalPriceExcludingTax }}</span> <span>€</span></span>
@@ -46,23 +43,7 @@
                 </div>
               </div>
             </div>
-            <!-- <div v-if="pr_model.model.type === 'PER_CALL_WITH_PREPAID'">
-              Subscription, fixed price per call<br>
-              <div class="asset__shopcard__variations__row__discounts">
-                <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
-                </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
-                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <label :for="`prepaid_tier_pcwp_${i}`">
-                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL_WITH_PREPAID'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
-                      <span>{{ prePaidTier.count }} calls, </span><span>{{ prePaidTier.discount }}% discount</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div> -->
+
             <div v-if="pr_model.model.type === 'PER_CALL'">
               Subscription, price per call<br>
               <!-- TODO: to be checked -->
@@ -89,23 +70,7 @@
                 </div>
               </div>
             </div>
-            <!-- <div v-if="pr_model.model.type === 'PER_ROW_WITH_PREPAID'">
-              Subscription, fixed price per row<br>
-              <div class="asset__shopcard__variations__row__discounts">
-                <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls</span><span>{{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
-                </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
-                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
-                    <label :for="`prepaid_tier_prwp_${i}`">
-                      <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW_WITH_PREPAID'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
-                      <span>{{ prePaidTier.count }} calls</span><span>{{ prePaidTier.discount }}% discount</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div> -->
+
             <div v-if="pr_model.model.type === 'PER_ROW'">
               Subscription, price per row<br>
               <!-- TODO: to be checked -->
@@ -143,7 +108,7 @@
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
     <ul v-if="selectedPricingModel" class="asset__shopcard__buyinfo pt-sm-10">
-      <li><strong>Asset application restrictions</strong></li>
+      <!-- <li><strong>Asset application restrictions</strong></li> -->
       <li>
         <strong>Use restricted for: </strong>
         <span v-if="getDomainRestrictions().length">
@@ -165,20 +130,32 @@
         </span>
         <span v-else>Worldwide</span>
       </li>
-    </ul>
 
-    <hr>
+      <hr><hr>
 
-    <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition>
-    <ul class="asset__shopcard__buyinfo">
-      <li><strong>Delivery type: </strong> {{ labelize(catalogueItem.deliveryMethod) }}</li>
-      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.mediaType"><strong>Media type: </strong> {{ catalogueItem.deliveryMethodOptions.mediaType }}</li>
-      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.numberOfItems"><strong>Number of items: </strong> {{ catalogueItem.deliveryMethodOptions.numberOfItems }}</li>
-      <li style="display: inline-block" v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.notes"><strong>Notes: </strong> {{ catalogueItem.deliveryMethodOptions.notes }}</li>
+    <!-- <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition> -->
+      <li>
+        <strong>Delivery type: </strong>
+        <span> {{ labelize(catalogueItem.deliveryMethod) }}</span>
+      </li>
 
-      <!-- <li><strong>Delivery format: </strong> digital / physical (DUMMY)</li> -->
-      <!-- <li><strong>Payment methods:</strong> <img src="@/assets/images/icons/cc_icon.svg" alt="credit card icon"><img src="@/assets/images/icons/bank_transfer.svg" alt="bank transfer icon"> </li> -->
-      <li><strong>Delivered from: </strong>{{ catalogueItem.publisher.name }}</li>
+      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.mediaType">
+        <strong>Media type: </strong>
+        <span>{{ catalogueItem.deliveryMethodOptions.mediaType }}</span>
+      </li>
+      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.numberOfItems">
+        <strong>Number of items: </strong>
+        <span>{{ catalogueItem.deliveryMethodOptions.numberOfItems }}</span>
+      </li>
+      <li v-if="catalogueItem.deliveryMethodOptions && catalogueItem.deliveryMethodOptions.notes">
+        <strong>Notes: </strong>
+        <span>{{ catalogueItem.deliveryMethodOptions.notes }}</span>
+      </li>
+
+      <li>
+        <strong>Delivered from: </strong>
+        <span>{{ catalogueItem.publisher.name }}</span>
+      </li>
     </ul>
   </div>
 </template>
@@ -360,4 +337,27 @@ export default class ShopCard extends Vue {
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
   @import "@/assets/styles/abstracts/_spacings.scss";
+
+  .asset__shopcard {
+    ul {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+
+      li {
+        display: contents;
+
+        strong {
+          white-space: nowrap;
+        }
+
+        > span:nth-child(2) {
+          margin-left: 10px;
+        }
+      }
+
+      hr {
+        width: 100%;
+      }
+    }
+  }
 </style>
