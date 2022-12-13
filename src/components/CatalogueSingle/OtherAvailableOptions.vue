@@ -5,7 +5,9 @@
       <div class="asset_card__view" :style="{'--color': getColor(asset)}"><span>VIEW</span></div>
         <div class="asset_card__inner" :style="{'--color': getColor(asset)}">
         <div class="asset_card__top">
-          <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}</span></div>
+          <div class="asset_card__top__left">
+            <card-icon :asset="asset"></card-icon>
+            <span>{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}</span></div>
           <div class="asset_card__top__right"><span>{{ asset.publisher.name }}</span></div>
         </div>
         <div class="asset_card__center">
@@ -31,11 +33,14 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CatalogueItem } from '@/model';
 import CatalogueApi from '@/service/catalogue';
 import getPriceOrMinimumPrice from '@/helper/cards';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class OtherAvailableOptions extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 

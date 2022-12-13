@@ -6,12 +6,7 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="item.asset.type === 'VECTOR'">
-          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="item.asset.type === 'RASTER'">
-          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="item.asset.type === 'TABULAR'">
-          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WMS'">
-          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'WFS'">
-          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="item.asset.type === 'SERVICE' && item.asset.spatialDataServiceType === 'DATA_API'">
+          <card-icon :asset="item.asset"></card-icon>
           <span class="asset_card__type">{{ item.asset.type === 'BUNDLE' ? 'COLLECTION' : item.asset.type }}</span>
         </div>
         <!-- <div class="asset_card__top__right"><span>asset status</span></div> -->
@@ -42,11 +37,14 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CartItem } from '@/model/cart';
 import { EnumAssetType } from '@/model/enum';
 // import moment from 'moment';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class CartCard extends Vue {
   @Prop({ required: true }) readonly item!: CartItem;
 

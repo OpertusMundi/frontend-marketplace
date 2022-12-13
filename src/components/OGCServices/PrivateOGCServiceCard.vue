@@ -5,9 +5,7 @@
         <div class="asset_card__inner" :style="{'--color': cardColor}">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
-            <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="ogcService.serviceType === 'WMS'">
-            <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="ogcService.serviceType === 'WFS'">
-            <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="ogcService.serviceType === 'DATA_API'">
+            <card-icon :asset="ogcService"></card-icon>
             <span class="asset_card__type">{{ ogcService.serviceType }}</span>
           </div>
           <div class="asset_card__top__right"><span>{{ ogcService.owner.username }}</span></div>
@@ -50,10 +48,13 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import moment from 'moment';
 import { PrivateOGCService } from '@/model/private-ogc-services';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class PrivateOGCServiceCard extends Vue {
   @Prop({ required: true }) readonly ogcService!: PrivateOGCService;
 

@@ -5,16 +5,11 @@
       <div class="asset_card__inner" :style="{ '--color': getColor() }">
         <div class="asset_card__top">
           <div class="asset_card__top__left">
-            <div v-if="asset.command">
-              <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.command.type === 'VECTOR'" />
-              <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="asset.command.type === 'RASTER'" />
-              <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="asset.command.type === 'TABULAR'" />
-              <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'WMS'" />
-              <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'WFS'" />
-              <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.command.type === 'SERVICE' && asset.command.spatialDataServiceType === 'DATA_API'" />
+            <template v-if="asset.command">
+              <card-icon :asset="asset.command"></card-icon>
               <span class="asset_card__type">{{ asset.command.type === 'SERVICE' ? asset.command.spatialDataServiceType : asset.command.type === 'BUNDLE' ? 'COLLECTION' : asset.command.type }}</span>
               <span v-for="(category, i) in asset.command.topicCategory" :key="category"> {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.command.topicCategory.length - 1">, </span> </span>
-            </div>
+            </template>
           </div>
           <div class="asset_card__top__right">
             <span>{{ formatStatus(asset.status) }}</span>
@@ -62,12 +57,15 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
 import getPriceOrMinimumPrice from '@/helper/cards';
 import moment from 'moment';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class AssetDraftCard extends Vue {
   @Prop({ required: true }) readonly asset!: AssetDraft;
 

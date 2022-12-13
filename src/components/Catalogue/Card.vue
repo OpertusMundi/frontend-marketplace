@@ -4,12 +4,7 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.type === 'VECTOR'">
-          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="asset.type === 'RASTER'">
-          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="asset.type === 'TABULAR'">
-          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'WMS'">
-          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'WFS'">
-          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'DATA_API'">
+          <card-icon :asset="asset"></card-icon>
           <span class="asset_card__type">{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}</span>
           <span v-for="(category, i) in asset.topicCategory" :key="category">
             {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.topicCategory.length - 1">, </span>
@@ -44,27 +39,40 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import {
   CatalogueItem,
 } from '@/model';
+import { EnumAssetType } from '@/model/enum';
 import moment from 'moment';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class CatalogueCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;
 
-  getColor(): string {
-    let color = '#358F8B';
-    if (this.asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (this.asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (this.asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
+  getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
+
+  getIcon(type: EnumAssetType): string {
+    if (type === EnumAssetType.VECTOR) return '/assets/images/icons/types/vector.svg';
+    if (type === EnumAssetType.RASTER) return '/assets/images/icons/types/raster.svg';
+    if (type === EnumAssetType.TABULAR) return '/assets/images/icons/types/tabular.svg';
+    return '';
   }
+
+  // getColor(): string {
+  //   let color = '#358F8B';
+  //   if (this.asset.type === 'VECTOR') {
+  //     color = '#358F8B';
+  //   } else if (this.asset.type === 'SERVICE') {
+  //     color = '#6F43B5';
+  //   } else if (this.asset.type === 'RASTER') {
+  //     color = '#197196';
+  //   }
+  //   return color;
+  // }
 
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');

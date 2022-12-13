@@ -4,12 +4,7 @@
       <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
         <div class="asset_card__top__left">
-          <img src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.asset.type === 'VECTOR'">
-          <img src="@/assets/images/icons/types/raster.svg" alt="" v-if="asset.asset.type === 'RASTER'">
-          <img src="@/assets/images/icons/types/tabular.svg" alt="" v-if="asset.asset.type === 'TABULAR'">
-          <img src="@/assets/images/icons/types/wms.svg" alt="" v-if="asset.asset.type === 'SERVICE' && asset.asset.spatialDataServiceType === 'WMS'">
-          <img src="@/assets/images/icons/types/wfs.svg" alt="" v-if="asset.asset.type === 'SERVICE' && asset.asset.spatialDataServiceType === 'WFS'">
-          <img src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.asset.type === 'SERVICE' && asset.asset.spatialDataServiceType === 'DATA_API'">
+          <card-icon :asset="asset.asset"></card-icon>
           <span class="asset_card__type">{{ asset.asset.type === 'SERVICE' ? asset.asset.spatialDataServiceType : asset.asset.type === 'BUNDLE' ? 'COLLECTION' : asset.asset.type }}</span>
           <span v-for="(category, i) in asset.asset.topicCategory" :key="category">
             {{ formatFirstLetterUpperCase(category) }}<span v-if="i !== asset.asset.topicCategory.length - 1">, </span>
@@ -48,6 +43,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 // import {
 //   CatalogueItem,
 // } from '@/model';
@@ -57,7 +53,9 @@ import FavoriteApi from '@/service/favorite';
 import getPriceOrMinimumPrice from '@/helper/cards';
 import store from '@/store';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class AssetFavoriteCard extends Vue {
   @Prop({ required: true }) readonly asset!: FavoriteAsset;
 
