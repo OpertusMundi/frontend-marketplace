@@ -16,7 +16,9 @@
         </div>
       </div>
 
-      <div class="mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
+      <span class="asset__shopcard__vat">+ VAT 24%</span>
+
+      <div class="asset__shopcard__variations__container mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
           <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
           <label :for="`p_variation_${pr_model.model.key}`">{{ formatPricingModelType(pr_model.model.type) }}
@@ -357,6 +359,41 @@ export default class ShopCard extends Vue {
 
       hr {
         width: 100%;
+      }
+    }
+
+    &__variations {
+      text-align: center;
+
+      &__container {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    &__vat {
+      display: block;
+      margin: 1.3em 0;
+      font-size: em(12);
+      color: $labelColor;
+    }
+
+    &__price {
+      width: 100%;
+
+      > span {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        > span {
+          font-weight: 500 !important;
+        }
+      }
+
+      span:nth-child(2) {
+        align-self: flex-start;
+        margin-left: 0 !important;
       }
     }
   }
