@@ -5,7 +5,9 @@
       <div class="asset_card__view" :style="{'--color': getColor(asset)}"><span>VIEW</span></div>
         <div class="asset_card__inner" :style="{'--color': getColor(asset)}">
         <div class="asset_card__top">
-          <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg" alt=""><span>{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}</span></div>
+          <div class="asset_card__top__left">
+            <card-icon :asset="asset"></card-icon>
+            <span>{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}</span></div>
           <div class="asset_card__top__right"><span>{{ asset.publisher.name }}</span></div>
         </div>
         <div class="asset_card__center">
@@ -31,11 +33,15 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CatalogueItem } from '@/model';
+import { EnumAssetType } from '@/model/enum';
 import CatalogueApi from '@/service/catalogue';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class OtherAvailableOptions extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
@@ -49,17 +55,7 @@ export default class OtherAvailableOptions extends Vue {
     });
   }
 
-  getColor(asset: CatalogueItem): string {
-    let color = '#358F8B';
-    if (asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (asset: CatalogueItem): string => getAssetCardColor(asset.type as EnumAssetType);
 
   getPrice(asset: CatalogueItem): {prefix: string, value: string, suffix: string} {
     return getPriceOrMinimumPrice(asset);

@@ -3,10 +3,9 @@
      class="asset_card asset_card--sm asset_card--nohover">
     <div class="asset_card__inner" :style="{'--color': getColor()}">
       <div class="asset_card__top">
-        <div class="asset_card__top__left"><img src="@/assets/images/icons/vector_icon.svg"
-                                                alt=""><span>{{
-            `${asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type}`
-          }}</span><span>{{ asset.publisher.name }}}</span>
+        <div class="asset_card__top__left">
+          <card-icon :asset="asset"></card-icon>
+          <span>{{ `${asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type}` }}</span><span>{{ asset.publisher.name }}}</span>
         </div>
         <div class="asset_card__top__right"><span>{{ formatStatus(asset.status) }}</span></div>
       </div>
@@ -33,26 +32,19 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { AssetDraft } from '@/model/draft';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
+import { getAssetCardColor } from '@/helper/cards';
 
-@Component
+@Component({
+  components: { CardIcon },
+})
 export default class AssetMiniCard extends Vue {
   @Prop({ required: true }) readonly asset!: AssetDraft;
 
-  // TODO: api must return asset type
-  getColor(): string {
-    let color = '#358F8B';
-    if (this.asset.command && this.asset.command.type === EnumAssetType.VECTOR) {
-      color = '#358F8B';
-    } else if (this.asset.command && this.asset.command.type === EnumAssetType.SERVICE) {
-      color = '#6F43B5';
-    } else if (this.asset.command && this.asset.command.type === EnumAssetType.RASTER) {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
   formatStatus(status: string): string {
     return status.replaceAll('_', ' ');

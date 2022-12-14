@@ -12,12 +12,13 @@
         <div class="a_carousel__item__inner" :style="{'--color': getColor(asset)}">
           <div class="a_carousel__item__top">
             <!-- <img src="@/assets/images/icons/vector_icon.svg" alt="" /> -->
-            <img height="25" src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.type === 'VECTOR'">
+            <card-icon :imgHeight="25" :asset="asset"></card-icon>
+            <!-- <img height="25" src="@/assets/images/icons/types/vector.svg" alt="" v-if="asset.type === 'VECTOR'">
             <img height="25" src="@/assets/images/icons/types/raster.svg" alt="" v-if="asset.type === 'RASTER'">
             <img height="25" src="@/assets/images/icons/types/tabular.svg" alt="" v-if="asset.type === 'TABULAR'">
             <img height="25" src="@/assets/images/icons/types/wms.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'WMS'">
             <img height="25" src="@/assets/images/icons/types/wfs.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'WFS'">
-            <img height="25" src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'DATA_API'">
+            <img height="25" src="@/assets/images/icons/types/data_api.svg" alt="" v-if="asset.type === 'SERVICE' && asset.spatialDataServiceType === 'DATA_API'"> -->
             <span>{{ asset.type === 'SERVICE' ? asset.spatialDataServiceType : asset.type }}</span>
           </div>
           <div class="a_carousel__item__main">
@@ -48,10 +49,13 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { dragscroll } from 'vue-dragscroll';
+import CardIcon from '@/components/Catalogue/CardIcon.vue';
 import { CatalogueItem } from '@/model';
-import getPriceOrMinimumPrice from '@/helper/cards';
+import { EnumAssetType } from '@/model/enum';
+import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
 @Component({
+  components: { CardIcon },
   directives: { dragscroll },
 })
 export default class AssetsCarousel extends Vue {
@@ -61,17 +65,7 @@ export default class AssetsCarousel extends Vue {
     return document.getElementById('asset__related__heading')?.getBoundingClientRect().x || null;
   }
 
-  getColor(asset: CatalogueItem): string {
-    let color = '#358F8B';
-    if (asset.type === 'VECTOR') {
-      color = '#358F8B';
-    } else if (asset.type === 'SERVICE') {
-      color = '#6F43B5';
-    } else if (asset.type === 'RASTER') {
-      color = '#197196';
-    }
-    return color;
-  }
+  getColor = (asset: CatalogueItem): string => getAssetCardColor(asset.type as EnumAssetType);
 
   price(asset: CatalogueItem): {prefix: string, value: string, suffix: string} {
     return getPriceOrMinimumPrice(asset);

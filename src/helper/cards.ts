@@ -1,4 +1,5 @@
 import { CatalogueItem, CatalogueItemCommand } from '@/model/catalogue';
+import { EnumAssetType } from '@/model/enum';
 import {
   BasePricingModelCommand,
   EnumPricingModel,
@@ -10,6 +11,7 @@ import {
   PerRowPricingModelCommand,
   SHSubscriptionPricingModelCommand,
 } from '@/model/pricing-model';
+import { assetTypeColorMappings } from '@/config/asset-cards';
 
 const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { prefix: string, value: string, suffix: string } => {
   const res = { prefix: '', value: '', suffix: '' };
@@ -80,5 +82,11 @@ export const renderedPriceAsString = (price: { prefix: string, value: string, su
   const suffix = price.suffix ? price.suffix : '';
   return `${prefix} ${value} ${suffix}`;
 };
+
+export const getAssetCardColor = (type: EnumAssetType): string => (
+  assetTypeColorMappings.some((x) => x.type === type)
+    ? assetTypeColorMappings.find((x) => x.type === type)?.color || ''
+    : '#fff'
+);
 
 export default getPriceOrMinimumPrice;
