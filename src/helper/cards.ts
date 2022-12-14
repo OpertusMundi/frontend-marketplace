@@ -83,10 +83,10 @@ export const renderedPriceAsString = (price: { prefix: string, value: string, su
   return `${prefix} ${value} ${suffix}`;
 };
 
-export const getAssetCardColor = (type: EnumAssetType) => {
-  return assetTypeColorMappings.some((x) => x.type === type)
+export const getAssetCardColor = (type: EnumAssetType): string => (
+  assetTypeColorMappings.some((x) => x.type === type)
     ? assetTypeColorMappings.find((x) => x.type === type)?.color || ''
-    : '#fff';
-}
+    : '#fff'
+);
 
 export default getPriceOrMinimumPrice;
