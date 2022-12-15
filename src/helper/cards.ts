@@ -19,9 +19,9 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
   if (!asset.pricingModels || !asset.pricingModels.length) return { prefix: '', value: '', suffix: '' };
 
   // CatalogueItem
-  if (asset.pricingModels[0] && 'model' in asset.pricingModels[0]) res.prefix = asset.pricingModels.length > 1 || (asset.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(asset.pricingModels[0].model.type))) ? 'FROM' : '';
+  if (asset.pricingModels[0] && 'model' in asset.pricingModels[0]) res.prefix = asset.pricingModels.length > 1 || (asset.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(asset.pricingModels[0].model.type))) ? 'from' : '';
   // CatalogueItemCommand
-  if (asset.pricingModels[0] && 'type' in asset.pricingModels[0]) res.prefix = asset.pricingModels.length > 1 || (asset.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(asset.pricingModels[0].type))) ? 'FROM' : '';
+  if (asset.pricingModels[0] && 'type' in asset.pricingModels[0]) res.prefix = asset.pricingModels.length > 1 || (asset.pricingModels[0] && (![EnumPricingModel.FREE, EnumPricingModel.FIXED].includes(asset.pricingModels[0].type))) ? 'from' : '';
 
   let minPrice = Infinity;
   for (let i = 0; i < asset.pricingModels.length; i += 1) {
@@ -58,18 +58,18 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
     if (pricingModel.type === EnumPricingModel.PER_CALL && (pricingModel as PerCallPricingModelCommand).price < minPrice) {
       minPrice = (pricingModel as PerCallPricingModelCommand).price;
       res.value = `${(pricingModel as PerCallPricingModelCommand).price}`;
-      res.suffix = 'per call';
+      res.suffix = '/ call';
     }
     if (pricingModel.type === EnumPricingModel.PER_ROW && (pricingModel as PerRowPricingModelCommand).price < minPrice) {
       minPrice = (pricingModel as PerRowPricingModelCommand).price;
       res.value = `${(pricingModel as PerRowPricingModelCommand).price}`;
-      res.suffix = 'per row';
+      res.suffix = '/ row';
     }
     // eslint-disable-next-line
     if (pricingModel.type === EnumPricingModel.SENTINEL_HUB_SUBSCRIPTION && (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax && (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax! < minPrice) {
       minPrice = (pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax || 0;
       res.value = `${(pricingModel as SHSubscriptionPricingModelCommand).monthlyPriceExcludingTax}`;
-      res.suffix = '';
+      res.suffix = '/ mo';
     }
   }
 

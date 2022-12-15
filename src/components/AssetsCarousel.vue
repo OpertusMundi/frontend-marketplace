@@ -35,9 +35,10 @@
             <div class="a_carousel__item__footer__price a_carousel__item__footer__price--open" v-if="price(asset).value">
               <!-- <img src="@/assets/images/icons/cc_icons/cc-by-nc-Attribution-NonCommercial.svg" alt="" /> -->
               <!-- <span>OPEN</span> -->
-              <small v-if="price(asset).prefix">{{ price(asset).prefix + ' ' }}</small>
-              {{ price(asset).value }}<span v-if="price(asset).value !== 'FREE'">€ </span>
-              <small v-if="price(asset).suffix">{{ price(asset).suffix}}</small>
+              <small style="margin-top: 0.5em" v-if="price(asset).prefix">{{ price(asset).prefix + ' ' }}</small>
+              <span>{{ price(asset).value }}{{ price(asset).value !== 'FREE' ? '€ ' : '' }}{{ price(asset).suffix || '' }}</span>
+              <!-- {{ price(asset).value }}<span v-if="price(asset).value !== 'FREE'">€ </span> -->
+              <!-- <small v-if="price(asset).suffix">{{ price(asset).suffix}}</small> -->
             </div>
           </div>
         </div>

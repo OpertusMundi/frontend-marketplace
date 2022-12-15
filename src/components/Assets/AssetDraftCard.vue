@@ -19,8 +19,9 @@
           <div class="asset_card__title">{{ asset.title }}</div>
           <div class="asset_card__price" v-if="price().value">
             <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-            {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
-            <small v-if="price().suffix">{{ price().suffix }}</small>
+            <span>{{ price().value }}{{ price().value !== 'FREE' ? '€ ' : '' }}{{ price().suffix || '' }}</span>
+            <!-- {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
+            <small v-if="price().suffix">{{ price().suffix }}</small> -->
           </div>
         </div>
         <div class="asset_card__bottom">
