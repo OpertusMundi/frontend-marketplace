@@ -91,7 +91,7 @@
       <ul>
         <li @click="selectedTab = 'ALL_ASSETS'" :class="{ active: selectedTab === 'ALL_ASSETS' }"><a href="#" @click.prevent="">All assets</a></li>
         <li @click="selectedTab = 'DATA_FILES'" :class="{ active: selectedTab === 'DATA_FILES' }"><a href="#" @click.prevent="">Data files</a></li>
-        <li @click="selectedTab = 'YOUR_APIS'" :class="{ active: selectedTab === 'YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li>
+        <!-- <li @click="selectedTab = 'YOUR_APIS'" :class="{ active: selectedTab === 'YOUR_APIS' }"><a href="#" @click.prevent="">Your APIs</a></li> -->
         <li @click="selectedTab = 'TOPIO_APIS'" :class="{ active: selectedTab === 'TOPIO_APIS' }"><a href="#" @click.prevent="">Topio APIs</a></li>
       </ul>
     </div>
@@ -379,12 +379,10 @@ export default class DashboardHome extends Vue {
   searchPublishedAssets(page: number, scrollBehavior = false): void {
     this.isLoadingPublished = true;
 
-    // TODO: api should support arrays so that DATA_FILES is [EnumAssetType.VECTOR, EnumAssetType.RASTER]. Currently RASTER is not supported.
-    // TODO: just a dummy value for YOUR_APIS as it should currently return no value
     const assetTypes = {
-      DATA_FILES: EnumAssetType.VECTOR,
-      YOUR_APIS: EnumAssetType.RASTER, // TODO: this is just DUMMY to return empty array
-      TOPIO_APIS: EnumAssetType.SERVICE,
+      DATA_FILES: [EnumAssetType.VECTOR, EnumAssetType.RASTER, EnumAssetType.NETCDF, EnumAssetType.TABULAR, EnumAssetType.BUNDLE],
+      // YOUR_APIS: EnumAssetType.RASTER,
+      TOPIO_APIS: [EnumAssetType.SERVICE, EnumAssetType.SENTINEL_HUB_OPEN_DATA],
     };
 
     const orderOptions = [
