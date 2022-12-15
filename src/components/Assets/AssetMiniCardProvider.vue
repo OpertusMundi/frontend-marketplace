@@ -23,7 +23,9 @@
           </div>
         </div>
         <div class="asset_card__bottom__right">
-          <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+          <span>{{ asset.statistics.sales }}</span>
+          <card-counter-icon :asset="asset"></card-counter-icon>
+          <!-- <img src="@/assets/images/icons/bag-icon.svg" alt=""> -->
         </div>
       </div>
     </div>
@@ -32,6 +34,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 import moment from 'moment';
 import { EnumAssetType } from '@/model/enum';
 import { CatalogueItem } from '@/model';
@@ -42,7 +45,7 @@ interface CatalogueItemWithPrice extends CatalogueItem {
 }
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardCounterIcon },
 })
 export default class AssetMiniCardProvider extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItemWithPrice;

@@ -36,7 +36,9 @@
           </div>
         </div>
         <div class="asset_card__bottom__right" v-if="asset.asset.statistics">
-          <span>{{ asset.asset.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+          <span>{{ asset.asset.statistics.sales }}</span>
+          <!-- <img src="@/assets/images/icons/bag-icon.svg" alt=""> -->
+          <card-counter-icon :asset="asset"></card-counter-icon>
         </div>
       </div>
     </div>
@@ -45,6 +47,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 // import {
 //   CatalogueItem,
 // } from '@/model';
@@ -56,7 +59,7 @@ import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import store from '@/store';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardCounterIcon },
 })
 export default class AssetFavoriteCard extends Vue {
   @Prop({ required: true }) readonly asset!: FavoriteAsset;
