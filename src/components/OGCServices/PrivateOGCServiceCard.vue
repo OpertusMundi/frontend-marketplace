@@ -27,7 +27,7 @@
             </div>
           </div>
           <div class="asset_card__bottom__right" v-if="ogcService.statistics">
-            <span>{{ ogcService.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+            <span>{{ ogcService.statistics.sales }}</span><img src="@/assets/images/icons/card_counter/subscriptions.svg" alt="">
           </div>
         </div>
       </div>

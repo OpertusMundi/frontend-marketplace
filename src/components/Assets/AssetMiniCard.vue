@@ -11,7 +11,7 @@
       </div>
       <div class="asset_card__center">
         <div class="asset_card__title">{{ asset.title }}</div>
-        <div class="asset_card__price">300€</div>
+        <div class="asset_card__price">€</div>
       </div>
       <div class="asset_card__bottom">
         <div class="asset_card__bottom__left">
@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="asset_card__bottom__right">
-          <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+          <!-- <span>26</span><img src="@/assets/images/icons/bag-icon.svg" alt=""> -->
         </div>
       </div>
     </div>

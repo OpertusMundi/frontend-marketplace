@@ -15,10 +15,12 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price" v-if="price().value">
+          <div class="asset_card__price" :class="{'asset_card__price--open': asset.openDataset}" v-if="price().value">
             <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-            {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
-            <small v-if="price().suffix">{{ price().suffix}}</small>
+            <card-open-asset-icons v-if="asset.openDataset" :asset="asset"></card-open-asset-icons>
+            <span>{{ price().value }}{{ !['FREE', 'OPEN'].includes(price().value) ? '€ ' : '' }}{{ price().suffix || '' }}</span>
+            <!-- {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span> -->
+            <!-- <small v-if="price().suffix">{{ price().suffix}}</small> -->
           </div>
         </div>
         <div class="asset_card__bottom">
@@ -26,6 +28,10 @@
             <div class="asset_card__bottom__left__info">
               <span><strong>Version: </strong>{{ asset.version }}</span><span v-if="asset.publicationDate"><strong>Last updated: </strong>{{ formatDate(asset.publicationDate) }}</span>
             </div>
+          </div>
+          <div class="asset_card__bottom__right" v-if="asset.statistics">
+            <span>{{ asset.statistics.sales }}</span>
+            <card-counter-icon :asset="asset"></card-counter-icon>
           </div>
         </div>
       </div>
@@ -50,6 +56,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 import DraftAssetApi from '@/service/draft';
 import CatalogueApi from '@/service/catalogue';
 import { EnumAssetType } from '@/model/enum';
@@ -61,7 +69,7 @@ import { CatalogueItem, DraftApiFromAssetCommand, EnumDraftCommandType } from '@
 import store from '@/store';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardCounterIcon, CardOpenAssetIcons },
 })
 export default class AssetPublishedCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;

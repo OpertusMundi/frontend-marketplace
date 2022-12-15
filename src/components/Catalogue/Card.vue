@@ -14,10 +14,11 @@
       </div>
       <div class="asset_card__center">
         <div class="asset_card__title">{{ asset.title }}</div>
-        <div class="asset_card__price" v-if="price().value">
+        <div class="asset_card__price" :class="{'asset_card__price--open': asset.openDataset}" v-if="price().value">
           <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-          {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
-          <small v-if="price().suffix">{{ price().suffix}}</small>
+          <card-open-asset-icons v-if="asset.openDataset" :asset="asset"></card-open-asset-icons>
+          <span>{{ price().value }}{{ !['FREE', 'OPEN'].includes(price().value) ? '€ ' : '' }}{{ price().suffix || '' }}</span>
+          <!-- <small v-if="price().suffix">{{ price().suffix}}</small> -->
         </div>
       </div>
       <div class="asset_card__bottom">
@@ -31,7 +32,8 @@
           </div>
         </div>
         <div class="asset_card__bottom__right" v-if="asset.statistics">
-          <span>{{ asset.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+          <span>{{ asset.statistics.sales }}</span>
+          <card-counter-icon :asset="asset"></card-counter-icon>
         </div>
       </div>
     </div>
@@ -40,6 +42,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 import {
   CatalogueItem,
 } from '@/model';
@@ -48,19 +52,19 @@ import moment from 'moment';
 import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardCounterIcon, CardOpenAssetIcons },
 })
 export default class CatalogueCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;
 
   getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
-  getIcon(type: EnumAssetType): string {
-    if (type === EnumAssetType.VECTOR) return '/assets/images/icons/types/vector.svg';
-    if (type === EnumAssetType.RASTER) return '/assets/images/icons/types/raster.svg';
-    if (type === EnumAssetType.TABULAR) return '/assets/images/icons/types/tabular.svg';
-    return '';
-  }
+  // getIcon(type: EnumAssetType): string {
+  //   if (type === EnumAssetType.VECTOR) return '/assets/images/icons/types/vector.svg';
+  //   if (type === EnumAssetType.RASTER) return '/assets/images/icons/types/raster.svg';
+  //   if (type === EnumAssetType.TABULAR) return '/assets/images/icons/types/tabular.svg';
+  //   return '';
+  // }
 
   // getColor(): string {
   //   let color = '#358F8B';

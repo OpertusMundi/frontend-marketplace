@@ -1400,6 +1400,11 @@
 			font-size: em(20);
 		}
 
+		&--open {
+			display: flex;
+			align-items: center;
+		}
+
 		div {
 			margin-top: 20px;
 		}

@@ -31,13 +31,19 @@
             <div class="a_carousel__item__main__vendor">{{ asset.publisherName || '' }}</div>
           </div>
           <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats" v-if="asset.statistics"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>{{ asset.statistics.downloads }}</span></div>
+            <div class="a_carousel__item__footer__stats" v-if="asset.statistics">
+              <!-- <img src="@/assets/images/icons/download-icon.svg" alt="" /> -->
+              <card-counter-icon :asset="asset"></card-counter-icon>
+              <span>{{ asset.statistics.downloads }}</span>
+            </div>
             <div class="a_carousel__item__footer__price a_carousel__item__footer__price--open" v-if="price(asset).value">
               <!-- <img src="@/assets/images/icons/cc_icons/cc-by-nc-Attribution-NonCommercial.svg" alt="" /> -->
               <!-- <span>OPEN</span> -->
-              <small v-if="price(asset).prefix">{{ price(asset).prefix + ' ' }}</small>
-              {{ price(asset).value }}<span v-if="price(asset).value !== 'FREE'">€ </span>
-              <small v-if="price(asset).suffix">{{ price(asset).suffix}}</small>
+              <small style="margin-top: 0.5em" v-if="price(asset).prefix">{{ price(asset).prefix + ' ' }}</small>
+              <card-open-asset-icons v-if="asset.openDataset" :asset="asset"></card-open-asset-icons>
+              <span>{{ price(asset).value }}{{ !['FREE', 'OPEN'].includes(price(asset).value) ? '€ ' : '' }}{{ price(asset).suffix || '' }}</span>
+              <!-- {{ price(asset).value }}<span v-if="price(asset).value !== 'FREE'">€ </span> -->
+              <!-- <small v-if="price(asset).suffix">{{ price(asset).suffix}}</small> -->
             </div>
           </div>
         </div>
@@ -50,12 +56,14 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { dragscroll } from 'vue-dragscroll';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
+import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
 import { CatalogueItem } from '@/model';
 import { EnumAssetType } from '@/model/enum';
 import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardOpenAssetIcons, CardCounterIcon },
   directives: { dragscroll },
 })
 export default class AssetsCarousel extends Vue {

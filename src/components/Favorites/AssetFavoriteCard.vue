@@ -18,10 +18,12 @@
       </div>
       <div class="asset_card__center">
         <div class="asset_card__title">{{ asset.asset.title }}</div>
-        <div class="asset_card__price" v-if="price().value">
+        <div class="asset_card__price" :class="{'asset_card__price--open': asset.asset.openDataset}" v-if="price().value">
           <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-          {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
-          <small v-if="price().suffix">{{ price().suffix}}</small>
+          <card-open-asset-icons v-if="asset.asset.openDataset" :asset="asset.asset"></card-open-asset-icons>
+          <span>{{ price().value }}{{ !['FREE', 'OPEN'].includes(price().value) ? '€ ' : '' }}{{ price().suffix || '' }}</span>
+          <!-- {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span> -->
+          <!-- <small v-if="price().suffix">{{ price().suffix}}</small> -->
         </div>
       </div>
       <div class="asset_card__bottom">
@@ -35,7 +37,9 @@
           </div>
         </div>
         <div class="asset_card__bottom__right" v-if="asset.asset.statistics">
-          <span>{{ asset.asset.statistics.sales }}</span><img src="@/assets/images/icons/bag-icon.svg" alt="">
+          <span>{{ asset.asset.statistics.sales }}</span>
+          <!-- <img src="@/assets/images/icons/bag-icon.svg" alt=""> -->
+          <card-counter-icon :asset="asset"></card-counter-icon>
         </div>
       </div>
     </div>
@@ -44,6 +48,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 // import {
 //   CatalogueItem,
 // } from '@/model';
@@ -55,7 +61,7 @@ import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import store from '@/store';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardCounterIcon, CardOpenAssetIcons },
 })
 export default class AssetFavoriteCard extends Vue {
   @Prop({ required: true }) readonly asset!: FavoriteAsset;
