@@ -17,9 +17,10 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price" v-if="price().value">
+          <div class="asset_card__price" :class="{'asset_card__price--open': asset.openDataset}" v-if="price().value">
             <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-            <span>{{ price().value }}{{ price().value !== 'FREE' ? '€ ' : '' }}{{ price().suffix || '' }}</span>
+            <card-open-asset-icons v-if="asset.openDataset" :asset="asset"></card-open-asset-icons>
+            <span>{{ price().value }}{{ !['FREE', 'OPEN'].includes(price().value) ? '€ ' : '' }}{{ price().suffix || '' }}</span>
             <!-- {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
             <small v-if="price().suffix">{{ price().suffix }}</small> -->
           </div>
@@ -59,6 +60,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
 import DraftAssetApi from '@/service/draft';
 import { AssetDraft } from '@/model/draft';
 import { EnumAssetType } from '@/model/enum';
@@ -66,7 +68,7 @@ import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 import moment from 'moment';
 
 @Component({
-  components: { CardIcon },
+  components: { CardIcon, CardOpenAssetIcons },
 })
 export default class AssetDraftCard extends Vue {
   @Prop({ required: true }) readonly asset!: AssetDraft;

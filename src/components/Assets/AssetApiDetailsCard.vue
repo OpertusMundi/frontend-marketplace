@@ -4,7 +4,7 @@
       <span>{{ formatFirstLetterUpperCase(asset.type) }}</span>
       <div class="asset_card_api_details__price" v-if="price().value">
         <small v-if="price().prefix">{{ price().prefix + ' ' }}</small>
-        {{ price().value }}<span v-if="price().value !== 'FREE'">€ </span>
+        {{ price().value }}<span v-if="!['FREE', 'OPEN'].includes(price().value)">€ </span>
         <small v-if="price().suffix">{{ price().suffix}}</small>
       </div>
     </div>

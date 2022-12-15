@@ -12,10 +12,10 @@
         </div>
         <div class="asset_card__center">
           <div class="asset_card__title">{{ asset.title }}</div>
-          <div class="asset_card__price" v-if="getPrice(asset).value">
+          <div class="asset_card__price" :class="{'asset_card__price--open': asset.openDataset}" v-if="getPrice(asset).value">
             <div style="white-space: nowrap; margin-top: 0;">
               <small v-if="getPrice(asset).prefix">{{ getPrice(asset).prefix + ' ' }}</small>
-              {{ getPrice(asset).value }}<span v-if="getPrice(asset).value !== 'FREE'">€ </span>
+              {{ getPrice(asset).value }}<span v-if="!['FREE', 'OPEN'].includes(getPrice(asset).value)">€ </span>
             </div>
           </div>
         </div>

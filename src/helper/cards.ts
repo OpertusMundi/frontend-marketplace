@@ -14,6 +14,8 @@ import {
 import { assetTypeColorMappings } from '@/config/asset-cards';
 
 const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { prefix: string, value: string, suffix: string } => {
+  if (asset.openDataset) return { prefix: '', value: 'OPEN', suffix: '' };
+
   const res = { prefix: '', value: '', suffix: '' };
 
   if (!asset.pricingModels || !asset.pricingModels.length) return { prefix: '', value: '', suffix: '' };
@@ -48,12 +50,12 @@ const getPriceOrMinimumPrice = (asset: CatalogueItem | CatalogueItemCommand): { 
     if (pricingModel.type === EnumPricingModel.FIXED_PER_ROWS && (pricingModel as FixedRowPricingModelCommand).price < minPrice) {
       minPrice = (pricingModel as FixedRowPricingModelCommand).price;
       res.value = `${(pricingModel as FixedRowPricingModelCommand).price}`;
-      res.suffix = '1,000 rows';
+      res.suffix = '/ 1,000 rows';
     }
     if (pricingModel.type === EnumPricingModel.FIXED_FOR_POPULATION && (pricingModel as FixedPopulationPricingModelCommand).price < minPrice) {
       minPrice = (pricingModel as FixedPopulationPricingModelCommand).price;
       res.value = `${(pricingModel as FixedPopulationPricingModelCommand).price}`;
-      res.suffix = '10,000 people';
+      res.suffix = '/ 10,000 people';
     }
     if (pricingModel.type === EnumPricingModel.PER_CALL && (pricingModel as PerCallPricingModelCommand).price < minPrice) {
       minPrice = (pricingModel as PerCallPricingModelCommand).price;
