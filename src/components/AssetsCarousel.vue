@@ -31,7 +31,11 @@
             <div class="a_carousel__item__main__vendor">{{ asset.publisherName || '' }}</div>
           </div>
           <div class="a_carousel__item__footer">
-            <div class="a_carousel__item__footer__stats" v-if="asset.statistics"><img src="@/assets/images/icons/download-icon.svg" alt="" /><span>{{ asset.statistics.downloads }}</span></div>
+            <div class="a_carousel__item__footer__stats" v-if="asset.statistics">
+              <!-- <img src="@/assets/images/icons/download-icon.svg" alt="" /> -->
+              <card-counter-icon :asset="asset"></card-counter-icon>
+              <span>{{ asset.statistics.downloads }}</span>
+            </div>
             <div class="a_carousel__item__footer__price a_carousel__item__footer__price--open" v-if="price(asset).value">
               <!-- <img src="@/assets/images/icons/cc_icons/cc-by-nc-Attribution-NonCommercial.svg" alt="" /> -->
               <!-- <span>OPEN</span> -->
@@ -52,13 +56,14 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { dragscroll } from 'vue-dragscroll';
 import CardIcon from '@/components/Catalogue/CardIcon.vue';
+import CardCounterIcon from '@/components/Catalogue/CardCounterIcon.vue';
 import CardOpenAssetIcons from '@/components/Catalogue/CardOpenAssetIcons.vue';
 import { CatalogueItem } from '@/model';
 import { EnumAssetType } from '@/model/enum';
 import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 
 @Component({
-  components: { CardIcon, CardOpenAssetIcons },
+  components: { CardIcon, CardOpenAssetIcons, CardCounterIcon },
   directives: { dragscroll },
 })
 export default class AssetsCarousel extends Vue {

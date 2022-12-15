@@ -16,8 +16,10 @@ export default class CardCounterIcon extends Vue {
 </script>
 <style lang="scss" scoped>
   .card-counter-icon {
-    img {
-      margin-top: 2px;
-    }
+    display: contents;
+
+    // img {
+    //   margin-top: 2px;
+    // }
   }
 </style>
