@@ -729,6 +729,12 @@ export default class Header extends Vue {
         this.$router.push(`/dashboard/order/${(notification.data as OrderDeliveryRequestData).orderKey}`);
         break;
       }
+      case EnumNotificationEventType.USER_SERVICE_PUBLISH_FAILURE:
+      case EnumNotificationEventType.ASSET_PUBLISHING_CANCELLED:
+      case EnumNotificationEventType.ASSET_PUBLISHING_REJECTED: {
+        this.$router.push('/dashboard/messages');
+        break;
+      }
       default:
     }
   }
