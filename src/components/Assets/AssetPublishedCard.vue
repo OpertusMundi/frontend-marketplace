@@ -37,7 +37,7 @@
       </div>
     </router-link>
     <div class="asset_card__right_dropdown_container">
-      <div @click="toggleRightDropdown" class="asset_card__three_dots_btn">
+      <div @click="toggleRightDropdown" class="asset_card__three_dots_btn" v-if="!noSideMenu">
         <svg data-name="Asset actions" xmlns="http://www.w3.org/2000/svg" width="3" height="17"><g data-name="Group 2622" fill="#333"><circle data-name="Ellipse 169" cx="1.5" cy="1.5" r="1.5"/><circle data-name="Ellipse 170" cx="1.5" cy="1.5" r="1.5" transform="translate(0 14)"/><circle data-name="Ellipse 171" cx="1.5" cy="1.5" r="1.5" transform="translate(0 7)"/></g></svg>
       </div>
       <transition name="fade" mode="out-in">
@@ -73,6 +73,8 @@ import store from '@/store';
 })
 export default class AssetPublishedCard extends Vue {
   @Prop({ required: true }) readonly asset!: CatalogueItem;
+
+  @Prop({ required: false }) readonly noSideMenu!: boolean;
 
   draftAssetApi: DraftAssetApi;
 
