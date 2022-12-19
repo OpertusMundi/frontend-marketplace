@@ -14,7 +14,9 @@
         <div class="filters__block__select">
           <label for="filter">STATUS: </label>
           <select v-model="selectedStatus" name="filter" id="filter">
-            <option v-for="status in statusFilterOptions" :key="status" :value="status">{{ status }}</option>
+            <option v-for="status in statusFilterOptions" :key="status" :value="status">
+              {{ status === 'ASSET_REGISTRATION' ? 'PENDING REGISTRATION' : status }}
+            </option>
           </select>
         </div>
       </div>
@@ -69,6 +71,7 @@ export default class DashboardOrders extends Vue {
     this.totalOrders = null;
     this.itemsPerPage = 5;
     this.currentPage = 0;
+
     this.statusFilterOptions = [
       'ALL',
       EnumOrderStatus.CREATED,
