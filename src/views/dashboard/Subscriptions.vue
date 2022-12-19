@@ -12,9 +12,9 @@
       </div>
       <div class="filters__block">
         <div class="filters__block__select">
-          <label for="filter">SORT BY: </label>
-          <select @change="setSortOrder($event)" v-model="selectedOrder" name="filter" id="filter">
-            <option v-for="order in sortOrders" :key="order" :value="order">{{ order }}</option>
+          <label for="filter">SORT BY:</label>
+          <select @change="setSortOrder($event)" v-model="selectedOrderOption" name="filter" id="filter">
+            <option v-for="order in orderOptions" :key="order.label" :value="order.label" :selected="order.label === selectedOrderOption.label">{{ order.label }}</option>
           </select>
         </div>
       </div>
@@ -41,7 +41,7 @@ import {
   SHSubscriptionPricingModelCommand,
 } from '@/model/pricing-model';
 
-import { Sorting } from '@/model/request';
+// import { Sorting } from '@/model/request';
 import ConsumerAPI from '@/service/consumer';
 import store from '@/store';
 import moment from 'moment';
@@ -61,27 +61,34 @@ export default class Subscriptions extends Vue {
 
   currentPage: number;
 
-  selectedOrder: string;
+  orderOptions: { label: string, field: EnumConsumerSubSortField, order: 'ASC' | 'DESC' }[];
 
-  sortOrder: Sorting<EnumConsumerSubSortField>;
-
-  sortOrders: EnumConsumerSubSortField[];
+  selectedOrderOption: string;
 
   subscriptions: ConsumerAccountSubscription[] | null;
 
   constructor() {
     super();
+
     this.consumerApi = new ConsumerAPI();
+
     this.itemsPerPage = 10;
     this.currentPage = 0;
     this.totalSubscriptions = null;
+
     this.subscriptions = null;
-    this.sortOrder = {
-      id: EnumConsumerSubSortField.ADDED_ON,
-      order: 'DESC',
-    };
-    this.selectedOrder = EnumConsumerSubSortField.ADDED_ON;
-    this.sortOrders = [EnumConsumerSubSortField.ADDED_ON, EnumConsumerSubSortField.UPDATED_ON, EnumConsumerSubSortField.TITLE, EnumConsumerSubSortField.PUBLISHER];
+
+    this.orderOptions = [
+      { label: 'SUBMISSION DATE ASCENDING', field: EnumConsumerSubSortField.ADDED_ON, order: 'ASC' },
+      { label: 'SUBMISSION DATE DESCENDING', field: EnumConsumerSubSortField.ADDED_ON, order: 'DESC' },
+      { label: 'STATUS UPDATE ASCENDING', field: EnumConsumerSubSortField.UPDATED_ON, order: 'ASC' },
+      { label: 'STATUS UPDATE DESCENDING', field: EnumConsumerSubSortField.UPDATED_ON, order: 'DESC' },
+      { label: 'TITLE ASCENDING', field: EnumConsumerSubSortField.TITLE, order: 'ASC' },
+      { label: 'TITLE DESCENDING', field: EnumConsumerSubSortField.TITLE, order: 'DESC' },
+      { label: 'PUBLISHER ASCENDING', field: EnumConsumerSubSortField.PUBLISHER, order: 'ASC' },
+      { label: 'PUBLISHER DESCENDING', field: EnumConsumerSubSortField.PUBLISHER, order: 'DESC' },
+    ];
+    this.selectedOrderOption = this.orderOptions[3].label;
   }
 
   mounted(): void {
@@ -90,8 +97,14 @@ export default class Subscriptions extends Vue {
 
   getSubscriptions(page: number): void {
     store.commit('setLoading', true);
+
+    const sorting = {
+      id: this.orderOptions.find((x) => x.label === this.selectedOrderOption)?.field || '' as EnumConsumerSubSortField,
+      order: this.orderOptions.find((x) => x.label === this.selectedOrderOption)?.order as 'ASC' | 'DESC',
+    };
+
     this.consumerApi
-      .findAllSubscriptions(null, page, this.itemsPerPage, this.sortOrder)
+      .findAllSubscriptions(null, page, this.itemsPerPage, sorting)
       .then((response) => {
         store.commit('setLoading', false);
         console.log(response);
@@ -137,7 +150,9 @@ export default class Subscriptions extends Vue {
 
   // eslint-disable-next-line
   setSortOrder(event: any): void {
-    this.sortOrder.id = event.target.value;
+    // this.sortOrder.id = event.target.value;
+    this.selectedOrderOption = event.target.value;
+    console.log(typeof event.target.value, 'ASD');
     this.currentPage = 0;
     this.getSubscriptions(0);
   }
