@@ -237,7 +237,7 @@ export default class ApiDetails extends Vue {
       { value: null, label: 'ALL' },
       { value: EnumAssetType.VECTOR, label: 'VECTOR' },
       { value: EnumAssetType.RASTER, label: 'RASTER' },
-      { value: EnumAssetType.BUNDLE, label: 'BUNDLE' },
+      // { value: EnumAssetType.BUNDLE, label: 'BUNDLE' },
     ];
 
     this.publishedAssetsOrder = 'NEWEST';
@@ -334,8 +334,8 @@ export default class ApiDetails extends Vue {
 
     const query: ProviderDraftQuery = {
       q: this.publishedAssetsSearchText,
-      type: this.publishedAssetsTypeFilter || [EnumAssetType.BUNDLE, EnumAssetType.VECTOR, EnumAssetType.RASTER],
-      // ...(this.publishedAssetsTypeFilter && { type: this.publishedAssetsTypeFilter }),
+      // type: this.publishedAssetsTypeFilter || [EnumAssetType.BUNDLE, EnumAssetType.VECTOR, EnumAssetType.RASTER],
+      type: this.publishedAssetsTypeFilter || [EnumAssetType.VECTOR, EnumAssetType.RASTER],
       pageRequest: { page, size: this.publishedAssetsPaginationData.itemsPerPage },
       sorting: {
         id: this.publishedAssetsOrderOptions.find((x) => x.label === this.publishedAssetsOrder)?.orderBy || '' as EnumProviderAssetSortField,
