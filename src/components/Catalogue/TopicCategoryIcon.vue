@@ -23,10 +23,10 @@ export default class TopicCategoryIcon extends Vue {
       VECTOR: 'Vector Dataset',
       RASTER: 'Raster Dataset',
       TABULAR: 'Tabular Dataset',
-      WMS: 'WMS Dataset',
-      WFS: 'WFS Dataset',
+      WMS: 'WMS',
+      WFS: 'WFS',
       DATA_API: 'Data API Dataset',
-      SENTINEL_HUB_OPEN_DATA: 'Sentinel Hub Open Dataset',
+      SENTINEL_HUB_OPEN_DATA: 'Sentinel Hub Open EO Collection',
       NETCDF: 'netCDF Dataset',
       BUNDLE: 'Collection of Datasets',
     };

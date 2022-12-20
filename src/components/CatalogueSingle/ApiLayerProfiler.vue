@@ -61,12 +61,13 @@
       <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">COVERAGE</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">DETAILS</a></li>
-        <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">STYLES</a></li>
-        <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">DIMENSIONS</a></li>
+        <li v-if="resources[1] && resources[1].styles"><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">STYLES</a></li>
+        <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">DIMENSIONS</a></li>
         <li><a href="#" @click.prevent="activeTab = 5" :class="{ 'active' : activeTab == 5 }">TILES</a></li>
         <li><a href="#" @click.prevent="activeTab = 6" :class="{ 'active' : activeTab == 6 }">SAMPLE 1</a></li>
         <li><a href="#" @click.prevent="activeTab = 7" :class="{ 'active' : activeTab == 7 }">SAMPLE 2</a></li>
-        <li><a href="#" @click.prevent="activeTab = 8" :class="{ 'active' : activeTab == 8 }">SAMPLE 3</a></li>
+        <li><a href="#" @click.prevent="activeTab = 8" :class="{ 'active' : activeTab == 8 }">SAMPLE 3</a></li> -->
+
         <!-- <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Sample 1</a></li> -->
         <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
       </ul>
@@ -119,17 +120,18 @@
               <p v-if="resources[1].outputFormats.length < 3"><strong>Output formats</strong> {{ resources[1].outputFormats.join(', ') }}</p>
               <p v-else><strong>Output formats</strong> <span>{{ resources[1].outputFormats.slice(0, 3).join(', ') }}... <button @click="onShowWholeOutputFormatsList" class="btn btn--std btn--outlinedark">show all</button></span></p>
             </div>
-            <hr>
-            <h3>Attributes</h3>
-            <!-- <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table asset__section__tabs__info_table--includes-buttons"> -->
-            <div v-if="resources[1] && resources[1].attributes" class="asset__section__tabs__info_table">
-              <p><strong>queryable</strong><span>{{ 'queryable' in resources[1].attributes && resources[1].attributes.queryable !== null ? resources[1].attributes.queryable : '' }}</span></p>
-              <p><strong>cascaded</strong><span>{{ 'cascaded' in resources[1].attributes && resources[1].attributes.cascaded !== null ? resources[1].attributes.cascaded : '' }}</span></p>
-              <p><strong>opaque</strong><span>{{ 'opaque' in resources[1].attributes && resources[1].attributes.opaque !== null ? resources[1].attributes.opaque : '' }}</span></p>
-              <p><strong>noSubsets</strong><span>{{ 'noSubsets' in resources[1].attributes && resources[1].attributes.noSubsets !== null ? resources[1].attributes.noSubsets : '' }}</span></p>
-              <p><strong>fixedWidth</strong><span>{{ 'fixedWidth' in resources[1].attributes && resources[1].attributes.fixedWidth !== null ? resources[1].attributes.fixedWidth : '' }}</span></p>
-              <p><strong>fixedHeight</strong><span>{{ 'fixedHeight' in resources[1].attributes && resources[1].attributes.fixedHeight !== null ? resources[1].attributes.fixedHeight : '' }}</span></p>
-            </div>
+            <template v-if="resources[1] && resources[1].attributes">
+              <hr>
+              <h3>Attributes</h3>
+              <div class="asset__section__tabs__info_table">
+                <p><strong>queryable</strong><span>{{ 'queryable' in resources[1].attributes && resources[1].attributes.queryable !== null ? resources[1].attributes.queryable : '' }}</span></p>
+                <p><strong>cascaded</strong><span>{{ 'cascaded' in resources[1].attributes && resources[1].attributes.cascaded !== null ? resources[1].attributes.cascaded : '' }}</span></p>
+                <p><strong>opaque</strong><span>{{ 'opaque' in resources[1].attributes && resources[1].attributes.opaque !== null ? resources[1].attributes.opaque : '' }}</span></p>
+                <p><strong>noSubsets</strong><span>{{ 'noSubsets' in resources[1].attributes && resources[1].attributes.noSubsets !== null ? resources[1].attributes.noSubsets : '' }}</span></p>
+                <p><strong>fixedWidth</strong><span>{{ 'fixedWidth' in resources[1].attributes && resources[1].attributes.fixedWidth !== null ? resources[1].attributes.fixedWidth : '' }}</span></p>
+                <p><strong>fixedHeight</strong><span>{{ 'fixedHeight' in resources[1].attributes && resources[1].attributes.fixedHeight !== null ? resources[1].attributes.fixedHeight : '' }}</span></p>
+              </div>
+            </template>
           </li>
 
           <!-- STYLES -->
