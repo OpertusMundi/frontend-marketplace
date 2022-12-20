@@ -27,7 +27,7 @@ import {
 } from 'vue-property-decorator';
 import 'leaflet/dist/leaflet.css';
 // import L, { latLng } from 'leaflet';
-import { latLng } from 'leaflet';
+// import { latLng } from 'leaflet';
 import { LMap, LTileLayer, LPolygon } from 'vue2-leaflet';
 import { CatalogueItem } from '@/model';
 
@@ -46,7 +46,9 @@ export default class AssetHeadMap extends Vue {
     if (!catalogueItem.geometry || catalogueItem.geometry.type !== 'Polygon') return;
 
     console.log('CCCCCCc', catalogueItem);
+    // eslint-disable-next-line
     const lats = catalogueItem.geometry.coordinates[0].map(([lon, lat]) => lat);
+    // eslint-disable-next-line
     const lons = catalogueItem.geometry.coordinates[0].map(([lon, lat]) => lon);
 
     console.log('ccccc', lats, lons);
