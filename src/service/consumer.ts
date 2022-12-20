@@ -138,4 +138,14 @@ export default class ConsumerApi extends Api {
       return data;
     });
   }
+
+  public async orderKeyToSubscription(key: string): Promise<ServerResponse<ConsumerAccountSubscription>> {
+    const url = `/action/consumer/subscriptions/order/${key}`;
+
+    return this.get<ServerResponse<ConsumerAccountSubscription>>(url).then((response) => {
+      const { data } = response;
+
+      return data;
+    });
+  }
 }

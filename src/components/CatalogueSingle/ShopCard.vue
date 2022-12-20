@@ -3,20 +3,55 @@
     <div class="asset__shopcard__variations">
 
       <div class="asset__shopcard__price">
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FREE'" class="asset__shopcard__price"><span>FREE</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'"><span>{{ selectedPricingModel.totalPriceExcludingTax }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
-        <span v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'"><span>{{ selectedPricingModel.price }}</span> <span>€</span></span>
+        <!-- FREE -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'FREE'" class="asset__shopcard__price">
+          <span>FREE</span>
+        </template>
+
+        <!-- FIXED -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED'">
+          <span class="asset__shopcard__price__text--main">{{ selectedPricingModel.totalPriceExcludingTax }}</span>
+          <span class="asset__shopcard__price__text--top">€</span>
+        </template>
+
+        <!-- FIXED PER ROWS -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">
+          <span class="asset__shopcard__price__text--main">{{ selectedPricingModel.price }}</span>
+          <span class="asset__shopcard__price__text--top">€</span>
+        </template>
+
+        <!-- FIXED FOR POPULATION -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">
+          <span class="asset__shopcard__price__text--main">{{ selectedPricingModel.price }}</span>
+          <span class="asset__shopcard__price__text--top">€</span>
+        </template>
+
+        <!-- PER CALL -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'">
+          <span class="asset__shopcard__price__text--main">{{ selectedPricingModel.price }}</span>
+          <span class="asset__shopcard__price__text--top">€</span>
+        </template>
+
+        <!-- PER ROW -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'">
+          <span class="asset__shopcard__price__text--main">{{ selectedPricingModel.price }}</span>
+          <span class="asset__shopcard__price__text--top">€</span>
+        </template>
+
+        <!-- SH IMAGES -->
         <span v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_IMAGES'">-</span>
-        <div v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
-          <div class="mb-xs-20"><span></span>monthly<span></span><span>{{ selectedPricingModel.monthlyPriceExcludingTax }}</span><span>€</span></div>
-          <div class="mb-xs-20"><span></span>annually<span></span><span>{{ selectedPricingModel.annualPriceExcludingTax }}</span><span>€</span></div>
-        </div>
+
+        <!-- SH SUBSCRIPTION -->
+        <template v-if="selectedPricingModel && selectedPricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
+          <span class="asset__shopcard__price__text--bottom">from</span>
+          <span class="asset__shopcard__price__text--main">25</span>
+          <span class="asset__shopcard__price__text--top">€/month</span>
+          <!-- <div class="mb-xs-20"><span></span>monthly<span></span><span>{{ selectedPricingModel.monthlyPriceExcludingTax }}</span><span>€</span></div> -->
+          <!-- <div class="mb-xs-20"><span></span>annually<span></span><span>{{ selectedPricingModel.annualPriceExcludingTax }}</span><span>€</span></div> -->
+        </template>
       </div>
 
-      <span class="asset__shopcard__vat">+ VAT 24%</span>
+      <span class="asset__shopcard__vat" v-if="selectedPricingModel.type !== 'SENTINEL_HUB_SUBSCRIPTION'">+ VAT 24%</span>
 
       <div class="asset__shopcard__variations__container mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
         <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
@@ -24,7 +59,8 @@
           <label :for="`p_variation_${pr_model.model.key}`">{{ formatPricingModelType(pr_model.model.type) }}
             <span v-if="pr_model.model.type === 'FIXED' && pr_model.model.yearsOfUpdates">+ {{ pr_model.model.yearsOfUpdates }} {{ pr_model.model.yearsOfUpdates > 1 ? 'years' : 'year' }} of updates</span>
             <div v-if="pr_model.model.type === 'FIXED_PER_ROWS'">
-              Price per 1,000 rows<br><strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
+              <!-- Price per 1,000 rows<br> -->
+              <strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
@@ -35,7 +71,8 @@
               </div>
             </div>
             <div v-if="pr_model.model.type === 'FIXED_FOR_POPULATION'">
-              Price per 10,000 people<br><strong>Minimum population percentage:</strong> {{ pr_model.model.minPercent ? pr_model.model.minPercent : 'not specified' }} %
+              <!-- Price per 10,000 people<br> -->
+              <strong>Minimum population percentage:</strong> {{ pr_model.model.minPercent ? pr_model.model.minPercent : 'not specified' }} %
               <div class="asset__shopcard__variations__row__discounts">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
@@ -47,7 +84,7 @@
             </div>
 
             <div v-if="pr_model.model.type === 'PER_CALL'">
-              Subscription, price per call<br>
+              <!-- Subscription, price per call<br> -->
               <!-- TODO: to be checked -->
               <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
@@ -74,7 +111,7 @@
             </div>
 
             <div v-if="pr_model.model.type === 'PER_ROW'">
-              Subscription, price per row<br>
+              <!-- Subscription, price per row<br> -->
               <!-- TODO: to be checked -->
               <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
@@ -105,11 +142,11 @@
     </div>
 
     <div v-if="!catalogueItem.availableToPurchase" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToWishlist() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO WISHLIST</a></div>
-    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue mt-xs-10 mb-xs-10" style="display: block; width: min-content;">SUBSCRIBE</a></div>
+    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)" class="d-flex justify-content-center"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue mt-xs-10 mb-xs-10" style="display: block; width: 100%; text-align: center;">SUBSCRIBE</a></div>
     <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
     <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
 
-    <ul v-if="selectedPricingModel" class="asset__shopcard__buyinfo pt-sm-10">
+    <ul v-if="selectedPricingModel && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA'" class="asset__shopcard__buyinfo pt-sm-10">
       <!-- <li><strong>Asset application restrictions</strong></li> -->
       <li>
         <strong>Use restricted for: </strong>
@@ -294,12 +331,12 @@ export default class ShopCard extends Vue {
     const labels = {
       FREE: 'FREE',
       FIXED: 'FIXED',
-      FIXED_PER_ROWS: 'FIXED PER ROWS',
-      FIXED_FOR_POPULATION: 'FIXED FOR POPULATION',
-      PER_CALL: 'PER CALL',
-      PER_ROW: 'PER ROW',
-      SENTINEL_HUB_IMAGES: 'SENTINEL HUB IMAGES',
-      SENTINEL_HUB_SUBSCRIPTION: 'SENTINEL HUB SUBSCRIPTION',
+      FIXED_PER_ROWS: 'Price per 1,000 rows',
+      FIXED_FOR_POPULATION: 'Price per 10,000 people',
+      PER_CALL: 'Subscription, price per call',
+      PER_ROW: 'Subscription, price per row',
+      SENTINEL_HUB_IMAGES: 'Sentinel Hub Images',
+      SENTINEL_HUB_SUBSCRIPTION: 'Sentinel Hub Subscription',
     };
     return labels[t];
   }
@@ -367,6 +404,8 @@ export default class ShopCard extends Vue {
 
       &__container {
         display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
       }
     }
@@ -378,23 +417,23 @@ export default class ShopCard extends Vue {
       color: $labelColor;
     }
 
-    &__price {
-      width: 100%;
+    // &__price {
+    //   width: 100%;
 
-      > span {
-        display: flex;
-        justify-content: center;
-        width: 100%;
+    //   > span {
+    //     display: flex;
+    //     justify-content: center;
+    //     width: 100%;
 
-        > span {
-          font-weight: 500 !important;
-        }
-      }
+    //     > span {
+    //       font-weight: 500 !important;
+    //     }
+    //   }
 
-      span:nth-child(2) {
-        align-self: flex-start;
-        margin-left: 0 !important;
-      }
-    }
+    //   span:nth-child(2) {
+    //     align-self: flex-start;
+    //     margin-left: 0 !important;
+    //   }
+    // }
   }
 </style>

@@ -215,16 +215,26 @@
 
 		&__price {
 			color: $secondColor;
-			display: inline-flex;
-			span, >div {
-				font-weight: 400;
-				line-height: 72%;
-				&:nth-child(odd) {
-					font-size: em(30);
+			display: flex;
+			justify-content: center;
+			gap: 5px;
+			font-weight: 400;
+
+			&__text {
+				&--top {
+					font-size: em(22);
+					align-self: flex-start;
+					line-height: 80%;
 				}
-				&:nth-child(even) {
-					margin-left: 10px;
-					font-size: em(16);
+				&--main {
+					// font-size: em(30);
+					font-size: em(60);
+					line-height: 80%;
+				}
+				&--bottom {
+					font-size: em(22);
+					align-self: flex-end;
+					line-height: 90%;
 				}
 			}
 		}
@@ -273,7 +283,7 @@
 					color: $secondColor;
 				}
 				&__discounts {
-					margin-top: 20px;
+					margin-top: 5px;
 					display: flex;
 					&__table {
 						margin-left: 20px;

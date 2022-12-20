@@ -45,4 +45,11 @@ export default class VendorInformationSH extends Vue {
 </script>
 <style lang="scss">
   @import "@/assets/styles/_assets.scss";
+
+  .asset__vendor_info {
+    .s_container {
+      background: $lightBgColor;
+      border-radius: 10px;
+    }
+  }
 </style>

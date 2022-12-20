@@ -4,8 +4,7 @@
       <l-map
         ref="map"
         v-if="map.show"
-        :zoom="map.zoom"
-        :center="map.center"
+        :bounds="bounds"
         :options="map.options"
       >
         <l-tile-layer
@@ -20,10 +19,15 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import {
+  Vue,
+  Component,
+  Prop,
+  Watch,
+} from 'vue-property-decorator';
 import 'leaflet/dist/leaflet.css';
 // import L, { latLng } from 'leaflet';
-import { latLng } from 'leaflet';
+// import { latLng } from 'leaflet';
 import { LMap, LTileLayer, LPolygon } from 'vue2-leaflet';
 import { CatalogueItem } from '@/model';
 
@@ -35,9 +39,32 @@ import { CatalogueItem } from '@/model';
   },
 })
 export default class AssetHeadMap extends Vue {
-  @Prop({ required: true }) catalogueItem!: CatalogueItem;
+  @Prop({ required: true }) readonly catalogueItem!: CatalogueItem;
+
+  @Watch('catalogueItem', { deep: true, immediate: true })
+  onCatalogueItemChange(catalogueItem: CatalogueItem): void {
+    if (!catalogueItem.geometry || catalogueItem.geometry.type !== 'Polygon') return;
+
+    console.log('CCCCCCc', catalogueItem);
+    // eslint-disable-next-line
+    const lats = catalogueItem.geometry.coordinates[0].map(([lon, lat]) => lat);
+    // eslint-disable-next-line
+    const lons = catalogueItem.geometry.coordinates[0].map(([lon, lat]) => lon);
+
+    console.log('ccccc', lats, lons);
+
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLon = Math.min(...lons);
+    const maxLon = Math.max(...lons);
+
+    this.bounds = [[minLat, minLon], [maxLat, maxLon]];
+    console.log('BBBBBb', this.bounds);
+  }
 
   map: any;
+
+  bounds: [[number, number], [number, number]] | null = null;
 
   resizeObserver: any;
 
@@ -46,8 +73,6 @@ export default class AssetHeadMap extends Vue {
 
     this.map = {
       show: false,
-      zoom: 7,
-      center: latLng(37.9782553, 23.7263485),
       options: {
         zoomSnap: 0.5,
         zoomControl: false,

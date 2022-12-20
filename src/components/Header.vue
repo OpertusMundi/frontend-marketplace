@@ -490,9 +490,9 @@
                     <li>
                       <router-link to="/dashboard"><img src="@/assets/images/icons/dashboard/dashboard.svg" alt="" />Dashboard</router-link>
                     </li>
-                    <!-- <li>
+                    <li>
                       <router-link to="/dashboard/profile"><img src="@/assets/images/icons/dashboard/profile.svg" alt="" />My profile</router-link>
-                    </li> -->
+                    </li>
                     <li>
                       <router-link to="/dashboard/settings"><img src="@/assets/images/icons/dashboard/settings.svg" alt="" />Settings</router-link>
                     </li>
@@ -727,6 +727,12 @@ export default class Header extends Vue {
       }
       case EnumNotificationEventType.DELIVERY_REQUEST: {
         this.$router.push(`/dashboard/order/${(notification.data as OrderDeliveryRequestData).orderKey}`);
+        break;
+      }
+      case EnumNotificationEventType.USER_SERVICE_PUBLISH_FAILURE:
+      case EnumNotificationEventType.ASSET_PUBLISHING_CANCELLED:
+      case EnumNotificationEventType.ASSET_PUBLISHING_REJECTED: {
+        this.$router.push('/dashboard/messages');
         break;
       }
       default:

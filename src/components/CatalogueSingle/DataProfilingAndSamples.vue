@@ -34,7 +34,7 @@
 
       <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
         <p v-if="'featureCount' in metadata"><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
-        <p><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
+        <p v-if="catalogueItem.type !== 'TABULAR' && metadata.crs"><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
         <p v-if="metadata.attributes">
           <strong>ATTRIBUTE NAMES:</strong> <span v-for="(attribute, i) in metadata.attributes" :key="attribute">{{ attribute }}<span v-if="i !== metadata.attributes.length - 1">, </span></span>
         </p>

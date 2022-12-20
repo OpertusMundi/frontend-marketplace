@@ -62,7 +62,7 @@
         <div class="filters__block__select">
           <label for="filter">STATUS: </label>
           <select v-model="selectedStatus" name="filter" id="filter">
-            <option v-for="status in statusFilterOptions" :key="status" :value="status">{{ status }}</option>
+            <option v-for="status in ['ALL', 'DRAFT', 'SUBMITTED', 'PENDING HELPDESK REVIEW', 'REJECTED BY HELPDESK', 'PENDING SUPPLIER REVIEW', 'REJECTED BY SUPPLIER', 'PROCESSING']" :key="status" :value="status">{{ status }}</option>
           </select>
         </div>
         <div class="filters__block__select">
@@ -267,7 +267,19 @@ export default class DashboardHome extends Vue {
 
     const query: Partial<AssetDraftQuery> = {};
 
-    query.status = this.selectedStatus === 'ALL' ? [EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING] : [this.selectedStatus as EnumDraftStatus];
+    const statusOptions = [
+      { label: 'DRAFT', value: EnumDraftStatus.DRAFT },
+      { label: 'SUBMITTED', value: EnumDraftStatus.SUBMITTED },
+      { label: 'PENDING HELPDESK REVIEW', value: EnumDraftStatus.PENDING_HELPDESK_REVIEW },
+      { label: 'REJECTED BY HELPDESK', value: EnumDraftStatus.HELPDESK_REJECTED },
+      { label: 'PENDING SUPPLIER REVIEW', value: EnumDraftStatus.PENDING_PROVIDER_REVIEW },
+      { label: 'REJECTED BY SUPPLIER', value: EnumDraftStatus.PROVIDER_REJECTED },
+      { label: 'PROCESSING', value: EnumDraftStatus.POST_PROCESSING },
+    ];
+
+    query.status = this.selectedStatus === 'ALL'
+      ? [EnumDraftStatus.DRAFT, EnumDraftStatus.SUBMITTED, EnumDraftStatus.PENDING_HELPDESK_REVIEW, EnumDraftStatus.HELPDESK_REJECTED, EnumDraftStatus.PENDING_PROVIDER_REVIEW, EnumDraftStatus.PROVIDER_REJECTED, EnumDraftStatus.POST_PROCESSING]
+      : [statusOptions.find((x) => x.label === this.selectedStatus)?.value || '' as EnumDraftStatus];
 
     const pageRequest = {
       page,

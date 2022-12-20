@@ -53,6 +53,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import store from '@/store';
 import moment from 'moment';
+import ConsumerApi from '@/service/consumer';
 import ConsumerOrderApi from '@/service/consumer-order';
 import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
@@ -68,6 +69,8 @@ import { CatalogueItemDetails } from '@/model/catalogue';
   },
 })
 export default class DashboardPurchases extends Vue {
+  consumerApi: ConsumerApi;
+
   consumerOrderApi: ConsumerOrderApi;
 
   consumerContractsApi: ConsumerContractsApi;
@@ -81,6 +84,7 @@ export default class DashboardPurchases extends Vue {
   constructor() {
     super();
 
+    this.consumerApi = new ConsumerApi();
     this.consumerOrderApi = new ConsumerOrderApi();
     this.consumerContractsApi = new ConsumerContractsApi();
     this.catalogueApi = new CatalogueApi();
@@ -172,7 +176,14 @@ export default class DashboardPurchases extends Vue {
   }
 
   onNavigateToSubscription(): void {
-    this.$router.push('/dashboard/subscriptions');
+    store.commit('setLoading', true);
+
+    this.consumerApi.orderKeyToSubscription(this.order.key).then((response) => {
+      store.commit('setLoading', true);
+
+      const { key: subscriptionKey } = response.result;
+      this.$router.push(`/dashboard/subscriptions/${subscriptionKey}`);
+    });
   }
 }
 </script>
