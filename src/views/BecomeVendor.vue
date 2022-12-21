@@ -439,6 +439,7 @@ import Multiselect from 'vue-multiselect';
 import Datepicker from 'vuejs-datepicker';
 import en from 'vee-validate/dist/locale/en.json';
 import PhoneNumber from 'awesome-phonenumber';
+import { orderBy } from 'lodash';
 import ProviderAPI from '@/service/provider';
 import { europeanCodeToISOCode } from '@/helper/country';
 import { getFormInputData } from '@/helper/form-config';
@@ -489,6 +490,8 @@ const vatValidator = {
   validate(value, args): boolean {
     const [country] = args;
     if (!country) return true;
+    // skip validation for ISRAEL
+    if (country === 'IL') return true;
 
     const fullVATValue = `${country}${value}`;
 
@@ -595,6 +598,9 @@ export default class BecomeVendor extends Vue {
 
     this.countries = store.getters.getConfig.configuration.countries;
     this.europeCountries = store.getters.getConfig.configuration.europeCountries.map((x) => ({name: x.name, code: x.code}));
+    // ADD ISRAEL
+    this.europeCountries.push({ name: 'Israel', code: 'IL' });
+    this.europeCountries = orderBy(this.europeCountries, ['name'], 'asc');
 
     this.legalPersonTypeOptions = [
       { name: 'Business', code: 'BUSINESS' },
