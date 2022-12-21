@@ -12,6 +12,7 @@
         :src="`data:${account.profile.provider.current.logoImageMimeType};base64,${account.profile.provider.current.logoImage}`"
         alt="profile image"
       >
+      <img v-else :src="defaultLogo()" alt="default logo image">
       <div>
         <span>{{ account.profile.provider.current.name }}</span>
         <span class="profile-section__address">{{ account.profile.provider.current.headquartersAddress.line1 }}, {{ account.profile.provider.current.headquartersAddress.line2 ? account.profile.provider.current.headquartersAddress.line1 + ', ': '' }} {{ account.profile.provider.current.headquartersAddress.postalCode }}, {{ account.profile.provider.current.headquartersAddress.city }}, {{ account.profile.provider.current.headquartersAddress.country }}</span>
@@ -20,12 +21,13 @@
       </div>
     </div>
 
-    <div v-else-if="account && account.profile">
+    <div class="profile-section" v-else-if="account && account.profile">
       <img
         v-if="account.profile.image && account.profile.imageMimeType"
         :src="`data:${account.profile.imageMimeType};base64,${account.profile.image}`"
         alt="profile image"
       >
+      <img v-else :src="defaultLogo()" alt="default logo image">
       <div>
         <span>{{ account.profile.firstName || '' }} {{ account.profile.lastName || '' }}</span>
         <span class="profile-section__join-date">Joined {{ formatDate(account.registeredAt).date.split(' ').filter((x, i) => i > 0).join(' ') }}</span>
@@ -33,7 +35,7 @@
       </div>
     </div>
 
-    <div>
+    <div v-if="account && account.profile && account.profile.provider && account.profile.provider.current">
       <div class="filters">
         <div class="filters__block">
           <p class="filters__title">{{ paginationData.itemsTotal }} ASSETS</p>
@@ -112,6 +114,7 @@ export default class Profile extends Vue {
 
   @Watch('selectedOrderOption', { deep: true })
   onOrderOptionChange(): void {
+    if (!this.account?.profile?.provider?.current) return;
     this.loadAssets();
   }
 
@@ -120,10 +123,9 @@ export default class Profile extends Vue {
 
     const profileResponse = await this.profileApi.getProfile();
     this.account = profileResponse.result;
-    store.commit('setLoading', true);
+    store.commit('setLoading', false);
 
     if (!this.account.profile?.provider?.current) return;
-
     this.loadAssets();
   }
 
