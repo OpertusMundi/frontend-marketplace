@@ -59,11 +59,11 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
 import {
-  AssetQuery,
   DataSeries,
   EnumAssetQueryMetric,
-  EnumAssetSource,
+  EnumSalesQueryMetric,
   EnumTemporalUnit,
+  SalesQuery,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import Highcharts from 'highcharts';
@@ -166,13 +166,12 @@ export default class MapViewerLocations extends Vue {
   }
 
   getAnalytics(): void {
-    const query: AssetQuery = {
+    const query: SalesQuery = {
       segments: {
         enabled: true,
       },
       assets: this.assetsQuery,
-      metric: EnumAssetQueryMetric.COUNT,
-      source: EnumAssetSource.VIEW,
+      metric: EnumSalesQueryMetric.COUNT_TRANSACTIONS,
       time: {
         unit: this.temporalUnit,
         min: this.temporalUnitMin,
@@ -183,7 +182,7 @@ export default class MapViewerLocations extends Vue {
         codes: [],
       },
     };
-    this.analyticsApi.executeAssetQuery(query)
+    this.analyticsApi.executeSalesQuery(query)
       .then((response) => {
         if (response.success) {
           this.analyticsData = response.result;

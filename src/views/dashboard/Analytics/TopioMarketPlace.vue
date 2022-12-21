@@ -116,7 +116,7 @@
          :class="{ active: activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
-          <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}</h5>
+          <h5>{{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
           {{ EnumAnalyticsMarketplaceDescription.VIEWER_LOCATIONS_DESC }}
@@ -127,7 +127,7 @@
          :class="{ active: activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }">
         <div class="analytics__types__item__upper">
           <img src="@/assets/images/icons/dashboard/map_chart_icon.svg" alt="">
-          <h5>COMMING SOON: {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}</h5>
+          <h5>{{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}</h5>
         </div>
         <div class="analytics__types__item__desc">
           {{ EnumAnalyticsMarketplaceDescription.PURCHASES_LOCATIONS_DESC }}
@@ -232,11 +232,21 @@
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.VIEWER_LOCATIONS">
-        COMING SOON: {{ EnumAnalyticsMarketplace.VIEWER_LOCATIONS }}
+        <MapViewerLocations
+        :card-heading="EnumAnalyticsMarketplace.VIEWER_LOCATIONS"
+        :card-description="EnumAnalyticsMarketplaceDescription.VIEWER_LOCATIONS_DESC"
+        :symbol-title="EnumAnalyticsMarketplace.VIEWER_LOCATIONS"
+        :symbol="''"
+        />
       </div>
       <div class="analytics__cards__item"
            v-if="activeTab === EnumAnalyticsMarketplace.PURCHASES_LOCATIONS">
-        COMING SOON: {{ EnumAnalyticsMarketplace.PURCHASES_LOCATIONS }}
+        <MapViewerTransactions
+          :card-heading="EnumAnalyticsMarketplace.PURCHASES_LOCATIONS"
+          :card-description="EnumAnalyticsMarketplaceDescription.PURCHASES_LOCATIONS_DESC"
+          :symbol-title="EnumAnalyticsMarketplace.PURCHASES_LOCATIONS"
+          :symbol="''"
+        />
       </div>
     </div>
   </div>
@@ -269,6 +279,8 @@ import MapCoverageFileAssets
   from '@/views/dashboard/Analytics/TopioMarketplace/MapCoverageFileAssets.vue';
 import MapViewerLocations
   from '@/views/dashboard/Analytics/TopioMarketplace/MapViewerLocations.vue';
+import MapViewerTransactions
+  from '@/views/dashboard/Analytics/TopioMarketplace/MapViewerTransactions.vue';
 
 enum EnumAnalyticsMarketplace {
   TOP_VIEWED_ASSETS = 'Top viewed assets',
@@ -302,6 +314,7 @@ enum EnumAnalyticsMarketplaceDescription {
 
 @Component({
   components: {
+    MapViewerTransactions,
     ViewsLineGraphCard,
     ViewsMapGraphCard,
     ViewsBarGraphCard,

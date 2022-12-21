@@ -69,10 +69,10 @@ export default class AnalyticsApi extends Api {
    *   "success": true
    * }
    */
-  public async executeSalesQuery(query: SalesQuery): Promise<ServerResponse<DataSeries>> {
+  public async executeSalesQuery(query: SalesQuery | AssetQuery): Promise<ServerResponse<DataSeries>> {
     const url = '/action/analytics/sales';
 
-    return this.post<SalesQuery, ServerResponse<DataSeries>>(url, query)
+    return this.post<SalesQuery | AssetQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
@@ -117,8 +117,8 @@ export default class AnalyticsApi extends Api {
       });
   }
 
-  public async getMostPopularAssets(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAsset[]>> {
-    const url = `/action/analytics/popular-assets?includeAssets=true&limit=${limit}`;
+  public async getMostPopularAssets(query?: AssetQuery, limit = 10, includeAssets = true): Promise<ServerResponse<PopularAsset[] | any[]>> {
+    const url = `/action/analytics/popular-assets?includeAssets=${includeAssets}&limit=${limit}`;
 
     const queryDefault = { metric: EnumAssetQueryMetric.COUNT, source: EnumAssetSource.VIEW };
     const q: AssetQuery = query ? { ...queryDefault, ...query } : queryDefault;
@@ -128,7 +128,8 @@ export default class AnalyticsApi extends Api {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 
-        return { ...data, result: data.result.map((x) => x.asset) };
+        const responseWithPopularAsset = { ...data, result: data.result.map((x) => x.asset) }; // TODO: when includesAssets is set to true the pid and count properties are not returned, needs refactoring
+        return includeAssets ? responseWithPopularAsset : { ...data };
       });
   }
 

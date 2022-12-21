@@ -224,14 +224,6 @@ export default class LineVendorsCount extends Vue {
     // });
   }
 
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    console.log(newVal);
-    this.assetsQuery = newVal.filter((el) => el)
-      .map((a) => a.assetPublished);
-    this.getAnalytics();
-  }
-
   filteredAssets(assets: AssetDraft[]): any {
     return assets.filter((asset) => this.selectedAssets.every((selected) => selected.key !== asset.key));
   }

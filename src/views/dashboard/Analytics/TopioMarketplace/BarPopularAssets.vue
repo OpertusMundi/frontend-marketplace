@@ -180,15 +180,14 @@ export default class BarPopularAssets extends Vue {
       },
     };
 
-    this.analyticsApi.getMostPopularAssets(query).then((response) => {
-      console.log('response: ', response);
-      if (response.success) {
-        const series = DataTransform.groupByPopularAssetsSeriesData(response.result, this.assets);
+    this.analyticsApi.getMostPopularAssets(query, 10000, false).then(({ result, success }) => {
+      if (success) {
+        // const series = DataTransform.groupByPopularAssetsSeriesData(response.result, this.assets);
         this.seriesData = [{
+          data: result.map((e) => e.count),
           name: this.cardHeading,
-          data: series.map((serie) => serie.data),
         }];
-        this.assetNames = series.map((serie) => serie.name);
+        this.assetNames = result.map((serie) => serie.pid);
         this.chartOptions = this.getOptions();
       }
     });
@@ -197,6 +196,11 @@ export default class BarPopularAssets extends Vue {
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: Array<any>): void {
     this.assetsQuery = newVal.filter((el) => el).map((a) => a.assetPublished);
+    this.getAnalytics();
+  }
+
+  @Watch('EnumAssetSource')
+  onEnumAssetSourceChange(): void {
     this.getAnalytics();
   }
 
