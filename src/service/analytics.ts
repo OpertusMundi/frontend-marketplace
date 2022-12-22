@@ -15,7 +15,7 @@ import {
   VendorCountQuery,
   BaseQuery,
   EnumAssetSource,
-  EnumAssetQueryMetric,
+  EnumAssetQueryMetric, PopularAssetCount,
 } from '@/model/analytics';
 import { AxiosResponse } from 'axios';
 
@@ -117,8 +117,8 @@ export default class AnalyticsApi extends Api {
       });
   }
 
-  public async getMostPopularAssets(query?: AssetQuery, limit = 10, includeAssets = true): Promise<ServerResponse<PopularAsset[] | any[]>> {
-    const url = `/action/analytics/popular-assets?includeAssets=${includeAssets}&limit=${limit}`;
+  public async getMostPopularAssets(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAsset[]>> {
+    const url = `/action/analytics/popular-assets?includeAssets=true&limit=${limit}`;
 
     const queryDefault = { metric: EnumAssetQueryMetric.COUNT, source: EnumAssetSource.VIEW };
     const q: AssetQuery = query ? { ...queryDefault, ...query } : queryDefault;
@@ -128,8 +128,17 @@ export default class AnalyticsApi extends Api {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
 
-        const responseWithPopularAsset = { ...data, result: data.result.map((x) => x.asset) }; // TODO: when includesAssets is set to true the pid and count properties are not returned, needs refactoring
-        return includeAssets ? responseWithPopularAsset : { ...data };
+        return { ...data, result: data.result.map((x) => x.asset) };
+      });
+  }
+
+  public async getPopularAssetCounts(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAssetCount[]>> {
+    const url = `/action/analytics/popular-assets?includeAssets=false&limit=${limit}`;
+    return this.post<AssetQuery, ServerResponse<PopularAssetCount[]>>(url, query)
+      .then((response: AxiosServerResponse<PopularAssetCount[]>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+        return data;
       });
   }
 

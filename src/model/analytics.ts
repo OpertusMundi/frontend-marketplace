@@ -247,3 +247,8 @@ export interface PopularTerm {
 export interface PopularAsset {
   [key: string]: number;
 }
+
+export interface PopularAssetCount {
+  pid: string,
+  count: number
+}
