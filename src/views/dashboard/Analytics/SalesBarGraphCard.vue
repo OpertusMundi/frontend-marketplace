@@ -53,16 +53,16 @@
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in chartDate" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
-        </tr>
+      <tr>
+        <th class="data_table__header">Asset</th>
+        <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
-        </tr>
+      <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
+        <td class="data_table__data">{{ data.name }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -179,10 +179,10 @@ export default class SalesBarGraphCard extends Vue {
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
       if (response.success) {
-        console.log('response: 2 ', response);
+        console.log('response: ', response);
         response.result.points.reverse();
         this.analyticsData = response.result;
-        // this.segmentsNames = this.formatSegmentsNames();
+        this.segmentsNames = this.formatSegmentsNames();
         this.datetimeSeries = this.formatSegmentNamesTime();
         this.chartDate = this.formatTheDate();
         this.seriesData = this.formatSeries();
@@ -253,8 +253,8 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       xAxis: {
-        categories: this.chartDate,
-        type: 'datetime',
+        categories: this.segmentsNames,
+        // type: 'datetime',
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,
@@ -305,7 +305,7 @@ export default class SalesBarGraphCard extends Vue {
 
   formatSeries(): any[] {
     const series: Array<any> = [];
-    if (this.assetsQuery?.length > 1) { // length > 4 it will never happen
+    if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUP BY SEGMENT NAME
         // const data: Array<number> = [];
@@ -318,12 +318,10 @@ export default class SalesBarGraphCard extends Vue {
         //     data.push(0);
         //   }
         // });
-
-        // TODO: Below code block must be replaced when server response return segments
         const assetTitle = this.assets.find(({ id }) => id === assetName);
         const data: Array<any> = [];
-        this.chartDate.forEach(() => { // group by segment method from helper/analytics.ts
-          const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName));
+        this.segmentsNames.forEach((segName) => { // group by segment method from helper/analytics.ts
+          const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
           if (value.length > 0) {
             data.push(value);
           } else {
@@ -342,8 +340,8 @@ export default class SalesBarGraphCard extends Vue {
         console.log('asset name: ', assetName);
         const assetTitle = this.assets.find(({ id }) => id === assetName);
         // TODO: Confirm if this chart must be grouped by segment or by date index
-        const data = this.analyticsData?.points.map((a) => a.value);
-        // const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
+        // const data = this.analyticsData?.points.map((a) => a.value);
+        const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
