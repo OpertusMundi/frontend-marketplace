@@ -108,4 +108,15 @@ export default class FileSystemApi extends Api {
       return data;
     });
   }
+
+  public async renameFile(sourcePath: string, targetFileName: string): Promise<ServerResponse<DirectoryInfo>> {
+    const url = '/action/file-system/files';
+
+    return this.put<{ sourcePath: string, targetFileName: string }, ServerResponse<DirectoryInfo>>(url, { sourcePath, targetFileName }).then((response) => {
+      const { data } = response;
+      if (data.success === false) showApiErrorModal(data.messages);
+
+      return data;
+    });
+  }
 }

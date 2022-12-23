@@ -69,20 +69,27 @@
             <td> {{ folder.modified | timestampToDate }}</td>
             <td>
               <div class="storage-files__item__actions">
-                <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
+                <!-- <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a> -->
                 <a href="#" @click.prevent="deleteRequest(folder.path, 'Folder')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
               </div>
             </td>
           </tr>
           <tr class="storage-files__item" v-for="(file, n) in filteredFiles" v-bind:key="`${n}_file`">
             <td><input type="checkbox" name="" id="" v-model="selectedFiles[file.path]"></td>
-            <td><img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}</td>
+            <td>
+              <template v-if="pathToRename === file.path">
+                <input type="text" :value="file.name" @keyup.enter="rename(file.path, $event.target.value)" />
+              </template>
+              <template v-else>
+                <img src="@/assets/images/icons/dashboard/file.svg" alt="">{{file.name}}
+              </template>
+            </td>
             <td>{{file.size | bytesToMb}} MB</td>
             <td> {{ file.modified | timestampToDate }}</td>
             <td>
               <div class="storage-files__item__actions">
                 <a href="#" @click.prevent="download(file.path)"><img src="@/assets/images/icons/dashboard/download.svg" alt=""></a>
-                <a href="#"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
+                <a href="#" @click.prevent="pathToRename = file.path"><img src="@/assets/images/icons/dashboard/edit.svg" alt=""></a>
                 <a href="#" @click.prevent="createPrivateOGCService(file.path, file.name)"><img src="@/assets/images/icons/dashboard/layers.svg" alt=""></a>
                 <a href="#" @click.prevent="deleteRequest(file.path, 'File')"><img src="@/assets/images/icons/dashboard/delete.svg" alt=""></a>
               </div>
@@ -104,6 +111,7 @@ import { SimpleResponse } from '@/model/response';
 import { DirectoryInfo, FileInfo, FileUploadCommand } from '@/model/file';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import moment from 'moment';
+import store from '@/store';
 
 @Component({
   filters: {
@@ -143,6 +151,8 @@ export default class DashboardStorage extends Vue {
   newFolder: any;
 
   newFile: any;
+
+  pathToRename: string;
 
   newFileData: FileUploadCommand;
 
@@ -190,6 +200,7 @@ export default class DashboardStorage extends Vue {
       show: false,
     };
     this.newFile = null;
+    this.pathToRename = '';
     this.uploadPercentage = 0;
     this.uploadSpeed = 0;
     this.newFileData = {
@@ -250,6 +261,7 @@ export default class DashboardStorage extends Vue {
   }
 
   getFileSystem():void {
+    store.commit('setLoading', true);
     this.fileSystemApi.browse().then((response: ServerResponse<DirectoryInfo>) => {
       this.fileSystem = response.result;
       this.activeFolder = this.fileSystem;
@@ -258,6 +270,8 @@ export default class DashboardStorage extends Vue {
         this.errors = error.response.data.messages;
         this.$vToastify.error(this.errors.map((e) => e.description).join(', '));
       }
+    }).finally(() => {
+      store.commit('setLoading', false);
     });
   }
 
@@ -343,6 +357,17 @@ export default class DashboardStorage extends Vue {
       }
     }
     return null;
+  }
+
+  rename(path: string, newName: string) {
+    store.commit('setLoading', true);
+
+    this.fileSystemApi.renameFile(path, newName).finally(() => {
+      store.commit('setLoading', false);
+
+      this.pathToRename = '';
+      this.getFileSystem();
+    });
   }
 
   handleFileUpload():void {
