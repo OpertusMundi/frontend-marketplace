@@ -155,6 +155,7 @@
           :card-description="EnumAnalyticsSalesDescription.NUMBER_SUBSCRIBERS_DESC"
           :symbol-title="EnumAnalyticsSales.NUMBER_SUBSCRIBERS"
           :subscribers-query-metric="EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS"
+          :asset-type-prop="EnumAssetType.SERVICE"
           :symbol="''"
         />
       </div>
@@ -167,6 +168,7 @@
           :card-heading="EnumAnalyticsSales.EARNINGS_API"
           :card-description="EnumAnalyticsSalesDescription.EARNINGS_API_DESC"
           :subscribers-query-metric="EnumSubscribersQueryMetric.EARNINGS"
+          :asset-type-prop="EnumAssetType.SERVICE"
           :symbol="'€'"
           :symbol-title="'Earnings in €'"
         />
@@ -208,6 +210,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import CatalogueCard from '@/components/Catalogue/Card.vue';
+import { EnumAssetType } from '@/model/enum';
 import {
   EnumSubscribersQueryMetric,
   EnumAssetTypeDimension,
@@ -277,6 +280,8 @@ export default class Sales extends Vue {
 
   EnumAssetSource: typeof EnumAssetSource;
 
+  EnumAssetType: typeof EnumAssetType;
+
 
   constructor() {
     super();
@@ -287,6 +292,7 @@ export default class Sales extends Vue {
     this.EnumSalesQueryMetric = EnumSalesQueryMetric;
     this.EnumAnalyticsSalesDescription = EnumAnalyticsSalesDescription;
     this.EnumAssetSource = EnumAssetSource;
+    this.EnumAssetType = EnumAssetType;
   }
 }
 </script>

@@ -73,6 +73,7 @@ export interface BaseQuery {
 export enum EnumSalesQueryMetric {
   COUNT_TRANSACTIONS = 'COUNT_TRANSACTIONS',
   SUM_SALES = 'SUM_SALES',
+  COUNT_VIEWS = 'COUNT_VIEWS'
 }
 
 export enum EnumSubscribersQueryMetric {
@@ -245,4 +246,9 @@ export interface PopularTerm {
 
 export interface PopularAsset {
   [key: string]: number;
+}
+
+export interface PopularAssetCount {
+  pid: string,
+  count: number
 }

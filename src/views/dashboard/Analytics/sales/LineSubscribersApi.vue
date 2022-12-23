@@ -116,6 +116,9 @@ interface TimeResponse {
   },
 })
 export default class LineSubscribersApi extends Vue {
+  @Prop({ default: EnumAssetType.VECTOR })
+  private assetTypeProp!: EnumAssetType;
+
   @Prop({ default: EnumSubscribersQueryMetric.COUNT_SUBSCRIBERS })
   private subscribersQueryMetric!: EnumSubscribersQueryMetric;
 
@@ -217,7 +220,7 @@ export default class LineSubscribersApi extends Vue {
   getAssets(): void {
     const query: ProviderDraftQuery = {
       q: '',
-      type: EnumAssetType.VECTOR,
+      type: this.assetTypeProp,
       pageRequest: {
         page: 0,
         size: 100,

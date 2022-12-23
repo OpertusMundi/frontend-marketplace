@@ -53,16 +53,16 @@
     <highcharts v-if="chartOptions" :options="chartOptions"></highcharts>
     <table class="data_table" v-if="chartOptions">
       <thead>
-        <tr>
-          <th class="data_table__header">Asset</th>
-          <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
-        </tr>
+      <tr>
+        <th class="data_table__header">Asset</th>
+        <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
+      </tr>
       </thead>
       <tbody>
-        <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
-          <td class="data_table__data">{{ data.name }}</td>
-          <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
-        </tr>
+      <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
+        <td class="data_table__data">{{ data.name }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+      </tr>
       </tbody>
     </table>
   </div>

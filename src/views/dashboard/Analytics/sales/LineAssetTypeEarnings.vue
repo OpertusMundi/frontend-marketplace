@@ -239,7 +239,7 @@ export default class LineAssetTypeEarnings extends Vue {
       xAxis: {
         categories: this.lineChartDate,
         type: 'datetime',
-        reversed: true,
+        reversed: false,
       },
       yAxis: {
         gridLineDashStyle: 'Dot',
@@ -368,15 +368,12 @@ export default class LineAssetTypeEarnings extends Vue {
   }
 
   getTimeResponse(): Array<any> {
-    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time)
-      .reverse();
+    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time);
   }
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.getAnalytics();
   }
 
   formatDate(value: TimeResponse): any {

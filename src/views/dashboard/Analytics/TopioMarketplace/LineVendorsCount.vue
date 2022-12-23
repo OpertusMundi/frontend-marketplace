@@ -80,7 +80,7 @@
 </template>
 <script lang="ts">
 import {
-  Component, Prop, Vue, Watch,
+  Component, Prop, Vue,
 } from 'vue-property-decorator';
 import AssetSelector from '@/components/AssetSelector.vue';
 import DataRangePicker from '@/components/DataRangePicker.vue';
@@ -141,9 +141,9 @@ export default class LineVendorsCount extends Vue {
 
   temporalUnit: EnumTemporalUnit;
 
-  temporalUnitMin: string;
+  temporalUnitMin: string | undefined;
 
-  temporalUnitMax: string;
+  temporalUnitMax: string | undefined;
 
   seriesData: any;
 
@@ -222,14 +222,6 @@ export default class LineVendorsCount extends Vue {
     //     this.chartOptions = this.getOptions();
     //   }
     // });
-  }
-
-  @Watch('selectedAssets')
-  selectedAssetsChanged(newVal: Array<any>): void {
-    console.log(newVal);
-    this.assetsQuery = newVal.filter((el) => el)
-      .map((a) => a.assetPublished);
-    this.getAnalytics();
   }
 
   filteredAssets(assets: AssetDraft[]): any {
@@ -474,7 +466,6 @@ export default class LineVendorsCount extends Vue {
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
     this.getAnalytics();
-    console.log('here', value);
   }
 
   formatDate(value: TimeResponse): any {

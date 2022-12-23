@@ -15,7 +15,7 @@ import {
   VendorCountQuery,
   BaseQuery,
   EnumAssetSource,
-  EnumAssetQueryMetric,
+  EnumAssetQueryMetric, PopularAssetCount,
 } from '@/model/analytics';
 import { AxiosResponse } from 'axios';
 
@@ -69,10 +69,10 @@ export default class AnalyticsApi extends Api {
    *   "success": true
    * }
    */
-  public async executeSalesQuery(query: SalesQuery): Promise<ServerResponse<DataSeries>> {
+  public async executeSalesQuery(query: SalesQuery | AssetQuery): Promise<ServerResponse<DataSeries>> {
     const url = '/action/analytics/sales';
 
-    return this.post<SalesQuery, ServerResponse<DataSeries>>(url, query)
+    return this.post<SalesQuery | AssetQuery, ServerResponse<DataSeries>>(url, query)
       .then((response: AxiosServerResponse<DataSeries>) => {
         const { data } = response;
         if (data.success === false) showApiErrorModal(data.messages);
@@ -129,6 +129,16 @@ export default class AnalyticsApi extends Api {
         if (data.success === false) showApiErrorModal(data.messages);
 
         return { ...data, result: data.result.map((x) => x.asset) };
+      });
+  }
+
+  public async getPopularAssetCounts(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAssetCount[]>> {
+    const url = `/action/analytics/popular-assets?includeAssets=false&limit=${limit}`;
+    return this.post<AssetQuery, ServerResponse<PopularAssetCount[]>>(url, query)
+      .then((response: AxiosServerResponse<PopularAssetCount[]>) => {
+        const { data } = response;
+        if (data.success === false) showApiErrorModal(data.messages);
+        return data;
       });
   }
 
