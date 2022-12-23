@@ -2,7 +2,7 @@
   <div class="dashboard__inner">
     <div class="dashboard__head">
       <div class="dashboard__head__left">
-        <h2>Subject</h2>
+        <h2>{{ subject }}</h2>
       </div>
     </div>
     <div class="thread">
@@ -113,6 +113,8 @@ export default class DashboardMessagesThread extends Vue {
 
   messageApi = new MessageApi();
 
+  subject = '';
+
   contacts: ClientContact[] = [];
 
   messages: Message[] | null = null;
@@ -135,6 +137,7 @@ export default class DashboardMessagesThread extends Vue {
 
     this.messageApi.getThread(this.threadId)
       .then((response) => {
+        this.subject = response.result.subject;
         this.contacts = Object.keys(response.contacts).map((x) => response.contacts[x]);
         this.messages = response.result.messages;
 

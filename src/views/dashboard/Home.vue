@@ -394,16 +394,16 @@ export default class DashboardHome extends Vue {
   }
 
   getTotalAssets(dates: TemporalDimension): void {
-    const query: AssetQuery = {
-      source: EnumAssetSource.VIEW,
-      metric: EnumAssetQueryMetric.COUNT,
+    const query: Partial<AssetQuery> = {
+      // source: EnumAssetSource.VIEW,
+      // metric: EnumAssetQueryMetric.COUNT,
       time: {
         unit: dates.unit,
-        min: dates.min,
-        max: dates.max,
+        min: dates.min || moment('1970-01-01').format('YYYY-MM-DD'),
+        max: dates.max || moment().format('YYYY-MM-DD'),
       },
     };
-    this.analyticsApi.executeAssetQuery(query).then((response) => {
+    this.analyticsApi.executeAssetCountQuery(query).then((response) => {
       this.itemsNum = response.result.points.reduce( // sum all values of assets
         (previousValue, currentValue) => previousValue + currentValue.value, 0,
       );

@@ -1,7 +1,19 @@
 <template>
   <section class="asset__section">
     <div class="asset__section__head">
-      <h4>Metadata</h4>
+      <div class="d-flex space-between">
+        <h4>Metadata</h4>
+        <div class="asset__section__head__sample_download__btn" @click="downloadMetadata">
+          <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
+            <g data-name="Group 753">
+              <g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333" /></g>
+            </g>
+            <g data-name="Group 755">
+              <g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333" /></g>
+            </g>
+          </svg>
+        </div>
+      </div>
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
       <ul class="asset__section__head__tabs">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Identification</a></li>
@@ -93,6 +105,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import fileDownload from 'js-file-download';
 import { CatalogueItem } from '@/model';
 import { CatalogueItemDetails } from '@/model/catalogue';
 import SpatialApi from '@/service/spatial';
@@ -132,9 +145,18 @@ export default class Metadata extends Vue {
   formatDate(date: string): string {
     return moment(date).format('DD MMM YYYY');
   }
+
+  downloadMetadata(): void {
+    const metadata = JSON.parse(JSON.stringify(this.catalogueItem));
+    delete metadata.automatedMetadata;
+    delete metadata.visibility;
+
+    fileDownload(JSON.stringify(metadata), 'metadata.json');
+  }
 }
 </script>
 <style lang="scss">
   @import "@/assets/styles/abstracts/_spacings.scss";
+  @import "@/assets/styles/abstracts/_flexbox-utilities.scss";
   @import "@/assets/styles/_assets.scss";
 </style>
