@@ -15,8 +15,8 @@
         </a>
       </template>
       <div v-if="mode === 'review'">
-        <button class="btn btn--std btn--outlineblue" @click="acceptDraft">accept</button>
-        <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">reject</button>
+        <button class="btn btn--std btn--outlineblue" @click="acceptDraft">publish</button>
+        <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">cancel</button>
       </div>
     </div>
     <!-- <div class="asset__head__version"> -->
