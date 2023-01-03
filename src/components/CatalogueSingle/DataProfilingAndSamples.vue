@@ -712,9 +712,10 @@ export default class DataProfilingAndSamples extends Vue {
       this.catalogueApi.getAssetSamples(this.metadata.samples).then((samplesResponse) => {
         console.log('samples!', samplesResponse);
 
-        const nonEmptySamples = samplesResponse.filter((x) => Object.keys(x).length);
+        const nonEmptySamples = samplesResponse.filter((x) => Object.keys(x).length && Object.values(x)[0].length);
 
         this.samples = nonEmptySamples;
+        console.log('SSSSSSSSSSS', this.samples);
         this.tempSamples = cloneDeep(nonEmptySamples);
       });
     }
