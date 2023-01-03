@@ -1,7 +1,7 @@
 <template>
   <div class="asset" v-show="isItemLoaded">
 
-    <asset-head-map :catalogueItem="catalogueItem"></asset-head-map>
+    <asset-head-map v-if="isItemLoaded" :catalogueItem="catalogueItem"></asset-head-map>
 
     <div class="s_container">
       <div class="asset__inner">

@@ -1,5 +1,5 @@
 <template>
-  <div class="asset__map" lazy>
+  <div ref="assetMap" class="asset__map" lazy>
     <div class="asset__map__inner">
       <l-map
         ref="map"
@@ -90,6 +90,9 @@ export default class AssetHeadMap extends Vue {
     this.resizeObserver = new (window as any).ResizeObserver((entries) => {
       entries.forEach(() => {
         (this as any).$refs.map.mapObject.invalidateSize();
+
+        const titleHeight = (document.querySelector('.asset__head__title h1') as HTMLElement).clientHeight;
+        (this.$refs.assetMap as HTMLElement).style.height = `calc(476px + ${titleHeight}px)`;
       });
     });
     // eslint-disable-next-line
