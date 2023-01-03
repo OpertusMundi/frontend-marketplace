@@ -703,7 +703,8 @@ export default class DataProfilingAndSamples extends Vue {
     // eslint-disable-next-line
     const tabs = [this.catalogueItem.type === 'RASTER' ? 'BANDS' : this.catalogueItem.type === 'NETCDF' ? 'VARIABLES' : 'ATTRIBUTES'];
     if (this.metadata.mbr || this.metadata.convexHull || this.metadata.thumbnail || this.metadata.heatmap || this.metadata.clusters?.features?.length) tabs.push('MAPS');
-    if (this.metadata.numericalAttributeCorrelation) tabs.push('CORRELATION MATRIX');
+    // if (this.metadata.numericalAttributeCorrelation) tabs.push('CORRELATION MATRIX');
+    if (this.showCorrelationMatrix()) tabs.push('CORRELATION MATRIX');
 
     this.tabs = tabs;
     this.samplesStartingTab = this.tabs.length + 1;
