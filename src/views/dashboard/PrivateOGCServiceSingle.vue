@@ -57,6 +57,13 @@
           <p class="private-ogc-single__detail__value">{{ service.path }}</p>
         </div>
 
+        <hr style="width: 100%;">
+
+        <div class="private-ogc-single__detail">
+          <p class="private-ogc-single__detail__title">Pricing</p>
+          <p class="private-ogc-single__detail__value">{{ service.pricingModel.price }} {{ service.pricingModel.type.replaceAll('_', ' ').toLowerCase() }}</p>
+        </div>
+
       </template>
     </div>
 
