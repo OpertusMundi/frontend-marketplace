@@ -88,6 +88,7 @@ export default class AssetDraftCard extends Vue {
   getColor = (): string => getAssetCardColor(this.asset.type as EnumAssetType);
 
   formatStatus(status: string): string {
+    if (status === 'PENDING_PROVIDER_REVIEW') return 'PENDING SUPPLIER REVIEW';
     return status.replaceAll('_', ' ');
   }
 

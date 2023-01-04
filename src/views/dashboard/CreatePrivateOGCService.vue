@@ -110,7 +110,10 @@
                         <div class="dashboard__form__step__title">
                           <h3>Payment amount</h3>
                           <p>The cost of using topio OGC is fixed</p>
-                          <div class="cost"><span>32</span><span>€/month</span></div>
+                          <div class="cost">
+                            <span>{{ $store.getters.getConfig.configuration.asset.privateServicePricingModel.price }}</span>
+                            <span>€/ {{ $store.getters.getConfig.configuration.asset.privateServicePricingModel.type.replaceAll('_', ' ').toLowerCase() }}</span>
+                          </div>
                           <p>Billed every 1st working day of the month</p>
                         </div>
                       </div>

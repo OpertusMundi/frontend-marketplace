@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div class="a_carousel draggable" v-dragscroll>
-      <router-link
+    <div class="a_carousel draggable" v-dragscroll @dragscrollstart="dragScrollEndTimestamp = Infinity" @dragscrollend="dragScrollEndTimestamp = Date.now()">
+      <div
         v-for="(asset, i) in assets"
         :key="asset.id"
-        :to="`/catalogue/${asset.id}`"
+        :to="''"
+        @click="onAssetSelection(asset.id)"
         class="a_carousel__item"
         :style="{'margin-left': i=== 0 ? `${relatedCardMarginLeft}px` : '10px', '--color': getColor(asset)}"
       >
@@ -47,7 +48,7 @@
             </div>
           </div>
         </div>
-      </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +70,10 @@ import getPriceOrMinimumPrice, { getAssetCardColor } from '@/helper/cards';
 export default class AssetsCarousel extends Vue {
   @Prop({ required: true }) assets!: CatalogueItem[];
 
+  clickAssetAfterScrollTimeThresh = 100;
+
+  dragScrollEndTimestamp = 0;
+
   get relatedCardMarginLeft(): number | null {
     return document.getElementById('asset__related__heading')?.getBoundingClientRect().x || null;
   }
@@ -77,6 +82,12 @@ export default class AssetsCarousel extends Vue {
 
   price(asset: CatalogueItem): {prefix: string, value: string, suffix: string} {
     return getPriceOrMinimumPrice(asset);
+  }
+
+  onAssetSelection(assetId: string): void {
+    console.log('SELECT');
+    if (Date.now() - this.clickAssetAfterScrollTimeThresh <= this.dragScrollEndTimestamp) return;
+    this.$router.push(`/catalogue/${assetId}`);
   }
 }
 </script>

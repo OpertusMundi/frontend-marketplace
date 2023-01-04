@@ -123,7 +123,7 @@
     <hr>
 
     <ul v-if="selectedPricingModel" class="asset__shopcard__buyinfo pt-sm-10">
-      <li><strong>Asset application restrictions</strong></li>
+      <!-- <li><strong>Asset application restrictions</strong></li> -->
       <li>
         <strong>Use restricted for: </strong>
         <span v-if="getDomainRestrictions().length">

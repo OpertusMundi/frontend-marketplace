@@ -192,7 +192,7 @@
       </li>
 
       <li>
-        <strong>Delivered from: </strong>
+        <strong>Delivered by: </strong>
         <span>{{ catalogueItem.publisher.name }}</span>
       </li>
     </ul>

@@ -5,7 +5,7 @@
       <topic-category-icon class="mr-xs-30" :type="catalogueItem.type === 'SERVICE' ? catalogueItem.spatialDataServiceType : catalogueItem.type"/>
     </div>
     <div class="asset__head__title">
-      <h1>{{ catalogueItem.title }}</h1>
+      <h1 style="display: inline;">{{ catalogueItem.title }}</h1>
       <template v-if="mode === 'catalogue'">
         <a v-if="!catalogueItem.favorite" href="#" @click.prevent="onAddToFavorites(catalogueItem.id)">
           <img src="@/assets/images/icons/favorites/favorite_icon.svg" alt="">
@@ -15,8 +15,8 @@
         </a>
       </template>
       <div v-if="mode === 'review'">
-        <button class="btn btn--std btn--outlineblue" @click="acceptDraft">accept</button>
-        <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">reject</button>
+        <button class="btn btn--std btn--outlineblue" @click="acceptDraft">publish</button>
+        <button class="btn btn--std btn--outlineblue ml-xs-10" @click="modalToShow = 'rejectDraft'">cancel</button>
       </div>
     </div>
     <!-- <div class="asset__head__version"> -->

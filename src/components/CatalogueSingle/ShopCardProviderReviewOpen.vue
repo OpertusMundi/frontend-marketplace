@@ -46,7 +46,7 @@
       <!-- <button class="btn btn--std btn--blue" style="width: 100%">download</button> -->
       <hr>
       <ul class="asset__shopcard__open-asset-delivery-info">
-        <li><strong>Delivered from: </strong> <span>topio</span></li>
+        <li><strong>Delivered by: </strong> <span>topio</span></li>
       </ul>
       <hr>
     </div>
