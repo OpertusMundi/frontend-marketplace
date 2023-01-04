@@ -146,6 +146,11 @@
                 font-size: em(30);
                 font-family: $titleFont;
                 font-weight: 700;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 @media(max-width: 576px) {
                     font-size: em(24);
                 }
