@@ -64,6 +64,7 @@
 
     </div>
     <related-assets :catalogueItem="catalogueItem" v-if="isItemLoaded && mode && !['review', 'helpdesk-review'].includes(mode)"></related-assets>
+    <match-finder></match-finder>
 
     <!-- MODALS -->
     <select-areas v-if="isSelectAreasModalOn" @close="closeSelectAreaModal" :assetId="catalogueItem.id" :pricingModel="selectedPricingModelForAreaSelection"></select-areas>
@@ -129,6 +130,7 @@ import Metadata from '../components/CatalogueSingle/Metadata.vue';
 import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import BundleAssets from '../components/CatalogueSingle/BundleAssets.vue';
+import MatchFinder from '../components/MatchFinder.vue';
 
 @Component({
   components: {
@@ -154,6 +156,7 @@ import BundleAssets from '../components/CatalogueSingle/BundleAssets.vue';
     SelectSentinelHubPlan,
     Modal,
     BundleAssets,
+    MatchFinder,
   },
 })
 export default class CatalogueSingle extends Vue {
