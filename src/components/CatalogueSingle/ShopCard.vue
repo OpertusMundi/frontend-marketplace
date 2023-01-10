@@ -149,21 +149,21 @@
     <ul v-if="selectedPricingModel && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA'" class="asset__shopcard__buyinfo pt-sm-10">
       <!-- <li><strong>Asset application restrictions</strong></li> -->
       <li>
-        <strong>Use restricted for: </strong>
+        <strong>Use restricted for: <tooltip :text="'In which application domains can this asset be used?'"></tooltip> </strong>
         <span v-if="getDomainRestrictions().length">
           <span v-for="(domain, i) in getDomainRestrictions()" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions().length - 1">, </span></span>
         </span>
         <span v-else>Any domain</span>
       </li>
       <li>
-        <strong>Coverage: </strong>
+        <strong>Coverage: <tooltip :text="'In which areas of the world can this asset be used?'"></tooltip> </strong>
         <span v-if="getCoverageRestrictions().length">
           <span v-for="(area, i) in getCoverageRestrictions()" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions().length - 1">, </span></span>
         </span>
         <span v-else>Worldwide</span>
       </li>
       <li>
-        <strong>Consumers: </strong>
+        <strong>Consumers: <tooltip :text="'Sales restricted to consumers from specific areas of the world.'"></tooltip> </strong>
         <span v-if="getConsumerRestrictions().length">
           <span v-for="(area, i) in getConsumerRestrictions()" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions().length - 1">, </span></span>
         </span>
@@ -206,6 +206,7 @@ import {
   Watch,
 } from 'vue-property-decorator';
 import SelectAreas from '@/components/CatalogueSingle/SelectAreas.vue';
+import Tooltip from '@/components/Tooltip.vue';
 import CartApi from '@/service/cart';
 import FavoriteApi from '@/service/favorite';
 import { CatalogueItem } from '@/model';
@@ -224,6 +225,7 @@ import store from '@/store';
   components: {
     // todo: check if needed
     SelectAreas,
+    Tooltip,
   },
 })
 export default class ShopCard extends Vue {
