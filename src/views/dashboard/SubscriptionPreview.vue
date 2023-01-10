@@ -44,67 +44,111 @@
       </div>
     </div>
     <div class="contract-single">
-      <ul class="contract-single__info">
-        <li>
-          <strong>Plan Description</strong>
-          <p>
-            <span v-if="subscription.pricingModel.type === 'FIXED_PER_ROWS'">
-              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum rows: {{ subscription.pricingModel.minRows }} <br /></span>
-              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-            </span>
-            <span v-if="subscription.pricingModel.type === 'FIXED_FOR_POPULATION'">
-              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br /></span>
-              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-            </span>
-            <span v-if="subscription.pricingModel.type === 'PER_CALL'">
-              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per call<br /></span>
-              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
-              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} calls<br /></div>
-            </span>
-            <span v-if="subscription.pricingModel.type === 'PER_ROW'">
-              <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per row<br /></span>
-              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
-              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} rows<br /></div>
-            </span>
-            <span v-if="subscription.pricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
-              <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">Monthly price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
-              <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">Annual price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
-            </span>
+      <div class="row">
+        <div class="col-md-6">
 
-            <span style="display: flex; margin-top: 0.5em;">
-              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Use restricted for: </strong>
-              <span v-if="getDomainRestrictions(subscription.pricingModel).length">
-                <span v-for="(domain, i) in getDomainRestrictions(subscription.pricingModel)" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions(subscription.pricingModel).length - 1">, </span></span>
-              </span>
-              <span v-else>Any domain</span>
-            </span>
+          <template v-if="servicesData.length">
+            <div v-for="(service, i) in servicesData" :key="i">
+              <p class="private-ogc-single__detail__title">Type</p>
+              <p class="private-ogc-single__detail__value">
+                {{ service.type }}
+              </p>
 
-            <span style="display: flex; margin-top: 0.3em;">
-              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Coverage: </strong>
-              <span v-if="getCoverageRestrictions(subscription.pricingModel).length">
-                <span v-for="(area, i) in getCoverageRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions(subscription.pricingModel).length - 1">, </span></span>
-              </span>
-              <span v-else>Worldwide</span>
-            </span>
+              <p class="private-ogc-single__detail__title mt-xs-10">URI</p>
+              <p class="private-ogc-single__detail__value">
+                <!-- <span>({{ service.type }})</span> -->
+                {{ service.uri }}
+              </p>
 
-            <span style="display: flex; margin-top: 0.3em;">
-              <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Consumers: </strong>
-              <span v-if="getConsumerRestrictions(subscription.pricingModel).length">
-                <span v-for="(area, i) in getConsumerRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions(subscription.pricingModel).length - 1">, </span></span>
-              </span>
-              <span v-else>Worldwide</span>
-            </span>
-          </p>
-        </li>
-        <li>
-          <strong>Provided by</strong>
-          <p>{{ subscription.provider.name }}</p>
-        </li>
-        <li>
-          <strong>Start date</strong>
-          <p>{{ formatDate(subscription.addedOn) }}</p>
-        </li>
-        <li class="mt-xs-50">
+              <p class="private-ogc-single__detail__title mt-xs-10">Requests</p>
+              <p class="private-ogc-single__detail__value">
+                <ul>
+                  <li v-for="request in service.availableRequests" :key="request">&#8226; {{ request }}</li>
+                </ul>
+              </p>
+
+              <div v-for="[paramKey, paramVal] in service.parameters" :key="paramKey">
+                <p class="private-ogc-single__detail__title mt-xs-10">{{ paramKey }}</p>
+                <p class="private-ogc-single__detail__value">
+                  {{ paramVal }}
+                </p>
+              </div>
+
+              <p class="private-ogc-single__detail__title mt-xs-10">Example</p>
+              <p class="private-ogc-single__detail__value">
+                {{ service.example }}
+              </p>
+            </div>
+          </template>
+          <div v-else class="private-ogc-single__detail__value"><span>(URI not yet available)</span></div>
+
+        </div>
+        <div class="col-md-6">
+          <ul class="contract-single__info">
+            <li>
+              <strong>Plan Description</strong>
+              <p>
+                <span v-if="subscription.pricingModel.type === 'FIXED_PER_ROWS'">
+                  <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum rows: {{ subscription.pricingModel.minRows }} <br /></span>
+                  <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                </span>
+                <span v-if="subscription.pricingModel.type === 'FIXED_FOR_POPULATION'">
+                  <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€, minimum percent: {{ pricingModel.minPercent }} <br /></span>
+                  <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">{{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                </span>
+                <span v-if="subscription.pricingModel.type === 'PER_CALL'">
+                  <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per call<br /></span>
+                  <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} calls<br /></div>
+                  <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} calls<br /></div>
+                </span>
+                <span v-if="subscription.pricingModel.type === 'PER_ROW'">
+                  <span style="font-weight: 400; margin-bottom: 0.5em; display: block">{{ subscription.pricingModel.price }}€ per row<br /></span>
+                  <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">discount: {{ discountRate.discount }}% discount at {{ discountRate.count }} rows<br /></div>
+                  <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">prepaid tier: {{ prePaidTier.discount }}% discount at {{ prePaidTier.count }} rows<br /></div>
+                </span>
+                <span v-if="subscription.pricingModel.type === 'SENTINEL_HUB_SUBSCRIPTION'">
+                  <div v-for="discountRate in subscription.pricingModel.discountRates" :key="discountRate.count">Monthly price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
+                  <div v-for="prePaidTier in subscription.pricingModel.prePaidTiers" :key="prePaidTier.count">Annual price excluding tax: {{ subscription.pricingModel.monthlyPriceExcludingTax }}€<br /></div>
+                </span>
+
+                <span style="display: flex; margin-top: 0.5em;">
+                  <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Use restricted for: </strong>
+                  <span v-if="getDomainRestrictions(subscription.pricingModel).length">
+                    <span v-for="(domain, i) in getDomainRestrictions(subscription.pricingModel)" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions(subscription.pricingModel).length - 1">, </span></span>
+                  </span>
+                  <span v-else>Any domain</span>
+                </span>
+
+                <span style="display: flex; margin-top: 0.3em;">
+                  <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Coverage: </strong>
+                  <span v-if="getCoverageRestrictions(subscription.pricingModel).length">
+                    <span v-for="(area, i) in getCoverageRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions(subscription.pricingModel).length - 1">, </span></span>
+                  </span>
+                  <span v-else>Worldwide</span>
+                </span>
+
+                <span style="display: flex; margin-top: 0.3em;">
+                  <strong style="font-weight: 500; margin-bottom: 0.3em; color: #333;">Consumers: </strong>
+                  <span v-if="getConsumerRestrictions(subscription.pricingModel).length">
+                    <span v-for="(area, i) in getConsumerRestrictions(subscription.pricingModel)" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions(subscription.pricingModel).length - 1">, </span></span>
+                  </span>
+                  <span v-else>Worldwide</span>
+                </span>
+              </p>
+            </li>
+            <li>
+              <strong>Provided by</strong>
+              <p>{{ subscription.provider.name }}</p>
+            </li>
+            <li>
+              <strong>Start date</strong>
+              <p>{{ formatDate(subscription.addedOn) }}</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ul>
+        <li class="mt-xs-50 mb-xs-20">
           <strong>Asset details</strong>
         </li>
       </ul>
@@ -133,6 +177,14 @@ export default class SubscriptionsPreview extends Vue {
 
   subscription: ConsumerAccountSubscription | null;
 
+  servicesData: {
+    uri: string,
+    type: string,
+    parameters: string[][],
+    availableRequests: string[],
+    example: string,
+  }[] = [];
+
   showOptions = false;
 
   modalToShow = '';
@@ -153,6 +205,33 @@ export default class SubscriptionsPreview extends Vue {
       if (response.data.success) {
         this.subscription = response.data.result;
         console.log(this.subscription);
+
+        if ((this.subscription.item as any).ingestionInfo[0]?.endpoints) {
+          this.servicesData = (this.subscription.item as any).ingestionInfo[0].endpoints
+            .map((x) => {
+              const parameters = x.uri.split('?')[1]
+                ? x.uri
+                  .split('?')[1]
+                  .split('&')
+                  .map((y) => y.split('='))
+                  .filter((y) => y[0].toLowerCase() !== 'request')
+                  .map((y) => [y[0].split('').map((z, i) => (i === 0 ? z.toUpperCase() : z)).join(''), y[1]])
+                : [];
+
+              return {
+                uri: x.uri.split('?')[0],
+                type: x.type,
+                // eslint-disable-next-line
+                availableRequests: x.type === 'WMS' ? ['GetCapabilities', 'GetMap', 'GetLegendGraphic', 'DescribeLayer'] : x.type === 'WFS' ? ['GetCapabilities', 'GetFeature', 'DescribeFeatureType'] : x.type as unknown as string === 'WMTS' ? ['GetCapabilities', 'GetTile'] : [],
+                example: x.uri,
+                parameters,
+              };
+            });
+
+          console.log('LAAAA', this.servicesData);
+
+          store.commit('setLoading', false);
+        }
       } else {
         // TODO: handle error
         console.log('error fetching subscription info');
@@ -201,4 +280,27 @@ export default class SubscriptionsPreview extends Vue {
 @import '@/assets/styles/abstracts/_spacings.scss';
 @import '@/assets/styles/_dashboard.scss';
 @import '@/assets/styles/_contracts.scss';
+@import "~flexboxgrid/css/flexboxgrid.min.css";
+
+.private-ogc-single {
+  &__detail {
+    margin-bottom: 25px;
+    font-size: .9em;
+
+    &__title {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    &__value {
+      span {
+        color: $labelColor;
+      }
+      margin-top: .3em;
+      font-size: .9em;
+      margin-bottom: 25px;
+    }
+  }
+}
+
 </style>
