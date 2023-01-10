@@ -44,8 +44,8 @@
         <div v-if="isRightDropdownOpen" class="asset_card__right_dropdown">
           <ul>
             <li @click="createNewDraftFromPublished">Edit</li>
-            <li v-if="!['SERVICE', 'TABULAR', 'SENTINEL_HUB_OPEN_DATA'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WMS')" @click="createService('WMS')">Create WMS</li>
-            <li v-if="!['SERVICE', 'TABULAR', 'SENTINEL_HUB_OPEN_DATA'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WFS')" @click="createService('WFS')">Create WFS</li>
+            <li v-if="!['SERVICE', 'TABULAR', 'SENTINEL_HUB_OPEN_DATA', 'BUNDLE'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WMS')" @click="createService('WMS')">Create WMS</li>
+            <li v-if="!['SERVICE', 'TABULAR', 'SENTINEL_HUB_OPEN_DATA', 'BUNDLE'].includes(asset.type) && !rightDropdownServiceCreationExcludedOptions.includes('WFS')" @click="createService('WFS')">Create WFS</li>
             <li @click="deleteAsset">Delete</li>
           </ul>
         </div>
