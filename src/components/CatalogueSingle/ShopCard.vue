@@ -149,7 +149,7 @@
     <ul v-if="selectedPricingModel && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA'" class="asset__shopcard__buyinfo pt-sm-10">
       <!-- <li><strong>Asset application restrictions</strong></li> -->
       <li>
-        <strong>Use restricted for: <tooltip :text="'In which application domains can this asset be used?'"></tooltip> </strong>
+        <strong>Domains: <tooltip :text="'In which application domains can this asset be used?'"></tooltip> </strong>
         <span v-if="getDomainRestrictions().length">
           <span v-for="(domain, i) in getDomainRestrictions()" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions().length - 1">, </span></span>
         </span>
@@ -174,7 +174,7 @@
 
     <!-- <transition name="fade" mode="out-in"><div class="asset__shopcard__errors" v-if="cartErrors">{{ cartErrors }}</div></transition> -->
       <li>
-        <strong>Delivery type: </strong>
+        <strong>Way of delivery: </strong>
         <span> {{ labelize(catalogueItem.deliveryMethod) }}</span>
       </li>
 
