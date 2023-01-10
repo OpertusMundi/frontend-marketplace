@@ -33,6 +33,7 @@ export default class MatchFinder extends Vue {
 .match-finder {
   height: 504px;
   position: relative;
+  overflow-x: hidden;
 
   &__bg {
     position: absolute;
