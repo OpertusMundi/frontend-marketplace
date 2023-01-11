@@ -18,8 +18,8 @@
       </div>
 
       <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
-        <span><strong>Download metadata:</strong></span>
-        <multiselect v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
+        <span><strong>Download metadata</strong></span>
+        <multiselect v-show="false" v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn">
           <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
             <g data-name="Group 753">
@@ -71,7 +71,7 @@
             <a href="#" @click.prevent="activeTab = i + samplesStartingTab" :class="{ active: activeTab == i + samplesStartingTab }">Sample {{ i + 1 }}</a>
           </li>
         </ul>
-        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && activeTab == 1 && !['RASTER', 'NETCDF'].includes(catalogueItem.type)">
+        <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated && (activeTab == 1 || tabs[activeTab - 1] === 'MAPS') && !['RASTER', 'NETCDF'].includes(catalogueItem.type)">
           <li>
             <a href="#" @click.prevent="changeLayout('VERTICAL')"
               ><svg :class="isVertical ? 'active' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
@@ -101,7 +101,7 @@
             </a>
           </li>
           <!-- DROPDOWN BUTTON -->
-          <li :class="toggleDropdownContainer ? 'active' : ''" class="dropdown-item">
+          <li :class="toggleDropdownContainer ? 'active' : ''" class="dropdown-item" v-if="activeTab === 1">
             <a v-if="metadata.attributes" class="no-underline" href="#" @click.prevent="toggleDropdownContainer = !toggleDropdownContainer">Viewing {{ selectedAttribute.length }} of {{ metadata.attributes.length }} attributes </a>
             <svg xmlns="http://www.w3.org/2000/svg" width="10.29" height="7.492" viewBox="0 0 10.29 7.492">
               <path id="Path_2045" data-name="Path 2045" d="M-1105.012-7721.223l4.3,5.28,4.45-5.28" transform="translate(1105.787 7721.867)" fill="none" stroke="#333" stroke-width="2" />
@@ -393,82 +393,84 @@
             <div v-else>
               <p>Contains map images with the geometry of the dataset</p>
               <hr />
-              <!-- MBR -->
-              <div v-if="metadata.mbr">
-                <div class="d-flex space-between mb-xs-5">
-                  <span class="map-type">MBR</span>
-                  <button v-if="mode === 'review' && !hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'mbr')">HIDE</button>
-                  <button v-if="mode === 'review' && hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'mbr')">SHOW</button>
+              <div :class="{'maps_container--horizontal': !isVertical}">
+                <!-- MBR -->
+                <div v-if="metadata.mbr">
+                  <div class="d-flex space-between mb-xs-5">
+                    <span class="map-type">MBR</span>
+                    <button v-if="mode === 'review' && !hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'mbr')">HIDE</button>
+                    <button v-if="mode === 'review' && hiddenMetadata.includes('mbr')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'mbr')">SHOW</button>
+                  </div>
+                  <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
+                  <div class="tab_maps-map" v-if="!hiddenMetadata.includes('mbr')">
+                    <l-map ref="mapConfigMbr" :bounds="getMapBoundsFromWKT(metadata.mbr)" :maxBounds="getMapBoundsFromWKT(metadata.mbr)" :options="mapConfig.options">
+                      <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
+                      <l-geo-json :geojson="wktToGeoJson(metadata.mbr)" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
+                    </l-map>
+                  </div>
                 </div>
-                <p>Rectilinear box (Minimum Bounding Rectangle) denoting the spatial extent of all features</p>
-                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('mbr')">
-                  <l-map ref="mapConfigMbr" :bounds="getMapBoundsFromWKT(metadata.mbr)" :maxBounds="getMapBoundsFromWKT(metadata.mbr)" :options="mapConfig.options">
-                    <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
-                    <l-geo-json :geojson="wktToGeoJson(metadata.mbr)" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
-                  </l-map>
+                <!-- CONVEX HULL -->
+                <div v-if="metadata.convexHull">
+                  <div class="d-flex space-between mb-xs-5">
+                    <span class="map-type">Convex Hull</span>
+                    <button v-if="mode === 'review' && !hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'convexHull')">HIDE</button>
+                    <button v-if="mode === 'review' && hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'convexHull')">SHOW</button>
+                  </div>
+                  <p>Convex polygon enclosing all features</p>
+                  <div class="tab_maps-map" v-if="!hiddenMetadata.includes('convexHull')">
+                    <!-- <l-map
+                      ref="mapConfigConvexHull"
+                      :bounds="mbrToLeafletBounds(metadata.mbr)"
+                      :maxBounds="mbrToLeafletBounds(metadata.mbr)"
+                      :options="mapConfig.options"
+                    > -->
+                    <l-map ref="mapConfigConvexHull" :bounds="getMapBoundsFromWKT(metadata.convexHull)" :maxBounds="getMapBoundsFromWKT(metadata.convexHull)" :options="mapConfig.options">
+                      <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
+                      <l-geo-json :geojson="wktToGeoJson(metadata.convexHull)" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
+                    </l-map>
+                  </div>
                 </div>
-              </div>
-              <!-- CONVEX HULL -->
-              <div v-if="metadata.convexHull">
-                <div class="d-flex space-between mb-xs-5">
-                  <span class="map-type">Convex Hull</span>
-                  <button v-if="mode === 'review' && !hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'convexHull')">HIDE</button>
-                  <button v-if="mode === 'review' && hiddenMetadata.includes('convexHull')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'convexHull')">SHOW</button>
+                <!-- THUMBNAIL -->
+                <div v-if="metadata.thumbnail">
+                  <div class="d-flex space-between mb-xs-5">
+                    <span class="map-type">Thumbnail</span>
+                    <button v-if="mode === 'review' && !hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'thumbnail')">HIDE</button>
+                    <button v-if="mode === 'review' && hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'thumbnail')">SHOW</button>
+                  </div>
+                  <p>Thumbnail image depicting the spatial coverage of the dataset</p>
+                  <div class="tab_maps-map tab_maps-map--auto-height tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
+                    <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail" />
+                  </div>
                 </div>
-                <p>Convex polygon enclosing all features</p>
-                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('convexHull')">
-                  <!-- <l-map
-                    ref="mapConfigConvexHull"
-                    :bounds="mbrToLeafletBounds(metadata.mbr)"
-                    :maxBounds="mbrToLeafletBounds(metadata.mbr)"
-                    :options="mapConfig.options"
-                  > -->
-                  <l-map ref="mapConfigConvexHull" :bounds="getMapBoundsFromWKT(metadata.convexHull)" :maxBounds="getMapBoundsFromWKT(metadata.convexHull)" :options="mapConfig.options">
-                    <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
-                    <l-geo-json :geojson="wktToGeoJson(metadata.convexHull)" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
-                  </l-map>
+                <!-- HEATMAP -->
+                <div v-if="metadata.heatmap">
+                  <div class="d-flex space-between mb-xs-5">
+                    <span class="map-type">Heatmap</span>
+                    <button v-if="mode === 'review' && !hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'heatmap')">HIDE</button>
+                    <button v-if="mode === 'review' && hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'heatmap')">SHOW</button>
+                  </div>
+                  <p>Colormap with varying intensity according to the density of features</p>
+                  <div class="tab_maps-map" v-if="!hiddenMetadata.includes('heatmap')">
+                    <l-map ref="mapConfigHeatmap" :bounds="getMapBoundsFromGeoJson(heatmapGeoJson)" :maxBounds="getMapBoundsFromGeoJson(heatmapGeoJson)" :options="mapConfig.options">
+                      <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
+                      <l-geo-json :geojson="heatmapGeoJson" :optionsStyle="mapConfig.styleHeatmap" :smoothFactor="0.2" :opacity="0.1" :options="{ smoothFactor: 0.2 }"> </l-geo-json>
+                    </l-map>
+                  </div>
                 </div>
-              </div>
-              <!-- THUMBNAIL -->
-              <div v-if="metadata.thumbnail">
-                <div class="d-flex space-between mb-xs-5">
-                  <span class="map-type">Thumbnail</span>
-                  <button v-if="mode === 'review' && !hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'thumbnail')">HIDE</button>
-                  <button v-if="mode === 'review' && hiddenMetadata.includes('thumbnail')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'thumbnail')">SHOW</button>
-                </div>
-                <p>Thumbnail image depicting the spatial coverage of the dataset</p>
-                <div class="tab_maps-map tab_maps-map--auto-height tab_maps-map-thumbnail" v-if="!hiddenMetadata.includes('thumbnail')">
-                  <img v-if="metadata" :src="metadata.thumbnail" alt="thumbnail" />
-                </div>
-              </div>
-              <!-- HEATMAP -->
-              <div v-if="metadata.heatmap">
-                <div class="d-flex space-between mb-xs-5">
-                  <span class="map-type">Heatmap</span>
-                  <button v-if="mode === 'review' && !hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'heatmap')">HIDE</button>
-                  <button v-if="mode === 'review' && hiddenMetadata.includes('heatmap')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'heatmap')">SHOW</button>
-                </div>
-                <p>Colormap with varying intensity according to the density of features</p>
-                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('heatmap')">
-                  <l-map ref="mapConfigHeatmap" :bounds="getMapBoundsFromGeoJson(heatmapGeoJson)" :maxBounds="getMapBoundsFromGeoJson(heatmapGeoJson)" :options="mapConfig.options">
-                    <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
-                    <l-geo-json :geojson="heatmapGeoJson" :optionsStyle="mapConfig.styleHeatmap" :smoothFactor="0.2" :opacity="0.1" :options="{ smoothFactor: 0.2 }"> </l-geo-json>
-                  </l-map>
-                </div>
-              </div>
-              <!-- CLUSTERS -->
-              <div v-if="metadata.clusters && metadata.clusters.features.length">
-                <div class="d-flex space-between mb-xs-5">
-                  <span class="map-type">Clusters</span>
-                  <button v-if="mode === 'review' && !hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'clusters')">HIDE</button>
-                  <button v-if="mode === 'review' && hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'clusters')">SHOW</button>
-                </div>
-                <p>Density-based spatial clusters of features</p>
-                <div class="tab_maps-map" v-if="!hiddenMetadata.includes('clusters')">
-                  <l-map ref="mapClusters" :bounds="getMapBoundsFromGeoJson(metadata.clusters)" :maxBounds="getMapBoundsFromGeoJson(metadata.clusters)" :options="mapConfig.options">
-                    <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
-                    <l-geo-json :geojson="metadata.clusters" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
-                  </l-map>
+                <!-- CLUSTERS -->
+                <div v-if="metadata.clusters && metadata.clusters.features.length">
+                  <div class="d-flex space-between mb-xs-5">
+                    <span class="map-type">Clusters</span>
+                    <button v-if="mode === 'review' && !hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(true, 'clusters')">HIDE</button>
+                    <button v-if="mode === 'review' && hiddenMetadata.includes('clusters')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'clusters')">SHOW</button>
+                  </div>
+                  <p>Density-based spatial clusters of features</p>
+                  <div class="tab_maps-map" v-if="!hiddenMetadata.includes('clusters')">
+                    <l-map ref="mapConfigClusters" :bounds="getMapBoundsFromGeoJson(metadata.clusters)" :maxBounds="getMapBoundsFromGeoJson(metadata.clusters)" :options="mapConfig.options">
+                      <l-tile-layer :url="mapConfig.tilesUrl" :attribution="mapConfig.attribution" />
+                      <l-geo-json :geojson="metadata.clusters" :optionsStyle="{ color: 'orange' }"> </l-geo-json>
+                    </l-map>
+                  </div>
                 </div>
               </div>
             </div>
@@ -736,6 +738,11 @@ export default class DataProfilingAndSamples extends Vue {
     console.log(v);
   }
 
+  @Watch('isVertical')
+  onIsVerticalChange(): void {
+    this.updateMaps();
+  }
+
   changeLayout(value: string): void {
     if (value === 'VERTICAL') {
       this.isVertical = true;
@@ -743,12 +750,15 @@ export default class DataProfilingAndSamples extends Vue {
       this.isVertical = false;
     }
     console.log(value);
+    this.updateMaps();
   }
 
   toggleExpansion(): void {
     // if (!this.isExpanded) window.scrollTo(0, 0);
     this.isExpanded = !this.isExpanded;
     document.body.style.overflowY = this.isExpanded ? 'hidden' : 'visible';
+    console.log(this.isExpanded);
+    this.updateMaps();
   }
 
   initNetCDFPagination(): void {
@@ -1127,6 +1137,19 @@ export default class DataProfilingAndSamples extends Vue {
     });
   }
 
+  updateMaps(): void {
+    this.$nextTick(() => {
+      ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
+        try {
+          (this as any).$refs[x].mapObject.invalidateSize();
+          this.setMinMaxZoomLevels();
+        } catch (err) {
+          console.log('err');
+        }
+      });
+    });
+  }
+
   setMinMaxZoomLevels(): void {
     this.$nextTick(() => {
       let fitBoundsZoomLevel;
@@ -1195,16 +1218,18 @@ export default class DataProfilingAndSamples extends Vue {
       console.log('hfr', hideFieldResponse);
       this.hiddenMetadata = hideFieldResponse.data.result.command.visibility;
       store.commit('setLoading', false);
-      this.$nextTick(() => {
-        ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
-          try {
-            (this as any).$refs[x].mapObject.invalidateSize();
-            this.setMinMaxZoomLevels();
-          } catch (err) {
-            console.log('err');
-          }
-        });
-      });
+
+      this.updateMaps();
+      // this.$nextTick(() => {
+      //   ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
+      //     try {
+      //       (this as any).$refs[x].mapObject.invalidateSize();
+      //       this.setMinMaxZoomLevels();
+      //     } catch (err) {
+      //       console.log('err');
+      //     }
+      //   });
+      // });
       // this.$nextTick(() => {
       //   (this as any).$refs.mapConfigMbr.mapObject.invalidateSize();
       //   (this as any).$refs.mapConfigConvexHull.mapObject.invalidateSize();

@@ -95,6 +95,14 @@
             color: #fff;
         }
     }
+    &--white-blue-text {
+        background: #fff;
+        color: $secondColor;
+        &:hover {
+            background: $secondColor;
+            color: #fff;
+        }
+    }
     &--trans {
         color:$secondColor;
         border-color:$secondColor;

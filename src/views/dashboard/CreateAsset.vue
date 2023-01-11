@@ -713,6 +713,8 @@ export default class CreateAsset extends Vue {
         console.log('ΕΔΩ');
       } else if (this.asset.type as string === 'SENTINEL_HUB_OPEN_DATA') {
         this.assetMainType = 'SENTINEL_HUB_OPEN_DATA';
+      } else if (this.asset.type === 'BUNDLE') {
+        this.assetMainType = 'COLLECTION';
       } else {
         // todo
         console.log('other main type');

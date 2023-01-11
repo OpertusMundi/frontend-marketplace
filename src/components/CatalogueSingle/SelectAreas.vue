@@ -73,7 +73,85 @@
             <span class="select-area-modal__col-submit__message" v-if="!areasSelectedForPurchase.length">Please, select areas to calculate price.</span>
             <button @click="getQuotation" v-if="!quotationResult" :disabled="!areasSelectedForPurchase.length || isQuotationLoading" class="btn btn--std btn--white mb-xs-20">{{ isQuotationLoading ? 'Please Wait...' : 'Calculate Price' }}</button>
 
+            <!-- ********************************************************************************  -->
+
             <div class="asset__shopcard" v-if="quotationResult">
+              <div class="asset__shopcard__variations">
+
+                <div class="asset__shopcard__price">
+                  <template>
+                    <span class="asset__shopcard__price__text--main">{{ quotationResult.quotation.totalPriceExcludingTax }}</span>
+                    <span class="asset__shopcard__price__text--top">€</span>
+                  </template>
+                </div>
+
+                <span class="asset__shopcard__vat">+ VAT {{ quotationResult.quotation.taxPercent }}%</span>
+
+                <!-- <div class="asset__shopcard__variations__container mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
+                  <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
+                    <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
+                    <label :for="`p_variation_${pr_model.model.key}`" :class="{'label--centered': catalogueItem.pricingModels.length === 1}">{{ formatPricingModelType(pr_model.model.type) }}
+
+                      <div v-if="pr_model.model.type === 'FIXED_PER_ROWS' && selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">
+                        <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset for the areas you need. Select the areas you are interested in and get a real-time quotation based on the number of rows included in your selection</p>
+                        <strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
+                        <div class="asset__shopcard__variations__row__discounts">
+                          <div><strong>Discounts:</strong></div>
+                          <div class="asset__shopcard__variations__row__discounts__table">
+                            <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                              <span>{{ discount.count }} rows, {{ discount.discount }}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-if="pr_model.model.type === 'FIXED_FOR_POPULATION' && selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">
+                        <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset with the areas you need. Select the areas you are interested in and get a real-time quotation based on the human population withn your selection</p>
+
+                        <strong>Minimum population percentage:</strong> {{ pr_model.model.minPercent ? pr_model.model.minPercent : 'not specified' }} %
+                        <div class="asset__shopcard__variations__row__discounts">
+                          <div><strong>Discounts:</strong></div>
+                          <div class="asset__shopcard__variations__row__discounts__table">
+                            <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                              <span>{{ discount.count }} rows, {{ discount.discount }}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </label>
+                  </div>
+                </div> -->
+              </div>
+
+              <div class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
+
+              <ul class="asset__shopcard__buyinfo pt-sm-10">
+                <li>
+                  <strong>Domains: <tooltip :text="'In which application domains can this asset be used?'"></tooltip> </strong>
+                  <span v-if="getDomainRestrictions().length">
+                    <span v-for="(domain, i) in getDomainRestrictions()" :key="domain">{{ domain }}<span v-if="i !== getDomainRestrictions().length - 1">, </span></span>
+                  </span>
+                  <span v-else>Any domain</span>
+                </li>
+                <li>
+                  <strong>Coverage: <tooltip :text="'In which areas of the world can this asset be used?'"></tooltip> </strong>
+                  <span v-if="getCoverageRestrictions().length">
+                    <span v-for="(area, i) in getCoverageRestrictions()" :key="area">{{ area }}<span v-if="i !== getCoverageRestrictions().length - 1">, </span></span>
+                  </span>
+                  <span v-else>Worldwide</span>
+                </li>
+                <li>
+                  <strong>Consumers: <tooltip :text="'Sales restricted to consumers from specific areas of the world.'"></tooltip> </strong>
+                  <span v-if="getConsumerRestrictions().length">
+                    <span v-for="(area, i) in getConsumerRestrictions()" :key="area">{{ area }}<span v-if="i !== getConsumerRestrictions().length - 1">, </span></span>
+                  </span>
+                  <span v-else>Worldwide</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- <div class="asset__shopcard" v-if="quotationResult">
               <div class="asset__shopcard__price">
                 <span>{{ quotationResult.quotation.totalPriceExcludingTax }}</span>
                 <span>{{ quotationResult.quotation.currency }}</span>
@@ -99,7 +177,9 @@
               </ul>
             </div>
 
-            <button @click="addToCart" v-if="quotationResult" class="btn btn--std btn--blue mt-xs-20">ADD TO CART</button>
+            <button @click="addToCart" v-if="quotationResult" class="btn btn--std btn--blue mt-xs-20">ADD TO CART</button> -->
+
+            <!-- ********************************************************************************  -->
 
             <!-- <div class="asset__shopcard">
               <ul class="asset__shopcard__priceoptions">
@@ -158,6 +238,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 // eslint-disable-next-line
 import { GeoJsonObject } from 'geojson';
+import Tooltip from '@/components/Tooltip.vue';
 import { CartAddItemCommand } from '../../model/cart';
 import QuotationApi from '../../service/quotation';
 import CartApi from '../../service/cart';
@@ -175,6 +256,7 @@ import {
     LMap,
     LTileLayer,
     LGeoJson,
+    Tooltip,
   },
 })
 export default class SelectAreas extends Vue {
@@ -440,6 +522,30 @@ export default class SelectAreas extends Vue {
       }
       this.isQuotationLoading = false;
     });
+  }
+
+  getDomainRestrictions(): string[] {
+    if (!this.quotationResult) return [];
+    if (!this.quotationResult.model.domainRestrictions) return [];
+    return this.quotationResult.model.domainRestrictions as string[];
+  }
+
+  getCoverageRestrictions(): string[] {
+    if (!this.quotationResult) return [];
+    const continents = Array.isArray(this.quotationResult.model.coverageRestrictionContinents) ? this.quotationResult.model.coverageRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(this.quotationResult.model.coverageRestrictionCountries) ? this.quotationResult.model.coverageRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
+  }
+
+  getConsumerRestrictions(): string[] {
+    if (!this.quotationResult) return [];
+    const continents = Array.isArray(this.quotationResult.model.consumerRestrictionContinents) ? this.quotationResult.model.consumerRestrictionContinents.map((x) => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()) : null;
+    const countries = Array.isArray(this.quotationResult.model.consumerRestrictionCountries) ? this.quotationResult.model.consumerRestrictionCountries.map((x) => store.getters.getConfig.configuration.countries.find((y) => y.code === x).name) as string[] : null;
+
+    if (continents && countries) return continents.concat(countries);
+    return continents || countries || [];
   }
 
   addToCart(): void {
