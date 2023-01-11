@@ -18,8 +18,8 @@
       </div>
 
       <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
-        <span><strong>Download metadata:</strong></span>
-        <multiselect v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
+        <span><strong>Download metadata</strong></span>
+        <multiselect v-show="false" v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn">
           <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
             <g data-name="Group 753">
