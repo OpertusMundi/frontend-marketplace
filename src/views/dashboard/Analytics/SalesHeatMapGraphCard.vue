@@ -32,7 +32,7 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import AnalyticsApi from '@/service/analytics';
-import { EnumSalesQueryMetric, SalesQuery, DataSeries } from '@/model/analytics';
+import { EnumSalesQueryMetric, SalesQuery } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 
 @Component({
@@ -124,7 +124,6 @@ export default class SalesHeatMapGraphCard extends Vue {
     if (!this.features) {
       return null;
     }
-    const name = 'Sales per segment';
 
     return {
       chart: {

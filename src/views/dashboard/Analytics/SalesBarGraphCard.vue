@@ -61,7 +61,7 @@
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value }}</td>
       </tr>
       </tbody>
     </table>

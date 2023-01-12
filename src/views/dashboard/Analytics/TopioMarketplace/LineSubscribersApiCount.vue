@@ -446,9 +446,7 @@ export default class LineSubscribersApiCount extends Vue {
 
   setTemporalUnit(value: EnumTemporalUnit): void {
     this.temporalUnit = value;
-    if (this.assetsQuery?.length) {
-      this.getAnalytics();
-    }
+    this.getAnalytics();
   }
 
   formatDate(value: TimeResponse): any {
