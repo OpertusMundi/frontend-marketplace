@@ -1,4 +1,4 @@
-import { EnumTopicCategory } from './catalogue';
+import { CatalogueItem, EnumTopicCategory } from './catalogue';
 
 export enum EnumTemporalUnit {
   YEAR = 'YEAR',
@@ -251,4 +251,5 @@ export interface PopularAsset {
 export interface PopularAssetCount {
   pid: string,
   count: number
+  asset: CatalogueItem
 }

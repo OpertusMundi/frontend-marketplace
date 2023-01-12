@@ -179,7 +179,6 @@ export default class SalesBarGraphCard extends Vue {
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
       if (response.success) {
-        console.log('response: ', response);
         response.result.points.reverse();
         this.analyticsData = response.result;
         this.segmentsNames = this.formatSegmentsNames();
@@ -253,8 +252,8 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       xAxis: {
-        categories: this.segmentsNames,
-        // type: 'datetime',
+        categories: this.chartDate,
+        type: 'datetime',
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,

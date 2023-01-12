@@ -186,7 +186,7 @@ export default class BarPopularAssets extends Vue {
           data: result.map((e) => e.count),
           name: this.cardHeading,
         }];
-        this.assetNames = result.map((e) => e.pid);
+        this.assetNames = result.map((e) => e.asset.title);
         this.chartOptions = this.getOptions();
       }
     });
