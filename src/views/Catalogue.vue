@@ -819,6 +819,10 @@ export default class Catalogue extends Vue {
   }
 
   selectfilterMenuItem(filterItem: string): void {
+    if (this.filterMenuItemSelected === filterItem) {
+      this.closeFilters();
+      return;
+    }
     this.filterMenuItemSelected = filterItem;
   }
 
