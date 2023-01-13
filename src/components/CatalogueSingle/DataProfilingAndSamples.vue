@@ -484,7 +484,11 @@
                 <button v-if="mode === 'review' && hiddenMetadata.includes('numericalAttributeCorrelation')" class="btn--std btn--outlineblue" @click="onToggleField(false, 'numericalAttributeCorrelation')">SHOW</button>
               </div>
               <hr>
-              <chart :options="getChartOptions('correlation_matrix', {})"  v-if="!hiddenMetadata.includes('numericalAttributeCorrelation')"></chart>
+              <div style="width: 100%; overflow: scroll;">
+                <div class="correlation_matrix_wrapper" :style="{'height': getCorrelationMatrixValues().categories.length * 60 + 'px', 'width': getCorrelationMatrixValues().categories.length * 60 + 'px', 'min-width': '100%', 'min-height': '340px'}">
+                  <chart :options="getChartOptions('correlation_matrix', {})"  v-if="!hiddenMetadata.includes('numericalAttributeCorrelation')"></chart>
+                </div>
+              </div>
             </div>
             <p v-else>No data</p>
           </li>
@@ -1330,5 +1334,14 @@ export default class DataProfilingAndSamples extends Vue {
   width: 30px;
   height: 30px;
   line-height: 30px;
+}
+
+.correlation_matrix_wrapper {
+  overflow: auto;
+  > div {
+    overflow: auto;
+    height: 100% !important;
+    width: 100% !important;
+  }
 }
 </style>
