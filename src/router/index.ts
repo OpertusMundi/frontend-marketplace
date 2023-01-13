@@ -3,15 +3,12 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 import store from '@/store';
 
-import ProfileApi from '@/service/profile';
-
 import Home from '@/views/Home.vue';
 import { EnumRole } from '@/model/role';
 import { navigateToKeycloakLogin } from '@/helper/login';
+import { fetchUserProfileAndCart } from '@/helper/user';
 
 Vue.use(VueRouter);
-
-const profileApi = new ProfileApi();
 
 const routes: RouteConfig[] = [
   {
@@ -488,24 +485,28 @@ router.beforeEach((to, from, next) => {
   // handle keycloak redirection
   if (to.name === 'Home' && routeToNavigateAfterLogin) {
     sessionStorage.removeItem('routeToNavigateAfterLogin');
-    sessionStorage.setItem('tryToFetchProfile', 'y');
-    next(routeToNavigateAfterLogin);
-  } else if (role && !store.getters.hasRole(role)) {
-    const tryToFetchProfile = sessionStorage.getItem('tryToFetchProfile');
-    if (tryToFetchProfile !== 'y') {
-      next('/error/401');
-    } else {
-      store.commit('setLoading', true);
-      sessionStorage.setItem('tryToFetchProfile', 'n');
-      profileApi.getProfile().then((response) => {
+    store.commit('setLoading', true);
+
+    fetchUserProfileAndCart()
+      .then((response) => {
         if (response.success) {
-          next();
-        } else {
-          next('/error/401');
+          if (role && !store.getters.hasRole(role)) {
+            next('/error/401');
+          } else {
+            next(routeToNavigateAfterLogin);
+          }
+          return;
         }
+        next();
+      })
+      .catch(() => {
+        next();
+      })
+      .finally(() => {
         store.commit('setLoading', false);
       });
-    }
+  } else if (role && !store.getters.hasRole(role)) {
+    next('/error/401');
   // end of handle keycloak redirection
   } else if (to.name === 'ConfirmEmail' && (from.name !== 'Register' && from.name !== 'RegisterVendor')) {
     next('/error/401');
