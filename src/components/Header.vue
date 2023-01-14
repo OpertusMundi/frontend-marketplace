@@ -163,7 +163,7 @@
                 <transition name="fade" mode="out-in">
                   <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
-                      <div class="header__submenu__items header__submenu__items--small header__submenu__block">
+                      <div class="header__submenu__items header__submenu__items--small header__submenu__block" v-show="$route.name !== 'Catalogue'">
                         <p>Asset categories</p>
                         <ul>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
