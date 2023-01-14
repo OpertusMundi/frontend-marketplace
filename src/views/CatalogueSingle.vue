@@ -123,7 +123,7 @@ import VendorInformationSH from '../components/CatalogueSingle/VendorInformation
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import OtherAvailableOptionsSH from '../components/CatalogueSingle/OtherAvailableOptionsSH.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
-import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
+// import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
 import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
 import SatelliteImagesExplorer from '../components/CatalogueSingle/SatelliteImagesExplorer.vue';
 import Metadata from '../components/CatalogueSingle/Metadata.vue';
@@ -148,7 +148,7 @@ import MatchFinder from '../components/MatchFinder.vue';
     OtherAvailableOptions,
     'other-available-options-sh': OtherAvailableOptionsSH,
     RelatedAssets,
-    ApiUsageExample,
+    // ApiUsageExample,
     ApiLayerProfiler,
     SatelliteImagesExplorer,
     Metadata,

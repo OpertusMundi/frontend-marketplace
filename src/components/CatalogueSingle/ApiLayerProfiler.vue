@@ -40,7 +40,9 @@
     <div class="asset__section__head">
       <div class="d-flex space-between">
         <h4>Layer Profiler</h4>
-        <div @click="toggleExpansion" style="cursor: pointer"><svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16"><path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333"/><path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333"/><path data-name="Path 9451" d="m.801 16-.8-.8v-3.764h1.346v1.73l-.093.453.1.058.29-.372 3.24-3.24L5.923 11.1l-3.229 3.251-.372.29.058.1.453-.093h1.731V16z" fill="#333"/><path data-name="Path 9450" d="m15.187 16 .8-.8v-3.76h-1.346v1.73l.093.453-.1.058-.29-.372-3.24-3.24-1.034 1.034 3.229 3.252.372.29-.058.1-.453-.093h-1.73v1.347z" fill="#333"/></svg></div>
+        <div @click="toggleExpansion" style="cursor: pointer" v-show="!isSectionMinified">
+          <svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16"><path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333"/><path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333"/><path data-name="Path 9451" d="m.801 16-.8-.8v-3.764h1.346v1.73l-.093.453.1.058.29-.372 3.24-3.24L5.923 11.1l-3.229 3.251-.372.29.058.1.453-.093h1.731V16z" fill="#333"/><path data-name="Path 9450" d="m15.187 16 .8-.8v-3.76h-1.346v1.73l.093.453-.1.058-.29-.372-3.24-3.24-1.034 1.034 3.229 3.252.372.29-.058.1-.453-.093h-1.73v1.347z" fill="#333"/></svg>
+        </div>
       </div>
 
       <!-- <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
@@ -49,7 +51,7 @@
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn"><svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16"><g data-name="Group 753"><g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333"/></g></g><g data-name="Group 755"><g data-name="Group 754"><path data-name="Path 2225" d="M13 11v3H2v-3H0v4a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4z" fill="#333"/></g></g></svg></div>
       </div> -->
 
-      <div class="asset__section__head__main_information asset__section__head__main_information--includes-buttons" v-if="isUserAuthenticated && resources[1]">
+      <div class="asset__section__head__main_information asset__section__head__main_information--includes-buttons" v-if="isUserAuthenticated && resources[1]" v-show="!isSectionMinified">
         <p v-if="resources[1].crs && resources[1].crs.length < 5"><strong>CRS:</strong> {{ resources[1].crs.join(', ') }}</p>
         <p v-if="resources[1].crs && resources[1].crs.length >= 5"><strong>CRS:</strong> {{ resources[1].crs.slice(0, 5).join(', ') }}... <button @click="onShowWholeCrsList" class="btn btn--std btn--outlinedark">show all</button></p>
         <p v-if="!resources[1].crs"><strong>CRS: </strong></p>
@@ -57,8 +59,8 @@
         <p><strong>TYPE:</strong> {{ resources[1].serviceType ? resources[1].serviceType : '' }}</p>
       </div>
 
-      <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
-      <ul class="asset__section__head__tabs" v-if="isUserAuthenticated">
+      <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt="" v-show="!isSectionMinified"></a>
+      <ul class="asset__section__head__tabs" v-if="isUserAuthenticated" v-show="!isSectionMinified">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">COVERAGE</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">DETAILS</a></li>
         <li v-if="resources[1] && resources[1].styles"><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">STYLES</a></li>
@@ -72,7 +74,7 @@
         <!-- <li><a href="#" @click.prevent="activeTab = 4" :class="{ 'active' : activeTab == 4 }">Sample 2</a></li> -->
       </ul>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner asset__section__content__inner--centered" v-if="!isUserAuthenticated">
         <div class="m-xs-40">
           <h2>Automated metadata and samples are visible only to registered users</h2>
@@ -156,7 +158,7 @@
         </ul>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
   </section>
 </template>
 <script lang="ts">
@@ -223,6 +225,8 @@ export default class ApiLayerProfiler extends Vue {
   isExpanded: boolean;
 
   modalToShow: string;
+
+  isSectionMinified = false;
 
   constructor() {
     super();

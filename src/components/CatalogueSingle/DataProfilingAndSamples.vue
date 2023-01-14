@@ -7,7 +7,7 @@
     <div class="asset__section__head">
       <div class="d-flex space-between">
         <h4>Data Profiling and Samples</h4>
-        <div @click="toggleExpansion" style="cursor: pointer">
+        <div @click="toggleExpansion" style="cursor: pointer" v-show="!isSectionMinified">
           <svg data-name="Full screen icon" xmlns="http://www.w3.org/2000/svg" width="15.989" height="16">
             <path data-name="Path 9453" d="m15.187 0 .8.8v3.763h-1.346v-1.73l.093-.453-.1-.058-.29.372-3.24 3.24L10.07 4.9l3.229-3.252.372-.29-.058-.1-.453.093h-1.73V0z" fill="#333" />
             <path data-name="Path 9452" d="m.801 0-.8.8v3.765h1.346v-1.73l-.093-.453.1-.058.29.372 3.245 3.239 1.034-1.034-3.229-3.252-.372-.29.058-.1.453.093h1.731V0z" fill="#333" />
@@ -17,7 +17,7 @@
         </div>
       </div>
 
-      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples">
+      <div class="asset__section__head__sample_download" v-if="isUserAuthenticated && metadata.samples" v-show="!isSectionMinified">
         <span><strong>Download metadata</strong></span>
         <multiselect v-show="false" v-model="metadataDownloadFileSelection" :options="['file_1']" :allowEmpty="false" :preselectFirst="true" :searchable="false" :openDirection="'bottom'" :close-on-select="true" :show-labels="false" placeholder="Select a sample to download"></multiselect>
         <div v-if="metadataDownloadFileSelection" @click="onDownloadAutomatedMetadata" class="asset__section__head__sample_download__btn">
@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <div class="asset__section__head__main_information" v-if="isUserAuthenticated">
+      <div class="asset__section__head__main_information" v-if="isUserAuthenticated" v-show="!isSectionMinified">
         <p v-if="'featureCount' in metadata"><strong>FEATURE COUNT:</strong> {{ metadata.featureCount }} <small class="ml-xs-20">Number of records in the dataset</small></p>
         <p v-if="catalogueItem.type !== 'TABULAR' && metadata.crs"><strong>NATIVE CRS:</strong> {{ metadata.crs }} <small class="ml-xs-20">Coordinate reference system (SRID/EPSG) of the original dataset</small></p>
         <p v-if="metadata.attributes">
@@ -62,8 +62,8 @@
         </div>
       </div>
 
-      <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
-      <div class="asset__section__head__tab-container">
+      <a href="#" class="asset__section__head__toggle" v-show="!isSectionMinified"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
+      <div class="asset__section__head__tab-container" v-show="!isSectionMinified">
         <ul class="asset__section__head__tabs asset__section__head__tabs" v-if="isUserAuthenticated">
           <li class="nowrap" v-for="(tab, i) in tabs" :key="tab"><a href="#" @click.prevent="activeTab = i + 1" :class="{ active: activeTab === i + 1 }">{{ tab }}</a></li>
 
@@ -121,7 +121,7 @@
         </ul>
       </div>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner asset__section__content__inner--centered" v-if="!isUserAuthenticated">
         <div class="m-xs-40">
           <h2>Automated metadata and samples are visible only to registered users</h2>
@@ -529,7 +529,7 @@
         </ul>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""/></a>
   </section>
 </template>
 <script lang="ts">
@@ -631,6 +631,8 @@ export default class DataProfilingAndSamples extends Vue {
     itemsPerPage: number,
     itemsTotal: number,
   };
+
+  isSectionMinified = false;
 
   constructor() {
     super();

@@ -3,13 +3,13 @@
     <div class="asset__section__head">
       <h4>Terms & Restrictions</h4>
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
-      <ul class="asset__section__head__tabs">
+      <ul class="asset__section__head__tabs" v-show="!isSectionMinified">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Core terms</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }" v-if="!catalogueItem.contract.type || catalogueItem.contract.type !== 'UPLOADED_CONTRACT'">Countries</a></li>
         <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }" v-if="!catalogueItem.contract.type || catalogueItem.contract.type !== 'UPLOADED_CONTRACT'">Use restricted for</a></li>
       </ul>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner">
         <ul class="asset__section__tabs">
           <li v-if="activeTab == 1">
@@ -60,7 +60,7 @@
         </ul>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
   </section>
 </template>
 <script lang="ts">
@@ -83,6 +83,8 @@ export default class TermsAndRestrictions extends Vue {
   countriesChunked: ContractTerm[][];
 
   restrictionsChunked: ContractTerm[][];
+
+  isSectionMinified = false;
 
   constructor() {
     super();

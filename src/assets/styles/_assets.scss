@@ -748,6 +748,11 @@
 			@media (max-width: 576px) {
 				display: none;
 			}
+			&--upside-down {
+				img {
+					transform: translate(-50%, -50%) rotate(180deg) !important;
+				}
+			}
 			img {
 				position: relative;
 				top: 55%;
