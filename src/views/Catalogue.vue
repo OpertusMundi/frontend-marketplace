@@ -835,9 +835,28 @@ export default class Catalogue extends Vue {
       case EnumAssetType.VECTOR:
       case EnumAssetType.RASTER:
       case EnumAssetType.SERVICE:
+      case EnumAssetType.SENTINEL_HUB_OPEN_DATA:
+      case EnumAssetType.TABULAR:
         // eslint-disable-next-line
         this.filters.types.find((x) => x.id === filter)!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;
         break;
+      case 'WMS': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.WMS ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'WFS': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.WFS ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'DATA_API': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.DATA_API ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'BUNDLE': {
+        // eslint-disable-next-line
+        this.filters.types.find((x) => x.id === 'BUNDLE')!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;
+        break;
+      }
       case 'OPEN':
         this.filters.isOpen = !this.filters.isOpen;
         break;
