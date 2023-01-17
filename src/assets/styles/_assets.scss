@@ -281,6 +281,7 @@
 				.label--centered {
 					text-align: center;
 					margin-left: 0;
+					cursor: default;
 				}
 				input {
 					transition: color 0.2s ease;
@@ -296,6 +297,12 @@
 				&__discounts {
 					margin-top: 5px;
 					display: flex;
+
+					&--centered {
+						width: fit-content;
+						margin: 0 auto;
+					}
+
 					&__table {
 						margin-left: 4px;
 						flex-grow: 1;

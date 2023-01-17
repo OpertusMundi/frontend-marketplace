@@ -70,7 +70,7 @@
               <!-- Price per 1,000 rows<br> -->
               <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset for the areas you need. Select the areas you are interested in and get a real-time quotation based on the number of rows included in your selection</p>
               <strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
-              <div class="asset__shopcard__variations__row__discounts">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
@@ -85,7 +85,7 @@
               <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset with the areas you need. Select the areas you are interested in and get a real-time quotation based on the human population withn your selection</p>
 
               <strong>Minimum population percentage:</strong> {{ pr_model.model.minPercent ? pr_model.model.minPercent : 'not specified' }} %
-              <div class="asset__shopcard__variations__row__discounts">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
@@ -100,7 +100,7 @@
               <!-- TODO: to be checked -->
               <p class="asset__shopcard__variations__row__description mb-xs-30">Subscribe and pay per service call, billed monthly</p>
 
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
@@ -108,7 +108,7 @@
                   </div>
                 </div>
               </div>
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
                 <div><strong>Prepaid Tiers:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
                   <span>{{ pr_model.model.prePaidTiers[0].count }} calls, {{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
@@ -129,7 +129,7 @@
               <!-- TODO: to be checked -->
               <p class="asset__shopcard__variations__row__description mb-xs-30">Subscribe and pay per row, billed monthly</p>
 
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
                   <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
@@ -137,7 +137,7 @@
                   </div>
                 </div>
               </div>
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
                 <div><strong>Prepaid Tiers:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
                   <span>{{ pr_model.model.prePaidTiers[0].count }} calls, {{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
