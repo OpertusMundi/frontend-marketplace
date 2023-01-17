@@ -96,13 +96,22 @@
       </ul>
     </div>
 
-    <div class="filters mt-xs-30">
+    <div class="filters mt-xs-30 align-items-center">
       <div class="filters__block">
         <p class="filters__title">
           <template v-if="!$store.getters.isLoading"> {{ publishedItemsTotal }} PUBLISHED ASSETS </template>
         </p>
       </div>
-      <div class="filters__block">
+      <div class="filters__block align-items-center">
+        <div class="asset_search asset_search--sm asset_search--grey-border">
+          <div class="filters__block__select">
+            <div class="asset_search__upper asset_search__upper--no-functional-search-button">
+              <input type="text" name="" id="" @input="onPublishedAssetsSearchTextChange($event.target.value)" placeholder="Search" class="asset_search__upper__input">
+              <div class="asset_search__upper__icon asset_search__upper__icon--open"><img src="@/assets/images/icons/search_black.svg" alt=""></div>
+            </div>
+          </div>
+        </div>
+
         <div class="filters__block__select">
           <label for="filter">&uarr;&darr;</label>
           <select v-model="selectedOrderOptionPublished" name="filter" id="filter">
@@ -128,6 +137,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Debounce } from 'vue-debounce-decorator';
 import store from '@/store';
 import DraftAssetApi from '@/service/draft';
 import ProviderAssetsApi from '@/service/provider-assets';
@@ -177,6 +187,8 @@ export default class DashboardHome extends Vue {
   publishedItemsPerPage: number;
 
   publishedItemsTotal: number;
+
+  publishedAssetsSearchText = '';
 
   isLoadingUnpublished: boolean;
 
@@ -255,11 +267,21 @@ export default class DashboardHome extends Vue {
     this.searchPublishedAssets(0, true);
   }
 
+  @Watch('publishedAssetsSearchText')
+  onDebouncedPublishedAssetsSearchTextChange(): void {
+    this.searchPublishedAssets(0, true);
+  }
+
   mounted(): void {
     // this.searchAssets(false, 0);
     // this.searchAssets(true, 0);
     this.searchUnpublishedAssets(0);
     this.searchPublishedAssets(0);
+  }
+
+  @Debounce(400)
+  onPublishedAssetsSearchTextChange(text: string): void {
+    this.publishedAssetsSearchText = text;
   }
 
   searchUnpublishedAssets(page: number, scrollBehavior = false): void {
@@ -407,7 +429,7 @@ export default class DashboardHome extends Vue {
     ];
 
     const query: ProviderDraftQuery = {
-      q: '',
+      q: this.publishedAssetsSearchText,
       type: this.selectedTab === 'ALL_ASSETS' ? '' : assetTypes[this.selectedTab],
       pageRequest: {
         page,
@@ -532,6 +554,7 @@ export default class DashboardHome extends Vue {
 </script>
 <style lang="scss">
 @import '@/assets/styles/abstracts/_spacings.scss';
+@import '@/assets/styles/abstracts/_flexbox-utilities.scss';
 @import '@/assets/styles/_filters.scss';
 @import '@/assets/styles/_collection.scss';
 </style>
