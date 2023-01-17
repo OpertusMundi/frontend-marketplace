@@ -208,6 +208,7 @@ export default class LineSubscribersApi extends Vue {
           this.timePoints = this.getTimeResponse();
           this.lineChartDate = this.formatTheDate();
           this.seriesData = this.formatSeries();
+          console.log('SERIES => ', this.seriesData);
           this.chartOptions = this.getOptions();
         }
       });
@@ -401,9 +402,11 @@ export default class LineSubscribersApi extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.timePoints.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
-            .map((a) => a.value);
+        this.timePoints.forEach(() => {
+          // const value = this.analyticsData?.points
+          //   .filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
+          //   .map((a) => a.value);
+          const value = this.analyticsData?.points.map((point) => point.value);
           if (value.length > 0) {
             data.push(value[0]);
           } else {

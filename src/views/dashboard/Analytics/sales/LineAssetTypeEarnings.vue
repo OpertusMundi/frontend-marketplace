@@ -183,6 +183,7 @@ export default class LineAssetTypeEarnings extends Vue {
     };
     this.analyticsApi.executeEarningsAssetTypeQuery(query)
       .then((response) => {
+        console.log('Response  -> ', response);
         this.analyticsData = response.result;
         this.timePoints = this.getTimeResponse();
         this.lineChartDate = this.formatTheDate();

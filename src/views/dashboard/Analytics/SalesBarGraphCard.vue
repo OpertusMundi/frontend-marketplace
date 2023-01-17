@@ -61,7 +61,7 @@
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value[0] }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value }}</td>
       </tr>
       </tbody>
     </table>
@@ -179,7 +179,6 @@ export default class SalesBarGraphCard extends Vue {
 
     this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
       if (response.success) {
-        console.log('response: ', response);
         response.result.points.reverse();
         this.analyticsData = response.result;
         this.segmentsNames = this.formatSegmentsNames();
@@ -253,8 +252,8 @@ export default class SalesBarGraphCard extends Vue {
         text: '',
       },
       xAxis: {
-        categories: this.segmentsNames,
-        // type: 'datetime',
+        categories: this.chartDate,
+        type: 'datetime',
         labels: {
           allowOverlap: true,
           autoRotationLimit: 0,

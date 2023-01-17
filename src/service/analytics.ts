@@ -133,7 +133,7 @@ export default class AnalyticsApi extends Api {
   }
 
   public async getPopularAssetCounts(query?: AssetQuery, limit = 10): Promise<ServerResponse<PopularAssetCount[]>> {
-    const url = `/action/analytics/popular-assets?includeAssets=false&limit=${limit}`;
+    const url = `/action/analytics/popular-assets?includeAssets=true&limit=${limit}`;
     return this.post<AssetQuery, ServerResponse<PopularAssetCount[]>>(url, query)
       .then((response: AxiosServerResponse<PopularAssetCount[]>) => {
         const { data } = response;

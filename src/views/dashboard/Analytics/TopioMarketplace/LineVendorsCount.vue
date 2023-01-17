@@ -207,6 +207,7 @@ export default class LineVendorsCount extends Vue {
         const dataSeries = this.analyticsData.points.map((point) => (point.value));
         this.seriesData = [{ name: 'Marketplace vendors', data: dataSeries }];
         this.chartOptions = this.getOptions();
+        console.log('DATE => ', this.lineChartDate);
       }
     });
 

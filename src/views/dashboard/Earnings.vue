@@ -20,22 +20,15 @@
                     Total
                   </li>
                   <li>
-                    Data files
+                    APIs
                   </li>
                   <li>
-                    Your APIs
-                  </li>
-                  <li>
-                    Topio APIs
+                    Assets
                   </li>
                 </ul>
               </div>
               <div class="stats-card__totals__amounts">
-                <ul>
-                  <li><span>€</span>87.478</li>
-                  <li><span>€</span>53.487</li>
-                  <li><span>€</span>30.000</li>
-                  <li><span>€</span>4.000</li>
+                <ul> <li v-for="{value, asset} in allAssetTypes" :key="asset"><span>€</span>{{ value }}</li>
                 </ul>
               </div>
             </div>
@@ -100,6 +93,13 @@ import Pagination from '@/components/Pagination.vue';
 import { Order } from '@/model/request';
 import store from '@/store';
 import SalesLineChart from '@/components/Aanalytics/SalesLineChart.vue';
+import AnalyticsApi from '@/service/analytics';
+import {
+  DataPoint,
+  EarningsAssetTypeQuery,
+  EnumAssetTypeDimension,
+  EnumSalesQueryMetric,
+} from '@/model/analytics';
 
 @Component({
   components: {
@@ -123,6 +123,10 @@ export default class Earnings extends Vue {
 
   referenceNumberSearch = '';
 
+  analyticsApi: AnalyticsApi;
+
+  allAssetTypes: DataPoint[];
+
   constructor() {
     super();
 
@@ -135,6 +139,10 @@ export default class Earnings extends Vue {
     this.orders = [];
 
     this.selectedOrderOption = 'MODIFIED DESCENDING';
+
+    this.analyticsApi = new AnalyticsApi();
+
+    this.allAssetTypes = [];
   }
 
   @Debounce(500)
@@ -146,6 +154,10 @@ export default class Earnings extends Vue {
     this.getSucceededOrders(0);
   }
 
+  mounted(): void {
+    this.getTotalEarningsAssetTypes();
+  }
+
   @Watch('selectedOrderOption')
   onSelectedOrderOption(): void {
     this.getSucceededOrders(0);
@@ -154,6 +166,19 @@ export default class Earnings extends Vue {
   @Watch('referenceNumberSearch')
   onDebouncedSearch(): void {
     this.getSucceededOrders(0);
+  }
+
+  /**
+   * Earnings API Calls
+   */
+  getTotalEarningsAssetTypes(): void {
+    const query: EarningsAssetTypeQuery = {
+      dimension: EnumAssetTypeDimension.ALL_ASSET_TYPES,
+      metric: EnumSalesQueryMetric.SUM_SALES,
+    };
+    this.analyticsApi.executeEarningsAssetTypeQuery(query).then((response) => {
+      this.allAssetTypes = response.result.points;
+    });
   }
 
   getSucceededOrders(page: number, scrollBehavior = false): void {

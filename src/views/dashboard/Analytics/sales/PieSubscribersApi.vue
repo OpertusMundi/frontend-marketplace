@@ -191,7 +191,7 @@ export default class PieSubscribersApi extends Vue {
   getAssets(): void {
     const query: ProviderDraftQuery = {
       q: '',
-      type: EnumAssetType.VECTOR,
+      type: EnumAssetType.SERVICE,
       pageRequest: {
         page: 0,
         size: 100,
