@@ -3,7 +3,7 @@
     <div class="asset__section__head">
       <h4>Assets in Bundle</h4>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner">
         <div class="assets_items">
           <a v-for="asset in assets" :key="asset.id" @click.stop="" :href="`/catalogue/${asset.id}`" target="_blank" style="text-decoration: none; display: block; margin-bottom: 1em;">
@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
   </section>
 </template>
 <script lang="ts">
@@ -30,6 +30,8 @@ export default class BundleAssets extends Vue {
   catalogueApi = new CatalogueApi();
 
   assets: CatalogueItemDetails[] = [];
+
+  isSectionMinified = false;
 
   created(): void {
     const promises = this.catalogueItem.resources.map((x) => this.catalogueApi.findOne(x.id));

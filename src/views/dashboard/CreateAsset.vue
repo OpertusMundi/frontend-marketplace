@@ -1116,6 +1116,12 @@ export default class CreateAsset extends Vue {
     if (this.asset.type === 'BUNDLE') this.asset.resources = this.asset.resources.map((x) => ({ id: x.id, type: 'ASSET' })) as unknown as Resource[];
     /* */
 
+    if (this.isEditingExistingDraft) {
+      const key = this.$route.params.id;
+      this.submitAsset(key);
+      return;
+    }
+
     const draft = await this.createDraft();
     this.submitAsset(draft.key);
   }

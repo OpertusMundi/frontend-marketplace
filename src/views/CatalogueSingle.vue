@@ -34,8 +34,27 @@
           </div>
         </div>
         <div class="asset__sidebar">
+          <template v-if="isItemLoaded">
+            <template v-if="catalogueItem.openDataset">
+              <shop-card-open
+                v-if="mode === 'catalogue'"
+                :catalogueItem="catalogueItem"
+                @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
+              ></shop-card-open>
+              <shop-card-provider-review-open v-if="['review', 'helpdesk-review'].includes(mode)" :catalogueItem="catalogueItem"></shop-card-provider-review-open>
+            </template>
+            <template v-else>
+              <shop-card
+                :catalogueItem="catalogueItem"
+                :isReviewMode="['review', 'helpdesk-review'].includes(mode)"
+                @openSelectAreaModal="openSelectAreaModal"
+                @openSelectSentinelHubPlanModal="openSelectSentinelHubPlanModal"
+                @showModalLoginToAddToCart="modalToShow='modalLoginToAddAssetToCart'"
+              ></shop-card>
+            </template>
+          </template>
 
-          <template v-if="isItemLoaded && mode === 'catalogue'">
+          <!-- <template v-if="isItemLoaded && mode === 'catalogue'">
             <shop-card-open
               v-if="catalogueItem.openDataset"
               :catalogueItem="catalogueItem"
@@ -52,7 +71,7 @@
           <template v-if="isItemLoaded && mode && ['review', 'helpdesk-review'].includes(mode)">
             <shop-card-provider-review-open v-if="catalogueItem.openDataset" :catalogueItem="catalogueItem"></shop-card-provider-review-open>
             <shop-card-provider-review v-else :catalogueItem="catalogueItem" @openSelectAreaModal="openSelectAreaModal"></shop-card-provider-review>
-          </template>
+          </template> -->
 
           <vendor-information-sh v-if="catalogueItem.type === 'SENTINEL_HUB_OPEN_DATA'"></vendor-information-sh>
           <vendor-information :catalogueItem="catalogueItem" @reloadAsset="loadAsset('catalogue')" v-else></vendor-information>
@@ -123,7 +142,7 @@ import VendorInformationSH from '../components/CatalogueSingle/VendorInformation
 import OtherAvailableOptions from '../components/CatalogueSingle/OtherAvailableOptions.vue';
 import OtherAvailableOptionsSH from '../components/CatalogueSingle/OtherAvailableOptionsSH.vue';
 import RelatedAssets from '../components/CatalogueSingle/RelatedAssets.vue';
-import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
+// import ApiUsageExample from '../components/CatalogueSingle/ApiUsageExample.vue';
 import ApiLayerProfiler from '../components/CatalogueSingle/ApiLayerProfiler.vue';
 import SatelliteImagesExplorer from '../components/CatalogueSingle/SatelliteImagesExplorer.vue';
 import Metadata from '../components/CatalogueSingle/Metadata.vue';
@@ -148,7 +167,7 @@ import MatchFinder from '../components/MatchFinder.vue';
     OtherAvailableOptions,
     'other-available-options-sh': OtherAvailableOptionsSH,
     RelatedAssets,
-    ApiUsageExample,
+    // ApiUsageExample,
     ApiLayerProfiler,
     SatelliteImagesExplorer,
     Metadata,

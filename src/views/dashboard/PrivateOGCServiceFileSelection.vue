@@ -22,9 +22,9 @@
       <div class="storage-files">
         <nav class="storage-files__nav">
           <ul>
-            <li v-for="path in pathFormatted" v-bind:key="path">
+            <li v-for="(path, i) in pathFormatted" v-bind:key="path">
               <a href="#" @click.prevent="goToPath('/')" v-if="path === ''" class="mt-xs-30">My Files</a>
-              <a href="#" @click.prevent="goToPath(path)" v-else>{{ path }}</a>
+              <a href="#" @click.prevent="goToPath(pathFormatted.filter((x, j) => j <= i).join('/'))" v-else>{{ path }}</a>
             </li>
           </ul>
         </nav>
@@ -219,10 +219,10 @@ export default class DashboardStorage extends Vue {
     this.activeFolder = folder;
   }
 
-  goToPath(name:string):void {
-    let search = name;
-    if (search !== '/') search = search.replace(/\//g, '');
-    const result = this.deepSearch(this.fileSystem, 'name', (k, v) => v === search);
+  goToPath(path:string):void {
+    // let search = name;
+    // if (search !== '/') search = search.replace(/\//g, '');
+    const result = this.deepSearch(this.fileSystem, 'path', (k, v) => v === path);
     if (result) {
       this.activeFolder = result;
     }

@@ -380,22 +380,22 @@
 
       <div class="assets__top-info d-flex">
         <!-- FILTER SHORTCUTS -->
-        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.isOpen}" @click="filters.isOpen ? '' : onToggleFilterShortcut('OPEN')">
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filtersApplied.isOpen}" @click="filters.isOpen ? '' : onToggleFilterShortcut('OPEN')">
           Open license
           <div v-if="!filters.isOpen" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
           <div v-else class="close-button" @click.stop="onToggleFilterShortcut('OPEN')"><font-awesome-icon icon="times" /></div>
         </div>
-        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'VECTOR').isChecked}" @click="filters.types.find((x) => x.id === 'VECTOR').isChecked ? '' : onToggleFilterShortcut('VECTOR')">
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filtersApplied.types.find((x) => x.id === 'VECTOR').isChecked}" @click="filters.types.find((x) => x.id === 'VECTOR').isChecked ? '' : onToggleFilterShortcut('VECTOR')">
           Vector
           <div v-if="!filters.types.find((x) => x.id === 'VECTOR').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
           <div v-else class="close-button" @click.stop="onToggleFilterShortcut('VECTOR')"><font-awesome-icon icon="times" /></div>
         </div>
-        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'RASTER').isChecked}" @click="filters.types.find((x) => x.id === 'RASTER').isChecked ? '' : onToggleFilterShortcut('RASTER')">
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filtersApplied.types.find((x) => x.id === 'RASTER').isChecked}" @click="filters.types.find((x) => x.id === 'RASTER').isChecked ? '' : onToggleFilterShortcut('RASTER')">
           Raster
           <div v-if="!filters.types.find((x) => x.id === 'RASTER').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
           <div v-else class="close-button" @click.stop="onToggleFilterShortcut('RASTER')"><font-awesome-icon icon="times" /></div>
         </div>
-        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filters.types.find((x) => x.id === 'SERVICE').isChecked}" @click="filters.types.find((x) => x.id === 'SERVICE').isChecked ? '' : onToggleFilterShortcut('SERVICE')">
+        <div class="btn--checkbox-type" :class="{'btn--checkbox-type--selected': filtersApplied.types.find((x) => x.id === 'SERVICE').isChecked}" @click="filters.types.find((x) => x.id === 'SERVICE').isChecked ? '' : onToggleFilterShortcut('SERVICE')">
           APIs
           <div v-if="!filters.types.find((x) => x.id === 'SERVICE').isChecked" class="svg-container"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path data-name="Path 9477" d="M9.883 9.318 6.439 5.874a3.607 3.607 0 1 0-2.821 1.36h.029a.4.4 0 0 0 0-.8 2.811 2.811 0 1 1 2.056-.917.647.647 0 0 0-.064.682l.923.923 2.762 2.762a.4.4 0 0 0 .565-.565Z" fill="#333"/></svg></div>
           <div v-else class="close-button" @click.stop="onToggleFilterShortcut('SERVICE')"><font-awesome-icon icon="times" /></div>
@@ -797,6 +797,18 @@ export default class Catalogue extends Vue {
     console.log('formats', availableFormats);
     this.filters.formats.vector = availableFormats.filter((x) => x.category === EnumAssetType.VECTOR).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
     this.filters.formats.raster = availableFormats.filter((x) => x.category === EnumAssetType.RASTER).map((x) => ({ id: x.format, name: x.format, isChecked: false }));
+
+    document.addEventListener('click', this.handleClick);
+  }
+
+  beforeDestroy(): void {
+    document.removeEventListener('click', this.handleClick);
+  }
+
+  handleClick(e: MouseEvent): void {
+    console.log('click in catalogue page');
+    if (e.composedPath().map((x) => (x as HTMLElement).className).some((x) => ['menu-select-style__wrapper', 'filter-dialog-wrapper'].includes(x))) return;
+    this.closeFilters();
   }
 
   onSelectPage(i: number): void {
@@ -807,6 +819,10 @@ export default class Catalogue extends Vue {
   }
 
   selectfilterMenuItem(filterItem: string): void {
+    if (this.filterMenuItemSelected === filterItem) {
+      this.closeFilters();
+      return;
+    }
     this.filterMenuItemSelected = filterItem;
   }
 
@@ -819,9 +835,28 @@ export default class Catalogue extends Vue {
       case EnumAssetType.VECTOR:
       case EnumAssetType.RASTER:
       case EnumAssetType.SERVICE:
+      case EnumAssetType.SENTINEL_HUB_OPEN_DATA:
+      case EnumAssetType.TABULAR:
         // eslint-disable-next-line
         this.filters.types.find((x) => x.id === filter)!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;
         break;
+      case 'WMS': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.WMS ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'WFS': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.WFS ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'DATA_API': {
+        this.filters.serviceTypes = this.filters.serviceTypes.map((x) => (x.id === EnumSpatialDataServiceType.DATA_API ? { ...x, isChecked: true } : x));
+        break;
+      }
+      case 'BUNDLE': {
+        // eslint-disable-next-line
+        this.filters.types.find((x) => x.id === 'BUNDLE')!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;
+        break;
+      }
       case 'OPEN':
         this.filters.isOpen = !this.filters.isOpen;
         break;

@@ -55,66 +55,66 @@
 
       <!-- ------------------------------------------------------------------------------------------- -->
 
-      <div class="asset__shopcard__variations__container mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || catalogueItem.pricingModels[0].model.type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
-        <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="pr_model.model.key">
-          <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${pr_model.model.key}`" v-model="selectedPricingModel" :value="pr_model.model">
-          <label :for="`p_variation_${pr_model.model.key}`" :class="{'label--centered': catalogueItem.pricingModels.length === 1}">{{ formatPricingModelType(pr_model.model.type) }}
+      <div class="asset__shopcard__variations__container mt-xs-20" v-if="((catalogueItem.pricingModels.length !== 1 || getPricingModel(catalogueItem.pricingModels[0]).type !== 'FREE') && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA')">
+        <div class="asset__shopcard__variations__row" v-for="pr_model in catalogueItem.pricingModels" :key="getPricingModel(pr_model).key">
+          <input :hidden="catalogueItem.pricingModels.length === 1" type="radio" name="variations" :id="`p_variation_${getPricingModel(pr_model).key}`" v-model="selectedPricingModel" :value="getPricingModel(pr_model)">
+          <label :for="`p_variation_${getPricingModel(pr_model).key}`" :class="{'label--centered': catalogueItem.pricingModels.length === 1}">{{ formatPricingModelType(getPricingModel(pr_model).type) }}
 
-            <div v-if="pr_model.model.type === 'FIXED' && pr_model.model.yearsOfUpdates && selectedPricingModel && selectedPricingModel.type === 'FIXED'">
-              <p class="asset__shopcard__variations__row__description">Fixed price including all versions of the asset for the next {{ pr_model.model.yearsOfUpdates }} {{ pr_model.model.yearsOfUpdates > 1 ? 'years' : 'year' }}</p>
+            <div v-if="getPricingModel(pr_model).type === 'FIXED' && getPricingModel(pr_model).yearsOfUpdates && selectedPricingModel && selectedPricingModel.type === 'FIXED'">
+              <p class="asset__shopcard__variations__row__description">Fixed price including all versions of the asset for the next {{ getPricingModel(pr_model).yearsOfUpdates }} {{ getPricingModel(pr_model).yearsOfUpdates > 1 ? 'years' : 'year' }}</p>
             </div>
 
-            <!-- <span v-if="pr_model.model.type === 'FIXED' && pr_model.model.yearsOfUpdates">+ {{ pr_model.model.yearsOfUpdates }} {{ pr_model.model.yearsOfUpdates > 1 ? 'years' : 'year' }} of updates</span> -->
+            <!-- <span v-if="getPricingModel(pr_model).type === 'FIXED' && getPricingModel(pr_model).yearsOfUpdates">+ {{ getPricingModel(pr_model).yearsOfUpdates }} {{ getPricingModel(pr_model).yearsOfUpdates > 1 ? 'years' : 'year' }} of updates</span> -->
 
-            <div v-if="pr_model.model.type === 'FIXED_PER_ROWS' && selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">
+            <div v-if="getPricingModel(pr_model).type === 'FIXED_PER_ROWS' && selectedPricingModel && selectedPricingModel.type === 'FIXED_PER_ROWS'">
               <!-- Price per 1,000 rows<br> -->
               <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset for the areas you need. Select the areas you are interested in and get a real-time quotation based on the number of rows included in your selection</p>
-              <strong>Minimum rows:</strong> {{ pr_model.model.minRows ? pr_model.model.minRows : 'not specified' }}
-              <div class="asset__shopcard__variations__row__discounts">
+              <strong>Minimum rows:</strong> {{ getPricingModel(pr_model).minRows ? getPricingModel(pr_model).minRows : 'not specified' }}
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
-                  <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                  <div class="grid-ignore-wrapper" v-for="(discount, i) in getPricingModel(pr_model).discountRates" :key="i">
                     <span>{{ discount.count }} rows, {{ discount.discount }}%</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div v-if="pr_model.model.type === 'FIXED_FOR_POPULATION' && selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">
+            <div v-if="getPricingModel(pr_model).type === 'FIXED_FOR_POPULATION' && selectedPricingModel && selectedPricingModel.type === 'FIXED_FOR_POPULATION'">
               <!-- Price per 10,000 people<br> -->
               <p class="asset__shopcard__variations__row__description mb-xs-10">Buy only a subset of the asset with the areas you need. Select the areas you are interested in and get a real-time quotation based on the human population withn your selection</p>
 
-              <strong>Minimum population percentage:</strong> {{ pr_model.model.minPercent ? pr_model.model.minPercent : 'not specified' }} %
-              <div class="asset__shopcard__variations__row__discounts">
+              <strong>Minimum population percentage:</strong> {{ getPricingModel(pr_model).minPercent ? getPricingModel(pr_model).minPercent : 'not specified' }} %
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
-                  <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                  <div class="grid-ignore-wrapper" v-for="(discount, i) in getPricingModel(pr_model).discountRates" :key="i">
                     <span>{{ discount.count }} rows, {{ discount.discount }}%</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div v-if="pr_model.model.type === 'PER_CALL'">
+            <div v-if="getPricingModel(pr_model).type === 'PER_CALL'">
               <!-- Subscription, price per call<br> -->
               <!-- TODO: to be checked -->
               <p class="asset__shopcard__variations__row__description mb-xs-30">Subscribe and pay per service call, billed monthly</p>
 
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="getPricingModel(pr_model).discountRates && getPricingModel(pr_model).discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
-                  <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                  <div class="grid-ignore-wrapper" v-for="(discount, i) in getPricingModel(pr_model).discountRates" :key="i">
                     <span>{{ discount.count }} calls, {{ discount.discount }}% discount</span>
                   </div>
                 </div>
               </div>
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="getPricingModel(pr_model).prePaidTiers && getPricingModel(pr_model).prePaidTiers.length">
                 <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls, {{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="getPricingModel(pr_model).prePaidTiers.length === 1">
+                  <span>{{ getPricingModel(pr_model).prePaidTiers[0].count }} calls, {{ getPricingModel(pr_model).prePaidTiers[0].discount }}% discount</span>
                 </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
-                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                <div v-if="getPricingModel(pr_model).prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in getPricingModel(pr_model).prePaidTiers" :key="i">
                     <label :for="`prepaid_tier_pcwp_${i}`">
                       <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_CALL'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_pcwp_${i}`">
                       <span>{{ prePaidTier.count }} calls, {{ prePaidTier.discount }}% discount</span>
@@ -124,26 +124,26 @@
               </div>
             </div>
 
-            <div v-if="pr_model.model.type === 'PER_ROW'">
+            <div v-if="getPricingModel(pr_model).type === 'PER_ROW'">
               <!-- Subscription, price per row<br> -->
               <!-- TODO: to be checked -->
               <p class="asset__shopcard__variations__row__description mb-xs-30">Subscribe and pay per row, billed monthly</p>
 
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.discountRates && pr_model.model.discountRates.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="getPricingModel(pr_model).discountRates && getPricingModel(pr_model).discountRates.length">
                 <div><strong>Discounts:</strong></div>
                 <div class="asset__shopcard__variations__row__discounts__table">
-                  <div class="grid-ignore-wrapper" v-for="(discount, i) in pr_model.model.discountRates" :key="i">
+                  <div class="grid-ignore-wrapper" v-for="(discount, i) in getPricingModel(pr_model).discountRates" :key="i">
                     <span>{{ discount.count }} rows, {{ discount.discount }}% discount</span>
                   </div>
                 </div>
               </div>
-              <div class="asset__shopcard__variations__row__discounts" v-if="pr_model.model.prePaidTiers && pr_model.model.prePaidTiers.length">
+              <div class="asset__shopcard__variations__row__discounts" :class="{'asset__shopcard__variations__row__discounts--centered': catalogueItem.pricingModels.length === 1}" v-if="getPricingModel(pr_model).prePaidTiers && getPricingModel(pr_model).prePaidTiers.length">
                 <div><strong>Prepaid Tiers:</strong></div>
-                <div class="asset__shopcard__variations__row__discounts__table" v-if="pr_model.model.prePaidTiers.length === 1">
-                  <span>{{ pr_model.model.prePaidTiers[0].count }} calls, {{ pr_model.model.prePaidTiers[0].discount }}% discount</span>
+                <div class="asset__shopcard__variations__row__discounts__table" v-if="getPricingModel(pr_model).prePaidTiers.length === 1">
+                  <span>{{ getPricingModel(pr_model).prePaidTiers[0].count }} calls, {{ getPricingModel(pr_model).prePaidTiers[0].discount }}% discount</span>
                 </div>
-                <div v-if="pr_model.model.prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
-                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in pr_model.model.prePaidTiers" :key="i">
+                <div v-if="getPricingModel(pr_model).prePaidTiers.length > 1" class="asset__shopcard__variations__row__discounts__radio_selections">
+                  <div class="grid-ignore-wrapper" v-for="(prePaidTier, i) in getPricingModel(pr_model).prePaidTiers" :key="i">
                     <label :for="`prepaid_tier_prwp_${i}`">
                       <input v-if="selectedPricingModel && selectedPricingModel.type === 'PER_ROW'" type="radio" :value="i" v-model="selectedPrepaidTierIndex" :id="`prepaid_tier_prwp_${i}`">
                       <span>{{ prePaidTier.count }} calls, {{ prePaidTier.discount }}% discount</span>
@@ -159,10 +159,12 @@
       <!-- ------------------------------------------------------------------------------------------- -->
     </div>
 
-    <div v-if="!catalogueItem.availableToPurchase" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToWishlist() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO WISHLIST</a></div>
-    <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)" class="d-flex justify-content-center"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue mt-xs-10 mb-xs-10" style="display: block; width: 100%; text-align: center;">SUBSCRIBE</a></div>
-    <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
-    <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
+    <template v-if="!isReviewMode">
+      <div v-if="!catalogueItem.availableToPurchase" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToWishlist() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO WISHLIST</a></div>
+      <div v-else-if="['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA'].includes(catalogueItem.type)" class="d-flex justify-content-center"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectSentinelHubPlanModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue mt-xs-10 mb-xs-10" style="display: block; width: 100%; text-align: center;">SUBSCRIBE</a></div>
+      <div v-else-if="selectedPricingModel && (selectedPricingModel.type == 'FIXED_PER_ROWS' || selectedPricingModel.type == 'FIXED_FOR_POPULATION')" class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? openSelectAreaModal() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">SELECT AREAS</a></div>
+      <div v-else class="asset__shopcard__addtocart"><a href="#" @click.prevent="$store.getters.isAuthenticated ? addToCart() : $emit('showModalLoginToAddToCart')" class="btn btn--std btn--blue">ADD TO CART</a></div>
+    </template>
 
     <ul v-if="selectedPricingModel && catalogueItem.type !== 'SENTINEL_HUB_OPEN_DATA'" class="asset__shopcard__buyinfo pt-sm-10">
       <!-- <li><strong>Asset application restrictions</strong></li> -->
@@ -209,7 +211,7 @@
         <span>{{ catalogueItem.deliveryMethodOptions.notes }}</span>
       </li>
 
-      <li>
+      <li v-if="catalogueItem.publisher">
         <strong>Delivered by: </strong>
         <span>{{ catalogueItem.publisher.name }}</span>
       </li>
@@ -249,6 +251,8 @@ import store from '@/store';
 export default class ShopCard extends Vue {
   @Prop({ required: true }) catalogueItem!: CatalogueItem;
 
+  @Prop({ required: false }) isReviewMode?: boolean;
+
   cartApi: CartApi;
 
   favoriteApi: FavoriteApi;
@@ -275,7 +279,9 @@ export default class ShopCard extends Vue {
     this.selectedPrepaidTierIndex = 0;
     this.isSelectAreasModalOn = false;
     this.cartErrors = '';
-    this.selectedPricingModel = this.catalogueItem.pricingModels[0].model;
+    console.log('is review mode: ', this.isReviewMode);
+    this.selectedPricingModel = this.isReviewMode ? this.catalogueItem.pricingModels[0] as any : this.catalogueItem.pricingModels[0].model;
+    // console.log('HERE IT IS!', this.catalogueItem.pricingModels[0]);
     this.labelize = labelize;
   }
 
@@ -359,6 +365,12 @@ export default class ShopCard extends Vue {
       SENTINEL_HUB_SUBSCRIPTION: 'Sentinel Hub Subscription',
     };
     return labels[t];
+  }
+
+  // eslint-disable-next-line
+  getPricingModel(model: any) {
+    if (this.isReviewMode) return model;
+    return model.model;
   }
 
   openSelectAreaModal(): void {

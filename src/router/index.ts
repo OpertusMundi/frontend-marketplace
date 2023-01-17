@@ -3,15 +3,12 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 import store from '@/store';
 
-import ProfileApi from '@/service/profile';
-
 import Home from '@/views/Home.vue';
 import { EnumRole } from '@/model/role';
 import { navigateToKeycloakLogin } from '@/helper/login';
+import { fetchUserProfileAndCart } from '@/helper/user';
 
 Vue.use(VueRouter);
-
-const profileApi = new ProfileApi();
 
 const routes: RouteConfig[] = [
   {
@@ -173,31 +170,31 @@ const routes: RouteConfig[] = [
         path: 'storage',
         name: 'Storage',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardstorage" */ '../views/dashboard/Storage.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER], layout: 'dashboard' },
       },
       {
         path: 'private-ogc-services',
         name: 'PrivateOGCServices',
         component: (): Promise<any> => import(/* webpackChunkName: "privateogcservices" */ '../views/dashboard/PrivateOGCServices.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER], layout: 'dashboard' },
       },
       {
         path: 'private-ogc-services/:key',
         name: 'PrivateOGCServiceSingle',
         component: (): Promise<any> => import(/* webpackChunkName: "privateogcservicesingle" */ '../views/dashboard/PrivateOGCServiceSingle.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_USER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER], layout: 'dashboard' },
       },
       {
         path: 'create-private-ogc-service/:fileStoragePath',
         name: 'CreatePrivateOGCService',
         component: (): Promise<any> => import(/* webpackChunkName: "dashboardcreateprivateogcservice" */ '../views/dashboard/CreatePrivateOGCService.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER], layout: 'dashboard' },
       },
       {
         path: 'private-ogc-service-file-selection',
         name: 'PrivateOGCServiceFileSelection',
         component: (): Promise<any> => import(/* webpackChunkName: "privateogcservicefileselection" */ '../views/dashboard/PrivateOGCServiceFileSelection.vue'),
-        meta: { requiresRole: [EnumRole.ROLE_PROVIDER, EnumRole.ROLE_VENDOR_PROVIDER], layout: 'dashboard' },
+        meta: { requiresRole: [EnumRole.ROLE_CONSUMER, EnumRole.ROLE_VENDOR_CONSUMER], layout: 'dashboard' },
       },
       {
         path: 'notebooks',
@@ -488,24 +485,28 @@ router.beforeEach((to, from, next) => {
   // handle keycloak redirection
   if (to.name === 'Home' && routeToNavigateAfterLogin) {
     sessionStorage.removeItem('routeToNavigateAfterLogin');
-    sessionStorage.setItem('tryToFetchProfile', 'y');
-    next(routeToNavigateAfterLogin);
-  } else if (role && !store.getters.hasRole(role)) {
-    const tryToFetchProfile = sessionStorage.getItem('tryToFetchProfile');
-    if (tryToFetchProfile !== 'y') {
-      next('/error/401');
-    } else {
-      store.commit('setLoading', true);
-      sessionStorage.setItem('tryToFetchProfile', 'n');
-      profileApi.getProfile().then((response) => {
+    store.commit('setLoading', true);
+
+    fetchUserProfileAndCart()
+      .then((response) => {
         if (response.success) {
-          next();
-        } else {
-          next('/error/401');
+          if (role && !store.getters.hasRole(role)) {
+            next('/error/401');
+          } else {
+            next(routeToNavigateAfterLogin);
+          }
+          return;
         }
+        next();
+      })
+      .catch(() => {
+        next();
+      })
+      .finally(() => {
         store.commit('setLoading', false);
       });
-    }
+  } else if (role && !store.getters.hasRole(role)) {
+    next('/error/401');
   // end of handle keycloak redirection
   } else if (to.name === 'ConfirmEmail' && (from.name !== 'Register' && from.name !== 'RegisterVendor')) {
     next('/error/401');

@@ -4,7 +4,7 @@
       <h4>Overview</h4>
       <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner">
         <div class="asset__section__overview__left">
           <h5>Description</h5>
@@ -51,7 +51,7 @@
         </div>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
   </section>
 </template>
 <script lang="ts">
@@ -71,6 +71,8 @@ export default class Overview extends Vue {
   providerAssetsApi: ProviderAssetsApi;
 
   draftAssetApi: DraftAssetApi;
+
+  isSectionMinified = false;
 
   constructor() {
     super();

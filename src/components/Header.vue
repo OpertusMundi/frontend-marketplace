@@ -163,21 +163,21 @@
                 <transition name="fade" mode="out-in">
                   <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
-                      <div class="header__submenu__items header__submenu__items--small header__submenu__block">
+                      <div class="header__submenu__items header__submenu__items--small header__submenu__block" v-show="$route.name !== 'Catalogue'">
                         <p>Asset categories</p>
                         <ul>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'VECTOR'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24"><path id="Path_9734" data-name="Path 9734" d="M1315.418,163.7h1.49v-4h-4v4h1a8.442,8.442,0,0,1-7.012,7.072V169.7h-4v1.175h-6.148a2,2,0,1,0,0,1.5h2.379a10.7,10.7,0,0,0-4.744,7.325H1292.9v4h4v-4h-1.01a8.4,8.4,0,0,1,7.01-7.072V173.7h4v-1.325h6.035a2,2,0,1,0,.067-1.5h-2.084A10.807,10.807,0,0,0,1315.418,163.7Z" transform="translate(-1292.898 -159.697)" fill="#333" /></svg>Vector</router-link
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'WMS'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_9742" data-name="Path 9742" d="M1312.152,531.977h0v-5h-19v19h5v5h19v-19Zm-17.5-3.5h16v3.5h-12.5v12.5h-3.5Zm21,21h-16v-3.5h12.5v-12.5h3.5Z" transform="translate(-1293.152 -526.977)" fill="#333" /></svg>WMS</router-link
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'TABULAR'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <g id="Group_3635" data-name="Group 3635" transform="translate(-1299.314 -397.794)">
                                   <path id="Path_9740" data-name="Path 9740" d="M1302.314,399.294v-1.5h-1.5v1.5h-1.5v1.5h1.5v21h1.5v-21h21v-1.5Z" fill="#333" />
@@ -196,7 +196,7 @@
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'WFS'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path id="Path_9760" data-name="Path 9760" d="M1307.983,651.411h11.25l-12-4.8-12,4.8h11.25v4.8h-11.25v4.8h11.25v4.727h-11.25c0,2.692,5.373,4.874,12,4.874s12-2.182,12-4.874h-11.25V661.01h11.25v-4.8h-11.25Zm-.75-3.185,4.211,1.685h-8.422Zm0,20.885c-4.353,0-7.439-.915-9.094-1.874h18.188C1314.672,668.2,1311.586,669.111,1307.233,669.111Zm10.5-9.6h-21v-1.8h21Z" transform="translate(-1295.233 -646.611)" fill="#333" />
                               </svg>
@@ -204,7 +204,7 @@
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'RASTER'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24">
                                 <g id="Group_3633" data-name="Group 3633" transform="translate(-1291.423 -275.129)">
                                   <rect id="Rectangle_4822" data-name="Rectangle 4822" width="4" height="4" transform="translate(1291.423 275.129)" fill="#333" />
@@ -231,7 +231,7 @@
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'DATA_API'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24.007" height="24.004" viewBox="0 0 24.007 24.004">
                                 <g id="Group_3640" data-name="Group 3640" transform="translate(-1293.148 -784.223)">
                                   <path id="Path_9744" data-name="Path 9744" d="M1308.682,796.823a2.87,2.87,0,1,0,2.869,2.869A2.873,2.873,0,0,0,1308.682,796.823Zm0,4.239a1.37,1.37,0,1,1,1.369-1.37A1.371,1.371,0,0,1,1308.682,801.062Z" fill="#333" />
@@ -243,14 +243,14 @@
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link to="/catalogue"
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SENTINEL_HUB_OPEN_DATA'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="23.995" height="23.996" viewBox="0 0 23.995 23.996">
                                 <path id="Path_9747" data-name="Path 9747" d="M1305.944,1028.2l-.884.884-4.4-4.4,3.023-3.023a4,4,0,0,0,5.062-.486l-5.657-5.656a4,4,0,0,0-.468,5.083l-3.021,3.021-4.394-4.394.884-.884-5.657-5.657-.884.884h0l-1.06,1.061h0l-.884.884,5.657,5.657.884-.884,4.394,4.394-4.343,4.342,1.06,1.061,4.343-4.343,4.4,4.4-.884.884,5.657,5.657,2.828-2.829Z" transform="translate(-1287.605 -1012.689)" fill="#333" />
                               </svg>
                               Earth Observation</router-link
                             >
                           </li>
-                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">BUNDLES</router-link></li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}}">BUNDLES</router-link></li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">EXPLORE ALL ASSETS</router-link></li>
                         </ul>
                       </div>

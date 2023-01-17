@@ -3,7 +3,7 @@
     <div class="asset__section__head">
       <div class="d-flex space-between">
         <h4>Metadata</h4>
-        <div class="asset__section__head__sample_download__btn" @click="downloadMetadata">
+        <div class="asset__section__head__sample_download__btn" @click="downloadMetadata" v-show="!isSectionMinified">
           <svg data-name="Group 2342" xmlns="http://www.w3.org/2000/svg" width="15" height="16">
             <g data-name="Group 753">
               <g data-name="Group 752"><path data-name="Path 2224" d="M11.455 7.293A.5.5 0 0 0 11.002 7h-2V.5a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 0-.5.5V7h-2a.5.5 0 0 0-.376.829l3.5 4a.5.5 0 0 0 .752 0l3.5-4a.5.5 0 0 0 .077-.536z" fill="#333" /></g>
@@ -14,8 +14,8 @@
           </svg>
         </div>
       </div>
-      <a href="#" class="asset__section__head__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
-      <ul class="asset__section__head__tabs">
+      <a href="#" class="asset__section__head__toggle" v-show="!isSectionMinified"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+      <ul class="asset__section__head__tabs" v-show="!isSectionMinified">
         <li><a href="#" @click.prevent="activeTab = 1" :class="{ 'active' : activeTab == 1 }">Identification</a></li>
         <li><a href="#" @click.prevent="activeTab = 2" :class="{ 'active' : activeTab == 2 }">Classification</a></li>
         <li><a href="#" @click.prevent="activeTab = 3" :class="{ 'active' : activeTab == 3 }">Geography</a></li>
@@ -24,7 +24,7 @@
         <li><a href="#" @click.prevent="activeTab = 6" :class="{ 'active' : activeTab == 6 }">More</a></li>
       </ul>
     </div>
-    <div class="asset__section__content">
+    <div class="asset__section__content" v-show="!isSectionMinified">
       <div class="asset__section__content__inner">
         <ul class="asset__section__tabs">
           <li v-if="activeTab == 1 && catalogueItem">
@@ -100,7 +100,7 @@
         </ul>
       </div>
     </div>
-    <a href="#" class="asset__section__toggle"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
+    <a @click.prevent="isSectionMinified = !isSectionMinified" href="#" class="asset__section__toggle" :class="{'asset__section__toggle--upside-down': !isSectionMinified}"><img src="@/assets/images/icons/arrow_down.svg" alt=""></a>
   </section>
 </template>
 <script lang="ts">
@@ -120,6 +120,8 @@ export default class Metadata extends Vue {
   activeTab: number;
 
   crsLabel: string;
+
+  isSectionMinified = false;
 
   constructor() {
     super();
@@ -148,8 +150,12 @@ export default class Metadata extends Vue {
 
   downloadMetadata(): void {
     const metadata = JSON.parse(JSON.stringify(this.catalogueItem));
-    delete metadata.automatedMetadata;
-    delete metadata.visibility;
+
+    const propertiesToDelete = ['automatedMetadata', 'visibility', 'deliveryMethod', 'deliveryMethodOptions', 'parentId', 'parentDataSourceId', 'userOnlyForVas', 'vettingRequired', 'availableToPurchase', 'statistics', 'contract', 'favorite', 'owned', 'resources', 'pricingModels'];
+
+    propertiesToDelete.forEach((x) => {
+      delete metadata[x];
+    });
 
     fileDownload(JSON.stringify(metadata), 'metadata.json');
   }
