@@ -156,7 +156,7 @@
                           <h3>Payment information</h3>
                           <hr>
                           <div class="service-details__table">
-                            <span>Amount:</span><span>32 €/month</span>
+                            <span>Amount:</span><span>{{ $store.getters.getConfig.configuration.asset.privateServicePricingModel.price }} € / {{ $store.getters.getConfig.configuration.asset.privateServicePricingModel.type.replaceAll('_', ' ').toLowerCase() }}</span>
                             <!-- <span>Method:</span><span></span> -->
                           </div>
                         </div>
