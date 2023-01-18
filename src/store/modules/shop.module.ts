@@ -10,6 +10,7 @@ const initialState: State = {
 
 const getters = {
   getCart: (state: State): Cart | null => state.cart,
+  isAssetInCart: (state: State) => (assetId: string): boolean => (!!state.cart && state.cart.items.map((x) => x.asset.id).includes(assetId)),
 };
 
 const actions = {
