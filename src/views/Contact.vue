@@ -100,7 +100,7 @@ import {
 import en from 'vee-validate/dist/locale/en.json';
 import Modal from '@/components/Modal.vue';
 import MessageApi from '@/service/message';
-import { ContactMessage } from '@/model/message';
+import { EnumContactFormType, ContactMessage } from '@/model/message';
 import { getFormInputData } from '@/helper/form-config';
 import { inputsConfig } from '@/config/contact';
 import store from '@/store';
@@ -130,6 +130,7 @@ export default class Contact extends Vue {
   messageApi = new MessageApi();
 
   messageData: ContactMessage = {
+    type: EnumContactFormType.NONE,
     firstName: '',
     lastName: '',
     email: '',

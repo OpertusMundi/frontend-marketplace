@@ -1,4 +1,9 @@
-import { ServerResponse, PageResult } from "./response";
+import { ServerResponse, PageResult } from './response';
+
+enum EnumContactFormType {
+  NONE = 'NONE',
+  DATA_MATCH = 'DATA_MATCH',
+}
 
 interface ClientContact {
   /**
@@ -37,7 +42,7 @@ interface Message {
    */
   readAt: string;
   /**
-   * Map with all contacts (sender/recipient) for all messages in the response. 
+   * Map with all contacts (sender/recipient) for all messages in the response.
    * The key is the contract key.
    */
   recipient: ClientContact;
@@ -92,6 +97,7 @@ interface MessageThreadResponse extends ServerResponse<Thread> {
 }
 
 interface ContactMessage {
+  type: EnumContactFormType,
   companyName?: string,
   email: string,
   firstName?: string,
@@ -113,6 +119,7 @@ interface ContactMessageResponse extends ContactMessage {
 }
 
 export {
+  EnumContactFormType,
   ClientContact,
   MessagesResponse,
   MessageThreadResponse,
