@@ -13,14 +13,16 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { bootstrap as bootstrapAnalytics } from 'vue-gtag';
 
 @Component
 export default class CookieBox extends Vue {
   acceptCookies(): void {
     localStorage.setItem('is_user_accepted_cookies', 'yes');
+    bootstrapAnalytics();
     this.$emit('close');
-    this.$ga.enable();
-    this.$ga.page(this.$router);
+    // this.$ga.enable();
+    // this.$ga.page(this.$router);
   }
 }
 </script>
