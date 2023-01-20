@@ -18,9 +18,10 @@
     <transition name="fade" mode="out-in">
       <global-modals v-if="$store.getters.getShownGlobalModal"></global-modals>
     </transition>
-    <transition name="fade" mode="out-in">
+    <!-- TEMP DISABLE COOKIE BOX -->
+    <!-- <transition name="fade" mode="out-in">
       <cookie-box v-if="!isCookiesOptionSet && !isCookiesBoxClosed" @close="isCookiesBoxClosed = true"></cookie-box>
-    </transition>
+    </transition> -->
   </div>
 </template>
 
