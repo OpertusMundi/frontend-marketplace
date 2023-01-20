@@ -31,7 +31,8 @@ declare module 'vue/types/vue' {
 Vue.use(VueAnalytics, {
   id: process.env.VUE_APP_GOOGLE_ANALYTICS_ID,
   router,
-  disabled: localStorage.getItem('is_user_accepted_cookies') !== 'yes',
+  // TEMP DISABLE COOKIE BOX
+  // disabled: localStorage.getItem('is_user_accepted_cookies') !== 'yes',
 });
 
 Vue.prototype.$labelize = labelize;
