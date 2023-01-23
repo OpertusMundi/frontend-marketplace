@@ -1,9 +1,29 @@
 <template>
   <div class="dashboard__inner order_preview">
+    <modal :withSlots="true" :show="modalToShow == 'modalFormDispute'" @dismiss="modalToShow = ''" :modalId="'modalFormDispute'">
+      <template v-slot:body>
+        <h1>Dispute order?</h1>
+
+        <div class="form-group">
+          <label for="modal_input_msg" class="mt-xs-20">Message</label>
+          <textarea v-model="ticketData.text" class="form-group__text" type="text" rows="4" id="modal_input_msg"></textarea>
+          <div class="errors" v-if="isErrorEmptyTextShown">Fill in text</div>
+        </div>
+      </template>
+
+      <template v-slot:footer>
+        <button class="btn--std btn--blue ml-xs-20" @click="disputeOrder">dispute</button>
+      </template>
+    </modal>
+
     <div class="dashboard__head dashboard__head--column">
       <router-link to="/dashboard/purchases"><a href="#" class="asset__head__breadcrumps"><svg class="mr-xs-10" xmlns="http://www.w3.org/2000/svg" width="6.938" height="9.904" viewBox="0 0 6.938 9.904"><path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l4.383,5.283,3.273-3.961h0l1.092-1.322" transform="translate(-7254.398 -472.947) rotate(90)" fill="none" stroke="#333" stroke-width="1.5"/></svg>BACK</a></router-link>
-      <div class="dashboard__head__helpers mt-xs-30 mb-xs-50">
+      <div class="dashboard__head__helpers dashboard__head__helpers--full-width dashboard__head__helpers--no-flex-wrap mt-xs-30 mb-xs-50 d-flex space-between">
         <h1>{{ order.referenceNumber ? `Purchase #${order.referenceNumber} - preview` : '' }}</h1>
+        <div>
+          <span>Is there an issue?</span>
+          <button class="btn btn--std btn--text" @click="modalToShow = 'modalFormDispute'">contact us</button>
+        </div>
       </div>
     </div>
 
@@ -50,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import store from '@/store';
 import moment from 'moment';
 import ConsumerApi from '@/service/consumer';
@@ -58,13 +78,17 @@ import ConsumerOrderApi from '@/service/consumer-order';
 import ConsumerContractsApi from '@/service/consumer-contracts';
 import CatalogueApi from '@/service/catalogue';
 import ConsumerAssetsApi from '@/service/consumer-assets';
+import ConsumerTicketApi from '@/service/consumer-ticket';
 import { EnumOrderStatus, ConsumerOrder as Order } from '@/model/order';
 import StepProgressBar from '@/components/StepProgressBar.vue';
+import Modal from '@/components/Modal.vue';
 import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
 import { CatalogueItemDetails } from '@/model/catalogue';
+import { EnumConsumerTicketType, ConsumerTicketCommand } from '@/model/consumer-ticket';
 
 @Component({
   components: {
+    Modal,
     StepProgressBar,
   },
 })
@@ -79,7 +103,15 @@ export default class DashboardPurchases extends Vue {
 
   consumerAssetsApi: ConsumerAssetsApi;
 
+  consumerTicketApi: ConsumerTicketApi;
+
   order: Order;
+
+  ticketData: ConsumerTicketCommand;
+
+  isErrorEmptyTextShown = false;
+
+  modalToShow = '';
 
   constructor() {
     super();
@@ -89,8 +121,15 @@ export default class DashboardPurchases extends Vue {
     this.consumerContractsApi = new ConsumerContractsApi();
     this.catalogueApi = new CatalogueApi();
     this.consumerAssetsApi = new ConsumerAssetsApi();
+    this.consumerTicketApi = new ConsumerTicketApi();
 
     this.order = {} as Order;
+    this.ticketData = { resourceKey: '', text: '', type: EnumConsumerTicketType.ORDER };
+  }
+
+  @Watch('ticketData', { deep: true })
+  onTicketDataChange(): void {
+    this.isErrorEmptyTextShown = false;
   }
 
   mounted(): void {
@@ -105,6 +144,8 @@ export default class DashboardPurchases extends Vue {
       if (orderResponse.success) {
         this.order = orderResponse.result;
         console.log(this.order);
+
+        this.ticketData = { ...this.ticketData, resourceKey: this.order.key };
         store.commit('setLoading', false);
       } else {
         // todo: handle
@@ -185,10 +226,27 @@ export default class DashboardPurchases extends Vue {
       this.$router.push(`/dashboard/subscriptions/${subscriptionKey}`);
     });
   }
+
+  disputeOrder(): void {
+    if (!this.ticketData.text) {
+      this.isErrorEmptyTextShown = true;
+      return;
+    }
+
+    store.commit('setLoading', true);
+    this.consumerTicketApi.openTicket(this.ticketData)
+      .then((response) => {
+        if (response.success) this.$router.push('/dashboard/messages');
+      })
+      .finally(() => {
+        store.commit('setLoading', false);
+      });
+  }
 }
 </script>
 <style lang="scss">
 @import "@/assets/styles/_dashboard.scss";
 @import "@/assets/styles/dashboard/_order-purchase-preview.scss";
 @import "@/assets/styles/abstracts/_spacings.scss";
+@import "@/assets/styles/abstracts/_flexbox-utilities.scss";
 </style>

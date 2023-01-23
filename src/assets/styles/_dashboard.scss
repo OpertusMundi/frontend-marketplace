@@ -250,6 +250,9 @@
         width: 100%;
         justify-content: space-between;
       }
+      &--no-flex-wrap {
+        flex-wrap: nowrap;
+      }
       @media (max-width: 768px) {
         margin-bottom: 20px;
       }
