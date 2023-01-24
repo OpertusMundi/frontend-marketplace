@@ -309,7 +309,10 @@
                 <a href="#" @click.prevent="showSubmenu3">Use <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
                 <div class="header__mobile-submenu" v-if="showSubmenuUse">
                   <ul>
-                    <li @click="showSubmenuUse = !showSubmenuUse">
+                    <li @click="showSubmenuUse = !showSubmenuUse" v-for="category in vasCategories" :key="category.id">
+                      <router-link :to="`/vas/${category.slug}`"><span> {{ category.title }}</span></router-link>
+                    </li>
+                    <!-- <li @click="showSubmenuUse = !showSubmenuUse">
                       <router-link to="/vas/drive-3"><span> Drive</span></router-link>
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
@@ -326,7 +329,7 @@
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
                       <router-link to="/vas/bundles"> <span>Bundles</span></router-link>
-                    </li>
+                    </li> -->
                   </ul>
                 </div>
                 <transition name="fade" mode="out-in">
@@ -338,7 +341,10 @@
                       <div class="header__submenu__items">
                         <p>topio services</p>
                         <ul>
-                          <li @click="showSubmenuUse = !showSubmenuUse">
+                          <li @click="showSubmenuUse = !showSubmenuUse" v-for="category in vasCategories" :key="category.id">
+                            <router-link :to="`/vas/${category.slug}`"><img src="@/assets/images/t-icon.svg" alt="" /> {{ category.title }}</router-link>
+                          </li>
+                          <!-- <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/drive-3"><img src="@/assets/images/t-icon.svg" alt="" /> Drive</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
@@ -355,7 +361,7 @@
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/bundles"><img src="@/assets/images/t-icon.svg" alt="" /> Bundles</router-link>
-                          </li>
+                          </li> -->
                           <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">EXPLORE ALL SERVICES</router-link></li>
                         </ul>
                         <hr />
@@ -586,6 +592,8 @@
 import {
   Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
+import moment from 'moment';
+import axios from 'axios';
 import store from '@/store';
 import AccountApi from '@/service/account';
 import NotificationApi from '@/service/notification';
@@ -604,7 +612,6 @@ import {
 import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import Modal from '@/components/Modal.vue';
-import moment from 'moment';
 import { navigateToKeycloakLogin } from '@/helper/login';
 import { EnumRole } from '@/model/role';
 // import { EnumRole } from '@/model/role';
@@ -644,6 +651,12 @@ export default class Header extends Vue {
 
   messageApi: MessageApi;
 
+  vasCategories: {
+    id: number,
+    title: string,
+    slug: string,
+  }[];
+
   showSubmenuSell = false;
 
   showSubmenuBuy = false;
@@ -667,6 +680,8 @@ export default class Header extends Vue {
     this.notificationApi = new NotificationApi();
     this.messageApi = new MessageApi();
 
+    this.vasCategories = [];
+
     this.notifications = [];
     this.pollTimeoutRef = null;
   }
@@ -679,6 +694,20 @@ export default class Header extends Vue {
   beforeDestroy(): void {
     console.log('unmounted navbar');
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+  }
+
+  @Watch('$store.getters.getConfig', { immediate: true })
+  onConfigChange(): void {
+    if (!store.getters.getConfig || !store.getters.getConfig.configuration || this.vasCategories.length) return;
+
+    const wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint || '';
+    axios.get(`${wpUrl}/wp-json/wp/v2/vas`).then((response) => {
+      this.vasCategories = response.data.map((x) => ({
+        id: x.id,
+        title: x.title?.rendered || '',
+        slug: x.slug,
+      }));
+    });
   }
 
   @Watch('$store.getters.isAuthenticated')

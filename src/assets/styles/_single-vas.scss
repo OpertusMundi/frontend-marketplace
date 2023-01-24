@@ -75,6 +75,12 @@
                     font-weight: bold;
                     color: white;
                     line-height: 1em;
+
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 5;
+                    -webkit-box-orient: vertical;
                 }
             }
             &__text {
