@@ -152,7 +152,7 @@ export default class PieChartSubscriberApi extends Vue {
           enabled: true,
         },
         point: {
-          valueSuffix: '%',
+          valueSuffix: '',
         },
       },
 
@@ -160,14 +160,14 @@ export default class PieChartSubscriberApi extends Vue {
         series: {
           dataLabels: {
             enabled: true,
-            format: '{point.name}: {point.y:.1f}%',
+            format: '{point.name}: {point.y}',
           },
         },
       },
 
       tooltip: {
         headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> of total<br/>',
       },
 
       series: [
