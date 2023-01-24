@@ -112,6 +112,13 @@
             color:#fff;
         }
     }
+    &--text {
+        background: transparent;
+        color: $darkColor;
+        &:hover {
+            color:$secondColor;
+        }
+    }
 
     &--checkbox-type {
         background: #fff;

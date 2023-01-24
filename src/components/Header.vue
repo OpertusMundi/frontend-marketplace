@@ -163,20 +163,52 @@
                 <transition name="fade" mode="out-in">
                   <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
-                      <div class="header__submenu__items header__submenu__items--small header__submenu__block" v-show="$route.name !== 'Catalogue'">
+                      <div class="header__submenu__items header__submenu__items--small header__submenu__items--menu-buy header__submenu__block">
                         <p>Asset categories</p>
                         <ul>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'VECTOR'}}"
-                              ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24"><path id="Path_9734" data-name="Path 9734" d="M1315.418,163.7h1.49v-4h-4v4h1a8.442,8.442,0,0,1-7.012,7.072V169.7h-4v1.175h-6.148a2,2,0,1,0,0,1.5h2.379a10.7,10.7,0,0,0-4.744,7.325H1292.9v4h4v-4h-1.01a8.4,8.4,0,0,1,7.01-7.072V173.7h4v-1.325h6.035a2,2,0,1,0,.067-1.5h-2.084A10.807,10.807,0,0,0,1315.418,163.7Z" transform="translate(-1292.898 -159.697)" fill="#333" /></svg>Vector</router-link
-                            >
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'VECTOR'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/vector.svg" alt="">
+                              Vector
+                            </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'WMS'}}"
-                              ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path id="Path_9742" data-name="Path 9742" d="M1312.152,531.977h0v-5h-19v19h5v5h19v-19Zm-17.5-3.5h16v3.5h-12.5v12.5h-3.5Zm21,21h-16v-3.5h12.5v-12.5h3.5Z" transform="translate(-1293.152 -526.977)" fill="#333" /></svg>WMS</router-link
-                            >
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'TABULAR'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/tabular.svg" alt="">
+                              Tabular
+                            </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'RASTER'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/raster.svg" alt="">
+                              Raster
+                            </router-link>
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'NETCDF'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/netcdf.svg" alt="">
+                              NetCDF
+                            </router-link>
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SERVICE'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/data_api.svg" alt="">
+                              API
+                            </router-link>
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/bundle.svg" alt="">
+                              Collection
+                            </router-link>
+                          </li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SENTINEL_HUB_OPEN_DATA'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
+                              <img src="@/assets/images/icons/types/eo.svg" alt="">
+                              <span style="white-space: nowrap;">Earth Observation</span>
+                            </router-link>
+                          </li>
+                          <!-- <li @click="showSubmenuBuy = !showSubmenuBuy">
                             <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'TABULAR'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <g id="Group_3635" data-name="Group 3635" transform="translate(-1299.314 -397.794)">
@@ -194,16 +226,16 @@
                               </svg>
                               Tabular</router-link
                             >
-                          </li>
-                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                          </li> -->
+                          <!-- <li @click="showSubmenuBuy = !showSubmenuBuy">
                             <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'WFS'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path id="Path_9760" data-name="Path 9760" d="M1307.983,651.411h11.25l-12-4.8-12,4.8h11.25v4.8h-11.25v4.8h11.25v4.727h-11.25c0,2.692,5.373,4.874,12,4.874s12-2.182,12-4.874h-11.25V661.01h11.25v-4.8h-11.25Zm-.75-3.185,4.211,1.685h-8.422Zm0,20.885c-4.353,0-7.439-.915-9.094-1.874h18.188C1314.672,668.2,1311.586,669.111,1307.233,669.111Zm10.5-9.6h-21v-1.8h21Z" transform="translate(-1295.233 -646.611)" fill="#333" />
                               </svg>
                               WFS</router-link
                             >
-                          </li>
-                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                          </li> -->
+                          <!-- <li @click="showSubmenuBuy = !showSubmenuBuy">
                             <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'RASTER'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24.01" height="24" viewBox="0 0 24.01 24">
                                 <g id="Group_3633" data-name="Group 3633" transform="translate(-1291.423 -275.129)">
@@ -229,8 +261,8 @@
                               </svg>
                               Raster</router-link
                             >
-                          </li>
-                          <li @click="showSubmenuBuy = !showSubmenuBuy">
+                          </li> -->
+                          <!-- <li @click="showSubmenuBuy = !showSubmenuBuy">
                             <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'DATA_API'}}"
                               ><svg xmlns="http://www.w3.org/2000/svg" width="24.007" height="24.004" viewBox="0 0 24.007 24.004">
                                 <g id="Group_3640" data-name="Group 3640" transform="translate(-1293.148 -784.223)">
@@ -250,7 +282,7 @@
                               Earth Observation</router-link
                             >
                           </li>
-                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}}">BUNDLES</router-link></li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}}">BUNDLES</router-link></li> -->
                           <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">EXPLORE ALL ASSETS</router-link></li>
                         </ul>
                       </div>
@@ -277,7 +309,10 @@
                 <a href="#" @click.prevent="showSubmenu3">Use <img src="@/assets/images/icons/caret_down.svg" alt=""/></a>
                 <div class="header__mobile-submenu" v-if="showSubmenuUse">
                   <ul>
-                    <li @click="showSubmenuUse = !showSubmenuUse">
+                    <li @click="showSubmenuUse = !showSubmenuUse" v-for="category in vasCategories" :key="category.id">
+                      <router-link :to="`/vas/${category.slug}`"><span> {{ category.title }}</span></router-link>
+                    </li>
+                    <!-- <li @click="showSubmenuUse = !showSubmenuUse">
                       <router-link to="/vas/drive-3"><span> Drive</span></router-link>
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
@@ -294,7 +329,7 @@
                     </li>
                     <li @click="showSubmenuUse = !showSubmenuUse">
                       <router-link to="/vas/bundles"> <span>Bundles</span></router-link>
-                    </li>
+                    </li> -->
                   </ul>
                 </div>
                 <transition name="fade" mode="out-in">
@@ -306,7 +341,10 @@
                       <div class="header__submenu__items">
                         <p>topio services</p>
                         <ul>
-                          <li @click="showSubmenuUse = !showSubmenuUse">
+                          <li @click="showSubmenuUse = !showSubmenuUse" v-for="category in vasCategories" :key="category.id">
+                            <router-link :to="`/vas/${category.slug}`"><img src="@/assets/images/t-icon.svg" alt="" /> {{ category.title }}</router-link>
+                          </li>
+                          <!-- <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/drive-3"><img src="@/assets/images/t-icon.svg" alt="" /> Drive</router-link>
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
@@ -323,7 +361,7 @@
                           </li>
                           <li @click="showSubmenuUse = !showSubmenuUse">
                             <router-link to="/vas/bundles"><img src="@/assets/images/t-icon.svg" alt="" /> Bundles</router-link>
-                          </li>
+                          </li> -->
                           <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">EXPLORE ALL SERVICES</router-link></li>
                         </ul>
                         <hr />
@@ -554,6 +592,8 @@
 import {
   Component, Prop, Vue, Watch,
 } from 'vue-property-decorator';
+import moment from 'moment';
+import axios from 'axios';
 import store from '@/store';
 import AccountApi from '@/service/account';
 import NotificationApi from '@/service/notification';
@@ -572,7 +612,6 @@ import {
 import CartMiniCard from '@/components/Cart/CartMiniCard.vue';
 import AssetMiniCard from '@/components/Assets/AssetMiniCard.vue';
 import Modal from '@/components/Modal.vue';
-import moment from 'moment';
 import { navigateToKeycloakLogin } from '@/helper/login';
 import { EnumRole } from '@/model/role';
 // import { EnumRole } from '@/model/role';
@@ -612,6 +651,12 @@ export default class Header extends Vue {
 
   messageApi: MessageApi;
 
+  vasCategories: {
+    id: number,
+    title: string,
+    slug: string,
+  }[];
+
   showSubmenuSell = false;
 
   showSubmenuBuy = false;
@@ -635,6 +680,8 @@ export default class Header extends Vue {
     this.notificationApi = new NotificationApi();
     this.messageApi = new MessageApi();
 
+    this.vasCategories = [];
+
     this.notifications = [];
     this.pollTimeoutRef = null;
   }
@@ -647,6 +694,20 @@ export default class Header extends Vue {
   beforeDestroy(): void {
     console.log('unmounted navbar');
     if (this.pollTimeoutRef) clearTimeout(this.pollTimeoutRef);
+  }
+
+  @Watch('$store.getters.getConfig', { immediate: true })
+  onConfigChange(): void {
+    if (!store.getters.getConfig || !store.getters.getConfig.configuration || this.vasCategories.length) return;
+
+    const wpUrl = this.$store.getters.getConfig.configuration.wordPress.endpoint || '';
+    axios.get(`${wpUrl}/wp-json/wp/v2/vas`).then((response) => {
+      this.vasCategories = response.data.map((x) => ({
+        id: x.id,
+        title: x.title?.rendered || '',
+        slug: x.slug,
+      }));
+    });
   }
 
   @Watch('$store.getters.isAuthenticated')

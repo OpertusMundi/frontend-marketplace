@@ -35,9 +35,11 @@ declare module 'vue/types/vue' {
 //   // disabled: localStorage.getItem('is_user_accepted_cookies') !== 'yes',
 // });
 
+// TEMP DISABLE COOKIE BOX
 Vue.use(VueGtag, {
   config: { id: process.env.VUE_APP_GOOGLE_ANALYTICS_ID },
-  bootstrap: localStorage.getItem('is_user_accepted_cookies') === 'yes',
+  bootstrap: true,
+  // bootstrap: localStorage.getItem('is_user_accepted_cookies') === 'yes',
 }, router);
 
 Vue.prototype.$labelize = labelize;

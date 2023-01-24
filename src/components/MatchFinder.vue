@@ -1,6 +1,6 @@
 <template>
   <div class="match-finder">
-    <svg class="match-finder__bg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="504" viewBox="0 0 1920 504">
+    <!-- <svg class="match-finder__bg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="504" viewBox="0 0 1920 504">
       <defs>
         <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
           <stop offset="0" stop-color="#100699"/>
@@ -8,7 +8,7 @@
         </linearGradient>
       </defs>
       <rect id="Rectangle_5943" data-name="Rectangle 5943" width="1920" height="504" fill="url(#linear-gradient)"/>
-    </svg>
+    </svg> -->
 
     <div class="match-finder__content">
       <p>Didn't find the data you need?</p>
@@ -34,11 +34,13 @@ export default class MatchFinder extends Vue {
   height: 504px;
   position: relative;
   overflow-x: hidden;
+  background-image: url("data:image/svg+xml, %3Csvg class='match-finder__bg' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='1920' height='504' viewBox='0 0 1920 504'%3E%3Cdefs%3E%3ClinearGradient id='linear-gradient' x1='0.5' x2='0.5' y2='1' gradientUnits='objectBoundingBox'%3E%3Cstop offset='0' stop-color='%23100699'/%3E%3Cstop offset='1' stop-color='%23328f8c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect id='Rectangle_5943' data-name='Rectangle 5943' width='1920' height='504' fill='url(%23linear-gradient)'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
 
-  &__bg {
-    position: absolute;
-    top: 0;
-  }
+  // &__bg {
+  //   position: absolute;
+  //   top: 0;
+  // }
 
   &__content {
     position: absolute;
