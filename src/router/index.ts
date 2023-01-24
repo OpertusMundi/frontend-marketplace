@@ -469,6 +469,12 @@ router.beforeEach((to, from, next) => {
   // Save last route to store
   if (from.name) store.commit('setLastRouteName', from.name);
 
+  if (to.name === 'Catalogue' && to.query.redirect) {
+    router.push('/').then(() => {
+      router.push({ name: 'Catalogue', params: to.params });
+    });
+  }
+
   const role = to.meta?.requiresRole;
   const auth = to.meta?.hideForAuth;
   if (auth && store.getters.isAuthenticated) {

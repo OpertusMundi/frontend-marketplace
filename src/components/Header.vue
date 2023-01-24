@@ -163,47 +163,47 @@
                 <transition name="fade" mode="out-in">
                   <div class="header__submenu header__submenu--medium">
                     <div class="header__submenu__wrapper">
-                      <div class="header__submenu__items header__submenu__items--small header__submenu__items--menu-buy header__submenu__block" v-show="$route.name !== 'Catalogue'">
+                      <div class="header__submenu__items header__submenu__items--small header__submenu__items--menu-buy header__submenu__block">
                         <p>Asset categories</p>
                         <ul>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'VECTOR'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'VECTOR'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/vector.svg" alt="">
                               Vector
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'TABULAR'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'TABULAR'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/tabular.svg" alt="">
                               Tabular
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'RASTER'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'RASTER'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/raster.svg" alt="">
                               Raster
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'NETCDF'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'NETCDF'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/netcdf.svg" alt="">
                               NetCDF
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SERVICE'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SERVICE'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/data_api.svg" alt="">
                               API
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/bundle.svg" alt="">
                               Collection
                             </router-link>
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy">
-                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SENTINEL_HUB_OPEN_DATA'}}">
+                            <router-link :to="{name: 'Catalogue', params: {filterShortcut: 'SENTINEL_HUB_OPEN_DATA'}, query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">
                               <img src="@/assets/images/icons/types/eo.svg" alt="">
                               <span style="white-space: nowrap;">Earth Observation</span>
                             </router-link>
