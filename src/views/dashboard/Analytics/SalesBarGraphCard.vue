@@ -307,26 +307,25 @@ export default class SalesBarGraphCard extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUP BY SEGMENT NAME
-        // const data: Array<number> = [];
-        // this.segmentsNames.forEach((segName) => {
-        //   const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
-        //   console.log('vaue -> ', value);
-        //   if (value.length > 0) {
-        //     data.push(value[0]);
-        //   } else {
-        //     data.push(0);
-        //   }
-        // });
-        const assetTitle = this.assets.find(({ id }) => id === assetName);
-        const data: Array<any> = [];
-        this.segmentsNames.forEach((segName) => { // group by segment method from helper/analytics.ts
-          const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
+        const data: Array<number> = [];
+        this.segmentsNames.forEach((segName) => {
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
           if (value.length > 0) {
-            data.push(value);
+            data.push(value[0]);
           } else {
             data.push(0);
           }
         });
+        const assetTitle = this.assets.find(({ id }) => id === assetName);
+        // const data: Array<any> = [];
+        // this.segmentsNames.forEach((segName) => { // group by segment method from helper/analytics.ts
+        //   const value = DataTransform.groupBySegmentToBarData(this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName));
+        //   if (value.length > 0) {
+        //     data.push(value);
+        //   } else {
+        //     data.push(0);
+        //   }
+        // });
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
@@ -339,8 +338,8 @@ export default class SalesBarGraphCard extends Vue {
         console.log('asset name: ', assetName);
         const assetTitle = this.assets.find(({ id }) => id === assetName);
         // TODO: Confirm if this chart must be grouped by segment or by date index
-        // const data = this.analyticsData?.points.map((a) => a.value);
-        const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
+        const data = this.analyticsData?.points.map((a) => a.value);
+        // const data = DataTransform.groupBySegmentToBarData(this.analyticsData.points);
         const assetObj = {
           name: assetTitle?.title,
           showInLegend: true,
