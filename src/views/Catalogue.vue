@@ -838,6 +838,7 @@ export default class Catalogue extends Vue {
       case EnumAssetType.RASTER:
       case EnumAssetType.SERVICE:
       case EnumAssetType.SENTINEL_HUB_OPEN_DATA:
+      case EnumAssetType.NETCDF:
       case EnumAssetType.TABULAR:
         // eslint-disable-next-line
         this.filters.types.find((x) => x.id === filter)!.isChecked = !this.filters.types.find((x) => x.id === filter)!.isChecked;

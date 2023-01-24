@@ -322,6 +322,13 @@
           }
         }
       }
+      &--menu-buy {
+        img {
+          height: 24px !important;
+          width: 24px !important;
+          margin: 0 10px 0 0 !important;
+        }
+      }
     }
     hr {
       //   margin: 0.5em 0;
