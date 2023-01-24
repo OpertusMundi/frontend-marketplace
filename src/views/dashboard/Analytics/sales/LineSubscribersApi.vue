@@ -402,11 +402,8 @@ export default class LineSubscribersApi extends Vue {
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         const data: Array<number> = [];
-        this.timePoints.forEach(() => {
-          // const value = this.analyticsData?.points
-          //   .filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName))
-          //   .map((a) => a.value);
-          const value = this.analyticsData?.points.map((point) => point.value);
+        this.timePoints.forEach((segName) => {
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && JSON.stringify(item?.time) === JSON.stringify(segName)).map((a) => a.value);
           if (value.length > 0) {
             data.push(value[0]);
           } else {
