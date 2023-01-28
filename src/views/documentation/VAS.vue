@@ -37,14 +37,14 @@
         </div>
       </div>
     </div>
-    <documentation-cards :title="page[0].acf.documentation_title"
+    <!-- <documentation-cards :title="page[0].acf.documentation_title"
                          :subtitle="page[0].acf.documentation_text"
                          :items="page[0].acf.documentation"></documentation-cards>
     <div v-if="page[0].acf.documentation_archive_link" class="page__bottom">
       <router-link :to="{name: 'documentation'}" class="btn btn--std btn--blue">
         all documentation
       </router-link>
-    </div>
+    </div> -->
   </div>
 </template>
 <script lang="ts">

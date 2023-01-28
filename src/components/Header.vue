@@ -364,12 +364,12 @@
                           </li> -->
                           <li @click="showSubmenuUse = !showSubmenuUse"><router-link to="/vas">EXPLORE ALL SERVICES</router-link></li>
                         </ul>
-                        <hr />
+                        <!-- <hr />
                         <p @click="showSubmenuUse = !showSubmenuUse">
                           <router-link to="/documentation"
                             >VIEW DOCUMENTATION<svg xmlns="http://www.w3.org/2000/svg" width="16.414" height="9.622" viewBox="0 0 16.414 9.622"><path id="Path_2312" data-name="Path 2312" d="M473.524-7260.857l7.515,7.5,7.485-7.5" transform="translate(-472.818 7261.565)" fill="none" stroke="#6c6c6c" stroke-width="2" /></svg>
                           </router-link>
-                        </p>
+                        </p> -->
                       </div>
                     </div>
                   </div>
