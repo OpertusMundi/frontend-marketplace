@@ -151,7 +151,7 @@ export default class Metadata extends Vue {
   downloadMetadata(): void {
     const metadata = JSON.parse(JSON.stringify(this.catalogueItem));
 
-    const propertiesToDelete = ['automatedMetadata', 'visibility', 'deliveryMethod', 'deliveryMethodOptions', 'parentId', 'parentDataSourceId', 'userOnlyForVas', 'vettingRequired', 'availableToPurchase', 'statistics', 'contract', 'favorite', 'owned', 'resources', 'pricingModels'];
+    const propertiesToDelete = ['automatedMetadata', 'visibility', 'deliveryMethod', 'deliveryMethodOptions', 'parentId', 'parentDataSourceId', 'userOnlyForVas', 'vettingRequired', 'availableToPurchase', 'statistics', 'contract', 'favorite', 'owned', 'resources', 'pricingModels', 'ingestionInfo'];
 
     propertiesToDelete.forEach((x) => {
       delete metadata[x];
