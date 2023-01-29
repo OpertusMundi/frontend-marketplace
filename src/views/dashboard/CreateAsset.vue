@@ -123,7 +123,7 @@
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :assetType="asset.type" :deliveryMethod="asset.deliveryMethod" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
-                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :iprProtectionEnabled.sync="asset.iprProtectionEnabled" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'COLLECTION'">
@@ -132,14 +132,14 @@
                 <pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :assetType="asset.type" :deliveryMethod="asset.deliveryMethod" v-if="currentStep === 4"></pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
-                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :iprProtectionEnabled.sync="asset.iprProtectionEnabled" :errors="errors" :asset="asset" v-if="currentStep === 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'OPEN'">
                 <open-asset-metadata ref="step2" :asset.sync="asset" :additionalResourcesToUpload.sync="additionalResourcesToUpload" v-if="currentStep === 2"></open-asset-metadata>
                 <license ref="step3" :license.sync="asset.license" v-if="currentStep === 3">license (wip)</license>
                 <open-asset-delivery ref="step4" :selectedPublishedFileForDataFileCreation.sync="selectedPublishedFileForDataFileCreation" :linkToAsset.sync="linkToAsset" :assetType="asset.type" :format="asset.format" v-if="currentStep === 4"></open-asset-delivery>
-                <review ref="step5" :accessToFileType="getAccessToFileType" :vettingRequired="false" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
+                <review ref="step5" :accessToFileType="getAccessToFileType" :vettingRequired="false" :iprProtectionEnabled.sync="asset.iprProtectionEnabled" :errors="errors" :asset="asset" v-if="currentStep === 5" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'API'">
@@ -149,7 +149,7 @@
                 <api-pricing ref="step4" :pricingModels.sync="asset.pricingModels" :selectedPricingModelForEditing.sync="selectedPricingModelForEditing" :serviceType="asset.spatialDataServiceType" v-if="currentStep === 4"></api-pricing>
                 <contract ref="step5" :contractTemplateType.sync="asset.contractTemplateType" :contractTemplateKey.sync="asset.contractTemplateKey" :customContractToUpload.sync="customContractToUpload" :assetMainType="assetMainType" v-if="currentStep === 5"></contract>
                 <payout ref="step6" :selectedPayoutMethod.sync="selectedPayoutMethod" v-if="currentStep === 6"></payout>
-                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
+                <review ref="step7" :accessToFileType="getAccessToFileType" :vettingRequired.sync="asset.vettingRequired" :iprProtectionEnabled.sync="asset.iprProtectionEnabled" :errors="errors" :asset="{ ...selectedPublishedAssetForApiCreation, ...{ contractTemplateKey: asset.contractTemplateKey, pricingModels: asset.pricingModels, spatialDataServiceType: asset.spatialDataServiceType } }" v-if="currentStep == 7" @goToStep="goToStep"></review>
               </template>
 
               <template v-if="assetMainType === 'SENTINEL_HUB_OPEN_DATA'">
@@ -541,6 +541,7 @@ export default class CreateAsset extends Vue {
         },
         format: '',
         ingested: false,
+        iprProtectionEnabled: false,
         keywords: [],
         language: '',
         license: '',
@@ -629,6 +630,7 @@ export default class CreateAsset extends Vue {
           },
         },
         ingested: false,
+        iprProtectionEnabled: false,
         keywords: [],
         language: '',
         license: '',

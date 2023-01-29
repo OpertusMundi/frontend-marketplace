@@ -269,6 +269,23 @@
                   </label>
                 </div>
               </div>
+              <div v-show="$store.getters.hasRole(['ROLE_TOPIO']) && ['VECTOR', 'TABULAR'].includes(asset.type)" class=" mt-xs-40 dashboard__form__review__item__head dashboard__form__review__item__head--no-border">
+                <h5>IPR protection</h5>
+              </div>
+              <div v-show="$store.getters.hasRole(['ROLE_TOPIO']) && ['VECTOR', 'TABULAR'].includes(asset.type)" class="dashboard__form__review__item__body">
+                <div class="form-group mt-xs-20">
+                  <label class="control control-radio">
+                    Yes, I want to add IPR protection
+                    <input type="radio" name="ipr_protection_true" v-model="iprProtectionEnabledLocal" :value="true" />
+                    <div class="control_indicator"></div>
+                  </label>
+                  <label class="control control-radio">
+                    No, I do not want to add IPR protection
+                    <input type="radio" name="ipr_protection_false" v-model="iprProtectionEnabledLocal" :value="false" />
+                    <div class="control_indicator"></div>
+                  </label>
+                </div>
+              </div>
             </template>
           </div>
           <div class="col-md-4">
@@ -314,6 +331,8 @@ export default class Review extends Vue {
 
   @Prop({ required: true }) private vettingRequired!: boolean;
 
+  @Prop({ required: true }) private iprProtectionEnabled!: boolean;
+
   @Prop({ required: true }) private accessToFileType!: string;
 
   @Prop({ required: false }) private errors: any;
@@ -323,6 +342,8 @@ export default class Review extends Vue {
   spatialApi: SpatialApi;
 
   vettingRequiredLocal: boolean;
+
+  iprProtectionEnabledLocal: boolean;
 
   contractTitle: string;
 
@@ -337,6 +358,8 @@ export default class Review extends Vue {
     this.spatialApi = new SpatialApi();
 
     this.vettingRequiredLocal = this.vettingRequired;
+    this.iprProtectionEnabledLocal = this.iprProtectionEnabled;
+
     this.contractTitle = '';
     this.referenceSystemTitle = '';
 
@@ -347,12 +370,22 @@ export default class Review extends Vue {
     this.setAsyncLabels();
 
     console.log('asset', this.asset);
+
+    if (![EnumAssetType.VECTOR, EnumAssetType.TABULAR].includes(this.asset.type as EnumAssetType)) {
+      this.$emit('update:iprProtectionEnabled', false);
+    }
   }
 
   @Watch('vettingRequiredLocal')
   onVettingRequiredLocalChange(vettingRequired: boolean): void {
     console.log('vetting', vettingRequired);
     this.$emit('update:vettingRequired', vettingRequired);
+  }
+
+  @Watch('iprProtectionEnabledLocal')
+  onIprProtectionEnabledLocalChange(iprProtectionEnabled: boolean): void {
+    console.log('ipr-protection enabled', iprProtectionEnabled);
+    this.$emit('update:iprProtectionEnabled', iprProtectionEnabled);
   }
 
   goToStep(step: number): void {
