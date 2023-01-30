@@ -7,23 +7,29 @@
     </div>
     <p><strong>Available features for your subscription</strong></p>
     <p class="mt-xs-20">Create, stylise and share up to 5 maps / month.</p>
-    <button class="btn btn--std btn--blue mt-xs-20 mb-xs-20">UPGRADE</button>
+    <a href="https://maps.topio.market/mapstore" target="_blank">
+      <button class="btn btn--std btn--blue mt-xs-20 mb-xs-20">CREATE</button>
+    </a>
     <div class="map_cards">
-      <div class="map_cards__head">
+      <!-- <div class="map_cards__head">
         <h4>My maps</h4>
         <a href="#">VIEW ALL</a>
-      </div>
+      </div> -->
       <div class="map_cards__grid">
-        <map-card image="map_color1.jpg" title="Iceland - Topographicmap"></map-card>
-        <map-card image="map_color2.jpg" title="Mediterranean Sea - Light map"></map-card>
-        <map-card image="map_color3.jpg" title="World - Satellite hybrid map"></map-card>
-        <map-card image="map_color4.jpg" title="Greece - Simple map"></map-card>
+        <map-card
+          v-for="item in maps"
+          :key="item.key"
+          :image="`https://maps.topio.market/mapstore/${item.thumbnailUrl}`"
+          :title="item.title"
+          :url="item.mapUrl"
+        ></map-card>
+
+        <!-- <div class="map_card map_card--empty"></div>
         <div class="map_card map_card--empty"></div>
-        <div class="map_card map_card--empty"></div>
-        <div class="map_card map_card--empty"></div>
+        <div class="map_card map_card--empty"></div> -->
       </div>
     </div>
-    <div class="map_cards">
+    <!-- <div class="map_cards">
       <div class="map_cards__head">
         <h4>Shared with me</h4>
         <a href="#">VIEW ALL</a>
@@ -37,8 +43,8 @@
         <div class="map_card map_card--empty"></div>
         <div class="map_card map_card--empty"></div>
       </div>
-    </div>
-    <div class="map_cards">
+    </div> -->
+    <!-- <div class="map_cards">
       <div class="map_cards__head">
         <h4>Public maps</h4>
         <a href="#">VIEW ALL</a>
@@ -52,18 +58,54 @@
         <div class="map_card map_card--empty"></div>
         <div class="map_card map_card--empty"></div>
       </div>
-    </div>
+    </div> -->
+
+    <pagination :currentPage="pagination.currentPage" :itemsPerPage="pagination.itemsPerPage" :itemsTotal="pagination.itemsTotal" @pageSelection="loadMaps($event)"></pagination>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import MapCard from '@/components/TopioMaps/MapCard.vue';
+import Pagination from '@/components/Pagination.vue';
+import MapsApi from '@/service/map';
+import { TopioMap } from '@/model/map';
+import store from '@/store';
 
 @Component({
-  components: { MapCard },
+  components: { MapCard, Pagination },
 })
-export default class DashboardTopioMaps extends Vue {}
+export default class DashboardTopioMaps extends Vue {
+  mapsApi = new MapsApi();
+
+  maps: TopioMap[] | null = null;
+
+  pagination = {
+    currentPage: 0,
+    itemsPerPage: 16,
+    itemsTotal: 0,
+  };
+
+  mounted(): void {
+    this.loadMaps();
+  }
+
+  loadMaps(page = 0): void {
+    store.commit('setLoading', true);
+    this.mapsApi.getMaps(page, this.pagination.itemsPerPage)
+      .then((response) => {
+        this.maps = response.result.items;
+
+        this.pagination = {
+          ...this.pagination,
+          currentPage: response.result.pageRequest.page,
+          itemsTotal: response.result.count,
+        };
+
+        store.commit('setLoading', false);
+      });
+  }
+}
 </script>
 <style lang="scss">
 @import '@/assets/styles/_mapcard.scss';

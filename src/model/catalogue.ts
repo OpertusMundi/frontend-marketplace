@@ -1081,6 +1081,10 @@ interface BaseCatalogueItemCommand extends BaseCatalogueItem {
    */
   ingestionInfo?: ResourceIngestionData[];
   /**
+   * true if the IPR protection feature is enabled. Currently this feature is only supported for assets of type TABULAR and VECTOR
+   */
+  iprProtectionEnabled: boolean;
+  /**
    * Provides the identifier of a parent data source resource
    */
   parentDataSourceId?: string;
