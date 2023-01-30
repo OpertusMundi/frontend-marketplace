@@ -283,7 +283,7 @@
                             >
                           </li>
                           <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link :to="{name: 'Catalogue', params: {filterShortcut: 'BUNDLE'}}">BUNDLES</router-link></li> -->
-                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link to="/catalogue">EXPLORE ALL ASSETS</router-link></li>
+                          <li @click="showSubmenuBuy = !showSubmenuBuy"><router-link :to="{name: 'Catalogue', query: $route.name === 'Catalogue' ? {redirect: Date.now()} : {}}">EXPLORE ALL ASSETS</router-link></li>
                         </ul>
                       </div>
                       <div class="header__submenu__block">
