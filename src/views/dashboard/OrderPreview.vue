@@ -24,11 +24,10 @@
       <router-link to="/dashboard/orders"><a href="#" class="asset__head__breadcrumps"><svg class="mr-xs-10" xmlns="http://www.w3.org/2000/svg" width="6.938" height="9.904" viewBox="0 0 6.938 9.904"><path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l4.383,5.283,3.273-3.961h0l1.092-1.322" transform="translate(-7254.398 -472.947) rotate(90)" fill="none" stroke="#333" stroke-width="1.5"/></svg>BACK</a></router-link>
       <div class="dashboard__head__helpers dashboard__head__helpers--full-width dashboard__head__helpers--no-flex-wrap mt-xs-30 mb-xs-50 d-flex space-between">
         <h1>{{ order.referenceNumber ? `Order #${order.referenceNumber} - preview` : '' }}</h1>
-        <!-- DISPUTE CURRENTLY DISABLED -->
-        <!-- <div>
+        <div>
           <span>Is there an issue?</span>
           <button class="btn btn--std btn--text" @click="modalToShow = 'modalFormDispute'">contact us</button>
-        </div> -->
+        </div>
       </div>
     </div>
 
@@ -72,9 +71,9 @@ import store from '@/store';
 import moment from 'moment';
 import ProviderOrderApi from '@/service/provider-order';
 import ProviderContractApi from '@/service/provider-contract';
-import ConsumerTicketApi from '@/service/consumer-ticket';
+import ProviderTicketApi from '@/service/provider-ticket';
 import { EnumOrderStatus, ProviderOrder as Order } from '@/model/order';
-import { EnumConsumerTicketType, ConsumerTicketCommand } from '@/model/consumer-ticket';
+import { EnumProviderTicketType, ProviderTicketCommand } from '@/model/provider-ticket';
 import StepProgressBar from '@/components/StepProgressBar.vue';
 import Modal from '@/components/Modal.vue';
 import { getOrderSteps, getOrderStatusDescription } from '@/helper/order-purchase';
@@ -90,11 +89,11 @@ export default class DashboardPurchases extends Vue {
 
   providerContractApi: ProviderContractApi;
 
-  consumerTicketApi: ConsumerTicketApi;
+  providerTicketApi: ProviderTicketApi;
 
   order: Order;
 
-  ticketData: ConsumerTicketCommand;
+  ticketData: ProviderTicketCommand;
 
   isErrorEmptyTextShown = false;
 
@@ -105,12 +104,12 @@ export default class DashboardPurchases extends Vue {
 
     this.providerOrderApi = new ProviderOrderApi();
     this.providerContractApi = new ProviderContractApi();
-    this.consumerTicketApi = new ConsumerTicketApi();
+    this.providerTicketApi = new ProviderTicketApi();
 
     this.order = {} as Order;
 
     this.modalToShow = '';
-    this.ticketData = { resourceKey: '', text: '', type: EnumConsumerTicketType.ORDER };
+    this.ticketData = { resourceKey: '', text: '', type: EnumProviderTicketType.ORDER };
   }
 
   @Watch('ticketData', { deep: true })
@@ -203,7 +202,7 @@ export default class DashboardPurchases extends Vue {
     }
 
     store.commit('setLoading', true);
-    this.consumerTicketApi.openTicket(this.ticketData)
+    this.providerTicketApi.openTicket(this.ticketData)
       .then((response) => {
         if (response.success) this.$router.push('/dashboard/messages');
       })
