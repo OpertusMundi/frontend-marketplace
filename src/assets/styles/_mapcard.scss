@@ -15,7 +15,8 @@
   &__grid {
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    // justify-content: space-between;
+    gap: 20px;
     flex-wrap: wrap;
   }
 }
@@ -37,9 +38,9 @@
   @media (max-width: 576px) {
     margin-bottom: 15px;
   }
-  &:last-child {
-    margin-bottom: 0px;
-  }
+  // &:last-child {
+  //   margin-bottom: 0px;
+  // }
   &--empty {
     height: 0px;
     overflow: hidden;

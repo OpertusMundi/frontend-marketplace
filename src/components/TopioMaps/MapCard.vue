@@ -3,7 +3,7 @@
     <div class="map_card__view"><span>OPEN</span></div>
     <div class="map_card__inner">
       <div class="map_card__img">
-        <img :src="require(`@/assets/images/maps/${image}`)" alt="" />
+        <img :src="image.startsWith('http') ? image : require(`@/assets/images/maps/${image}`)" alt="" />
       </div>
       <div class="map_card__inner__title">{{ title }}</div>
     </div>

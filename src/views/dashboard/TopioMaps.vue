@@ -7,7 +7,9 @@
     </div>
     <p><strong>Available features for your subscription</strong></p>
     <p class="mt-xs-20">Create, stylise and share up to 5 maps / month.</p>
-    <button class="btn btn--std btn--blue mt-xs-20 mb-xs-20">UPGRADE</button>
+    <a href="https://maps.topio.market/mapstore" target="_blank">
+      <button class="btn btn--std btn--blue mt-xs-20 mb-xs-20">CREATE</button>
+    </a>
     <div class="map_cards">
       <!-- <div class="map_cards__head">
         <h4>My maps</h4>
@@ -17,7 +19,7 @@
         <map-card
           v-for="item in maps"
           :key="item.key"
-          image="map_color1.jpg"
+          :image="`https://maps.topio.market/mapstore/${item.thumbnailUrl}`"
           :title="item.title"
           :url="item.mapUrl"
         ></map-card>
@@ -80,7 +82,7 @@ export default class DashboardTopioMaps extends Vue {
 
   pagination = {
     currentPage: 0,
-    itemsPerPage: 1,
+    itemsPerPage: 16,
     itemsTotal: 0,
   };
 
