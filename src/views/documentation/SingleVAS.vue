@@ -160,6 +160,8 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import axios from 'axios';
+import WiGeoGISApi from '@/service/wigeogis';
+import store from '@/store';
 
 @Component
 export default class VAS extends Vue {
@@ -168,6 +170,8 @@ export default class VAS extends Vue {
   wpUrl: string;
 
   services: any;
+
+  wiGeoGISApi = new WiGeoGISApi();
 
   constructor() {
     super();
@@ -183,6 +187,11 @@ export default class VAS extends Vue {
     }
   }
 
+  @Watch('$store.getters.isAuthenticated')
+  onAuthenticationChange(): void {
+    if (this.$route.params.slug === 'geocoder') this.handleGeocoderPage();
+  }
+
   mounted(): void {
     this.getData();
   }
@@ -194,6 +203,8 @@ export default class VAS extends Vue {
       top: 0,
       behavior: 'smooth',
     });
+
+    if (this.$route.params.slug === 'geocoder') this.handleGeocoderPage();
   }
 
   async getPageResponse(): Promise<any> {
@@ -205,6 +216,25 @@ export default class VAS extends Vue {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  async handleGeocoderPage(): Promise<void> {
+    const specialLinkString = '[--geocoder-link--]';
+
+    store.commit('setLoading', true);
+
+    const pageTemp = JSON.stringify(this.page);
+    this.page = JSON.parse(JSON.stringify(this.page).replaceAll(specialLinkString, ''));
+
+    const loginResult = store.getters.isAuthenticated ? await this.wiGeoGISApi.login() : null;
+
+    const linkBtn = !loginResult || !loginResult.success || !loginResult.result
+      ? "<a class='btn btn--std btn--white-blue-text' href='https://geocoder.wigeogis.com' target='_blank'>GEOCODER</a>"
+      : `<a class='btn btn--std btn--white-blue-text' href='${loginResult.result}' target='_blank'>GEOCODER</a>`;
+
+    this.page = JSON.parse(pageTemp.replaceAll(specialLinkString, linkBtn));
+
+    store.commit('setLoading', false);
   }
 }
 </script>
