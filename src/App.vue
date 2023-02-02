@@ -22,6 +22,9 @@
     <!-- <transition name="fade" mode="out-in">
       <cookie-box v-if="!isCookiesOptionSet && !isCookiesBoxClosed" @close="isCookiesBoxClosed = true"></cookie-box>
     </transition> -->
+    <transition name="fade" mode="out-in">
+      <tobie v-if="tobieShortcut.isTobieShown"></tobie>
+    </transition>
   </div>
 </template>
 
@@ -48,6 +51,7 @@ import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
 import GlobalModals from '@/components/GlobalModals.vue';
 import CookieBox from '@/components/CookieBox.vue';
+import Tobie from '@/components/Tobie.vue';
 
 @Component({
   components: {
@@ -57,6 +61,7 @@ import CookieBox from '@/components/CookieBox.vue';
     Loader,
     GlobalModals,
     CookieBox,
+    Tobie,
   },
 })
 export default class App extends Vue {
@@ -83,6 +88,16 @@ export default class App extends Vue {
   noLoaderRoutes: Array<string>;
 
   isCookiesBoxClosed = false;
+
+  tobieShortcut: {
+    shortcutKeys: string[],
+    currentKeys: string[],
+    isTobieShown: boolean,
+  } = {
+    shortcutKeys: ['t', 'o'],
+    currentKeys: [],
+    isTobieShown: false,
+  };
 
   constructor() {
     super();
@@ -203,6 +218,15 @@ export default class App extends Vue {
         console.log('getConfiguration error', err);
         // store.commit('setLoading', false);
       });
+
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      this.tobieShortcut = { ...this.tobieShortcut, currentKeys: [...new Set([...this.tobieShortcut.currentKeys, e.key.toLowerCase()])] };
+      if (this.tobieShortcut.shortcutKeys.toString() === this.tobieShortcut.currentKeys.toString()) this.tobieShortcut = { ...this.tobieShortcut, isTobieShown: !this.tobieShortcut.isTobieShown };
+    });
+
+    window.addEventListener('keyup', () => {
+      this.tobieShortcut = { ...this.tobieShortcut, currentKeys: [] };
+    });
   }
 
   toggleMobileMenu(status: boolean): void {
