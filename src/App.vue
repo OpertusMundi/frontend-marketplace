@@ -23,7 +23,7 @@
       <cookie-box v-if="!isCookiesOptionSet && !isCookiesBoxClosed" @close="isCookiesBoxClosed = true"></cookie-box>
     </transition> -->
     <transition name="fade" mode="out-in">
-      <tobie-icon v-if="tobieShortcut.isTobieShown"></tobie-icon>
+      <tobie v-if="tobieShortcut.isTobieShown"></tobie>
     </transition>
   </div>
 </template>
@@ -51,7 +51,7 @@ import AppFooter from '@/components/Footer.vue';
 import Loader from '@/components/Loader.vue';
 import GlobalModals from '@/components/GlobalModals.vue';
 import CookieBox from '@/components/CookieBox.vue';
-import TobieIcon from '@/components/TobieIcon.vue';
+import Tobie from '@/components/Tobie.vue';
 
 @Component({
   components: {
@@ -61,7 +61,7 @@ import TobieIcon from '@/components/TobieIcon.vue';
     Loader,
     GlobalModals,
     CookieBox,
-    TobieIcon,
+    Tobie,
   },
 })
 export default class App extends Vue {
