@@ -244,7 +244,7 @@ enum EnumAnalyticsSalesDescription {
   EARNINGS_ASSET_DESC = 'How much revenue did you earn from file asset sales',
   MARKET_SEGMENT_SALES_FILE_DESC = 'What market segment your clients belong to',
   MARKET_SEGMENT_TRANSACTIONS_DESC = 'What market segment your clients belong to',
-  NUMBER_SUBSCRIBERS_DESC = 'How many subcribers your APIs have',
+  NUMBER_SUBSCRIBERS_DESC = 'How many subscribers your APIs have',
   NUMBER_API_CALLS_DESC = 'How many times your APIs have been invoked',
   EARNINGS_API_DESC = 'How much revenues did you earn from your API subscriptions',
   SUBSCRIBER_LOCATION_DESC = 'Where are your clients located',

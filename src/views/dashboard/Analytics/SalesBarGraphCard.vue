@@ -29,24 +29,31 @@
       </div>
       <div class="graphcard__head__filters">
         <div class="graphcard__head__filters__assets">
-          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[0]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[1]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
-          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)" :searchable="true" :close-on-select="true" :show-labels="false" label="title" placeholder="Select asset">
+          <multiselect v-model="selectedAssets[2]" :options="filteredAssets(assets)"
+                       :searchable="true" :close-on-select="true" :show-labels="false" label="title"
+                       placeholder="Select asset">
             <template slot="option" slot-scope="props">
               <AssetMiniCardProvider :asset="props.option"></AssetMiniCardProvider>
             </template>
           </multiselect>
         </div>
         <div class="graphcard__head__filters__time">
-          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax" v-on:triggerchange="getAnalytics()" />
+          <DataRangePicker :dataRangeMin.sync="temporalUnitMin" :dataRangeMax.sync="temporalUnitMax"
+                           v-on:triggerchange="getAnalytics()"/>
         </div>
       </div>
     </div>
@@ -55,13 +62,18 @@
       <thead>
       <tr>
         <th class="data_table__header">Asset</th>
-        <th v-for="(name, index) in segmentsNames" class="data_table__header" :key="index">{{ upperCaseTransform(name) }}</th>
+        <th v-for="(name, index) in chartDate" class="data_table__header" :key="index">
+          {{ upperCaseTransform(name) }}
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr class="data_table__row" v-for="data in seriesData" :key="data.id">
         <td class="data_table__data">{{ data.name }}</td>
-        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{ value }}</td>
+        <td class="data_table__data" v-for="(value, index) in data.data" :key="index">{{
+            value
+          }}
+        </td>
       </tr>
       </tbody>
     </table>
@@ -78,7 +90,7 @@ import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 import AnalyticsApi from '@/service/analytics';
 import {
-  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit,
+  EnumSalesQueryMetric, SalesQuery, DataSeries, EnumTemporalUnit, DataPoint,
 } from '@/model/analytics';
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
@@ -177,22 +189,25 @@ export default class SalesBarGraphCard extends Vue {
       },
     };
 
-    this.analyticsApi.executeSalesQuery(segmentQuery).then((response) => {
-      if (response.success) {
-        response.result.points.reverse();
-        this.analyticsData = response.result;
-        this.segmentsNames = this.formatSegmentsNames();
-        this.datetimeSeries = this.formatSegmentNamesTime();
-        this.chartDate = this.formatTheDate();
-        this.seriesData = this.formatSeries();
-        this.chartOptions = this.getOptions();
-      }
-    });
+    this.analyticsApi.executeSalesQuery(segmentQuery)
+      .then((response) => {
+        if (response.success) {
+          response.result.points.reverse();
+          this.analyticsData = response.result;
+          this.segmentsNames = this.formatSegmentsNames();
+          this.datetimeSeries = this.formatSegmentNamesTime();
+          this.chartDate = this.formatTheDate();
+          // this.seriesData = this.formatSeries();
+          this.seriesData = this.formatSeriesByDatetime();
+          this.chartOptions = this.getOptions();
+        }
+      });
   }
 
   @Watch('selectedAssets')
   selectedAssetsChanged(newVal: CatalogueItem[]): void {
-    this.assetsQuery = newVal.filter((val) => val).map((a) => a.id);
+    this.assetsQuery = newVal.filter((val) => val)
+      .map((a) => a.id);
     this.getAnalytics();
   }
 
@@ -299,17 +314,45 @@ export default class SalesBarGraphCard extends Vue {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   formatSegmentNamesTime() {
-    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time).reverse();
+    return [...new Map(this.analyticsData.points.map((item) => [JSON.stringify(item.time), item])).values()].map((a) => a.time)
+      .reverse();
   }
 
+  formatSeriesByDatetime(): any {
+    const mutations = this.analyticsData.points.map((point) => ({
+      ...point,
+      datetime: this.convertTimeObjectToString(point.time),
+    }));
+
+    const getDataSeries = (asset) => this.chartDate.map((date) => {
+      const found = mutations.find((mutation) => mutation.datetime === date && mutation.asset === asset);
+      return found ? found!.value : 0;
+    });
+
+    const dataSeries = this.assetsQuery.map((asset) => ({
+      data: getDataSeries(asset),
+      name: this.assets.find(({ id }) => id === asset)!.title,
+      showInLegend: true,
+    }));
+
+    return dataSeries;
+  }
+
+  // Deprecated method
   formatSeries(): any[] {
     const series: Array<any> = [];
     if (this.assetsQuery?.length > 1) {
       this.assetsQuery.forEach((assetName) => {
         // TODO: THIS IS PREVIOUS VERSION WITHOUT GROUP BY SEGMENT NAME
         const data: Array<number> = [];
-        this.segmentsNames.forEach((segName) => {
-          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName && item?.segment === segName).map((a) => a.value);
+        const time = this.analyticsData?.points.map((point) => this.convertTimeObjectToString(point.time));
+        console.log('time: ', time);
+        // eslint-disable-next-line no-unused-expressions
+        this.analyticsData?.points.forEach((point) => {
+          console.log('segName: ', point);
+          const value = this.analyticsData?.points.filter((item) => item?.asset === assetName)
+            .map((a) => a.value);
+          console.log('VALUE: ', value);
           if (value.length > 0) {
             data.push(value[0]);
           } else {
@@ -396,11 +439,42 @@ export default class SalesBarGraphCard extends Vue {
     }
     return formattedDate;
   }
+
+  convertTimeObjectToString(date): string {
+    let dateFormat;
+    if (Object.prototype.hasOwnProperty.call(date, 'day')) {
+      const dayFormat = moment(`${date.year}-${date.month}-${date.day}`)
+        .format('MMM D, YY');
+      dateFormat = dayFormat;
+    } else if (Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year') && !Object.prototype.hasOwnProperty.call(date, 'week')) {
+      const monthFormat = moment(`${date.year}-${date.month}`)
+        // .set({ year: date.year, month: date.month })
+        .format('MMMM YYYY');
+      dateFormat = monthFormat;
+    } else if (Object.prototype.hasOwnProperty.call(date, 'week') && Object.prototype.hasOwnProperty.call(date, 'month') && Object.prototype.hasOwnProperty.call(date, 'year')) {
+      const startWeek = moment(`${date.year}`)
+        .add(date.week, 'weeks')
+        .startOf('isoWeek')
+        .format('MMM D');
+      const endWeek = moment(`${date.year}`)
+        .add(date.week, 'weeks')
+        .endOf('isoWeek')
+        .format('MMM D, YY');
+      const weekFormat = `${startWeek} - ${endWeek}`;
+      dateFormat = weekFormat;
+    } else if (Object.prototype.hasOwnProperty.call(date, 'year')) {
+      const yearFormat = moment(`${date.year}`)
+        .format('YYYY');
+      dateFormat = yearFormat;
+    }
+    return dateFormat;
+  }
 }
 </script>
 <style lang="scss">
 @import '@/assets/styles/graphs/_graphcard.scss';
 @import '@/assets/styles/graphs/_table.scss';
+
 .multiselect__option--highlight {
   background: none !important;
 }
