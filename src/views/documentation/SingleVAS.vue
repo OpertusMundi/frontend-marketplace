@@ -226,7 +226,7 @@ export default class VAS extends Vue {
     const pageTemp = JSON.stringify(this.page);
     this.page = JSON.parse(JSON.stringify(this.page).replaceAll(specialLinkString, ''));
 
-    const loginResult = store.getters.isAuthenticated ? await this.wiGeoGISApi.login() : null;
+    const loginResult = store.getters.isAuthenticated && store.getters.hasRole(['ROLE_WIGEOGIS']) ? await this.wiGeoGISApi.login() : null;
 
     const linkBtn = !loginResult || !loginResult.success || !loginResult.result
       ? "<a class='btn btn--std btn--white-blue-text' href='https://geocoder.wigeogis.com' target='_blank'>GEOCODER</a>"
