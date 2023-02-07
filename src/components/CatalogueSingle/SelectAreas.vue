@@ -52,8 +52,8 @@
 
               <div class="select-area-modal__col-map__add-area" v-if="selectedNutsCountry && subAreasGeoJson && !areasSelectedForPurchase.includes(selectedNutsCountry)">
                 <h3>{{ europeGeoJson.features.find((x) => x.properties.id === selectedNutsCountry).properties.NAME_ENGL }}</h3>
-                <span>130,000 rows</span>
-                <button @click="addCountry()" class="btn--std btn--blue">ADD COUNTRY</button>
+                <!-- <span>130,000 rows</span> -->
+                <button @click="addCountry()" class="btn--std btn--blue mt-xs-10">ADD COUNTRY</button>
               </div>
               <l-tile-layer :url="mapOptions.tileUrl"></l-tile-layer>
               <!-- <l-geo-json ref="europeGeoJsonLayer" v-if="!isMapStateCountryLevel" :geojson="europeGeoJson" :optionsStyle="mapOptions.europeGeoJsonStyle" :options="mapOptions.europeGeoJsonOptions"></l-geo-json> -->
