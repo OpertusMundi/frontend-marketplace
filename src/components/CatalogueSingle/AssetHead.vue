@@ -44,7 +44,7 @@
         <li><strong>Version:</strong>{{ catalogueItem.version }}</li>
         <li v-if="!['SERVICE', 'BUNDLE'].includes(catalogueItem.type)"><strong>Last updated:</strong><span v-if="catalogueItem.revisionDate">{{ catalogueItem.revisionDate | format_date }}</span><span v-else>-</span></li>
         <li v-if="!['SERVICE', 'BUNDLE'].includes(catalogueItem.type)"><strong>Created:</strong><span v-if="catalogueItem.publicationDate">{{ catalogueItem.publicationDate | format_date }}</span><span v-else>-</span></li>
-        <li v-if="!['SERVICE', 'BUNDLE'].includes(catalogueItem.type)"><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.scales.length - 1">, </span></span></li>
+        <li v-if="!['SERVICE', 'BUNDLE'].includes(catalogueItem.type)"><strong>Topic:</strong><span v-for="(category, i) in catalogueItem.topicCategory" v-bind:key="`${category}_cat`">{{ category }}<span v-if="i !== catalogueItem.topicCategory.length - 1">, </span></span></li>
         <li v-if="!['SERVICE', 'BUNDLE'].includes(catalogueItem.type)"><strong>Format:</strong>{{ catalogueItem.format }}</li>
         <!-- <li><strong>CRS:</strong>{{ catalogueItem.referenceSystem ? `EPSG:${catalogueItem.referenceSystem}` : '' }}</li> -->
         <li v-if="!['BUNDLE', 'TABULAR'].includes(catalogueItem.type)"><strong>CRS:</strong>{{ crsLabel }}</li>
