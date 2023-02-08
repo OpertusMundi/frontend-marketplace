@@ -240,6 +240,19 @@
 			}
 		}
 
+		&__rows-data {
+			> div {
+				font-size: 0.9em;
+				color: $darkColor;
+				display: flex;
+				justify-content: space-between;
+
+				span {
+					font-weight: 500;
+				}
+			}
+		}
+
 		&__label-open {
 			color: $secondColor;
 			display: inline-flex;

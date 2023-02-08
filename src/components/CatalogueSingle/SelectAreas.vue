@@ -78,6 +78,22 @@
             <div class="asset__shopcard" v-if="quotationResult">
               <div class="asset__shopcard__variations">
 
+                <div class="asset__shopcard__rows-data mb-xs-20" v-if="'selectedPopulation' in quotationResult.systemParameters || 'selectedRows' in quotationResult.systemParameters">
+                  <template v-if="'selectedPopulation' in quotationResult.systemParameters">
+                    <div>
+                      <span>Population:</span>
+                      <span>{{ quotationResult.systemParameters.selectedPopulation }}</span>
+                    </div>
+                  </template>
+                  <hr v-if="'selectedPopulation' in quotationResult.systemParameters && 'selectedRows' in quotationResult.systemParameters">
+                  <template v-if="'selectedRows' in quotationResult.systemParameters">
+                    <div>
+                      <span>Total rows:</span>
+                      <span>{{ quotationResult.systemParameters.selectedRows }}</span>
+                    </div>
+                  </template>
+                </div>
+
                 <div class="asset__shopcard__price">
                   <template>
                     <span class="asset__shopcard__price__text--main">{{ quotationResult.quotation.totalPriceExcludingTax }}</span>
