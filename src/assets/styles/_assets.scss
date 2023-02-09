@@ -245,10 +245,16 @@
 				font-size: 0.9em;
 				color: $darkColor;
 				display: flex;
+				align-items: center;
+				gap: 1em;
+
 				justify-content: space-between;
 
 				span {
 					font-weight: 500;
+				}
+				span:first-child {
+					text-align: start;
 				}
 			}
 		}
