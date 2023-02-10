@@ -19,7 +19,7 @@
         <map-card
           v-for="item in maps"
           :key="item.key"
-          :image="`https://maps.topio.market/mapstore/${item.thumbnailUrl}`"
+          :image="item.thumbnailUrl.startsWith('http') ? item.thumbnailUrl : `https://maps.topio.market/mapstore/${item.thumbnailUrl}`"
           :title="item.title"
           :url="item.mapUrl"
         ></map-card>

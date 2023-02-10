@@ -81,14 +81,14 @@
                 <div class="asset__shopcard__rows-data mb-xs-20" v-if="'selectedPopulation' in quotationResult.systemParameters || 'selectedRows' in quotationResult.systemParameters">
                   <template v-if="'selectedPopulation' in quotationResult.systemParameters">
                     <div>
-                      <span>Population:</span>
+                      <span>Population in select areas</span>
                       <span>{{ quotationResult.systemParameters.selectedPopulation }}</span>
                     </div>
                   </template>
                   <hr v-if="'selectedPopulation' in quotationResult.systemParameters && 'selectedRows' in quotationResult.systemParameters">
                   <template v-if="'selectedRows' in quotationResult.systemParameters">
                     <div>
-                      <span>Total rows:</span>
+                      <span>Rows to be charged</span>
                       <span>{{ quotationResult.systemParameters.selectedRows }}</span>
                     </div>
                   </template>
