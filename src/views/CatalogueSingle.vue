@@ -31,6 +31,8 @@
 
             <!-- <api-metadata v-if="catalogueItem.type === 'SERVICE'" :catalogueItem="catalogueItem"></api-metadata> -->
             <metadata :catalogueItem="catalogueItem" v-if="catalogueItem.type !== 'BUNDLE'"></metadata>
+
+            <discovery v-if="(!['SENTINEL_HUB_OPEN_DATA', 'SENTINEL_HUB_COMMERCIAL_DATA', 'BUNDLE'].includes(catalogueItem.type))" :asset="catalogueItem"></discovery>
           </div>
         </div>
         <div class="asset__sidebar">
@@ -150,6 +152,7 @@ import SelectAreas from '../components/CatalogueSingle/SelectAreas.vue';
 import SelectSentinelHubPlan from '../components/CatalogueSingle/SelectSentinelHubPlan.vue';
 import BundleAssets from '../components/CatalogueSingle/BundleAssets.vue';
 import MatchFinder from '../components/MatchFinder.vue';
+import Discovery from '../components/CatalogueSingle/Discovery.vue';
 
 @Component({
   components: {
@@ -176,6 +179,7 @@ import MatchFinder from '../components/MatchFinder.vue';
     Modal,
     BundleAssets,
     MatchFinder,
+    Discovery,
   },
 })
 export default class CatalogueSingle extends Vue {

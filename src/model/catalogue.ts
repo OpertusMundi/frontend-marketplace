@@ -1223,3 +1223,38 @@ export interface CatalogueItemMetadataCommand {
    */
   visibility?: string[] | null;
 }
+
+export interface DiscoveryCatalogueItem {
+  /**
+   * Catalogue item identifier (PID)
+   */
+  id: string,
+  /**
+   * Supported pricing models
+   */
+  pricingModels: BasePricingModelCommand[],
+  /**
+   * Id of an entity responsible for making the resource available
+   */
+  publisherId: string,
+  /**
+   * The nature or genre of the service
+   */
+  serviceType: EnumSpatialDataServiceType | null,
+  /**
+   * Asset statistics
+   */
+  statistics: CatalogueItemStatistics,
+  /**
+   * A name given to the resource
+   */
+  title: string,
+  /**
+   * The nature or genre of the resource
+   */
+  type: EnumAssetType,
+  /**
+   * Version of the resource
+   */
+  version: string,
+}

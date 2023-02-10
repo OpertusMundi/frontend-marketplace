@@ -5,7 +5,14 @@ import { CatalogueQueryResponse, CatalogueItem, QueryResultPage } from '@/model'
 import { AxiosResponse } from 'axios';
 import { Provider } from '@/model/account';
 import {
-  CatalogueHarvestCommand, CatalogueHarvestImportCommand, CatalogueItemDetails, ElasticCatalogueQuery, EnumCatalogueType, EnumElasticSearchSortField, Sample,
+  CatalogueHarvestCommand,
+  CatalogueHarvestImportCommand,
+  CatalogueItemDetails,
+  DiscoveryCatalogueItem,
+  ElasticCatalogueQuery,
+  EnumCatalogueType,
+  EnumElasticSearchSortField,
+  Sample,
 } from '@/model/catalogue';
 import { HarvestImportResponse } from '@/model/draft';
 // eslint-disable-next-line
@@ -72,6 +79,17 @@ export default class CatalogueApi extends Api {
 
     return this.get<ServerResponse<CatalogueItem | CatalogueItemDetails>>(url)
       .then((response: AxiosServerResponse<CatalogueItem | CatalogueItemDetails>) => {
+        const { data } = response;
+
+        return data;
+      });
+  }
+
+  public async findOneDiscoveryAsset(id: string): Promise<ServerResponse<DiscoveryCatalogueItem>> {
+    const url = `/action/catalogue/joinable-items/${id}`;
+
+    return this.get<ServerResponse<DiscoveryCatalogueItem>>(url)
+      .then((response: AxiosServerResponse<DiscoveryCatalogueItem>) => {
         const { data } = response;
 
         return data;
