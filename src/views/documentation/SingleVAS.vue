@@ -229,7 +229,7 @@ export default class VAS extends Vue {
     const loginResult = store.getters.isAuthenticated && store.getters.hasRole(['ROLE_WIGEOGIS']) ? await this.wiGeoGISApi.login() : null;
 
     const linkBtn = !loginResult || !loginResult.success || !loginResult.result
-      ? "<a class='btn btn--std btn--white-blue-text' href='https://geocoder.wigeogis.com' target='_blank'>GEOCODER</a>"
+      ? "<a class='btn btn--std btn--white-blue-text' href='https://geocoder-topio.wigeogis.com' target='_blank'>GEOCODER</a>"
       : `<a class='btn btn--std btn--white-blue-text' href='${loginResult.result}' target='_blank'>GEOCODER</a>`;
 
     this.page = JSON.parse(pageTemp.replaceAll(specialLinkString, linkBtn));
