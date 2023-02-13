@@ -9,23 +9,25 @@
 
         <div class="tobie__chatbox__main">
           <div
-            v-for="message, i in dummyMessages" :key="i"
+            v-for="message, i in messages" :key="i"
             class="tobie__chatbox__main__message"
             :class="message.isBot ? 'tobie__chatbox__main__message--bot' : 'tobie__chatbox__main__message--human'"
           >
-          <div class="tobie__chatbox__main__message__bot-icon" v-if="message.isBot">
-            <svg data-name="tobie avatar inside chat" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35"><g data-name="Ellipse 2" fill="#fff" stroke="#bcbcbc" stroke-width=".5"><circle cx="17.5" cy="17.5" r="17.5" stroke="none"/><circle cx="17.5" cy="17.5" r="17.25" fill="none"/></g><path data-name="Path 8740" d="m21.843 11.15.915-2.032a2.172 2.172 0 0 0 .527.064 2.308 2.308 0 0 0 1.106-.276A2.126 2.126 0 0 0 25.53 6.97a2.126 2.126 0 0 0-.638-1.6 2.355 2.355 0 0 0-3.2.024 2.1 2.1 0 0 0-.654 1.568 2.068 2.068 0 0 0 .31 1.115 2.217 2.217 0 0 0 .63.681l-.906 2.013a9.014 9.014 0 0 0-7.144 0l-.906-2.013a2.217 2.217 0 0 0 .627-.677 2.068 2.068 0 0 0 .31-1.115 2.1 2.1 0 0 0-.656-1.568 2.355 2.355 0 0 0-3.2-.024 2.126 2.126 0 0 0-.638 1.6 2.126 2.126 0 0 0 1.144 1.932 2.308 2.308 0 0 0 1.106.276 2.172 2.172 0 0 0 .527-.064l.915 2.032a9 9 0 0 0-1.53 14.693l5.915 5.915v-3.731a9 9 0 0 0 4.3-16.877m.448-5.175a1.479 1.479 0 0 1 1.987 0 1.328 1.328 0 0 1 .39 1 1.344 1.344 0 0 1-.39 1 1.479 1.479 0 0 1-1.987 0 1.336 1.336 0 0 1-.391-1 1.343 1.343 0 0 1 .391-1m-11.569 2a1.344 1.344 0 0 1-.39-1 1.328 1.328 0 0 1 .39-1 1.479 1.479 0 0 1 1.987 0 1.343 1.343 0 0 1 .391 1 1.336 1.336 0 0 1-.391 1 1.479 1.479 0 0 1-1.987 0m6.782 16.322a5.267 5.267 0 1 1 5.267-5.267 5.267 5.267 0 0 1-5.267 5.267" fill="#100699"/></svg>
+            <div class="tobie__chatbox__main__message__bot-icon" v-if="message.isBot">
+              <svg data-name="tobie avatar inside chat" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35"><g data-name="Ellipse 2" fill="#fff" stroke="#bcbcbc" stroke-width=".5"><circle cx="17.5" cy="17.5" r="17.5" stroke="none"/><circle cx="17.5" cy="17.5" r="17.25" fill="none"/></g><path data-name="Path 8740" d="m21.843 11.15.915-2.032a2.172 2.172 0 0 0 .527.064 2.308 2.308 0 0 0 1.106-.276A2.126 2.126 0 0 0 25.53 6.97a2.126 2.126 0 0 0-.638-1.6 2.355 2.355 0 0 0-3.2.024 2.1 2.1 0 0 0-.654 1.568 2.068 2.068 0 0 0 .31 1.115 2.217 2.217 0 0 0 .63.681l-.906 2.013a9.014 9.014 0 0 0-7.144 0l-.906-2.013a2.217 2.217 0 0 0 .627-.677 2.068 2.068 0 0 0 .31-1.115 2.1 2.1 0 0 0-.656-1.568 2.355 2.355 0 0 0-3.2-.024 2.126 2.126 0 0 0-.638 1.6 2.126 2.126 0 0 0 1.144 1.932 2.308 2.308 0 0 0 1.106.276 2.172 2.172 0 0 0 .527-.064l.915 2.032a9 9 0 0 0-1.53 14.693l5.915 5.915v-3.731a9 9 0 0 0 4.3-16.877m.448-5.175a1.479 1.479 0 0 1 1.987 0 1.328 1.328 0 0 1 .39 1 1.344 1.344 0 0 1-.39 1 1.479 1.479 0 0 1-1.987 0 1.336 1.336 0 0 1-.391-1 1.343 1.343 0 0 1 .391-1m-11.569 2a1.344 1.344 0 0 1-.39-1 1.328 1.328 0 0 1 .39-1 1.479 1.479 0 0 1 1.987 0 1.343 1.343 0 0 1 .391 1 1.336 1.336 0 0 1-.391 1 1.479 1.479 0 0 1-1.987 0m6.782 16.322a5.267 5.267 0 1 1 5.267-5.267 5.267 5.267 0 0 1-5.267 5.267" fill="#100699"/></svg>
+            </div>
+            <div class="tobie__chatbox__main__message__text">
+              {{ message.text }}
+            </div>
           </div>
-          <div class="tobie__chatbox__main__message__text">
-            {{ message.text }}
-          </div>
-          </div>
+
+          <div class="tobie__bottom"></div>
         </div>
 
         <div class="tobie__chatbox__new-message">
-          <input type="text" placeholder="Type your message" v-model="newMessage" @keyup.enter="sendDummyMessage">
+          <input type="text" placeholder="Type your message" v-model="newMessage" @keyup.enter="sendMessage">
 
-          <div class="tobie__chatbox__new-message__btn-send" @click="sendDummyMessage">
+          <div class="tobie__chatbox__new-message__btn-send" @click="sendMessage">
             <svg xmlns="http://www.w3.org/2000/svg" width="21.032" height="21.03" viewBox="0 0 21.032 21.03"><g data-name="Send icon"><g data-name="Group 1808"><path data-name="Path 8738" d="M20.118 9.83 1.547.599a.684.684 0 0 0-.854.215.813.813 0 0 0-.017.945l6.107 8.77-6.107 8.769a.816.816 0 0 0 .016.945.694.694 0 0 0 .556.286.66.66 0 0 0 .3-.071l18.571-9.231a.8.8 0 0 0 0-1.4Z" fill="#fff" stroke="#bcbcbc"/></g></g></svg>
           </div>
         </div>
@@ -48,12 +50,15 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import TobieApi from '@/service/tobie';
 
 @Component
 export default class Tobie extends Vue {
+  tobieApi = new TobieApi();
+
   isChatOpen = false;
 
-  dummyMessages = [
+  messages = [
     {
       isBot: true,
       text: 'How can I help you with your data search?',
@@ -62,22 +67,51 @@ export default class Tobie extends Vue {
 
   newMessage = '';
 
-  sendDummyMessage(): void {
+  sendMessage(): void {
     const message = this.newMessage;
     this.newMessage = '';
 
-    this.dummyMessages.push({
+    this.messages.push({
       isBot: false,
       text: message,
     });
+    this.scrollBottom();
 
-    setTimeout(() => {
-      this.dummyMessages.push({
+    this.tobieApi.sendMessage({
+      sender: 'user',
+      message,
+    }).then((response) => {
+      this.messages.push({
         isBot: true,
-        text: 'blah blah blah blah. this is just a dummy response from bot. lorem ipsum...',
+        text: response.text,
       });
-    }, 600);
+
+      this.scrollBottom();
+    });
   }
+
+  scrollBottom(): void {
+    this.$nextTick(() => {
+      (document.querySelector('.tobie__bottom') as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }
+
+  // sendDummyMessage(): void {
+  //   const message = this.newMessage;
+  //   this.newMessage = '';
+
+  //   this.messages.push({
+  //     isBot: false,
+  //     text: message,
+  //   });
+
+  //   setTimeout(() => {
+  //     this.messages.push({
+  //       isBot: true,
+  //       text: 'blah blah blah blah. this is just a dummy response from bot. lorem ipsum...',
+  //     });
+  //   }, 600);
+  // }
 }
 </script>
 <style lang="scss" scoped>
@@ -138,8 +172,12 @@ export default class Tobie extends Vue {
 
         &__message {
           display: flex;
-          margin-bottom: 10px;
+          margin-bottom: 15px;
           font-size: 0.9em;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
 
           &__bot-icon {
             margin-right: 10px;
@@ -188,6 +226,10 @@ export default class Tobie extends Vue {
           cursor: pointer;
         }
       }
+    }
+
+    &__bottom {
+      margin-top: 15px;
     }
   }
 </style>

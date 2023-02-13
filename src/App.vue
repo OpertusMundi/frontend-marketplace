@@ -221,7 +221,7 @@ export default class App extends Vue {
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       this.tobieShortcut = { ...this.tobieShortcut, currentKeys: [...new Set([...this.tobieShortcut.currentKeys, e.key.toLowerCase()])] };
-      if (this.tobieShortcut.shortcutKeys.toString() === this.tobieShortcut.currentKeys.toString()) this.tobieShortcut = { ...this.tobieShortcut, isTobieShown: !this.tobieShortcut.isTobieShown };
+      if (this.tobieShortcut.shortcutKeys.toString() === this.tobieShortcut.currentKeys.toString()) this.tobieShortcut = { ...this.tobieShortcut, isTobieShown: !this.tobieShortcut.isTobieShown ? true : this.tobieShortcut.isTobieShown };
     });
 
     window.addEventListener('keyup', () => {
