@@ -31,7 +31,7 @@
                 <div class="form-group">
                   <form>
                     <div v-for="model in pricingModelTypes" :key="model.priceModel">
-                      <template v-if="model.priceModel !== 'FREE' || deliveryMethod === 'DIGITAL_PLATFORM'">
+                      <template v-if="(model.priceModel !== 'FREE' || deliveryMethod === 'DIGITAL_PLATFORM') && (deliveryMethod === 'DIGITAL_PLATFORM' || !['FIXED_PER_ROWS', 'FIXED_FOR_POPULATION'].includes(model.priceModel))">
                         <label class="control control-radio" :for="`model_option_${model.priceModel}`">
                           <!-- <input @change="onChangePricingModelType(model.priceModel)" v-model="tempSelectedType" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel"> -->
                           <input @change="onChangePricingModelType(model.priceModel)" v-model="pricingModelsLocal[selectedPricingModelForEditingLocal].type" type="radio" :id="`model_option_${model.priceModel}`" :name="`model_option`" :value="model.priceModel">
@@ -379,6 +379,10 @@ export default class Pricing extends Vue {
 
   created(): void {
     this.fixPricingModelsFormatFromParent();
+
+    if (this.selectedPricingModelForEditingLocal !== null && !this.pricingModelsLocal[this.selectedPricingModelForEditingLocal]) {
+      this.selectedPricingModelForEditingLocal = null;
+    }
   }
 
   fixPricingModelsFormatFromParent(): void {
