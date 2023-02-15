@@ -351,7 +351,7 @@ export default class Delivery extends Vue {
 
     this.fileToUploadLocal = { ...this.fileToUpload };
 
-    this.byOwnMeans = 0;
+    this.byOwnMeans = null;
 
     this.byPlatform = null;
 
