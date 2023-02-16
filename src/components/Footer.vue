@@ -104,7 +104,7 @@
           <div class="footer__upper__item">
             <h6>Use Geodata</h6>
             <router-link to="/vas">Services</router-link>
-            <router-link to="/documentation">Documentation</router-link>
+            <!-- <router-link to="/documentation">Documentation</router-link> -->
           </div>
           <div class="footer__upper__item">
             <h6>About</h6>
