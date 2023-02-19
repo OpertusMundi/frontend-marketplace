@@ -54,8 +54,41 @@
                       </div>
                     </div>
 
-                    <!-- <div class="discovery__card discovery__card--no-border" v-if="hoveredAssetId" style="position: absolute">
-                    </div> -->
+                    <div class="discovery__card discovery__card--no-border" v-if="selectedAssetId">
+
+                      <div class="discovery__card__upper-btns">
+                        <span class="arrow-left" v-if="currentExplanationTab > 0" @click="currentExplanationTab --">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10.207" height="14.788" viewBox="0 0 10.207 14.788">
+                            <path id="Path_2295" data-name="Path 2295" d="M473.524-7260.858l6.637,8,6.61-8" transform="translate(-7251.291 -472.755) rotate(90)" fill="none" stroke="#190AFF" stroke-width="2"/>
+                          </svg>
+                        </span>
+                        <span v-else></span>
+
+                        <span class="arrow-right" v-if="currentExplanationTab < explanationsOfSelectedAsset.length - 1" @click="currentExplanationTab ++">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10.207" height="14.788" viewBox="0 0 10.207 14.788">
+                            <path id="Path_9659" data-name="Path 9659" d="M0,8,6.637,0l6.61,8" transform="translate(8.638 0.77) rotate(90)" fill="none" stroke="#190AFF" stroke-width="2"/>
+                          </svg>
+                        </span>
+                        <span v-else></span>
+                      </div>
+
+                      <div class="discovery__card__explanation">
+                        <strong>Source column</strong>
+                        <span>{{ explanationsOfSelectedAsset[currentExplanationTab].fromColumn }}</span>
+
+                        <strong>Target column</strong>
+                        <span>{{ explanationsOfSelectedAsset[currentExplanationTab].toColumn }}</span>
+
+                        <div>
+                          <strong class="explanation-large">Score</strong>
+                          <span>{{ Math.round(1000 * explanationsOfSelectedAsset[currentExplanationTab].score) / 1000  }}</span>
+                        </div>
+                      </div>
+
+                      <div class="discovery__card__bottom-btns">
+                        <button class="btn btn--std btn--outlineblue" @click="navigateToAsset(selectedAssetId)">view asset</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div
@@ -66,10 +99,8 @@
                   <div class="discovery__child discovery__card__outter" v-for="asset in discoveryAssets" :key="asset.id">
                     <div
                       class="discovery__child discovery__card"
-                      :class="{'discovery__card--selected': hoveredAssetId === asset.id}"
-                      @click="navigateToClickedAsset(asset.id)"
-                      @mouseover="hoveredAssetId = asset.id"
-                      @mouseleave="hoveredAssetId = ''"
+                      :class="{'discovery__card--selected': selectedAssetId === asset.id}"
+                      @click="selectAsset(asset.id)"
                     >
                       <div class="discovery__card__top">
                         <span>{{ formatFirstLetterUpperCase(asset.type) }}</span>
@@ -107,6 +138,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import DiscoveryApi from '@/service/discovery';
 import CatalogueApi from '@/service/catalogue';
 import { DiscoveryCatalogueItem, CatalogueItem } from '@/model/catalogue';
+import { DiscoveryResult } from '@/model/discovery';
 // import { EnumAssetType } from '@/model/enum';
 // import { EnumPricingModel } from '@/model/pricing-model';
 import getPriceOrMinimumPrice from '@/helper/cards';
@@ -121,9 +153,20 @@ export default class SatelliteImagesExplorer extends Vue {
 
   isDiscoveryLoading = false;
 
+  discoveryResult: DiscoveryResult | null = null;
+
   discoveryAssets: DiscoveryCatalogueItem[] | null = null;
 
-  hoveredAssetId = '';
+  selectedAssetId = '';
+
+  explanationsOfSelectedAsset: {
+    fromColumn: string,
+    toColumn: string,
+    score: number,
+    text: string,
+  }[] = [];
+
+  currentExplanationTab = 0;
 
   dividerMarginTop = 0;
 
@@ -138,92 +181,72 @@ export default class SatelliteImagesExplorer extends Vue {
   }
 
   showDiscovery(): void {
-    this.isDiscoveryLoading = true;
+    try {
+      this.isDiscoveryLoading = true;
 
-    this.discoveryApi.find(this.asset.id).then((response) => {
-      if (!response.result) {
-        this.discoveryAssets = [];
-        return;
-      }
+      this.discoveryApi.find(this.asset.id).then((response) => {
+        this.discoveryResult = response.result;
 
-      let assets: string[] = [];
-      response.result.joinableTables.forEach((joinableTable) => {
-        joinableTable.matches.forEach((match) => {
-          const { from } = match.keys;
-          const fromName = from.split('/')[0];
+        if (!response.result) {
+          this.discoveryAssets = [];
+          return;
+        }
 
-          const { to } = match.keys;
-          const toName = to.split('/')[0];
+        const assets = response.result.joinableTables
+          .map((x) => x.tablePath.split('/')[0]);
 
-          if (!assets.includes(fromName)) assets.push(fromName);
-          if (!assets.includes(toName)) assets.push(toName);
+        // let assets: string[] = [];
+        // response.result.joinableTables.forEach((joinableTable) => {
+        //   joinableTable.matches.forEach((match) => {
+        //     const { from } = match.keys;
+        //     const fromName = from.split('/')[0];
+
+        //     const { to } = match.keys;
+        //     const toName = to.split('/')[0];
+
+        //     if (!assets.includes(fromName)) assets.push(fromName);
+        //     if (!assets.includes(toName)) assets.push(toName);
+        //   });
+        // });
+
+        // assets = assets.filter((x) => x !== this.asset.id);
+
+        const findAssetPromises = assets.map((x) => this.catalogueApi.findOneDiscoveryAsset(x));
+
+        Promise.all(findAssetPromises).then((responses) => {
+          this.discoveryAssets = responses
+            .filter((x) => x.success)
+            .map((x) => x.result);
+
+          this.computeDividerMargins();
+          this.isDiscoveryLoading = false;
         });
       });
-
-      assets = assets.filter((x) => x !== this.asset.id);
-
-      const findAssetPromises = assets.map((x) => this.catalogueApi.findOneDiscoveryAsset(x));
-
-      Promise.all(findAssetPromises).then((responses) => {
-        this.discoveryAssets = responses
-          .filter((x) => x.success)
-          .map((x) => x.result);
-
-        /* DUMMY */
-        // this.discoveryAssets = [
-        //   {
-        //     title: 'My Dummy Asset',
-        //     publisherId: '123',
-        //     serviceType: null,
-        //     type: EnumAssetType.VECTOR,
-        //     pricingModels: [
-        //       {
-        //         key: '123',
-        //         type: EnumPricingModel.FIXED,
-        //         totalPriceExcludingTax: 10,
-        //         yearsOfUpdates: 2,
-        //       } as any,
-        //     ],
-        //     id: '111111',
-        //     statistics: {
-        //       downloads: 2,
-        //       sales: 3,
-        //       rating: 4,
-        //     },
-        //     version: '1.1',
-        //   },
-        //   {
-        //     title: 'My Dummy Assettt asdasdsa fska fkashfkj ashkjf hsakjfaskjhf skjahf ksahfkjsahfkj sahjkfs hakjfhakjfh skaj hfkjsag fhsaf sjagf ksafagks fahs fshak test',
-        //     publisherId: '123',
-        //     serviceType: null,
-        //     type: EnumAssetType.VECTOR,
-        //     pricingModels: [
-        //       {
-        //         key: '123',
-        //         type: EnumPricingModel.FIXED,
-        //         totalPriceExcludingTax: 10,
-        //         yearsOfUpdates: 2,
-        //       } as any,
-        //     ],
-        //     id: '123123',
-        //     statistics: {
-        //       downloads: 2,
-        //       sales: 3,
-        //       rating: 4,
-        //     },
-        //     version: '1.1',
-        //   },
-        // ];
-        /* */
-
-        this.computeDividerMargins();
-        this.isDiscoveryLoading = false;
-      });
-    });
+    } catch (err) {
+      this.discoveryAssets = [];
+      this.isDiscoveryLoading = false;
+    }
   }
 
-  navigateToClickedAsset(id: string): void {
-    this.$router.push(`/catalogue/${id}`);
+  selectAsset(assetId: string): void {
+    this.currentExplanationTab = 0;
+    this.selectedAssetId = assetId;
+
+    if (!this.discoveryResult) return;
+    // eslint-disable-next-line
+    this.explanationsOfSelectedAsset = this.discoveryResult.joinableTables
+      .find((x) => x.tablePath.startsWith(this.selectedAssetId))!
+      .matches
+      .map((x) => ({
+        fromColumn: x.keys.from,
+        toColumn: x.keys.to,
+        score: x.related.coma,
+        text: x.explanation,
+      }));
+  }
+
+  navigateToAsset(assetId: string): void {
+    this.$router.push(`/catalogue/${assetId}`);
   }
 
   computeDividerMargins(): void {
@@ -365,6 +388,40 @@ export default class SatelliteImagesExplorer extends Vue {
         &__bottom {
           display: flex;
           justify-content: space-between;
+        }
+
+        &__upper-btns {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 1em;
+
+          span {
+            cursor: pointer;
+          }
+        }
+
+        &__bottom-btns {
+          display: flex;
+          justify-content: center;
+        }
+
+        &__explanation {
+          display: flex;
+          flex-direction: column;
+          font-size: 0.8em;
+
+          span {
+            margin-bottom: 1em;
+            word-break: break-all;
+          }
+
+          div:last-child {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            font-size: 1.2rem !important;
+          }
         }
       }
     }

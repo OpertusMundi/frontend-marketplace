@@ -13,6 +13,7 @@ interface DiscoveryResult {
   joinableTables: {
     matches: Match[],
     tableName: string,
+    tablePath: string,
   }[],
 }
 
