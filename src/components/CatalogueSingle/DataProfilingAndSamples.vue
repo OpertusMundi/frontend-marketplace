@@ -1219,6 +1219,7 @@ export default class DataProfilingAndSamples extends Vue {
       // TODO: handle multiple resources
       resourceKey: this.metadata.key,
       visibility: fieldsToHide,
+      samples: this.samples,
     };
     this.draftAssetApi.updateDraftMetadata(key, visibility).then((hideFieldResponse) => {
       console.log('hfr', hideFieldResponse);
@@ -1226,22 +1227,6 @@ export default class DataProfilingAndSamples extends Vue {
       store.commit('setLoading', false);
 
       this.updateMaps();
-      // this.$nextTick(() => {
-      //   ['mapConfigMbr', 'mapConfigConvexHull', 'mapConfigHeatmap', 'mapConfigClusters'].forEach((x) => {
-      //     try {
-      //       (this as any).$refs[x].mapObject.invalidateSize();
-      //       this.setMinMaxZoomLevels();
-      //     } catch (err) {
-      //       console.log('err');
-      //     }
-      //   });
-      // });
-      // this.$nextTick(() => {
-      //   (this as any).$refs.mapConfigMbr.mapObject.invalidateSize();
-      //   (this as any).$refs.mapConfigConvexHull.mapObject.invalidateSize();
-      //   (this as any).$refs.mapConfigHeatmap.mapObject.invalidateSize();
-      //   (this as any).$refs.mapConfigClusters.mapObject.invalidateSize();
-      // });
     });
   }
 
@@ -1283,6 +1268,7 @@ export default class DataProfilingAndSamples extends Vue {
     const samples: CatalogueItemMetadataCommand = {
       resourceKey: this.metadata.key,
       samples: samplesData,
+      visibility: this.hiddenMetadata,
     };
     this.draftAssetApi.updateDraftMetadata(key, samples).then((updateSamplesResponse) => {
       if (updateSamplesResponse.data.success) {
