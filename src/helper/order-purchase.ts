@@ -13,7 +13,8 @@ const getOrderSteps = (order: ConsumerOrder | ProviderOrder): { status: EnumOrde
       ];
       break;
     }
-    case EnumDeliveryMethod.PHYSICAL_PROVIDER: {
+    case EnumDeliveryMethod.PHYSICAL_PROVIDER:
+    case EnumDeliveryMethod.DIGITAL_PROVIDER: {
       steps = [
         { status: EnumOrderStatus.CREATED, label: 'Purchase requested' },
         { status: EnumOrderStatus.CHARGED, label: 'PayIn created' },

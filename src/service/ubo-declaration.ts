@@ -69,7 +69,7 @@ export default class UboDeclarationApi extends Api {
   }
 
   public async addUbo(uboDeclarationId: string, command: UboCommand): Promise<ServerResponse<Ubo>> {
-    const url = `/action/ubo-declarations/${uboDeclarationId}/ubos`;
+    const url = `/action/ubo-declarations/${uboDeclarationId}/ubos?type=PROVIDER`;
 
     return this.post<UboCommand, ServerResponse<Ubo>>(url, command).then((response: AxiosServerResponse<Ubo>) => {
       const { data } = response;
