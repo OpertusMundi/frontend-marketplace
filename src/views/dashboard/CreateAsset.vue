@@ -1219,6 +1219,10 @@ export default class CreateAsset extends Vue {
         resources: draftAsset.command.resources,
         additionalResources: draftAsset.command.additionalResources,
       };
+
+      // eslint-disable-next-line
+      if (this.asset.type === EnumAssetType.SERVICE) delete this.asset['deliveryMethodOptions'];
+
       await this.submitAsset(draftAsset.key);
     } catch (err) {
       console.error((err as any).message);
