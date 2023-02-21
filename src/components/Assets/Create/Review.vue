@@ -14,7 +14,7 @@
                 <ul>
                   <li>
                     <strong>{{ asset.spatialDataServiceType ? 'Published Asset type:' : 'Type:' }}</strong
-                    >{{ asset.type === 'BUNDLE' ? 'COLLECTION' : asset.type }}
+                    >{{ asset.type === 'BUNDLE' ? 'COLLECTION' : apiCreationType ? 'API' : asset.type }}
                   </li>
                   <li v-if="asset.spatialDataServiceType"><strong>Service type:</strong>{{ asset.spatialDataServiceType }}</li>
                 </ul>
@@ -53,7 +53,40 @@
                 <a href="#" @click.prevent="goToStep(2)">EDIT</a>
               </div>
               <div class="dashboard__form__review__item__body">
-                <ul>
+                <ul v-if="apiCreationType && apiSourceAsset">
+                  <li v-if="apiSourceAsset.title"><strong>Asset title:</strong>{{ apiSourceAsset.title }}</li>
+                  <li v-if="apiSourceAsset.version"><strong>Version:</strong>{{ apiSourceAsset.version }}</li>
+                  <li v-if="apiSourceAsset.format"><strong>Format:</strong>{{ apiSourceAsset.format }}</li>
+                  <li v-if="apiSourceAsset.abstract || apiSourceAsset.abstractText"><strong>Asset short description:</strong>{{ apiSourceAsset.abstract || apiSourceAsset.abstractText }}</li>
+                  <li v-if="apiSourceAsset.language"><strong>Language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === apiSourceAsset.language).name || '' }}</li>
+                  <!-- <li v-if="asset.keywords && asset.keywords.length"><strong>Keywords:</strong>{{ asset.keywords.map(x => x.keyword).join(', ') }}</li> -->
+                  <li class="d-flex" v-if="apiSourceAsset.keywords && apiSourceAsset.keywords.length"><strong>Keywords:</strong><div class="d-flex flex-column"><span v-for="(keyword, i) in apiSourceAsset.keywords.map(x => x.keyword)" :key="i">{{ keyword }}</span></div></li>
+                  <li class="d-flex" v-if="apiSourceAsset.topicCategory && apiSourceAsset.topicCategory.length"><strong>Topic:</strong><div class="d-flex flex-column"><span v-for="(topic, i) in apiSourceAsset.topicCategory" :key="i">{{ topic }}</span></div></li>
+                  <li class="d-flex" v-if="apiSourceAsset.suitableFor && apiSourceAsset.suitableFor.length"><strong>Suitable for:</strong><div class="d-flex flex-column"><span v-for="(suitable, i) in apiSourceAsset.suitableFor" :key="i">{{ suitable }}</span></div></li>
+                  <li v-if="apiSourceAsset.referenceSystem"><strong>Reference system:</strong>{{ referenceSystemTitle }}</li>
+                  <li class="d-flex" v-if="apiSourceAsset.scales && apiSourceAsset.scales.length"><strong>Scales:</strong><div class="d-flex flex-column"><span v-for="(scale, i) in apiSourceAsset.scales.map(x => x.description)" :key="i">{{ scale }}</span></div></li>
+                  <li v-if="apiSourceAsset.dateStart"><strong>Date start:</strong>{{ apiSourceAsset.dateStart }}</li>
+                  <li v-if="apiSourceAsset.dateEnd"><strong>Date end:</strong>{{ apiSourceAsset.dateEnd }}</li>
+                  <li v-if="apiSourceAsset.creationDate"><strong>Creation date:</strong>{{ apiSourceAsset.creationDate }}</li>
+                  <li v-if="apiSourceAsset.publicationDate"><strong>Publication date:</strong>{{ apiSourceAsset.publicationDate }}</li>
+                  <li v-if="apiSourceAsset.revisionDate"><strong>Revision date:</strong>{{ apiSourceAsset.revisionDate }}</li>
+                  <li class="d-flex" v-for="(responsibleParty, i) in apiSourceAsset.responsibleParty" :key="i">
+                    <!-- <strong>Responsible party ({{ responsibleParty.role }})</strong>{{ `${responsibleParty.name}, ${responsibleParty.organizationName}${ responsibleParty.email ? ', ' + responsibleParty.email : '' }${ responsibleParty.address ? ', ' + responsibleParty.address : '' }${ responsibleParty.phone ? ', ' + responsibleParty.phone : '' }${responsibleParty.serviceHours ? ', ' + responsibleParty.serviceHours : ''}` }} -->
+                    <strong>Responsible party ({{ responsibleParty.role }})</strong>
+                    <div class="d-flex flex-column" style="max-width: 50%">
+                      <span v-if="responsibleParty.name">{{ responsibleParty.name }}</span>
+                      <span v-if="responsibleParty.organizationName">{{ responsibleParty.organizationName }}</span>
+                      <span v-if="responsibleParty.email">{{ responsibleParty.email }}</span>
+                      <span v-if="responsibleParty.address">{{ responsibleParty.address }}</span>
+                      <span v-if="responsibleParty.phone">{{ responsibleParty.phone }}</span>
+                      <span v-if="responsibleParty.serviceHours">{{ responsibleParty.serviceHours }}</span>
+                    </div>
+                  </li>
+                  <li v-if="apiSourceAsset.metadataLanguage"><strong>Metadata language:</strong>{{ $store.getters.getConfig.configuration.europeLanguages.find((x) => x.code === apiSourceAsset.metadataLanguage).name || '' }}</li>
+                  <li v-if="apiSourceAsset.metadataDate"><strong>Metadata date:</strong>{{ apiSourceAsset.metadataDate }}</li>
+                </ul>
+
+                <ul v-else>
                   <li v-if="asset.title"><strong>Asset title:</strong>{{ asset.title }}</li>
                   <li v-if="asset.version"><strong>Version:</strong>{{ asset.version }}</li>
                   <li v-if="asset.spatialDataServiceType || asset.format"><strong>Format:</strong>{{ asset.spatialDataServiceType || asset.format }}</li>
@@ -73,7 +106,7 @@
                   <li class="d-flex" v-for="(responsibleParty, i) in asset.responsibleParty" :key="i">
                     <!-- <strong>Responsible party ({{ responsibleParty.role }})</strong>{{ `${responsibleParty.name}, ${responsibleParty.organizationName}${ responsibleParty.email ? ', ' + responsibleParty.email : '' }${ responsibleParty.address ? ', ' + responsibleParty.address : '' }${ responsibleParty.phone ? ', ' + responsibleParty.phone : '' }${responsibleParty.serviceHours ? ', ' + responsibleParty.serviceHours : ''}` }} -->
                     <strong>Responsible party ({{ responsibleParty.role }})</strong>
-                    <div class="d-flex flex-column">
+                    <div class="d-flex flex-column" style="max-width: 50%">
                       <span v-if="responsibleParty.name">{{ responsibleParty.name }}</span>
                       <span v-if="responsibleParty.organizationName">{{ responsibleParty.organizationName }}</span>
                       <span v-if="responsibleParty.email">{{ responsibleParty.email }}</span>
@@ -234,15 +267,18 @@
                 <ul>
                   <li><span><strong>Means of delivery:</strong>
                     {{
-                      asset.deliveryMethod === 'DIGITAL_PLATFORM'
+                      apiCreationType
                         ? 'Through the platform'
-                        : asset.deliveryMethod === 'DIGITAL_PROVIDER'
-                          ? 'Through digital provider'
-                          : asset.deliveryMethod === 'PHYSICAL_PROVIDER'
-                            ? 'Through physical provider' : ''
+                        : asset.deliveryMethod === 'DIGITAL_PLATFORM'
+                          ? 'Through the platform'
+                          : asset.deliveryMethod === 'DIGITAL_PROVIDER'
+                            ? 'Through digital provider'
+                            : asset.deliveryMethod === 'PHYSICAL_PROVIDER'
+                              ? 'Through physical provider'
+                              : ''
                     }}</span>
                   </li>
-                  <li><span><strong>Access to asset: </strong>{{ accessToFileType }}</span></li>
+                  <li v-if="!apiCreationType"><span><strong>Access to asset: </strong>{{ accessToFileType }}</span></li>
                 </ul>
               </div>
             </div>
@@ -336,6 +372,10 @@ export default class Review extends Vue {
   @Prop({ required: true }) private accessToFileType!: string;
 
   @Prop({ required: false }) private errors: any;
+
+  @Prop({ required: false }) private apiCreationType?: 'PUBLISHED_ASSET' | 'TOPIO_DRIVE';
+
+  @Prop({ required: false }) private apiSourceAsset?: CatalogueItem;
 
   contractApi: ContractApi;
 
